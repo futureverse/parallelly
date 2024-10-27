@@ -1,93 +1,33 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://parallelly.futureverse.org/404.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/CONDUCT.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/CONTRIBUTING.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/index.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/as.cluster.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/autoStopCluster.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/availableConnections.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/availableCores.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/availableWorkers.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/cloneNode.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/cpuLoad.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/find_rshcmd.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/freeCores.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/freePort.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/isConnectionValid.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/isForkedChild.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/isForkedNode.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/isLocalhostNode.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/isNodeAlive.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/killNode.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/makeClusterMPI.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/makeClusterPSOCK.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/makeClusterSequential.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/parallelly.options.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/pid_exists.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/serializedSize.html</loc>
-  </url>
-  <url>
-    <loc>https://parallelly.futureverse.org/reference/supportsMulticore.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://parallelly.futureverse.org/404.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/CONDUCT.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/CONTRIBUTING.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/authors.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/index.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/news/index.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/as.cluster.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/autoStopCluster.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/availableConnections.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/availableCores.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/availableWorkers.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/cloneNode.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/cpuLoad.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/find_rshcmd.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/freeCores.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/freePort.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/index.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/isConnectionValid.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/isForkedChild.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/isForkedNode.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/isLocalhostNode.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/isNodeAlive.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/killNode.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/makeClusterMPI.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/makeClusterPSOCK.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/makeClusterSequential.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/parallelly.options.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/pid_exists.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/serializedSize.html</loc></url>
+<url><loc>https://parallelly.futureverse.org/reference/supportsMulticore.html</loc></url>
 </urlset>
+
