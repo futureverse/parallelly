@@ -122,7 +122,8 @@ To install the pre-release version that is available in Git branch `develop` on 
 ```r
 remotes::install_github("HenrikBengtsson/parallelly", ref="develop")
 ```
-This will install the package from source.  
+This will install the package from source.  Because of this and because this package also compiles native code, Windows users need to have [Rtools](https://cran.r-project.org/bin/windows/Rtools/) installed and macOS users need to have [Xcode](https://developer.apple.com/xcode/) installed.
+
 
 <!-- pkgdown-drop-below -->
 
