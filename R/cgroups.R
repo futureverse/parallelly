@@ -1,6 +1,26 @@
 #-------------------------------------------------------
 # Unix control groups ("cgroups")
 #-------------------------------------------------------
+#  @return An character string to an existing cgroups root folder.
+#  If no such folder could be found, NA_character_ is returned.
+# 
+#' @importFrom utils file_test
+getCGroupsRoot <- local({
+  .cache <- NULL
+  
+  function() {
+    path <- .cache
+    if (!is.null(path)) return(path)
+    
+    path <- "/sys/fs/cgroup"
+    if (!file_test("-d", path)) path <- NA_character_
+    .cache <<- path
+
+    path
+  }
+})
+
+
 #  @return An named character vector of zero or more cgroups parameters.
 #  If cgroups is not used, character(0L).
 # 
@@ -47,26 +67,6 @@ getCGroups <- local({
     }
 
     .cache
-  }
-})
-
-
-#  @return An character string to an existing cgroups root folder.
-#  If no such folder could be found, NA_character_ is returned.
-# 
-#' @importFrom utils file_test
-getCGroupsRoot <- local({
-  .cache <- NULL
-  
-  function() {
-    path <- .cache
-    if (!is.null(path)) return(path)
-    
-    path <- "/sys/fs/cgroup"
-    if (!file_test("-d", path)) path <- NA_character_
-    .cache <<- path
-
-    path
   }
 })
 
