@@ -370,11 +370,11 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       n <- detectCores(logical = logical)
     } else if (method == "cgroups.cpuset") {
       ## Number of cores according to Unix Cgroups CPU set
-      n <- length(getCGroupsCpuSet())
+      n <- length(getCGroups1CpuSet())
       if (n == 0L) n <- NA_integer_
     } else if (method == "cgroups.cpuquota") {
       ## Number of cores according to Unix Cgroups CPU quota
-      n <- getCGroupsCpuQuota()
+      n <- getCGroups1CpuQuota()
       if (!is.na(n)) {
         n <- as.integer(floor(n + 0.5))
 	if (n == 0L) n <- 1L  ## If CPU quota < 0.5, round up to one CPU
