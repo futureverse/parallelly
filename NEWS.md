@@ -1,6 +1,8 @@
 # Version (development version)
 
- * ...
+## Miscellaneous
+
+ * Improved how CGroups v1 and CGroups v2 settings are queried.
 
 
 # Version 1.38.0 [2024-07-27]
