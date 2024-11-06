@@ -57,12 +57,12 @@ getCGroupsRoot <- local({
 #  @param pid (integer) The ID of an existing process.
 #
 #  @return A data frame with three columns:
-#  * `hierarchy_id` (integer): 0 for CGroups v2.
-#  * `controller` (string): The controller name for CGroups v1,
-#    but empty for CGroups v2.
+#  * `hierarchy_id` (integer): 0 for cgroups v2.
+#  * `controller` (string): The controller name for cgroups v1,
+#    but empty for cgroups v2.
 #  * `path` (string): The path to the CGroup in the hierarchy
 #    that the process is part of.
-#  If CGroups is not used, the an empty data.frame is returned.
+#  If cgroups is not used, the an empty data.frame is returned.
 # 
 #' @importFrom utils file_test
 getCGroups <- local({
@@ -75,17 +75,17 @@ getCGroups <- local({
     data <- .cache[[pid_str]]
     if (!is.null(data)) return(data)
 
-    ## Get CGroups
+    ## Get cgroups
     file <- file.path("/proc", pid, "cgroup")
 
-    ## CGroups is not set?
+    ## cgroups is not set?
     if (!file_test("-f", file)) {
       data <- data.frame(hierarchy_id = integer(0L), controller = character(0L), path = character(0L))
       .cache[[pid_str]] <- data
       return(data)
     }
 
-    ## Parse CGroups lines <hierarchy ID>:<controller>:<path>
+    ## Parse cgroups lines <hierarchy ID>:<controller>:<path>
     bfr <- readLines(file, warn = FALSE)
     pattern <- "^([[:digit:]]+):([^:]*):(.*)"
     bfr <- grep(pattern, bfr, value = TRUE)
@@ -120,13 +120,13 @@ getCGroups <- local({
 })
 
 
-#  Get the path to a specific CGroups controller
+#  Get the path to a specific cgroups controller
 #
-#  @param controller (character) A CGroups v1 set or `""` for CGroups v2.
+#  @param controller (character) A cgroups v1 set or `""` for cgroups v2.
 # 
 #  @param pid (integer) The ID of an existing process.
 #
-#  @return An character string to an existing CGroups folder.
+#  @return An character string to an existing cgroups folder.
 #  If no folder could be found, `NA_character_` is returned.
 # 
 #' @importFrom utils file_test
@@ -164,13 +164,13 @@ getCGroupsPath <- function(controller, pid = Sys.getpid()) {
 }
 
 
-#  Get all CGroups fields for a specific controller
+#  Get all cgroups fields for a specific controller
 #
-#  @param controller (character) A CGroups v1 set or `""` for CGroups v2.
+#  @param controller (character) A cgroups v1 set or `""` for cgroups v2.
 # 
 #  @param pid (integer) The ID of an existing process.
 #
-#  @return An character vector of CGroups fields.
+#  @return An character vector of cgroups fields.
 #  If no folder could be found, a`NA_character_` is returned.
 getCGroupsFields <- function(controller, pid = Sys.getpid()) {
   path <- getCGroupsPath(controller = controller, pid = pid)
@@ -188,9 +188,9 @@ getCGroups2Fields <- function(pid = Sys.getpid()) {
 }
 
 
-#  Get the value of specific CGroups controller and field
+#  Get the value of specific cgroups controller and field
 #
-#  @param controller (character) A CGroups v1 set or `""` for CGroups v2.
+#  @param controller (character) A cgroups v1 set, or `""` for cgroups v2.
 # 
 #  @param field (character) A cgroups field.
 # 
@@ -215,11 +215,11 @@ getCGroupsValue <- function(controller, field, pid = Sys.getpid()) {
 }
 
 
-#  Get the value of specific CGroups v1 field
+#  Get the value of specific cgroups v1 field
 #
-#  @param controller (character) A CGroups v1 set.
+#  @param controller (character) A cgroups v1 set.
 #
-#  @param field (character) A CGroups v1 field.
+#  @param field (character) A cgroups v1 field.
 # 
 #  @param pid (integer) The ID of an existing process.
 #
@@ -236,9 +236,9 @@ getCGroups1Value <- function(controller, field, pid = Sys.getpid()) {
 }
 
 
-#  Get the value of specific CGroups v2 field
+#  Get the value of specific cgroups v2 field
 #
-#  @param field (character) A CGroups v2 field.
+#  @param field (character) A cgroups v2 field.
 # 
 #  @param pid (integer) The ID of an existing process.
 #
@@ -265,14 +265,14 @@ getCGroups2Value <- function(field, pid = Sys.getpid()) {
 }
 
 
-#  Get CGroups version
+#  Get cgroups version
 #
 #  @param pid (integer) The ID of an existing process.
 #
 #  @return
-#  If the current process is under CGroups v1, then `1L` is returned.
-#  If it is under CGroups v2, then `2L` is returned.
-#  If not under CGroups control, then `-1L` is returned.
+#  If the current process is under cgroups v1, then `1L` is returned.
+#  If it is under cgroups v2, then `2L` is returned.
+#  If not under cgroups control, then `-1L` is returned.
 getCGroupsVersion <- function(pid = Sys.getpid()) {
   cgroups <- getCGroups(pid = pid)
   if (nrow(cgroups) == 0) return(-1L)
@@ -285,7 +285,7 @@ getCGroupsVersion <- function(pid = Sys.getpid()) {
 # --------------------------------------------------------------------------
 # CGroups v1 CPU settings
 # --------------------------------------------------------------------------
-#  Get CGroups v1 'cpuset.cpus'
+#  Get cgroups v1 'cpuset.cpus'
 #
 #  @return An integer vector of CPU indices. If cgroups v1 field
 #  `cpuset.cpus` could not be queried, integer(0) is returned.
@@ -484,7 +484,7 @@ getCGroups2CpuMax <- function(pid = Sys.getpid()) {
   if (!is.na(value)) {
     max_cores <- parallel::detectCores(logical = TRUE)
     if (!is.finite(value) || value <= 0.0 || value > max_cores) {
-      warning(sprintf("[INTERNAL]: Will ignore the CGroups v2 CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
+      warning(sprintf("[INTERNAL]: Will ignore the cgroups v2 CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
       value <- NA_real_
     }
   }

@@ -47,10 +47,10 @@
 #'    Query \code{\link[parallel]{detectCores}(logical = logical)}.
 #'
 #'  \item `"cgroups.cpuset"` -
-#'    On Unix, query control group (cgroup) value \code{cpuset.set}.
+#'    On Unix, query control group (cgroup v1) value \code{cpuset.set}.
 #'
 #'  \item `"cgroups.cpuquota"` -
-#'    On Unix, query control group (cgroup) value
+#'    On Unix, query control group (cgroup v1) value
 #'    \code{cpu.cfs_quota_us} / \code{cpu.cfs_period_us}.
 #'
 #'  \item `"cgroups2.cpu.max"` -
@@ -369,18 +369,18 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       ## Number of cores available according to parallel::detectCores()
       n <- detectCores(logical = logical)
     } else if (method == "cgroups.cpuset") {
-      ## Number of cores according to Unix Cgroups CPU set
+      ## Number of cores according to Unix cgroups v1 CPU set
       n <- length(getCGroups1CpuSet())
       if (n == 0L) n <- NA_integer_
     } else if (method == "cgroups.cpuquota") {
-      ## Number of cores according to Unix Cgroups CPU quota
+      ## Number of cores according to Unix cgroups v1 CPU quota
       n <- getCGroups1CpuQuota()
       if (!is.na(n)) {
         n <- as.integer(floor(n + 0.5))
 	if (n == 0L) n <- 1L  ## If CPU quota < 0.5, round up to one CPU
       }
     } else if (method == "cgroups2.cpu.max") {
-      ## Number of cores according to Unix Cgroups v2 CPU max quota
+      ## Number of cores according to Unix cgroups v2 CPU max quota
       n <- getCGroups2CpuMax()
       if (!is.na(n)) {
         n <- as.integer(floor(n + 0.5))
@@ -551,7 +551,7 @@ getNproc <- function(ignore = c("OMP_NUM_THREADS", "OMP_THREAD_LIMIT")) {
 #' running on the same machine.  This also a problem on systems where R
 #' gets allotted a specific number of CPU cores, which is the case on
 #' high-performance compute (HPC) clusters, but also on other shared systems
-#' that limits user processes via Linux Control Groups (CGroups).
+#' that limits user processes via Linux Control Groups (cgroups).
 #' For example, a free account on Posit Cloud is limited to a single
 #' CPU core. Parallelizing with 32 workers when only having access to
 #' a single core, will result in 3200% overuse and 32 concurrent R
