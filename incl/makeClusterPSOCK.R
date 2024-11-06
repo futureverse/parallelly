@@ -280,7 +280,8 @@ cl <- makeClusterPSOCK(1L,
     "-p", "MemoryMax=50M", "-p", "MemorySwapMax=50M",
     "*"
   ),
-quiet = TRUE, verbose = TRUE)
+  dryrun = TRUE, quiet = TRUE
+)
 
 
 ## EXAMPLE: Two workers running in Docker on the local machine
