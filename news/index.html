@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.38.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.38.0-9002</span>
       </span>
     </div>
 
@@ -126,12 +126,23 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> recognizes also CGroups v2 <code>cpu.max</code> CPU restrictions.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="miscellaneous-development-version">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous-development-version"></a></h3>
+<ul><li>Improved how CGroups v1 and CGroups v2 settings are queried.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="1.38.0" id="version-1380">Version 1.38.0<small>2024-07-27</small><a class="anchor" aria-label="anchor" href="#version-1380"></a></h2>
 <div class="section level3">
 <h3 id="new-features-1-38-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-38-0"></a></h3>
 <ul><li><p>Now argument <code>rshcmd</code> of <code><a href="../reference/makeClusterPSOCK.html">makeNodePSOCK()</a></code> can be a function. It must accept at least two arguments named <code>rshopts</code> and <code>worker</code>. The <code>rshopts</code> argument is a character vector of length zero or more. The <code>worker</code> argument is a string hostname. The function must return a single string.</p></li>
 <li><p>Now <code><a href="../reference/makeClusterPSOCK.html">makeNodePSOCK()</a></code> accepts <code>rscript_sh = "none"</code>, which skips quoting the Rscript call.</p></li>
-<li><p>Now <code><a href="../reference/makeClusterPSOCK.html">makeNodePSOCK()</a></code> accepts <code>rscript_sh</code> of length one or two. If <code>length(rscript_sh) == 2</code>, then <code>rscript_sh[1]</code> is for the inner and <code>rscript_sh[2]</code> is for the outer shell quoting of the Rscript call. More precisely, <code>rscript_sh[1]</code> is for Rscript arguments that need shell quoting (e.g. <code>Rscript -e "&lt;expr&gt;"</code>), and <code>rscript_sh[2]</code> is for the whole <code>Rscript ...</code> call.}</p></li>
+<li><p>Now <code><a href="../reference/makeClusterPSOCK.html">makeNodePSOCK()</a></code> accepts <code>rscript_sh</code> of length one or two. If <code>length(rscript_sh) == 2</code>, then <code>rscript_sh[1]</code> is for the inner and <code>rscript_sh[2]</code> is for the outer shell quoting of the Rscript call. More precisely, <code>rscript_sh[1]</code> is for Rscript arguments that need shell quoting (e.g. <code>Rscript -e "&lt;expr&gt;"</code>), and <code>rscript_sh[2]</code> is for the whole <code>Rscript ...</code> call.</p></li>
 <li><p>Add <code><a href="../reference/makeClusterSequential.html">makeClusterSequential()</a></code> available for R (&gt;= 4.4.0).</p></li>
 <li><p>Starting with R 4.5.0 (currently R-devel), one can use <code>parallel::makeCluster(n, type = parallelly::PSOCK)</code> as an alternative to <code>parallelly::makeClusterPSOCK(n)</code>. Similarly, <code>type    = parallelly::MPI</code> creates a cluster using <code><a href="../reference/makeClusterMPI.html">parallelly::makeClusterMPI()</a></code>, and <code>type = parallelly::SEQ</code> creates a cluster using <code><a href="../reference/makeClusterSequential.html">parallelly::makeClusterSequential()</a></code>.</p></li>
 <li><p>Add <code><a href="../reference/serializedSize.html">serializedSize()</a></code> for calculating the size of an object by counting the number of bytes required to serialize it.</p></li>
