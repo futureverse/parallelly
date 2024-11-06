@@ -269,7 +269,7 @@ negative effect on the current R process, but also on all other processes
 running on the same machine.  This also a problem on systems where R
 gets allotted a specific number of CPU cores, which is the case on
 high-performance compute (HPC) clusters, but also on other shared systems
-that limits user processes via Linux Control Groups (CGroups).
+that limits user processes via Linux Control Groups (cgroups).
 For example, a free account on Posit Cloud is limited to a single
 CPU core. Parallelizing with 32 workers when only having access to
 a single core, will result in 3200\% overuse and 32 concurrent R
@@ -871,6 +871,22 @@ cl <- makeClusterPSOCK(
 ## Section 5. Parallel workers running locally inside virtual
 ## machines, Linux containers, etc.
 ## ---------------------------------------------------------------
+## EXAMPLE: Two workers limited to 100\% CPU process and 50 MiB of
+## memory on Linux. The 100\% CPU limit constrain each worker to
+## use at most one CPU worth of processing preventing them from
+## overusing the machine, e.g. through unintended nested
+## parallelization. The 50 MiB memory limit is strict - if a
+## worker use more than this, the operating system will terminate
+## the worker instantly.
+cl <- makeClusterPSOCK(1L,
+  rscript = c("systemd-run", "--user", "--scope",
+    "-p", "CPUWeight=100",
+    "-p", "MemoryMax=50M", "-p", "MemorySwapMax=50M",
+    "*"
+  ),
+quiet = TRUE, verbose = TRUE)
+
+
 ## EXAMPLE: Two workers running in Docker on the local machine
 ## Setup of 2 Docker workers running rocker/r-parallel
 ##
@@ -935,12 +951,12 @@ cl <- makeClusterPSOCK(
 ## EXAMPLE: One worker running in Wine for Linux on the local machine
 ## To install R for MS Windows in Wine, do something like:
 ##   winecfg  # In GUI, set 'Windows version' to 'Windows 10'
-##   wget https://cran.r-project.org/bin/windows/base/R-4.4.1-win.exe
-##   wine R-4.4.1-win.exe /SILENT
+##   wget https://cran.r-project.org/bin/windows/base/R-4.4.2-win.exe
+##   wine R-4.4.2-win.exe /SILENT
 ## Prevent packages from being installed to R's system library:
-##   chmod ugo-w "$HOME/.wine/drive_c/Program Files/R/R-4.4.1/library/"
+##   chmod ugo-w "$HOME/.wine/drive_c/Program Files/R/R-4.4.2/library/"
 ## Verify it works:
-##   wine "C:/Program Files/R/R-4.4.1/bin/x64/Rscript.exe" --version
+##   wine "C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe" --version
 ##
 ## The parallel worker is launched as:
 ## R_DEFAULT_PACKAGES=... WINEDEBUG=fixme-all R_LIBS_SITE= R_LIBS_USER= 'wine' ...
@@ -951,7 +967,7 @@ cl <- makeClusterPSOCK(1L,
     ## Don't pass LC_* and R_LIBS* environments from host to Wine
     sprintf("\%s=", grep("^(LC_|R_LIBS)", names(Sys.getenv()), value = TRUE)),
     "wine",
-    "C:/Program Files/R/R-4.4.1/bin/x64/Rscript.exe"
+    "C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe"
   ),
   dryrun = TRUE, quiet = TRUE
 )

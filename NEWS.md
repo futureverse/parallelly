@@ -1,5 +1,10 @@
 # Version (development version)
 
+## Documentation
+
+ * Add example to `help("makeClusterPSOCK")` on how to use
+   `systemd-run` to limit workers' CPU quota and memory allowances.
+
 ## Miscellaneous
 
  * Improved how cgroups v1 and v2 settings are queried.
