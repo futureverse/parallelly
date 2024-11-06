@@ -268,15 +268,16 @@ cl <- makeClusterPSOCK(
 ## machines, Linux containers, etc.
 ## ---------------------------------------------------------------
 ## EXAMPLE: Two workers limited to 100% CPU process and 50 MiB of
-## memory on Linux. The 100% CPU limit constrain each worker to
-## use at most one CPU worth of processing preventing them from
-## overusing the machine, e.g. through unintended nested
-## parallelization. The 50 MiB memory limit is strict - if a
-## worker use more than this, the operating system will terminate
-## the worker instantly.
-cl <- makeClusterPSOCK(1L,
+## memory using Linux CGroups management. The 100% CPU quota limit
+## constrain each worker to use at most one CPU worth of
+## processing preventing them from overusing the machine, e.g.
+## through unintended nested parallelization. The 50 MiB memory
+## limit is strict - if a worker use more than this, the operating
+## system will terminate the worker instantly.
+## See 'man systemd.resource-control' for more details.
+cl <- makeClusterPSOCK(2L,
   rscript = c("systemd-run", "--user", "--scope",
-    "-p", "CPUWeight=100",
+    "-p", "CPUQuota=100%",
     "-p", "MemoryMax=50M", "-p", "MemorySwapMax=50M",
     "*"
   ),
