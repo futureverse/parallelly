@@ -1,5 +1,10 @@
 # Version (development version)
 
+## New Features
+
+ * Now `availableCores()` recognizes also CGroups v2 `cpu.max` CPU
+   restrictions.
+
 ## Miscellaneous
 
  * Improved how CGroups v1 and CGroups v2 settings are queried.
