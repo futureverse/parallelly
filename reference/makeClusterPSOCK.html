@@ -1042,15 +1042,16 @@ This was validated with R-devel revision 82991 (2022-10-02).</p>
 <span class="r-in"><span><span class="co">## machines, Linux containers, etc.</span></span></span>
 <span class="r-in"><span><span class="co">## ---------------------------------------------------------------</span></span></span>
 <span class="r-in"><span><span class="co">## EXAMPLE: Two workers limited to 100% CPU process and 50 MiB of</span></span></span>
-<span class="r-in"><span><span class="co">## memory on Linux. The 100% CPU limit constrain each worker to</span></span></span>
-<span class="r-in"><span><span class="co">## use at most one CPU worth of processing preventing them from</span></span></span>
-<span class="r-in"><span><span class="co">## overusing the machine, e.g. through unintended nested</span></span></span>
-<span class="r-in"><span><span class="co">## parallelization. The 50 MiB memory limit is strict - if a</span></span></span>
-<span class="r-in"><span><span class="co">## worker use more than this, the operating system will terminate</span></span></span>
-<span class="r-in"><span><span class="co">## the worker instantly.</span></span></span>
-<span class="r-in"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">makeClusterPSOCK</span><span class="op">(</span><span class="fl">1L</span>,</span></span>
+<span class="r-in"><span><span class="co">## memory using Linux CGroups management. The 100% CPU quota limit</span></span></span>
+<span class="r-in"><span><span class="co">## constrain each worker to use at most one CPU worth of</span></span></span>
+<span class="r-in"><span><span class="co">## processing preventing them from overusing the machine, e.g.</span></span></span>
+<span class="r-in"><span><span class="co">## through unintended nested parallelization. The 50 MiB memory</span></span></span>
+<span class="r-in"><span><span class="co">## limit is strict - if a worker use more than this, the operating</span></span></span>
+<span class="r-in"><span><span class="co">## system will terminate the worker instantly.</span></span></span>
+<span class="r-in"><span><span class="co">## See 'man systemd.resource-control' for more details.</span></span></span>
+<span class="r-in"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">makeClusterPSOCK</span><span class="op">(</span><span class="fl">2L</span>,</span></span>
 <span class="r-in"><span>  rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"systemd-run"</span>, <span class="st">"--user"</span>, <span class="st">"--scope"</span>,</span></span>
-<span class="r-in"><span>    <span class="st">"-p"</span>, <span class="st">"CPUWeight=100"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"-p"</span>, <span class="st">"CPUQuota=100%"</span>,</span></span>
 <span class="r-in"><span>    <span class="st">"-p"</span>, <span class="st">"MemoryMax=50M"</span>, <span class="st">"-p"</span>, <span class="st">"MemorySwapMax=50M"</span>,</span></span>
 <span class="r-in"><span>    <span class="st">"*"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
