@@ -24,7 +24,7 @@ number of cores available is always at least one."><meta property="og:image" con
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.38.0-9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.38.0-9003</span>
       </span>
     </div>
 
@@ -209,9 +209,9 @@ Together with <code>na.rm = FALSE</code> missing values may also be returned.</p
 are supported:</p><ul><li><p><code>"system"</code> -
 Query <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a>(logical = logical)</code>.</p></li>
 <li><p><code>"cgroups.cpuset"</code> -
-On Unix, query control group (cgroup) value <code>cpuset.set</code>.</p></li>
+On Unix, query control group (cgroup v1) value <code>cpuset.set</code>.</p></li>
 <li><p><code>"cgroups.cpuquota"</code> -
-On Unix, query control group (cgroup) value
+On Unix, query control group (cgroup v1) value
 <code>cpu.cfs_quota_us</code> / <code>cpu.cfs_period_us</code>.</p></li>
 <li><p><code>"cgroups2.cpu.max"</code> -
 On Unix, query control group (cgroup v2) values <code>cpu.max</code>.</p></li>

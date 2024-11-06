@@ -31,7 +31,7 @@ background R workers, and how to connect to external machines."><meta property="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.38.0-9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.38.0-9003</span>
       </span>
     </div>
 
@@ -468,7 +468,7 @@ negative effect on the current R process, but also on all other processes
 running on the same machine.  This also a problem on systems where R
 gets allotted a specific number of CPU cores, which is the case on
 high-performance compute (HPC) clusters, but also on other shared systems
-that limits user processes via Linux Control Groups (CGroups).
+that limits user processes via Linux Control Groups (cgroups).
 For example, a free account on Posit Cloud is limited to a single
 CPU core. Parallelizing with 32 workers when only having access to
 a single core, will result in 3200% overuse and 32 concurrent R
@@ -1041,6 +1041,126 @@ This was validated with R-devel revision 82991 (2022-10-02).</p>
 <span class="r-in"><span><span class="co">## Section 5. Parallel workers running locally inside virtual</span></span></span>
 <span class="r-in"><span><span class="co">## machines, Linux containers, etc.</span></span></span>
 <span class="r-in"><span><span class="co">## ---------------------------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## EXAMPLE: Two workers limited to 100% CPU process and 50 MiB of</span></span></span>
+<span class="r-in"><span><span class="co">## memory on Linux. The 100% CPU limit constrain each worker to</span></span></span>
+<span class="r-in"><span><span class="co">## use at most one CPU worth of processing preventing them from</span></span></span>
+<span class="r-in"><span><span class="co">## overusing the machine, e.g. through unintended nested</span></span></span>
+<span class="r-in"><span><span class="co">## parallelization. The 50 MiB memory limit is strict - if a</span></span></span>
+<span class="r-in"><span><span class="co">## worker use more than this, the operating system will terminate</span></span></span>
+<span class="r-in"><span><span class="co">## the worker instantly.</span></span></span>
+<span class="r-in"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">makeClusterPSOCK</span><span class="op">(</span><span class="fl">1L</span>,</span></span>
+<span class="r-in"><span>  rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"systemd-run"</span>, <span class="st">"--user"</span>, <span class="st">"--scope"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"-p"</span>, <span class="st">"CPUWeight=100"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"-p"</span>, <span class="st">"MemoryMax=50M"</span>, <span class="st">"-p"</span>, <span class="st">"MemorySwapMax=50M"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"*"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>quiet <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.232] [local output] makeClusterPSOCK() ...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.237] [local output] Workers: [n = 1] ‘localhost’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.237] [local output] Base port: 11068</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.238] [local output] Getting setup options for 1 cluster nodes ...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.238] [local output]  - Node #1 of 1 ...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.239] [local output] localMachine=TRUE =&gt; revtunnel=FALSE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.241] Testing if worker's PID can be inferred: ‘'/usr/bin/systemd-run' '--user' '--scope' '-p' CPUWeight=100 '-p' MemoryMax=50M '-p' MemorySwapMax=50M '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' -e 'try(suppressWarnings(cat(Sys.getpid(),file="/tmp/henrik/RtmpQFAJnV/worker.rank=1.parallelly.parent=136951.216f749c262ef.pid")), silent = TRUE)' -e 'file.exists("/tmp/henrik/RtmpQFAJnV/worker.rank=1.parallelly.parent=136951.216f749c262ef.pid")'’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.665] - Possible to infer worker's PID: TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.666] [local output] Rscript port: 11068</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.666] [local output] Getting setup options for 1 cluster nodes ... done</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667] [local output]  - Parallel setup requested for some PSOCK nodes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667] [local output] Setting up PSOCK nodes in parallel</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667] List of 36</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ worker          : chr "localhost"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..- attr(*, "localhost")= logi TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ master          : chr "localhost"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ port            : int 11068</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ connectTimeout  : num 120</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ timeout         : num 2592000</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rscript         : chr "R_DEFAULT_PACKAGES=datasets,utils,grDevices,graphics,stats,methods '/usr/bin/systemd-run' '--user' '--scope' '-"| __truncated__</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ homogeneous     : logi TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rscript_args    : chr "-e 'try(suppressWarnings(cat(Sys.getpid(),file=\"/tmp/henrik/RtmpQFAJnV/worker.rank=1.parallelly.parent=136951."| __truncated__</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rscript_envs    : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rscript_libs    : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rscript_startup : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rscript_sh      : chr [1:2] "sh" "sh"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ default_packages: chr [1:6] "datasets" "utils" "grDevices" "graphics" ...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ methods         : logi TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ socketOptions   : chr "no-delay"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ useXDR          : logi FALSE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ outfile         : chr "/dev/null"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ renice          : int NA</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rshcmd          : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ user            : chr(0) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ revtunnel       : logi FALSE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rshlogfile      : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rshopts         : chr(0) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rank            : int 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ manual          : logi FALSE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ dryrun          : logi FALSE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ quiet           : logi TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ setup_strategy  : chr "parallel"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ local_cmd       : chr "R_DEFAULT_PACKAGES=datasets,utils,grDevices,graphics,stats,methods '/usr/bin/systemd-run' '--user' '--scope' '-"| __truncated__</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ pidfile         : chr "/tmp/henrik/RtmpQFAJnV/worker.rank=1.parallelly.parent=136951.216f749c262ef.pid"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rshcmd_label    : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ rsh_call        : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ cmd             : chr "R_DEFAULT_PACKAGES=datasets,utils,grDevices,graphics,stats,methods '/usr/bin/systemd-run' '--user' '--scope' '-"| __truncated__</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ localMachine    : logi TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ make_fcn        :function (worker = getOption2("parallelly.localhost.hostname", "localhost"), </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]     master = NULL, port, connectTimeout = getOption2("parallelly.makeNodePSOCK.connectTimeout", </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]         2 * 60), timeout = getOption2("parallelly.makeNodePSOCK.timeout", </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]         30 * 24 * 60 * 60), rscript = NULL, homogeneous = NULL, rscript_args = NULL, </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]     rscript_envs = NULL, rscript_libs = NULL, rscript_startup = NULL, rscript_sh = c("auto", </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]         "cmd", "sh", "none"), default_packages = c("datasets", "utils", </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]         "grDevices", "graphics", "stats", if (methods) "methods"), methods = TRUE, </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]     socketOptions = getOption2("parallelly.makeNodePSOCK.socketOptions", </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]         "no-delay"), useXDR = getOption2("parallelly.makeNodePSOCK.useXDR", </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]         FALSE), outfile = "/dev/null", renice = NA_integer_, rshcmd = getOption2("parallelly.makeNodePSOCK.rshcmd", </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]         NULL), user = NULL, revtunnel = NA, rshlogfile = NULL, rshopts = getOption2("parallelly.makeNodePSOCK.rshopts", </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]         NULL), rank = 1L, manual = FALSE, dryrun = FALSE, quiet = FALSE, </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]     setup_strategy = getOption2("parallelly.makeNodePSOCK.setup_strategy", </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]         "parallel"), action = c("launch", "options"), verbose = FALSE)  </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  $ arguments       :List of 28</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ worker          : chr "localhost"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ master          : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ port            : int 11068</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ connectTimeout  : num 120</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ timeout         : num 2592000</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rscript         : chr [1:10] "systemd-run" "--user" "--scope" "-p" ...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ homogeneous     : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rscript_args    : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rscript_envs    : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rscript_libs    : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rscript_startup : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rscript_sh      : chr "auto"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ default_packages: chr [1:6] "datasets" "utils" "grDevices" "graphics" ...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ methods         : logi TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ socketOptions   : chr "no-delay"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ useXDR          : logi FALSE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ outfile         : chr "/dev/null"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ renice          : int NA</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rshcmd          : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ user            : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ revtunnel       : logi NA</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rshlogfile      : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rshopts         : NULL</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ rank            : int 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ manual          : logi FALSE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ dryrun          : logi FALSE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ quiet           : logi TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]   ..$ setup_strategy  : chr "parallel"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.667]  - attr(*, "class")= chr [1:2] "makeNodePSOCKOptions" "makeNodeOptions"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.690] [local output] System call to launch all workers:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.690] [local output] R_DEFAULT_PACKAGES=datasets,utils,grDevices,graphics,stats,methods '/usr/bin/systemd-run' '--user' '--scope' '-p' CPUWeight=100 '-p' MemoryMax=50M '-p' MemorySwapMax=50M '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' -e 'try(suppressWarnings(cat(Sys.getpid(),file="/tmp/henrik/RtmpQFAJnV/worker.rank=1.parallelly.parent=136951.216f749c262ef.pid")), silent = TRUE)' -e 'options(socketOptions = "no-delay")' -e 'workRSOCK &lt;- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()' MASTER=localhost PORT=11068 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=parallel</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.690] [local output] Starting PSOCK main server</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.692] [local output] Workers launched</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.692] [local output] Waiting for workers to connect back</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:45.692]  - [local output] 0 workers out of 1 ready</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:46.097]  - [local output] 0 workers out of 1 ready</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:46.098]  - [local output] 1 workers out of 1 ready</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:46.099] [local output] Launching of 1 workers completed</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:46.099] [local output] Number of nodes in cluster: 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:46.099] [local output] Collecting session information from 1 workers</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [09:34:46.100] [local output]  - Worker #1 of 1</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## EXAMPLE: Two workers running in Docker on the local machine</span></span></span>
 <span class="r-in"><span><span class="co">## Setup of 2 Docker workers running rocker/r-parallel</span></span></span>
 <span class="r-in"><span><span class="co">##</span></span></span>
@@ -1105,12 +1225,12 @@ This was validated with R-devel revision 82991 (2022-10-02).</p>
 <span class="r-in"><span><span class="co">## EXAMPLE: One worker running in Wine for Linux on the local machine</span></span></span>
 <span class="r-in"><span><span class="co">## To install R for MS Windows in Wine, do something like:</span></span></span>
 <span class="r-in"><span><span class="co">##   winecfg  # In GUI, set 'Windows version' to 'Windows 10'</span></span></span>
-<span class="r-in"><span><span class="co">##   wget https://cran.r-project.org/bin/windows/base/R-4.4.1-win.exe</span></span></span>
-<span class="r-in"><span><span class="co">##   wine R-4.4.1-win.exe /SILENT</span></span></span>
+<span class="r-in"><span><span class="co">##   wget https://cran.r-project.org/bin/windows/base/R-4.4.2-win.exe</span></span></span>
+<span class="r-in"><span><span class="co">##   wine R-4.4.2-win.exe /SILENT</span></span></span>
 <span class="r-in"><span><span class="co">## Prevent packages from being installed to R's system library:</span></span></span>
-<span class="r-in"><span><span class="co">##   chmod ugo-w "$HOME/.wine/drive_c/Program Files/R/R-4.4.1/library/"</span></span></span>
+<span class="r-in"><span><span class="co">##   chmod ugo-w "$HOME/.wine/drive_c/Program Files/R/R-4.4.2/library/"</span></span></span>
 <span class="r-in"><span><span class="co">## Verify it works:</span></span></span>
-<span class="r-in"><span><span class="co">##   wine "C:/Program Files/R/R-4.4.1/bin/x64/Rscript.exe" --version</span></span></span>
+<span class="r-in"><span><span class="co">##   wine "C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe" --version</span></span></span>
 <span class="r-in"><span><span class="co">##</span></span></span>
 <span class="r-in"><span><span class="co">## The parallel worker is launched as:</span></span></span>
 <span class="r-in"><span><span class="co">## R_DEFAULT_PACKAGES=... WINEDEBUG=fixme-all R_LIBS_SITE= R_LIBS_USER= 'wine' ...</span></span></span>
@@ -1121,7 +1241,7 @@ This was validated with R-devel revision 82991 (2022-10-02).</p>
 <span class="r-in"><span>    <span class="co">## Don't pass LC_* and R_LIBS* environments from host to Wine</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s="</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^(LC_|R_LIBS)"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="st">"wine"</span>,</span></span>
-<span class="r-in"><span>    <span class="st">"C:/Program Files/R/R-4.4.1/bin/x64/Rscript.exe"</span></span></span>
+<span class="r-in"><span>    <span class="st">"C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
 <span class="r-in"><span>  dryrun <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
