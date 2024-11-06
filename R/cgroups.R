@@ -245,7 +245,23 @@ getCGroups1Value <- function(controller, field, pid = Sys.getpid()) {
 #  @return An character string. If the requested cgroups v2 field could not be
 #  queried, NA_character_ is returned.
 getCGroups2Value <- function(field, pid = Sys.getpid()) {
-  getCGroupsValue(controller = "", field = field, pid = pid)
+  path <- getCGroupsPath("", pid = pid)
+  if (is.na(path)) return(NA_character_)
+
+  path_prev <- ""
+  while (path != path_prev) {
+    file <- file.path(path, field)
+    if (file_test("-f", file)) {
+      value <- readLines(file, warn = FALSE)
+      if (length(value) == 0L) value <- NA_character_
+      attr(value, "path") <- path
+      return(value)
+    }
+    path_prev <- path
+    path <- dirname(path)
+  }
+  
+  NA_character_
 }
 
 
