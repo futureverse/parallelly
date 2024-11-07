@@ -188,14 +188,8 @@ appveyor <- function(text = FALSE) {
 
 covr <- function() {
   bfr <- NULL
-  files <- c("covr.yaml", "R-CMD-check.yaml")
-  for (file in file.path(".github/workflows", files)) {
-    if (file.exists(file)) {
-      bfr <- readLines(file)
-      break
-    }
-  }
-  if (!any(grepl("covr::codecov", bfr, fixed=TRUE))) return()
+  files <- c("test-coverage.yaml", "covr.yaml")
+  if (!any(file_test("-f", file.path(".github/workflows/", files)))) return()
   a("https://app.codecov.io/gh/%s", github_repos(), body=img("https://codecov.io/gh/%s/branch/develop/graph/badge.svg", github_repos(), alt="Coverage Status"))
 }
 %>

@@ -267,6 +267,24 @@ cl <- makeClusterPSOCK(
 ## Section 5. Parallel workers running locally inside virtual
 ## machines, Linux containers, etc.
 ## ---------------------------------------------------------------
+## EXAMPLE: Two workers limited to 100% CPU process and 50 MiB of
+## memory using Linux CGroups management. The 100% CPU quota limit
+## constrain each worker to use at most one CPU worth of
+## processing preventing them from overusing the machine, e.g.
+## through unintended nested parallelization. The 50 MiB memory
+## limit is strict - if a worker use more than this, the operating
+## system will terminate the worker instantly.
+## See 'man systemd.resource-control' for more details.
+cl <- makeClusterPSOCK(2L,
+  rscript = c("systemd-run", "--user", "--scope",
+    "-p", "CPUQuota=100%",
+    "-p", "MemoryMax=50M", "-p", "MemorySwapMax=50M",
+    "*"
+  ),
+  dryrun = TRUE, quiet = TRUE
+)
+
+
 ## EXAMPLE: Two workers running in Docker on the local machine
 ## Setup of 2 Docker workers running rocker/r-parallel
 ##
@@ -331,12 +349,12 @@ cl <- makeClusterPSOCK(
 ## EXAMPLE: One worker running in Wine for Linux on the local machine
 ## To install R for MS Windows in Wine, do something like:
 ##   winecfg  # In GUI, set 'Windows version' to 'Windows 10'
-##   wget https://cran.r-project.org/bin/windows/base/R-4.4.1-win.exe
-##   wine R-4.4.1-win.exe /SILENT
+##   wget https://cran.r-project.org/bin/windows/base/R-4.4.2-win.exe
+##   wine R-4.4.2-win.exe /SILENT
 ## Prevent packages from being installed to R's system library:
-##   chmod ugo-w "$HOME/.wine/drive_c/Program Files/R/R-4.4.1/library/"
+##   chmod ugo-w "$HOME/.wine/drive_c/Program Files/R/R-4.4.2/library/"
 ## Verify it works:
-##   wine "C:/Program Files/R/R-4.4.1/bin/x64/Rscript.exe" --version
+##   wine "C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe" --version
 ##
 ## The parallel worker is launched as:
 ## R_DEFAULT_PACKAGES=... WINEDEBUG=fixme-all R_LIBS_SITE= R_LIBS_USER= 'wine' ...
@@ -347,7 +365,7 @@ cl <- makeClusterPSOCK(1L,
     ## Don't pass LC_* and R_LIBS* environments from host to Wine
     sprintf("%s=", grep("^(LC_|R_LIBS)", names(Sys.getenv()), value = TRUE)),
     "wine",
-    "C:/Program Files/R/R-4.4.1/bin/x64/Rscript.exe"
+    "C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe"
   ),
   dryrun = TRUE, quiet = TRUE
 )

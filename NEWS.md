@@ -1,3 +1,26 @@
+# Version 1.39.0 [2024-11-07]
+
+## New Features
+
+ * Environment variables `R_PARALLELLY_RANDOM_PORTS` now supports
+   multiple, comma-separated port specifications, e.g.
+   `"20001:20999"` and `"1068:1099,20001:20999,40530"`.
+ 
+## Documentation
+
+ * Add example to `help("makeClusterPSOCK")` on how to use
+   `systemd-run` to limit workers' CPU quota and memory allowances.
+
+## Miscellaneous
+
+ * Improved how cgroups v1 and v2 settings are queried.
+
+## Bug Fixes
+
+ * Now `availableCores()` does a better job detecting cgroups v2
+   `cpu.max` CPU restrictions.
+
+
 # Version 1.38.0 [2024-07-27]
 
 ## New Features
@@ -16,7 +39,7 @@
    and `rscript_sh[2]` is for the outer shell quoting of the Rscript
    call.  More precisely, `rscript_sh[1]` is for Rscript arguments
    that need shell quoting (e.g. `Rscript -e "<expr>"`), and
-   `rscript_sh[2]` is for the whole `Rscript ...` call.}
+   `rscript_sh[2]` is for the whole `Rscript ...` call.
 
  * Add `makeClusterSequential()` available for R (>= 4.4.0).
 
@@ -192,11 +215,11 @@
    such as `system2("Rscript --version")`.  If not, an informative
    error message is produced.
    
- * On Unix, `availableCores()` queries also control groups v2
-   (cgroups2) field `cpu.max` for a possible CPU quota allocation. If
-   a CPU quota is set, then the number of CPUs is rounded to the
-   nearest integer, unless its less that 0.5, in case it's rounded up
-   to a single CPU. An example, where cgroups CPU quotas can be set to
+ * On Unix, `availableCores()` queries also control groups v2 (cgroups
+   v2) field `cpu.max` for a possible CPU quota allocation. If a CPU
+   quota is set, then the number of CPUs is rounded to the nearest
+   integer, unless its less that 0.5, in case it's rounded up to a
+   single CPU. An example, where cgroups CPU quotas can be set to
    limit the total CPU load, is with Linux containers, e.g. `docker
    run --cpus=3.5 ...`.
 

@@ -6,7 +6,7 @@
 * GitHub: NA
 * Source code: https://github.com/cran/adea
 * Date/Publication: 2023-11-24 16:00:02 UTC
-* Number of recursive dependencies: 61
+* Number of recursive dependencies: 54
 
 Run `revdepcheck::revdep_details(, "adea")` for more info
 
@@ -30,7 +30,7 @@ Run `revdepcheck::revdep_details(, "adea")` for more info
 * GitHub: https://github.com/smeekes/bootUR
 * Source code: https://github.com/cran/bootUR
 * Date/Publication: 2024-05-20 09:30:02 UTC
-* Number of recursive dependencies: 69
+* Number of recursive dependencies: 68
 
 Run `revdepcheck::revdep_details(, "bootUR")` for more info
 
@@ -40,9 +40,9 @@ Run `revdepcheck::revdep_details(, "bootUR")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  6.6Mb
+      installed size is  6.7Mb
       sub-directories of 1Mb or more:
-        libs   6.2Mb
+        libs   6.3Mb
     ```
 
 *   checking for GNU extensions in Makefiles ... NOTE
@@ -58,7 +58,7 @@ Run `revdepcheck::revdep_details(, "bootUR")` for more info
 * GitHub: https://github.com/dmenne/breathtestcore
 * Source code: https://github.com/cran/breathtestcore
 * Date/Publication: 2024-01-24 15:02:47 UTC
-* Number of recursive dependencies: 130
+* Number of recursive dependencies: 129
 
 Run `revdepcheck::revdep_details(, "breathtestcore")` for more info
 
@@ -84,7 +84,7 @@ Run `revdepcheck::revdep_details(, "breathtestcore")` for more info
 * GitHub: https://github.com/dmenne/breathteststan
 * Source code: https://github.com/cran/breathteststan
 * Date/Publication: 2024-01-13 17:20:06 UTC
-* Number of recursive dependencies: 153
+* Number of recursive dependencies: 152
 
 Run `revdepcheck::revdep_details(, "breathteststan")` for more info
 
@@ -108,11 +108,11 @@ Run `revdepcheck::revdep_details(, "breathteststan")` for more info
 
 <details>
 
-* Version: 2.4.4
+* Version: 2.6.0
 * GitHub: https://github.com/seriph78/COTAN
 * Source code: https://github.com/cran/COTAN
-* Date/Publication: 2024-06-30
-* Number of recursive dependencies: 266
+* Date/Publication: 2024-10-29
+* Number of recursive dependencies: 276
 
 Run `revdepcheck::revdep_details(, "COTAN")` for more info
 
@@ -122,9 +122,9 @@ Run `revdepcheck::revdep_details(, "COTAN")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  9.1Mb
+      installed size is 13.8Mb
       sub-directories of 1Mb or more:
-        doc   7.4Mb
+        doc  12.0Mb
     ```
 
 *   checking dependencies in R code ... NOTE
@@ -138,38 +138,61 @@ Run `revdepcheck::revdep_details(, "COTAN")` for more info
 
 *   checking R code for possible problems ... NOTE
     ```
-    GDIPlot: no visible binding for global variable ‘sum.raw.norm’
-    GDIPlot: no visible binding for global variable ‘GDI’
-    UMAPPlot: no visible binding for global variable ‘x’
-    UMAPPlot: no visible binding for global variable ‘y’
-    calculateCoex_Legacy: no visible binding for global variable
-      ‘expectedNN’
-    calculateCoex_Legacy: no visible binding for global variable
-      ‘expectedNY’
-    calculateCoex_Legacy: no visible binding for global variable
-      ‘expectedYN’
+    mergeUniformCellsClusters : fromMergedName: warning in
+      vapply(currentClNames, function(clName, mergedName) {: partial
+      argument match of 'FUN.VAL' to 'FUN.VALUE'
+    mergeUniformCellsClusters : fromMergedName: warning in
+      return(str_detect(mergedName, clName)): partial argument match of
+      'FUN.VAL' to 'FUN.VALUE'
+    mergeUniformCellsClusters : fromMergedName: warning in }, FUN.VAL =
+      logical(1L), mergedClName): partial argument match of 'FUN.VAL' to
+      'FUN.VALUE'
+    ECDPlot: no visible binding for global variable ‘.’
     ...
-    coerce,COTAN-scCOTAN: no visible binding for global variable
       ‘clusterData’
     Undefined global functions or variables:
-      . .x CellNumber Cluster Condition ExpGenes GCS GDI PC1 PC2 a cl1 cl2
-      clusterData clusters coex condName conditions expectedN expectedNN
-      expectedNY expectedYN expectedYY g2 group hk keys lambda means
-      mit.percentage n nu nuPlot obj objSeurat observedNN observedNY
-      observedY observedYN observedYY permMap rankGenes rawNorm
-      secondaryMarkers sum.raw.norm type useTorch usedMaxResolution values
-      violinwidth width x xmax xmaxv xminv y zoomedNuPlot
+      . .x CellNumber Cluster Condition ExpGenes GCS GDI PC1 PC2 UDEPLot a
+      bGroupGenesPlot cl1 cl2 clName1 clName2 clusterData clusters coex
+      condName conditions expectedN expectedNN expectedNY expectedYN
+      expectedYY g2 group hk keys lambda means mit.percentage n nu nuPlot
+      obj objSeurat observedNN observedNY observedY observedYN observedYY
+      pcaCellsPlot permMap rankGenes rawNorm secondaryMarkers sum.raw.norm
+      type types useTorch usedMaxResolution values violinwidth width x xmax
+      xmaxv xminv y zoomedNuPlot
+    ```
+
+# dataquieR
+
+<details>
+
+* Version: 2.1.0
+* GitHub: NA
+* Source code: https://github.com/cran/dataquieR
+* Date/Publication: 2024-03-29 10:30:02 UTC
+* Number of recursive dependencies: 156
+
+Run `revdepcheck::revdep_details(, "dataquieR")` for more info
+
+</details>
+
+## Newly broken
+
+*   checking installed package size ... NOTE
+    ```
+      installed size is  5.8Mb
+      sub-directories of 1Mb or more:
+        R   4.0Mb
     ```
 
 # decoupleR
 
 <details>
 
-* Version: 2.10.0
+* Version: 2.12.0
 * GitHub: https://github.com/saezlab/decoupleR
 * Source code: https://github.com/cran/decoupleR
-* Date/Publication: 2024-05-29
-* Number of recursive dependencies: 267
+* Date/Publication: 2024-10-29
+* Number of recursive dependencies: 268
 
 Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 
@@ -177,27 +200,50 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 
 ## In both
 
+*   checking examples ... ERROR
+    ```
+    Running examples in ‘decoupleR-Ex.R’ failed
+    The error most likely occurred in:
+    
+    > ### Name: run_gsva
+    > ### Title: Gene Set Variation Analysis (GSVA)
+    > ### Aliases: run_gsva
+    > 
+    > ### ** Examples
+    > 
+    > inputs_dir <- system.file("testdata", "inputs", package = "decoupleR")
+    > 
+    > mat <- readRDS(file.path(inputs_dir, "mat.rds"))
+    > net <- readRDS(file.path(inputs_dir, "net.rds"))
+    > 
+    > run_gsva(mat, net, minsize=1, verbose = FALSE)
+    Error in value[[3L]](cond) : 
+      No such method in GSVA: `gsva`. To learn more check ?gsva.No such method in GSVA: `plage`. To learn more check ?gsva.No such method in GSVA: `ssgsea`. To learn more check ?gsva.No such method in GSVA: `zscore`. To learn more check ?gsva.
+    Calls: run_gsva ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
+    Execution halted
+    ```
+
 *   checking tests ...
     ```
       Running ‘testthat.R’
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 50 lines of output:
-        |                                                                      |   0%
-        |                                                                            
-        |===================================                                   |  50%
-        |                                                                            
-        |======================================================================| 100%
-      
-    ...
+      <purrr_error_indexed/rlang_error/error/condition>
+      Error in `map2(.x, .y, .f, ...)`: i In index: 8.
+      Caused by error in `value[[3L]]()`:
+      ! No such method in GSVA: `gsva`. To learn more check ?gsva.No such method in GSVA: `plage`. To learn more check ?gsva.No such method in GSVA: `ssgsea`. To learn more check ?gsva.No such method in GSVA: `zscore`. To learn more check ?gsva.
       Backtrace:
+           ▆
+    ...
           ▆
-       1. ├─decoupleR::get_progeny(organism = "mouse") at test-omnipath.R:19:3
-       2. │ └─... %>% ...
-       3. ├─rlang::set_names(., c("source", "target", "weight", "p_value"))
-       4. └─rlang::abort(message = message)
+       1. └─decoupleR::run_gsva(mat, net, minsize = 1L, verbose = FALSE) at test-statistic-gsva.R:22:5
+       2.   └─base::tryCatch(...)
+       3.     └─base (local) tryCatchList(expr, classes, parentenv, handlers)
+       4.       └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
+       5.         └─value[[3L]](cond)
       
-      [ FAIL 1 | WARN 4 | SKIP 0 | PASS 34 ]
+      [ FAIL 2 | WARN 9 | SKIP 0 | PASS 33 ]
       Error: Test failures
       Execution halted
     ```
@@ -212,9 +258,9 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  8.8Mb
+      installed size is  9.1Mb
       sub-directories of 1Mb or more:
-        doc       6.6Mb
+        doc       6.9Mb
         extdata   1.4Mb
     ```
 
@@ -236,19 +282,68 @@ Run `revdepcheck::revdep_details(, "desla")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 13.1Mb
+      installed size is  7.4Mb
       sub-directories of 1Mb or more:
-        libs  13.0Mb
+        libs   7.2Mb
+    ```
+
+# gastempt
+
+<details>
+
+* Version: 0.6.1
+* GitHub: https://github.com/dmenne/gastempt
+* Source code: https://github.com/cran/gastempt
+* Date/Publication: 2024-09-27 16:30:01 UTC
+* Number of recursive dependencies: 109
+
+Run `revdepcheck::revdep_details(, "gastempt")` for more info
+
+</details>
+
+## In both
+
+*   checking installed package size ... NOTE
+    ```
+      installed size is 177.2Mb
+      sub-directories of 1Mb or more:
+        libs  176.7Mb
+    ```
+
+*   checking for GNU extensions in Makefiles ... NOTE
+    ```
+    GNU make is a SystemRequirements.
+    ```
+
+# gtfstools
+
+<details>
+
+* Version: 1.3.0
+* GitHub: https://github.com/ipeaGIT/gtfstools
+* Source code: https://github.com/cran/gtfstools
+* Date/Publication: 2024-10-07 18:40:02 UTC
+* Number of recursive dependencies: 89
+
+Run `revdepcheck::revdep_details(, "gtfstools")` for more info
+
+</details>
+
+## In both
+
+*   checking Rd cross-references ... NOTE
+    ```
+    Package unavailable to check Rd xrefs: ‘tidytransit’
     ```
 
 # InPAS
 
 <details>
 
-* Version: 2.12.0
+* Version: 2.14.0
 * GitHub: NA
 * Source code: https://github.com/cran/InPAS
-* Date/Publication: 2024-04-30
+* Date/Publication: 2024-10-29
 * Number of recursive dependencies: 165
 
 Run `revdepcheck::revdep_details(, "InPAS")` for more info
@@ -321,7 +416,7 @@ Run `revdepcheck::revdep_details(, "JMbayes2")` for more info
 * GitHub: https://github.com/cole-brokamp/mappp
 * Source code: https://github.com/cran/mappp
 * Date/Publication: 2022-01-25 09:22:42 UTC
-* Number of recursive dependencies: 40
+* Number of recursive dependencies: 35
 
 Run `revdepcheck::revdep_details(, "mappp")` for more info
 
@@ -343,45 +438,13 @@ Run `revdepcheck::revdep_details(, "mappp")` for more info
 * GitHub: https://github.com/amices/mice
 * Source code: https://github.com/cran/mice
 * Date/Publication: 2023-06-05 14:40:02 UTC
-* Number of recursive dependencies: 131
+* Number of recursive dependencies: 130
 
 Run `revdepcheck::revdep_details(, "mice")` for more info
 
 </details>
 
-## Newly fixed
-
-*   checking tests ...
-    ```
-      Running ‘testthat.R’
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 50 lines of output:
-       1. ├─testthat::expect_warning(A <- parlmice(nhanes, m = 2, seed = 123)) at test-parlmice.R:5:3
-       2. │ └─testthat:::quasi_capture(...)
-       3. │   ├─testthat (local) .capture(...)
-       4. │   │ └─base::withCallingHandlers(...)
-       5. │   └─rlang::eval_bare(quo_get_expr(.quo), quo_get_env(.quo))
-       6. └─mice::parlmice(nhanes, m = 2, seed = 123)
-    ...
-       4. │   │ └─base::withCallingHandlers(...)
-       5. │   └─rlang::eval_bare(quo_get_expr(.quo), quo_get_env(.quo))
-       6. └─mice::parlmice(nhanes, n.core = 2, m = 7)
-       7.   └─parallel::makeCluster(n.core, type = cl.type)
-       8.     └─parallel::makePSOCKcluster(names = spec, ...)
-       9.       └─base::serverSocket(port = port)
-      
-      [ FAIL 4 | WARN 0 | SKIP 0 | PASS 357 ]
-      Error: Test failures
-      Execution halted
-    ```
-
 ## In both
-
-*   checking package dependencies ... NOTE
-    ```
-    Package suggested but not available for checking: ‘miceadds’
-    ```
 
 *   checking Rd files ... NOTE
     ```
@@ -402,20 +465,15 @@ Run `revdepcheck::revdep_details(, "mice")` for more info
            |                                                                                            ^
     ```
 
-*   checking Rd cross-references ... NOTE
-    ```
-    Package unavailable to check Rd xrefs: ‘miceadds’
-    ```
-
 # mmrm
 
 <details>
 
-* Version: 0.3.12
+* Version: 0.3.14
 * GitHub: https://github.com/openpharma/mmrm
 * Source code: https://github.com/cran/mmrm
-* Date/Publication: 2024-06-26 15:00:09 UTC
-* Number of recursive dependencies: 162
+* Date/Publication: 2024-09-27 23:30:01 UTC
+* Number of recursive dependencies: 176
 
 Run `revdepcheck::revdep_details(, "mmrm")` for more info
 
@@ -423,59 +481,11 @@ Run `revdepcheck::revdep_details(, "mmrm")` for more info
 
 ## In both
 
-*   checking re-building of vignette outputs ... ERROR
-    ```
-    Error(s) in re-building vignettes:
-    --- re-building ‘algorithm.Rmd’ using rmarkdown
-    --- finished re-building ‘algorithm.Rmd’
-    
-    --- re-building ‘between_within.Rmd’ using rmarkdown
-    --- finished re-building ‘between_within.Rmd’
-    
-    --- re-building ‘coef_vcov.Rmd’ using rmarkdown
-    --- finished re-building ‘coef_vcov.Rmd’
-    
-    ...
-    --- finished re-building ‘predict.Rmd’
-    
-    --- re-building ‘satterthwaite.Rmd’ using rmarkdown
-    --- finished re-building ‘satterthwaite.Rmd’
-    
-    SUMMARY: processing the following file failed:
-      ‘introduction.Rmd’
-    
-    Error: Vignette re-building failed.
-    Execution halted
-    ```
-
 *   checking installed package size ... NOTE
     ```
-      installed size is 188.8Mb
+      installed size is 188.7Mb
       sub-directories of 1Mb or more:
         libs  186.9Mb
-    ```
-
-# modeltime
-
-<details>
-
-* Version: 1.2.8
-* GitHub: https://github.com/business-science/modeltime
-* Source code: https://github.com/cran/modeltime
-* Date/Publication: 2023-09-02 15:10:02 UTC
-* Number of recursive dependencies: 252
-
-Run `revdepcheck::revdep_details(, "modeltime")` for more info
-
-</details>
-
-## In both
-
-*   checking dependencies in R code ... NOTE
-    ```
-    Namespaces in Imports field not imported from:
-      ‘tidymodels’ ‘tidyverse’
-      All declared Imports should be used.
     ```
 
 # NCC
@@ -546,83 +556,15 @@ Run `revdepcheck::revdep_details(, "outliers.ts.oga")` for more info
     See ‘/c4/home/henrik/repositories/parallelly/revdep/checks/outliers.ts.oga/new/outliers.ts.oga.Rcheck/00install.out’ for details.
     ```
 
-# pgxRpi
-
-<details>
-
-* Version: 1.0.3
-* GitHub: https://github.com/progenetix/pgxRpi
-* Source code: https://github.com/cran/pgxRpi
-* Date/Publication: 2024-06-26
-* Number of recursive dependencies: 151
-
-Run `revdepcheck::revdep_details(, "pgxRpi")` for more info
-
-</details>
-
-## In both
-
-*   checking examples ... ERROR
-    ```
-    Running examples in ‘pgxRpi-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: pgxLoader
-    > ### Title: Load data from Progenetix database
-    > ### Aliases: pgxLoader
-    > 
-    > ### ** Examples
-    > 
-    > ## query metadata
-    > biosamples <- pgxLoader(type="biosample", filters = "NCIT:C3512")
-    > ## query segment variants
-    > seg <- pgxLoader(type="variant", output = "pgxseg", biosample_id = "pgxbs-kftvgx4y")
-    Error in `[.data.frame`(result, , col) : undefined columns selected
-    Calls: pgxLoader ... <Anonymous> -> lapply -> FUN -> read_variant_pgxseg
-    Execution halted
-    ```
-
-*   checking re-building of vignette outputs ... ERROR
-    ```
-    Error(s) in re-building vignettes:
-    --- re-building ‘Introduction_1_loadmetadata.Rmd’ using rmarkdown
-    The magick package is required to crop "/c4/home/henrik/repositories/parallelly/revdep/checks/pgxRpi/new/pgxRpi.Rcheck/vign_test/pgxRpi/vignettes/Introduction_1_loadmetadata_files/figure-html/unnamed-chunk-12-1.png" but not available.
-    --- finished re-building ‘Introduction_1_loadmetadata.Rmd’
-    
-    --- re-building ‘Introduction_2_loadvariants.Rmd’ using rmarkdown
-    
-    Quitting from lines 189-191 [unnamed-chunk-13] (Introduction_2_loadvariants.Rmd)
-    Error: processing vignette 'Introduction_2_loadvariants.Rmd' failed with diagnostics:
-    undefined columns selected
-    ...
-    The magick package is required to crop "/c4/home/henrik/repositories/parallelly/revdep/checks/pgxRpi/new/pgxRpi.Rcheck/vign_test/pgxRpi/vignettes/Introduction_4_process_pgxseg_files/figure-html/unnamed-chunk-14-1.png" but not available.
-    The magick package is required to crop "/c4/home/henrik/repositories/parallelly/revdep/checks/pgxRpi/new/pgxRpi.Rcheck/vign_test/pgxRpi/vignettes/Introduction_4_process_pgxseg_files/figure-html/unnamed-chunk-15-1.png" but not available.
-    The magick package is required to crop "/c4/home/henrik/repositories/parallelly/revdep/checks/pgxRpi/new/pgxRpi.Rcheck/vign_test/pgxRpi/vignettes/Introduction_4_process_pgxseg_files/figure-html/unnamed-chunk-16-1.png" but not available.
-    --- finished re-building ‘Introduction_4_process_pgxseg.Rmd’
-    
-    SUMMARY: processing the following files failed:
-      ‘Introduction_2_loadvariants.Rmd’ ‘Introduction_3_loadfrequency.Rmd’
-    
-    Error: Vignette re-building failed.
-    Execution halted
-    ```
-
-*   checking installed package size ... NOTE
-    ```
-      installed size is  6.2Mb
-      sub-directories of 1Mb or more:
-        doc   5.9Mb
-    ```
-
 # pmartR
 
 <details>
 
-* Version: 2.4.5
+* Version: 2.4.6
 * GitHub: https://github.com/pmartR/pmartR
 * Source code: https://github.com/cran/pmartR
-* Date/Publication: 2024-05-21 15:50:02 UTC
-* Number of recursive dependencies: 148
+* Date/Publication: 2024-10-14 21:10:02 UTC
+* Number of recursive dependencies: 147
 
 Run `revdepcheck::revdep_details(, "pmartR")` for more info
 
@@ -639,17 +581,17 @@ Run `revdepcheck::revdep_details(, "pmartR")` for more info
     ```
       installed size is 10.5Mb
       sub-directories of 1Mb or more:
-        libs   8.1Mb
+        libs   8.0Mb
     ```
 
 # QDNAseq
 
 <details>
 
-* Version: 1.40.0
+* Version: 1.42.0
 * GitHub: https://github.com/ccagc/QDNAseq
 * Source code: https://github.com/cran/QDNAseq
-* Date/Publication: 2024-04-30
+* Date/Publication: 2024-10-29
 * Number of recursive dependencies: 94
 
 Run `revdepcheck::revdep_details(, "QDNAseq")` for more info
@@ -683,13 +625,6 @@ Run `revdepcheck::revdep_details(, "QDNAseq")` for more info
     Execution halted
     ```
 
-*   checking Rd files ... NOTE
-    ```
-    checkRd: (-1) exportBins.Rd:41: Lost braces
-        41 |         \code{"bed"}.  This argument is ignored if code{type = "calls"}.}
-           |                                                        ^
-    ```
-
 # qtl2pleio
 
 <details>
@@ -698,7 +633,7 @@ Run `revdepcheck::revdep_details(, "QDNAseq")` for more info
 * GitHub: https://github.com/fboehm/qtl2pleio
 * Source code: https://github.com/cran/qtl2pleio
 * Date/Publication: 2020-12-02 22:50:02 UTC
-* Number of recursive dependencies: 130
+* Number of recursive dependencies: 129
 
 Run `revdepcheck::revdep_details(, "qtl2pleio")` for more info
 
@@ -718,15 +653,36 @@ Run `revdepcheck::revdep_details(, "qtl2pleio")` for more info
       'LazyData' is specified without a 'data' directory
     ```
 
+# ResIN
+
+<details>
+
+* Version: 2.0.0
+* GitHub: https://github.com/pwarncke77/ResIN
+* Source code: https://github.com/cran/ResIN
+* Date/Publication: 2024-10-04 10:40:03 UTC
+* Number of recursive dependencies: 111
+
+Run `revdepcheck::revdep_details(, "ResIN")` for more info
+
+</details>
+
+## In both
+
+*   checking data for non-ASCII characters ... NOTE
+    ```
+      Note: found 1 marked UTF-8 string
+    ```
+
 # scruff
 
 <details>
 
-* Version: 1.22.0
+* Version: 1.24.0
 * GitHub: https://github.com/campbio/scruff
 * Source code: https://github.com/cran/scruff
-* Date/Publication: 2024-04-30
-* Number of recursive dependencies: 189
+* Date/Publication: 2024-10-29
+* Number of recursive dependencies: 180
 
 Run `revdepcheck::revdep_details(, "scruff")` for more info
 
@@ -736,10 +692,10 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  5.0Mb
+      installed size is  5.2Mb
       sub-directories of 1Mb or more:
         data   2.4Mb
-        doc    1.6Mb
+        doc    1.7Mb
     ```
 
 *   checking DESCRIPTION meta-information ... NOTE
@@ -772,15 +728,38 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
       genes
     ```
 
+# SimDesign
+
+<details>
+
+* Version: 2.17.1
+* GitHub: https://github.com/philchalmers/SimDesign
+* Source code: https://github.com/cran/SimDesign
+* Date/Publication: 2024-08-17 05:00:02 UTC
+* Number of recursive dependencies: 135
+
+Run `revdepcheck::revdep_details(, "SimDesign")` for more info
+
+</details>
+
+## In both
+
+*   checking installed package size ... NOTE
+    ```
+      installed size is  7.3Mb
+      sub-directories of 1Mb or more:
+        doc   6.5Mb
+    ```
+
 # streetscape
 
 <details>
 
-* Version: 1.0.2
+* Version: 1.0.3
 * GitHub: NA
 * Source code: https://github.com/cran/streetscape
-* Date/Publication: 2024-06-07 20:00:02 UTC
-* Number of recursive dependencies: 140
+* Date/Publication: 2024-08-31 06:10:02 UTC
+* Number of recursive dependencies: 139
 
 Run `revdepcheck::revdep_details(, "streetscape")` for more info
 
@@ -842,11 +821,11 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
 
 <details>
 
-* Version: 3.0.3
+* Version: 3.0.4
 * GitHub: https://github.com/shaelebrown/TDApplied
 * Source code: https://github.com/cran/TDApplied
-* Date/Publication: 2024-03-12 23:00:02 UTC
-* Number of recursive dependencies: 81
+* Date/Publication: 2024-10-29 08:30:02 UTC
+* Number of recursive dependencies: 84
 
 Run `revdepcheck::revdep_details(, "TDApplied")` for more info
 
@@ -856,9 +835,9 @@ Run `revdepcheck::revdep_details(, "TDApplied")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 13.3Mb
+      installed size is 13.0Mb
       sub-directories of 1Mb or more:
-        doc    8.6Mb
+        doc    8.2Mb
         libs   4.4Mb
     ```
 

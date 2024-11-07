@@ -67,10 +67,10 @@ are supported:
 Query \code{\link[parallel]{detectCores}(logical = logical)}.
 
 \item \code{"cgroups.cpuset"} -
-On Unix, query control group (cgroup) value \code{cpuset.set}.
+On Unix, query control group (cgroup v1) value \code{cpuset.set}.
 
 \item \code{"cgroups.cpuquota"} -
-On Unix, query control group (cgroup) value
+On Unix, query control group (cgroup v1) value
 \code{cpu.cfs_quota_us} / \code{cpu.cfs_period_us}.
 
 \item \code{"cgroups2.cpu.max"} -

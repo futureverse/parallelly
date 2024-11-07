@@ -111,9 +111,14 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
     stop_if_not(length(v) == 1L)
     v
   }
-  
+
+  ## Soon, RStudio will no longer come with a built-in 'ssh' client
+  ## for MS Windows. It's old and Windows (>= 10) comes with a
+  ## built-in 'ssh' client.
+  ## Source: https://github.com/HenrikBengtsson/parallelly/issues/116
   find_rstudio_ssh <- function() {
-    path <- Sys.getenv("RSTUDIO_MSYS_SSH")
+    path <- Sys.getenv("RSTUDIO_MSYS_SSH", NA_character_)
+    if (is.na(path)) return(NULL)
     if (!file_test("-d", path)) return(NULL)   
     path <- normalizePath(path)
     path_org <- Sys.getenv("PATH")
