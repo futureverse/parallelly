@@ -10,7 +10,8 @@
 getCGroupsRoot <- local({
   .cache <- list()
   
-  function(pid = Sys.getpid()) {
+  function(controller = "", pid = Sys.getpid()) {
+    stopifnot(is.character(controller), length(controller) == 1L, !is.na(controller))
     stopifnot(is.integer(pid), length(pid) == 1L, pid > 0L)
     pid_str <- as.character(pid)
 
@@ -36,6 +37,19 @@ getCGroupsRoot <- local({
       return(path)
     }
 
+    ## CGroups v1?
+    if (length(bfr) > 1 && nzchar(controller)) {
+      pattern <- sprintf("\\b%s\\b", controller)
+      bfr <- grep(pattern, bfr, value = TRUE)
+      if (length(bfr) == 0) {
+        stop(sprintf("Failed to identify mount point for CGroups v1 controller %s", sQuote(controller)))
+      } else if (length(bfr) != 1) {
+        bfr <- bfr[1]
+        warning(sprintf("Detected more than one 'cgroup' mount point for CGroups v1 controller %s; using the first one",
+                sQuote(controller)))
+      }
+    }
+    
     if (length(bfr) > 1) {
       bfr <- bfr[1]
       warning("Detected more than one 'cgroup' mount point; using the first one")
@@ -43,7 +57,9 @@ getCGroupsRoot <- local({
 
     path <- sub("^cgroup[^[:blank:]]*[[:blank:]]+", "", bfr)
     path <- sub("^([^[:blank:]]+)[[:blank:]]+.*", "\\1", path)
-    if (!file_test("-d", path)) path <- NA_character_
+    if (!file_test("-d", path)) {
+      path <- NA_character_
+    }
     
     .cache[[pid_str]] <<- path
 
@@ -131,7 +147,7 @@ getCGroups <- local({
 # 
 #' @importFrom utils file_test
 getCGroupsPath <- function(controller, pid = Sys.getpid()) {
-  root <- getCGroupsRoot(pid = pid)
+  root <- getCGroupsRoot(controller = controller, pid = pid)
   if (is.na(root)) return(NA_character_)
 
   data <- getCGroups(pid = pid)
@@ -147,6 +163,7 @@ getCGroupsPath <- function(controller, pid = Sys.getpid()) {
     if (file_test("-d", path)) {
       break
     }
+    ## Should this ever happen?
     set_prev <- set
     set <- dirname(set)
     if (set == set_prev) break
@@ -232,7 +249,24 @@ getCGroups1Value <- function(controller, field, pid = Sys.getpid()) {
     !is.na(controller),
     nzchar(controller)
   )
-  getCGroupsValue(controller = controller, field = field, pid = pid)
+
+  path <- getCGroupsPath(controller, pid = pid)
+  if (is.na(path)) return(NA_character_)
+
+  path_prev <- ""
+  while (path != path_prev) {
+    file <- file.path(path, field)
+    if (file_test("-f", file)) {
+      value <- readLines(file, warn = FALSE)
+      if (length(value) == 0L) value <- NA_character_
+      attr(value, "path") <- path
+      return(value)
+    }
+    path_prev <- path
+    path <- dirname(path)
+  }
+
+  NA_character_
 }
 
 
@@ -328,7 +362,7 @@ getCGroups1CpuSet <- function() {
   })
 
   ## Sanity checks
-  if (is.null(max_cores)) max_cores <- parallel::detectCores(logical = TRUE)
+  max_cores <- parallel::detectCores(logical = TRUE)
   if (any(value < 0L | value >= max_cores)) {
     warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU set, because it contains one or more CPU indices that is out of range [0,%d]: %s", max_cores - 1L, value0))
     value <- integer(0L)
