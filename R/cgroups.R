@@ -181,30 +181,6 @@ getCGroupsPath <- function(controller, pid = Sys.getpid()) {
 }
 
 
-#  Get all cgroups fields for a specific controller
-#
-#  @param controller (character) A cgroups v1 set or `""` for cgroups v2.
-# 
-#  @param pid (integer) The ID of an existing process.
-#
-#  @return An character vector of cgroups fields.
-#  If no folder could be found, a`NA_character_` is returned.
-getCGroupsFields <- function(controller, pid = Sys.getpid()) {
-  path <- getCGroupsPath(controller = controller, pid = pid)
-  if (is.na(path)) return(character(0L))
-  dir(path = path)
-}
-
-
-getCGroups1Fields <- function(controller, pid = Sys.getpid()) {
-  getCGroupsFields(controller = controller, pid = pid)
-}
-
-getCGroups2Fields <- function(pid = Sys.getpid()) {
-  getCGroupsFields(controller = "", pid = pid)
-}
-
-
 #  Get the value of specific cgroups controller and field
 #
 #  @param controller (character) A cgroups v1 set, or `""` for cgroups v2.
@@ -219,16 +195,23 @@ getCGroups2Fields <- function(pid = Sys.getpid()) {
 #
 #' @importFrom utils file_test
 getCGroupsValue <- function(controller, field, pid = Sys.getpid()) {
-  path <- getCGroupsPath(controller, pid = pid)
+  path <- getCGroupsPath(controller = controller, pid = pid)
   if (is.na(path)) return(NA_character_)
 
-  file <- file.path(path, field)
-  if (!file_test("-f", file)) return(NA_character_)
+  path_prev <- ""
+  while (path != path_prev) {
+    file <- file.path(path, field)
+    if (file_test("-f", file)) {
+      value <- readLines(file, warn = FALSE)
+      if (length(value) == 0L) value <- NA_character_
+      attr(value, "path") <- path
+      return(value)
+    }
+    path_prev <- path
+    path <- dirname(path)
+  }
   
-  value <- readLines(file, warn = FALSE)
-  if (length(value) == 0L) value <- NA_character_
-  
-  value
+  NA_character_
 }
 
 
@@ -242,31 +225,9 @@ getCGroupsValue <- function(controller, field, pid = Sys.getpid()) {
 #
 #  @return An character string. If the requested cgroups v1 field could not be
 #  queried, NA_character_ is returned.
+#
 getCGroups1Value <- function(controller, field, pid = Sys.getpid()) {
-  stop_if_not(
-    length(controller) == 1L,
-    is.character(controller),
-    !is.na(controller),
-    nzchar(controller)
-  )
-
-  path <- getCGroupsPath(controller, pid = pid)
-  if (is.na(path)) return(NA_character_)
-
-  path_prev <- ""
-  while (path != path_prev) {
-    file <- file.path(path, field)
-    if (file_test("-f", file)) {
-      value <- readLines(file, warn = FALSE)
-      if (length(value) == 0L) value <- NA_character_
-      attr(value, "path") <- path
-      return(value)
-    }
-    path_prev <- path
-    path <- dirname(path)
-  }
-
-  NA_character_
+  getCGroupsValue(controller, field = field, pid = pid)
 }
 
 
@@ -279,23 +240,7 @@ getCGroups1Value <- function(controller, field, pid = Sys.getpid()) {
 #  @return An character string. If the requested cgroups v2 field could not be
 #  queried, NA_character_ is returned.
 getCGroups2Value <- function(field, pid = Sys.getpid()) {
-  path <- getCGroupsPath("", pid = pid)
-  if (is.na(path)) return(NA_character_)
-
-  path_prev <- ""
-  while (path != path_prev) {
-    file <- file.path(path, field)
-    if (file_test("-f", file)) {
-      value <- readLines(file, warn = FALSE)
-      if (length(value) == 0L) value <- NA_character_
-      attr(value, "path") <- path
-      return(value)
-    }
-    path_prev <- path
-    path <- dirname(path)
-  }
-  
-  NA_character_
+  getCGroupsValue("", field = field, pid = pid)
 }
 
 
@@ -307,6 +252,7 @@ getCGroups2Value <- function(field, pid = Sys.getpid()) {
 #  If the current process is under cgroups v1, then `1L` is returned.
 #  If it is under cgroups v2, then `2L` is returned.
 #  If not under cgroups control, then `-1L` is returned.
+#
 getCGroupsVersion <- function(pid = Sys.getpid()) {
   cgroups <- getCGroups(pid = pid)
   if (nrow(cgroups) == 0) return(-1L)
@@ -330,7 +276,6 @@ getCGroupsVersion <- function(pid = Sys.getpid()) {
 #
 #  [1] https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
 #
-#' @importFrom utils file_test
 getCGroups1CpuSet <- function() {
   ## TEMPORARY: In case the cgroups options causes problems, make
   ## it possible to override their values via hidden options
@@ -404,7 +349,6 @@ getCGroups1CpuSet <- function() {
 #
 #  [1] https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
 #
-#' @importFrom utils file_test
 getCGroups1CpuQuotaMicroseconds <- function(pid = Sys.getpid()) {
   value <- suppressWarnings({
     ## e.g. /sys/fs/cgroup/cpu/cpu.cfs_quota_us
@@ -415,7 +359,6 @@ getCGroups1CpuQuotaMicroseconds <- function(pid = Sys.getpid()) {
 }
 
 
-#' @importFrom utils file_test
 getCGroups1CpuPeriodMicroseconds <- function() {
   value <- suppressWarnings({
     ## e.g. /sys/fs/cgroup/cpu/cpu.cfs_period_us
@@ -429,7 +372,6 @@ getCGroups1CpuPeriodMicroseconds <- function() {
 #  @return A non-negative numeric.
 #  If cgroups is not in use, or could not be queried, NA_real_ is returned.
 #
-#' @importFrom utils file_test
 getCGroups1CpuQuota <- function() {
   ## TEMPORARY: In case the cgroups options causes problems, make
   ## it possible to override their values via hidden options
@@ -481,7 +423,6 @@ getCGroups1CpuQuota <- function() {
 #
 #  [1] https://docs.kernel.org/admin-guide/cgroup-v2.html
 #
-#' @importFrom utils file_test
 getCGroups2CpuMax <- function(pid = Sys.getpid()) {
   ## TEMPORARY: In case the cgroups options causes problems, make
   ## it possible to override their values via hidden options
