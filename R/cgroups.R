@@ -106,7 +106,7 @@ getCGroups <- local({
         data2 <- data[row, ]
         for (name in names[-1]) {
           data2$controller <- name
-          data <- cbind(data, data2)
+          data <- rbind(data, data2)
         }
       }
     }
