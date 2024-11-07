@@ -1,5 +1,11 @@
 # Version (development version)
 
+## New Features
+
+ * Environment variables `R_PARALLELLY_RANDOM_PORTS` now supports
+   multiple, comma-separated port specifications, e.g.
+   `"20001:20999"` and `"1068:1099,20001:20999,40530"`.
+ 
 ## Documentation
 
  * Add example to `help("makeClusterPSOCK")` on how to use

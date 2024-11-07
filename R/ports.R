@@ -92,37 +92,52 @@ randomParallelPorts <- function(default = 11000:11999) {
   random <- getEnvVar2("R_PARALLELLY_RANDOM_PORTS", "")
   if (!nzchar(random)) return(default)
 
-  pattern <- "^([[:digit:]]+)(|:([[:digit:]]+))$"
-  if (!grepl(pattern, random)) {
-    warnf("Value of environment variable 'R_PARALLELLY_RANDOM_PORTS' does not match regular expression %s: %s", sQuote(pattern), sQuote(random))
-    return(default)
+  specs <- strsplit(random, split = ",", fixed = TRUE)[[1]]
+
+  pattern_port <- "^([[:digit:]]{1,5})$"
+  pattern_range <- "^([[:digit:]]{1,5}):([[:digit:]]{1,5})$"
+
+  ports <- integer(0L)
+  for (kk in seq_along(specs)) {
+    spec <- specs[kk]
+    if (grepl(pattern_port, spec)) {
+      ports_kk <- as.integer(spec)
+      if (is.na(ports_kk)) {
+        ## This should never be able to happen with the above
+        ## regular expressions /HB 2024-11-06
+        warnf("Skipping port specification in environment variable 'R_PARALLELLY_RANDOM_PORTS' that coerced to NA_integer_: %s", sQuote(spec))
+        next
+      }
+    } else if (grepl(pattern_range, spec)) {
+      from <- sub(pattern_range, "\\1", spec)
+      to <- sub(pattern_range, "\\2", spec)
+      from <- as.integer(from)
+      to <- as.integer(to)
+      if (is.na(from) || is.na(to)) {
+        ## This should never be able to happen with the above
+        ## regular expressions /HB 2024-11-06
+        warnf("Skipping port specification in environment variable 'R_PARALLELLY_RANDOM_PORTS' that coerced to NA_integer_: %s", sQuote(spec))
+        next
+      } else if (from < 0L || from > 65535L || to < 0L || to > 65535L) {
+        warnf("Skipping port specification in environment variable 'R_PARALLELLY_RANDOM_PORTS' that specify ports outside of [0,65535]: %s", sQuote(spec))
+        next
+      }
+      ports_kk <- from:to
+    } else {
+       warnf("Skipping unknown port specification in environment variable 'R_PARALLELLY_RANDOM_PORTS': %s", sQuote(spec))
+       next
+    }
+    ports <- c(ports, ports_kk)
+  } ## for (kk ...)
+
+  if (length(ports) == 0L) {
+    warnf("Will use the default set of random ports, because environment variable 'R_PARALLELLY_RANDOM_PORTS' did not specify any valid ports: %s", sQuote(random))
+    ports <- default
   }
 
-  from <- sub(pattern, "\\1", random)
-  from <- as.integer(from)
-  if (is.na(from)) {
-    warnf("Value of environment variable 'R_PARALLELLY_RANDOM_PORTS' coerced to NA_integer_: %s", sQuote(random))
-    return(default)
-  }
-  if (from < 0L || from > 65535L) {
-    warnf("Value of environment variable 'R_PARALLELLY_RANDOM_PORTS' does not specify ports in [0,65535]: %s", sQuote(random))
-    return(default)
-  }
+  ports <- unique(sort(ports))
 
-  to <- sub(pattern, "\\3", random)
-  if (!nzchar(to)) return(from)
-  
-  to <- as.integer(to)
-  if (is.na(to)) {
-    warnf("Value of environment variable 'R_PARALLELLY_RANDOM_PORTS' coerced to NA_integer_: %s", sQuote(random))
-    return(default)
-  }
-  if (to < 0L || to > 65535L) {
-    warnf("Value of environment variable 'R_PARALLELLY_RANDOM_PORTS' does not specify ports in [0,65535]: %s", sQuote(random))
-    return(default)
-  }
-
-  from:to
+  ports
 }
 
 
