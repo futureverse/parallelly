@@ -1,7 +1,7 @@
 
 
 <div id="badges"><!-- pkgdown markup -->
-<a href="https://CRAN.R-project.org/web/checks/check_results_parallelly.html"><img border="0" src="https://www.r-pkg.org/badges/version/parallelly" alt="CRAN check status"/></a> <a href="https://github.com/HenrikBengtsson/parallelly/actions?query=workflow%3AR-CMD-check"><img border="0" src="https://github.com/HenrikBengtsson/parallelly/actions/workflows/R-CMD-check.yaml/badge.svg?branch=develop" alt="R CMD check status"/></a> <a href="https://github.com/HenrikBengtsson/parallelly/actions?query=workflow%3Arevdepcheck-top"><img border="0" src="https://github.com/HenrikBengtsson/parallelly/actions/workflows/revdepcheck-top.yaml/badge.svg?branch=develop" alt="Top reverse-dependency checks status"/></a>    <a href="https://app.codecov.io/gh/HenrikBengtsson/parallelly"><img border="0" src="https://codecov.io/gh/HenrikBengtsson/parallelly/branch/develop/graph/badge.svg" alt="Coverage Status"/></a> 
+<a href="https://CRAN.R-project.org/web/checks/check_results_parallelly.html"><img border="0" src="https://www.r-pkg.org/badges/version/parallelly" alt="CRAN check status"/></a> <a href="https://github.com/futureverse/parallelly/actions?query=workflow%3AR-CMD-check"><img border="0" src="https://github.com/futureverse/parallelly/actions/workflows/R-CMD-check.yaml/badge.svg?branch=develop" alt="R CMD check status"/></a> <a href="https://github.com/futureverse/parallelly/actions?query=workflow%3Arevdepcheck-top"><img border="0" src="https://github.com/futureverse/parallelly/actions/workflows/revdepcheck-top.yaml/badge.svg?branch=develop" alt="Top reverse-dependency checks status"/></a>    <a href="https://app.codecov.io/gh/futureverse/parallelly"><img border="0" src="https://codecov.io/gh/futureverse/parallelly/branch/develop/graph/badge.svg" alt="Coverage Status"/></a> 
 </div>
 
 # parallelly: Enhancing the 'parallel' Package <img border="0" src="man/figures/logo.png" alt="The 'parallelly' hexlogo" align="right"/>
@@ -121,7 +121,7 @@ install.packages("parallelly")
 
 To install the pre-release version that is available in Git branch `develop` on GitHub, use:
 ```r
-remotes::install_github("HenrikBengtsson/parallelly", ref="develop")
+remotes::install_github("futureverse/parallelly", ref="develop")
 ```
 This will install the package from source.  Because of this and because this package also compiles native code, Windows users need to have [Rtools](https://cran.r-project.org/bin/windows/Rtools/) installed and macOS users need to have [Xcode](https://developer.apple.com/xcode/) installed.
 
