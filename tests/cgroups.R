@@ -1,9 +1,10 @@
 source("incl/start.R")
 
-file <- system.file(package = "parallelly", "test-data", "cgroups.tar.gz", mustWork = TRUE)
-td <- tempdir()
-res <- untar(file, exdir = td)
-stopifnot(res == 0)
+#file <- system.file(package = "parallelly", "test-data", "cgroups.tar.gz", mustWork = TRUE)
+#td <- tempdir()
+#res <- untar(file, exdir = td)
+#stopifnot(res == 0)
+td <- system.file(package = "parallelly", "test-data", mustWork = TRUE)
 hosts <- dir(path = file.path(td, "cgroups"), full.names = TRUE)
 
 message("*** cgroups ...")
