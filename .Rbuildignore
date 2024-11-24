@@ -45,7 +45,6 @@ Rplots.pdf$
 ^[.]test
 ^[.]check
 ^[.]local
-^.*[.]tar[.]gz$
 
 #----------------------------
 # Package specific
