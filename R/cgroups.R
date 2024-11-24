@@ -52,6 +52,84 @@ proc_path <- local({
 })
 
 
+get_uid <- local({
+  .uid <- NULL
+  
+  function() {
+    if (!is.null(.uid)) return(.uid)
+    res <- system2("id", args = "-u", stdout = TRUE)
+    uid <- as.integer(res)
+    if (is.na(uid)) stop("id -u returned a non-integer: ", sQuote(res))
+    .uid <<- uid
+    uid
+  }
+})
+
+
+#' @importFrom utils file_test
+clone_cgroup <- function(dest = tempdir()) {
+  stopifnot(file_test("-d", dest))
+  
+  ## Temporarily reset overrides
+  old_pid <- current_pid(NA)
+  old_path <- proc_path(NA)
+  on.exit({
+    proc_path(old_path)
+    current_pid(old_pid)
+  })
+
+  ## Record current UID
+  uid <- get_uid()
+  file <- file.path(dest, "uid")
+  cat(uid, file = file)
+
+  ## Record /proc/self/
+  src <- "/proc/self"
+  path <- file.path(dest, src)
+  dir.create(path, recursive = TRUE)
+  files <- c("mounts", "cgroup")
+  files <- files[file_test("-f", file.path(src, files))]
+  for (file in files) {
+    bfr <- readLines(file.path(src, file), warn = FALSE)
+    if (file == "mounts") {
+      bfr <- grep("cgroup", bfr, value = TRUE)
+    }
+    writeLines(bfr, con = file.path(path, file))
+  }
+
+  ## Record CGroups root folder
+  root <- getCGroupsRoot()
+  path <- file.path(dest, root)
+  dir.create(path, recursive = TRUE)
+  
+  cgroups <- getCGroups()
+  paths <- character(0)
+  for (dir in cgroups$path) {
+    paths <- c(paths, dir)
+    while (nzchar(dir) && dir != "/") {
+      dir <- dirname(dir)
+      paths <- c(paths, dir)
+    }
+  }
+  paths <- unique(paths)
+
+  ## Copy file structure
+  for (dir in paths) {
+    src <- file.path(root, dir)
+    if (!file_test("-d", src)) next
+    path <- file.path(dest, src)
+    if (!file_test("-d", path)) dir.create(path, recursive = TRUE)
+    files <- dir(path = src)
+    files <- files[file_test("-f", file.path(src, files))]
+    for (file in files) {
+      file.copy(file.path(src, file), file.path(path, file))
+    }
+  }
+
+  dest
+}
+
+
 #-------------------------------------------------------
 # Unix control groups ("cgroups")
 #-------------------------------------------------------
@@ -76,7 +154,7 @@ getCGroupsRoot <- local({
     ## $ grep cgroup /proc/$$/mounts
     ## cgroup2 /sys/fs/cgroup cgroup2 rw,seclabel,nosuid,nodev,noexec,relatime,nsdelegate 0 0
 
-    file <- file.path(proc_path(), pid, "mounts")
+    file <- file.path(proc_path(), "self", "mounts")
     if (!file_test("-f", file)) {
       path <- NA_character_
       .cache[[pid_str]] <- path
@@ -146,7 +224,7 @@ getCGroups <- local({
     if (!is.null(data)) return(data)
 
     ## Get cgroups
-    file <- file.path(proc_path(), pid, "cgroup")
+    file <- file.path(proc_path(), "self", "cgroup")
 
     ## cgroups is not set?
     if (!file_test("-f", file)) {
