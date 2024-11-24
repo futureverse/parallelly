@@ -1,24 +1,3 @@
-# CRAN submission parallelly 1.38.0
-
-on 2024-07-27
-
-I've verified this submission has no negative impact on any of the 55 reverse package dependencies available on CRAN (n = 48) and Bioconductor (n = 7).
+I've verified this submission has no negative impact on any of the 61 reverse package dependencies available on CRAN (n = 55) and Bioconductor (n = 6).
 
 Thank you
-
-
-## Notes not sent to CRAN
-
-### R CMD check validation
-
-The package has been verified using `R CMD check --as-cran` on:
-
-| R version | GitHub | mac/win-builder |
-| --------- | ------ | --------------- |
-| 3.5.x     | L      |                 |
-| 4.2.x     | L      |                 |
-| 4.3.x     | L M  W |                 |
-| 4.4.x     | L M  W | M1 W            |
-| devel     | L M1 W |    W            |
-
-_Legend: OS: L = Linux, M = macOS, M1 = macOS M1, W = Windows_

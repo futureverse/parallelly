@@ -1,5 +1,10 @@
 # Version (development version)
 
+ * ...
+ 
+
+# Version 1.39.0 [2024-11-07]
+
 ## New Features
 
  * Environment variables `R_PARALLELLY_RANDOM_PORTS` now supports
