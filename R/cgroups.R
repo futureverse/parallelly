@@ -76,7 +76,10 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
     currentPID(old_pid)
   })
 
-  dest <- tempdir()
+  ## Create a temporary directory
+  dest <- tempfile()
+  dir.create(dest)
+  stopifnot(file_test("-d", dest))
 
   ## Record current UID
   uid <- getUID()
