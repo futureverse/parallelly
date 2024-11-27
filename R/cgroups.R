@@ -147,7 +147,7 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    message(" - Adjust /proc/self/mounts accordingly:")
    file <- file.path(tmpdir, "proc", "self", "mounts")
    bfr <- readLines(file, warn = FALSE)
-   bfr <- gsub("/sys/fs/cgroup", file.path(tmpdir, "sys/fs/cgroup"), bfr)
+   bfr <- gsub("/sys/fs/cgroup", file.path(tmpdir, "sys/fs/cgroup", fsep = "/"), bfr)
    writeLines(bfr, con = file)
    bfr <- readLines(file, warn = FALSE)
    bfr <- sprintf("   %02d: %s", seq_along(bfr), bfr)
