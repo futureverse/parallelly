@@ -1,6 +1,27 @@
 #-------------------------------------------------------
 # Utility functions with option to override for testing
 #-------------------------------------------------------
+maxCores <- local({
+  .max <- NULL
+  
+  function(max = NULL) {
+    ## Set new max?
+    if (!is.null(max)) {
+      ## Reset?
+      if (is.na(max)) max <- NULL
+      old_max <- .max
+      .max <<- max
+      return(old_max)
+    }
+
+    ## Update cache?
+    if (is.null(.max)) .max <<- parallel::detectCores(logical = TRUE)
+
+    .max
+  }
+})
+
+
 procPath <- local({
   .path <- NULL
   
@@ -15,6 +36,7 @@ procPath <- local({
       ## Reset caches
       environment(getCGroupsRoot)$.cache <- NULL
       environment(getCGroups)$.data <- NULL
+      environment(maxCores)$.max <- NULL
 
       return(old_path)
     }
@@ -26,6 +48,24 @@ procPath <- local({
   }
 })
 
+
+readMounts <- function(file) {
+  stopifnot(file_test("-f", file))
+  data <- read.table(file, sep = " ", stringsAsFactors = FALSE)
+  names <- c("device", "mountpoint", "type", "options", "dump", "pass")
+  if (ncol(data) < length(names)) {
+    names <- names[seq_len(ncol(data))]
+  } else if (ncol(data) > length(names)) {
+    names <- c(names, rep("", ncol(data) - length(names)))
+  }
+  names(data) <- names  
+  data
+}
+
+
+writeMounts <- function(mounts, file) {
+  write.table(mounts, file = file, quote = FALSE, sep = " ", row.names = FALSE, col.names = FALSE)
+}
 
 getUID <- local({
   .uid <- NULL
@@ -45,14 +85,13 @@ getUID <- local({
 cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
   ## Temporarily reset overrides
   old_path <- procPath(NA)
-  on.exit({
-    procPath(old_path)
-  })
+  on.exit(procPath(old_path))
 
   ## Create a temporary directory
   dest <- tempfile()
   dir.create(dest)
   stopifnot(file_test("-d", dest))
+  on.exit(unlink(dest, recursive = TRUE), add = TRUE)
 
   ## Record current UID
   uid <- getUID()
@@ -63,32 +102,40 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
   controller <- NA_character_
   
   ## Record /proc/self/
-  src <- "/proc/self"
+  src <- file.path("/proc", "self")
   path <- file.path(dest, src)
   dir.create(path, recursive = TRUE)
-  files <- c("mounts", "cgroup")
-  files <- files[file_test("-f", file.path(src, files))]
-  for (file in files) {
-    bfr <- readLines(file.path(src, file), warn = FALSE)
-    if (file == "mounts") {
-      bfr <- grep("^cgroup[^[:blank:]]*[[:blank:]]+", bfr, value = TRUE)
-      ## Identify CGroups version
-      types <- gsub("[[:blank:]].*", "", bfr)
-      utypes <- unique(types)
-      if (length(utypes) > 1) {
-        stop("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))	
-      }
-      if (utypes == "cgroup") {
-        controller <- "cpuset"
-      } else if (utypes == "cgroup2") {
-        controller <- ""
-      } else {
-        stop("Unknown CGroups version: ", sQuote(utypes))
-      }
-    }
-    writeLines(bfr, con = file.path(path, file))
-  }
 
+  ## Record /proc/self/cgroup
+  file <- file.path(src, "cgroup")
+  if (file_test("-f", file)) {
+    file.copy(from = file, to = file.path(path, file))
+  }
+  
+  ## Record /proc/self/mounts
+  file <- file.path(src, "mounts")
+  if (file_test("-f", file)) {
+    file.copy(from = file, to = file.path(path, file))
+    
+    mounts <- readMounts(file)
+    
+    ## Keep CGroups mount points
+    mounts <- subset(mounts, grepl("^cgroup", type))
+
+    ## Mixed CGroups versions are not supported
+    utypes <- unique(mounts$type)
+    if (length(utypes) > 1) {
+      stop("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))	
+    }
+    
+    if (utypes == "cgroup") {
+      controller <- "cpuset"
+    } else if (utypes == "cgroup2") {
+      controller <- ""
+    } else {
+      stop("Unknown CGroups version: ", sQuote(utypes))
+    }
+  }
 
   ## Record CGroups root folder for controller of interest
   root <- getCGroupsRoot(controller = controller)
@@ -118,14 +165,12 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
       file.copy(file.path(src, file), file.path(path, file))
     }
   }
-
   
   local({
     opwd <- setwd(dest)
     on.exit(setwd(opwd))
     tar(file.path(opwd, tarfile), compression = "gzip")
   })
-  unlink(dest, recursive = TRUE)
   
   tarfile
 }
@@ -160,23 +205,35 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    on.exit(procPath(old_procPath), add = TRUE)
    message(sprintf(" - procPath(): %s", sQuote(procPath())))
 
+   ## Disable max CPU cores validation
+   old_maxCores <- maxCores(Inf)
+   on.exit(maxCores(old_maxCores), add = TRUE)
+   message(sprintf(" - maxCores(): %s", maxCores()))
+
    ## Adjust /sys/fs/cgroup root accordingly
    message(" - Adjust /proc/self/mounts accordingly:")
    file <- file.path(tmpdir, "proc", "self", "mounts")
-   bfr <- readLines(file, warn = FALSE)
-   bfr <- gsub("/sys/fs/cgroup", normalizePath(file.path(tmpdir, "sys/fs/cgroup"), winslash = "/"), bfr)
-   writeLines(bfr, con = file)
+   mounts <- readMounts(file)
+   idxs <- which(mounts$type %in% c("cgroup", "cgroup2"))
+   for (idx in idxs) {
+     mounts[idx, "mountpoint"] <- normalizePath(file.path(tmpdir, mounts[idx, "mountpoint"]), winslash = "/", mustWork = FALSE)
+   }
+   writeMounts(mounts, file = file)
    bfr <- readLines(file, warn = FALSE)
    bfr <- sprintf("   %02d: %s", seq_along(bfr), bfr)
    writeLines(bfr)
-   
-   message(sprintf(" - getCGroupsRoot(): %s", sQuote(getCGroupsRoot())))
+
+   message(" - getCGroupsVersion(): ", getCGroupsVersion())
+   controller <- ""
+   if (getCGroupsVersion() == 1) {
+     controller <- "cpuset"
+   }
+
+   message(sprintf(" - getCGroupsRoot(controller = \"%s\"): %s", controller, sQuote(getCGroupsRoot(controller = controller))))
 
    message(" - getCGroups():")
    cgroups <- getCGroups()
    print(cgroups)
-
-   message(" - getCGroupsVersion(): ", getCGroupsVersion())
 
    message(" - length(getCGroups1CpuSet()): ", length(getCGroups1CpuSet()))
    message(" - getCGroups1CpuQuota(): ", getCGroups1CpuQuota())
@@ -226,19 +283,18 @@ getCGroupsRoot <- local({
     }
 
     ## Read all mount points
-    bfr <- readLines(file, warn = FALSE)
+    mounts <- readMounts(file)
     
     ## Keep CGroups mount points
-    bfr <- grep("^cgroup[^[:blank:]]*[[:blank:]]+", bfr, value = TRUE)
-    if (length(bfr) == 0) {
+    mounts <- subset(mounts, grepl("^cgroup", type))
+    if (nrow(mounts) == 0) {
       path <- NA_character_
       .cache[[controller]] <<- path
       return(path)
     }
 
-    ## Identify CGroups version
-    types <- gsub("[[:blank:]].*", "", bfr)
-    utypes <- unique(types)
+    ## Mixed CGroups versions are not supported
+    utypes <- unique(mounts$type)
     if (length(utypes) > 1) {
       warning("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))
       path <- NA_character_
@@ -248,39 +304,37 @@ getCGroupsRoot <- local({
     
     ## Filter by CGroups v1 or v2?
     if (nzchar(controller)) {
-      bfr <- grep("^cgroup[[:blank:]]+", bfr, value = TRUE)
+      mounts <- subset(mounts, type == "cgroup")
     } else {
-      bfr <- grep("^cgroup2[[:blank:]]+", bfr, value = TRUE)
+      mounts <- subset(mounts, type == "cgroup2")
     }
-    if (length(bfr) == 0) {
+    if (nrow(mounts) == 0) {
       path <- NA_character_
       .cache[[controller]] <<- path
       return(path)
     }
 
-    if (length(bfr) > 1) {
+    if (nrow(mounts) > 1) {
       ## CGroups v1 or v2?
       if (nzchar(controller)) {
         ## CGroups v1
         pattern <- sprintf("\\b%s\\b", controller)
-        bfr <- grep(pattern, bfr, value = TRUE)
-        if (length(bfr) == 0) {
+        mounts <- subset(mounts, grepl(pattern, mountpoint))
+        if (nrow(mounts) == 0) {
           stop(sprintf("Failed to identify mount point for CGroups v1 controller %s", sQuote(controller)))
-        } else if (length(bfr) > 1) {
-          bfr <- bfr[1]
-          warning(sprintf("Detected more than one 'cgroup' mount point for CGroups v1 controller %s; using the first one",
-                  sQuote(controller)))
+        } else if (nrow(mounts) > 1) {
+          warning(sprintf("Detected more than one 'cgroup' mount point for CGroups v1 controller %s; using the first one", sQuote(controller)))
+          mounts <- mounts[1, ]
         }
       } else {
         ## CGroups v2
-        print(bfr)
-        bfr <- bfr[1]
         warning("Detected more than one 'cgroup2' mount point for CGroups v2; using the first one")
+        mounts <- mounts[1, ]
       }
     }
-    
-    path <- sub("^cgroup[^[:blank:]]*[[:blank:]]+", "", bfr)
-    path <- sub("^([^[:blank:]]+)[[:blank:]]+.*", "\\1", path)
+
+    stopifnot(nrow(mounts) == 1L)
+    path <- mounts$mountpoint
     if (!file_test("-d", path)) {
       path <- NA_character_
     }
@@ -516,7 +570,7 @@ getCGroups1CpuSet <- function() {
   })
 
   ## Sanity checks
-  max_cores <- parallel::detectCores(logical = TRUE)
+  max_cores <- maxCores()
   if (any(value < 0L | value >= max_cores)) {
     warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU set, because it contains one or more CPU indices that is out of range [0,%d]: %s", max_cores - 1L, value0))
     value <- integer(0L)
@@ -597,7 +651,7 @@ getCGroups1CpuQuota <- function() {
   value <- ms / total
 
   if (!is.na(value)) {
-    if (is.null(max_cores)) max_cores <- parallel::detectCores(logical = TRUE)
+    if (is.null(max_cores)) max_cores <- maxCores()
     if (!is.finite(value) || value <= 0.0 || value > max_cores) {
       warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
       value <- NA_real_
@@ -666,7 +720,7 @@ getCGroups2CpuMax <- function() {
   max <- as.integer(max)
   value <- max / period
   if (!is.na(value)) {
-    max_cores <- parallel::detectCores(logical = TRUE)
+    max_cores <- maxCores()
     if (!is.finite(value) || value <= 0.0 || value > max_cores) {
       warning(sprintf("[INTERNAL]: Will ignore the cgroups v2 CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
       value <- NA_real_
