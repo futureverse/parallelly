@@ -120,7 +120,8 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
   ## Record /proc/self/mounts
   file <- file.path(src, "mounts")
   if (file_test("-f", file)) {
-    file.copy(from = file, to = file.path(path, file))
+    ## Avoid write-permission issues later
+    file.copy(from = file, to = file.path(path, file), copy.mode = FALSE)
     
     mounts <- readMounts(file)
     
