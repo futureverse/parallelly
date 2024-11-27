@@ -13,7 +13,7 @@ procPath <- local({
       .path <<- path
 
       ## Reset caches
-      environment(getCGroupsRoot)$.path <- NULL
+      environment(getCGroupsRoot)$.cache <- NULL
       environment(getCGroups)$.data <- NULL
 
       return(old_path)
@@ -59,6 +59,9 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
   file <- file.path(dest, "uid")
   cat(uid, file = file)
 
+  ## Cgroups controller
+  controller <- NA_character_
+  
   ## Record /proc/self/
   src <- "/proc/self"
   path <- file.path(dest, src)
@@ -68,13 +71,27 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
   for (file in files) {
     bfr <- readLines(file.path(src, file), warn = FALSE)
     if (file == "mounts") {
-      bfr <- grep("cgroup", bfr, value = TRUE)
+      bfr <- grep("^cgroup[^[:blank:]]*[[:blank:]]+", bfr, value = TRUE)
+      ## Identify CGroups version
+      types <- gsub("[[:blank:]].*", "", bfr)
+      utypes <- unique(types)
+      if (length(utypes) > 1) {
+        stop("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))	
+      }
+      if (utypes == "cgroup") {
+        controller <- "cpuset"
+      } else if (utypes == "cgroup2") {
+        controller <- ""
+      } else {
+        stop("Unknown CGroups version: ", sQuote(utypes))
+      }
     }
     writeLines(bfr, con = file.path(path, file))
   }
 
-  ## Record CGroups root folder
-  root <- getCGroupsRoot()
+
+  ## Record CGroups root folder for controller of interest
+  root <- getCGroupsRoot(controller = controller)
   path <- file.path(dest, root)
   dir.create(path, recursive = TRUE)
   
@@ -189,58 +206,86 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
 #
 #' @importFrom utils file_test
 getCGroupsRoot <- local({
-  .path <- NULL
+  .cache <- list()
   
   function(controller = "") {
     stopifnot(is.character(controller), length(controller) == 1L, !is.na(controller))
 
-    path <- .path
+    path <- .cache[[controller]]
     if (!is.null(path)) return(path)
 
-    ## FIXME: Look up the CGroups mount point, e.g.
+    ## Look up the CGroups mount point, e.g.
     ## $ grep cgroup /proc/$$/mounts
     ## cgroup2 /sys/fs/cgroup cgroup2 rw,seclabel,nosuid,nodev,noexec,relatime,nsdelegate 0 0
 
     file <- file.path(procPath(), "self", "mounts")
     if (!file_test("-f", file)) {
       path <- NA_character_
-      .path <<- path
+      .cache[[controller]] <<- path
       return(path)
     }
 
+    ## Read all mount points
     bfr <- readLines(file, warn = FALSE)
+    
+    ## Keep CGroups mount points
     bfr <- grep("^cgroup[^[:blank:]]*[[:blank:]]+", bfr, value = TRUE)
     if (length(bfr) == 0) {
       path <- NA_character_
-      .path <<- path
+      .cache[[controller]] <<- path
       return(path)
     }
 
-    ## CGroups v1?
-    if (length(bfr) > 1 && nzchar(controller)) {
-      pattern <- sprintf("\\b%s\\b", controller)
-      bfr <- grep(pattern, bfr, value = TRUE)
-      if (length(bfr) == 0) {
-        stop(sprintf("Failed to identify mount point for CGroups v1 controller %s", sQuote(controller)))
-      } else if (length(bfr) != 1) {
+    ## Identify CGroups version
+    types <- gsub("[[:blank:]].*", "", bfr)
+    utypes <- unique(types)
+    if (length(utypes) > 1) {
+      warning("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))
+      path <- NA_character_
+      .cache[[controller]] <<- path
+      return(path)
+    }
+    
+    ## Filter by CGroups v1 or v2?
+    if (nzchar(controller)) {
+      bfr <- grep("^cgroup[[:blank:]]+", bfr, value = TRUE)
+    } else {
+      bfr <- grep("^cgroup2[[:blank:]]+", bfr, value = TRUE)
+    }
+    if (length(bfr) == 0) {
+      path <- NA_character_
+      .cache[[controller]] <<- path
+      return(path)
+    }
+
+    if (length(bfr) > 1) {
+      ## CGroups v1 or v2?
+      if (nzchar(controller)) {
+        ## CGroups v1
+        pattern <- sprintf("\\b%s\\b", controller)
+        bfr <- grep(pattern, bfr, value = TRUE)
+        if (length(bfr) == 0) {
+          stop(sprintf("Failed to identify mount point for CGroups v1 controller %s", sQuote(controller)))
+        } else if (length(bfr) > 1) {
+          bfr <- bfr[1]
+          warning(sprintf("Detected more than one 'cgroup' mount point for CGroups v1 controller %s; using the first one",
+                  sQuote(controller)))
+        }
+      } else {
+        ## CGroups v2
+        print(bfr)
         bfr <- bfr[1]
-        warning(sprintf("Detected more than one 'cgroup' mount point for CGroups v1 controller %s; using the first one",
-                sQuote(controller)))
+        warning("Detected more than one 'cgroup2' mount point for CGroups v2; using the first one")
       }
     }
     
-    if (length(bfr) > 1) {
-      bfr <- bfr[1]
-      warning("Detected more than one 'cgroup' mount point; using the first one")
-    }
-
     path <- sub("^cgroup[^[:blank:]]*[[:blank:]]+", "", bfr)
     path <- sub("^([^[:blank:]]+)[[:blank:]]+.*", "\\1", path)
     if (!file_test("-d", path)) {
       path <- NA_character_
     }
     
-    .path <<- path
+    .cache[[controller]] <<- path
 
     path
   }
