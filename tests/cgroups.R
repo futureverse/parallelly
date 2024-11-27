@@ -1,11 +1,15 @@
 source("incl/start.R")
 
-#file <- system.file(package = "parallelly", "test-data", "cgroups.tar.gz", mustWork = TRUE)
-#td <- tempdir()
-#res <- untar(file, exdir = td)
-#stopifnot(res == 0)
-td <- system.file(package = "parallelly", "test-data", mustWork = TRUE)
-hosts <- dir(path = file.path(td, "cgroups"), full.names = TRUE)
+path <- system.file(package = "parallelly", "test-data", "cgroups", mustWork = TRUE)
+tarballs <- dir(path = path, pattern = ".*[.]tar[.]gz", full.names = TRUE)
+names(tarballs) <- sub("[.]tar[.]gz$", "", basename(tarballs))
+print(tarballs)
+
+for (tarball in tarballs) {
+  res <- parallelly:::withCGroups(tarball)
+  print(res)
+}
+
 
 message("*** cgroups ...")
 
@@ -97,7 +101,5 @@ stopifnot(
 )
 
 message("*** cgroups ... DONE")
-
-unlink(td, recursive = TRUE)
 
 source("incl/end.R")

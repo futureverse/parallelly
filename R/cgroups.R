@@ -1,31 +1,6 @@
 #-------------------------------------------------------
 # Utility functions with option to override for testing
 #-------------------------------------------------------
-currentPID <- local({
-  .pid <- NULL
-  
-  function(pid = NULL) {
-    ## Set new PID?
-    if (!is.null(pid)) {
-      ## Reset?
-      if (is.na(pid)) pid <- NULL
-      old_pid <- .pid
-      .pid <<- pid
-
-      ## Reset caches
-      environment(getCGroupsRoot)$.cache <- NULL
-      environment(getCGroups)$.cache <- NULL
-
-      return(old_pid)
-    }
-
-    ## Update cache?
-    if (is.null(.pid)) .pid <<- Sys.getpid()
-    
-    .pid
-  }
-})
-
 procPath <- local({
   .path <- NULL
   
@@ -69,11 +44,9 @@ getUID <- local({
 #' @importFrom utils file_test tar
 cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
   ## Temporarily reset overrides
-  old_pid <- currentPID(NA)
   old_path <- procPath(NA)
   on.exit({
     procPath(old_path)
-    currentPID(old_pid)
   })
 
   ## Create a temporary directory
@@ -141,24 +114,70 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
 }
 
 
+#' @importFrom utils file_test untar
+withCGroups <- function(tarball) {
+   stopifnot(file_test("-f", tarball))
+
+   name <- sub("[.]tar[.]gz$", "", basename(tarball))
+   message(sprintf("CGroups for system %s ...", sQuote(name)))
+
+   ## Create a temporary temporary directory
+   td <- tempfile()
+   dir.create(td)
+   untar(tarball, exdir = td)
+   on.exit(unlink(td, recursive = TRUE))
+
+   ## Read the UID
+   file <- file.path(td, "uid")
+   uid <- scan(file.path(td, "uid"), what = "integer", n = 1L, quiet = TRUE)
+   uid <- as.integer(uid)
+   message(sprintf(" - UID: %d", uid))
+
+   ## Adjust /proc accordingly
+   old_procPath <- procPath(file.path(td, "proc"))
+   on.exit(procPath(old_procPath), add = TRUE)
+   message(sprintf(" - procPath(): %s", sQuote(procPath())))
+
+   ## Adjust /sys/fs/cgroup root accordingly
+   message(" - Adjust /proc/self/mounts accordingly:")
+   file <- file.path(td, "proc", "self", "mounts")
+   bfr <- readLines(file, warn = FALSE)
+   bfr <- gsub("/sys/fs/cgroup", file.path(td, "sys/fs/cgroup"), bfr)
+   writeLines(bfr, con = file)
+   bfr <- readLines(file, warn = FALSE)
+   bfr <- sprintf("   %02d: %s", seq_along(bfr), bfr)
+   writeLines(bfr)
+   
+   message(sprintf(" - getCGroupsRoot(): %s", sQuote(getCGroupsRoot())))
+
+   message(" - getCGroups():")
+   cgroups <- getCGroups()
+   print(cgroups)
+
+   message(sprintf(" - getCGroupsVersion(): %s", getCGroupsVersion()))
+
+   message(" - availableCores(which = 'all'):")
+   cores <- availableCores(which = "all")
+   print(cores)
+
+   message(sprintf("CGroups for system %s ... done", sQuote(name)))
+}
+
+
 #-------------------------------------------------------
 # Unix control groups ("cgroups")
 #-------------------------------------------------------
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return A character string to an existing CGroups root folder.
 #  If no such folder could be found, NA_character_ is returned.
 #
 #' @importFrom utils file_test
 getCGroupsRoot <- local({
-  .cache <- list()
+  .path <- NULL
   
-  function(controller = "", pid = currentPID()) {
+  function(controller = "") {
     stopifnot(is.character(controller), length(controller) == 1L, !is.na(controller))
-    stopifnot(is.integer(pid), length(pid) == 1L, pid > 0L)
 
-    pid_str <- as.character(pid)
-    path <- .cache[[pid_str]]
+    path <- .path
     if (!is.null(path)) return(path)
 
     ## FIXME: Look up the CGroups mount point, e.g.
@@ -168,7 +187,7 @@ getCGroupsRoot <- local({
     file <- file.path(procPath(), "self", "mounts")
     if (!file_test("-f", file)) {
       path <- NA_character_
-      .cache[[pid_str]] <- path
+      .path <<- path
       return(path)
     }
 
@@ -176,7 +195,7 @@ getCGroupsRoot <- local({
     bfr <- grep("^cgroup[^[:blank:]]*[[:blank:]]+", bfr, value = TRUE)
     if (length(bfr) == 0) {
       path <- NA_character_
-      .cache[[pid_str]] <- path
+      .path <<- path
       return(path)
     }
 
@@ -204,7 +223,7 @@ getCGroupsRoot <- local({
       path <- NA_character_
     }
     
-    .cache[[pid_str]] <<- path
+    .path <<- path
 
     path
   }
@@ -212,8 +231,6 @@ getCGroupsRoot <- local({
 
 
 #  Get the CGroups hierarchy for a specific process
-#
-#  @param pid (integer) The ID of an existing process.
 #
 #  @return A data frame with three columns:
 #  * `hierarchy_id` (integer): 0 for cgroups v2.
@@ -225,13 +242,10 @@ getCGroupsRoot <- local({
 # 
 #' @importFrom utils file_test
 getCGroups <- local({
-  .cache <- list()
+  .data <- NULL
   
-  function(pid = currentPID()) {
-    stopifnot(is.integer(pid), length(pid) == 1L, pid > 0L)
-    pid_str <- as.character(pid)
-
-    data <- .cache[[pid_str]]
+  function() {
+    data <- .data
     if (!is.null(data)) return(data)
 
     ## Get cgroups
@@ -240,7 +254,7 @@ getCGroups <- local({
     ## cgroups is not set?
     if (!file_test("-f", file)) {
       data <- data.frame(hierarchy_id = integer(0L), controller = character(0L), path = character(0L))
-      .cache[[pid_str]] <- data
+      .data <<- data
       return(data)
     }
 
@@ -272,7 +286,7 @@ getCGroups <- local({
     
     ## Order by hierarchy ID
     data <- data[order(data$hierarchy_id), ]
-    .cache[[pid_str]] <<- data
+    .data <<- data
     
     data
   }
@@ -283,17 +297,15 @@ getCGroups <- local({
 #
 #  @param controller (character) A cgroups v1 set or `""` for cgroups v2.
 # 
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return An character string to an existing cgroups folder.
 #  If no folder could be found, `NA_character_` is returned.
 # 
 #' @importFrom utils file_test
-getCGroupsPath <- function(controller, pid = currentPID()) {
-  root <- getCGroupsRoot(controller = controller, pid = pid)
+getCGroupsPath <- function(controller) {
+  root <- getCGroupsRoot(controller = controller)
   if (is.na(root)) return(NA_character_)
 
-  data <- getCGroups(pid = pid)
+  data <- getCGroups()
 
   set <- data[data$controller == controller, ]
   if (nrow(set) == 0L) {
@@ -331,15 +343,13 @@ getCGroupsPath <- function(controller, pid = currentPID()) {
 # 
 #  @param field (character) A cgroups field.
 # 
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return An character string.
 #  If the requested cgroups controller and field could not be queried,
 #  NA_character_ is returned.
 #
 #' @importFrom utils file_test
-getCGroupsValue <- function(controller, field, pid = currentPID()) {
-  path <- getCGroupsPath(controller = controller, pid = pid)
+getCGroupsValue <- function(controller, field) {
+  path <- getCGroupsPath(controller = controller)
   if (is.na(path)) return(NA_character_)
 
   path_prev <- ""
@@ -365,13 +375,11 @@ getCGroupsValue <- function(controller, field, pid = currentPID()) {
 #
 #  @param field (character) A cgroups v1 field.
 # 
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return An character string. If the requested cgroups v1 field could not be
 #  queried, NA_character_ is returned.
 #
-getCGroups1Value <- function(controller, field, pid = currentPID()) {
-  getCGroupsValue(controller, field = field, pid = pid)
+getCGroups1Value <- function(controller, field) {
+  getCGroupsValue(controller, field = field)
 }
 
 
@@ -379,26 +387,22 @@ getCGroups1Value <- function(controller, field, pid = currentPID()) {
 #
 #  @param field (character) A cgroups v2 field.
 # 
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return An character string. If the requested cgroups v2 field could not be
 #  queried, NA_character_ is returned.
-getCGroups2Value <- function(field, pid = currentPID()) {
-  getCGroupsValue("", field = field, pid = pid)
+getCGroups2Value <- function(field) {
+  getCGroupsValue("", field = field)
 }
 
 
 #  Get cgroups version
-#
-#  @param pid (integer) The ID of an existing process.
 #
 #  @return
 #  If the current process is under cgroups v1, then `1L` is returned.
 #  If it is under cgroups v2, then `2L` is returned.
 #  If not under cgroups control, then `-1L` is returned.
 #
-getCGroupsVersion <- function(pid = currentPID()) {
-  cgroups <- getCGroups(pid = pid)
+getCGroupsVersion <- function() {
+  cgroups <- getCGroups()
   if (nrow(cgroups) == 0) return(-1L)
   if (nzchar(cgroups$controller)) return(1L)
   2L
@@ -493,7 +497,7 @@ getCGroups1CpuSet <- function() {
 #
 #  [1] https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
 #
-getCGroups1CpuQuotaMicroseconds <- function(pid = currentPID()) {
+getCGroups1CpuQuotaMicroseconds <- function() {
   value <- suppressWarnings({
     ## e.g. /sys/fs/cgroup/cpu/cpu.cfs_quota_us
     as.integer(getCGroups1Value("cpu", "cpu.cfs_quota_us"))
@@ -567,7 +571,7 @@ getCGroups1CpuQuota <- function() {
 #
 #  [1] https://docs.kernel.org/admin-guide/cgroup-v2.html
 #
-getCGroups2CpuMax <- function(pid = currentPID()) {
+getCGroups2CpuMax <- function() {
   ## TEMPORARY: In case the cgroups options causes problems, make
   ## it possible to override their values via hidden options
   quota <- get_package_option("cgroups2.cpu.max", NULL)
@@ -576,7 +580,7 @@ getCGroups2CpuMax <- function(pid = currentPID()) {
 
   raw <- suppressWarnings({
     ## e.g. /sys/fs/cgroup/cpu.max
-    getCGroups2Value("cpu.max", pid = pid)
+    getCGroups2Value("cpu.max")
   })
 
   if (is.na(raw)) {
