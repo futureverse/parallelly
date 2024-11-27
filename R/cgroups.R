@@ -13,8 +13,8 @@ procPath <- local({
       .path <<- path
 
       ## Reset caches
-      environment(getCGroupsRoot)$.cache <- NULL
-      environment(getCGroups)$.cache <- NULL
+      environment(getCGroupsRoot)$.path <- NULL
+      environment(getCGroups)$.data <- NULL
 
       return(old_path)
     }
