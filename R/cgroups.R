@@ -115,34 +115,39 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
 
 
 #' @importFrom utils file_test untar
-withCGroups <- function(tarball) {
+withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = NULL) {
    stopifnot(file_test("-f", tarball))
+   expr <- substitute(expr)
 
    name <- sub("[.]tar[.]gz$", "", basename(tarball))
    message(sprintf("CGroups for system %s ...", sQuote(name)))
 
-   ## Create a temporary temporary directory
-   td <- tempfile()
-   dir.create(td)
-   untar(tarball, exdir = td)
-   on.exit(unlink(td, recursive = TRUE))
+   ## Create a temporary temporary directory?
+   if (is.null(tmpdir)) {
+       tmpdir <- tempfile()
+       dir.create(tmpdir)
+       on.exit(unlink(tmpdir, recursive = TRUE))
+   }
+   message(" - Using temporary folder: ", sQuote(tmpdir))
+   
+   untar(tarball, exdir = tmpdir)
 
    ## Read the UID
-   file <- file.path(td, "uid")
-   uid <- scan(file.path(td, "uid"), what = "integer", n = 1L, quiet = TRUE)
+   file <- file.path(tmpdir, "uid")
+   uid <- scan(file.path(tmpdir, "uid"), what = "integer", n = 1L, quiet = TRUE)
    uid <- as.integer(uid)
    message(sprintf(" - UID: %d", uid))
 
    ## Adjust /proc accordingly
-   old_procPath <- procPath(file.path(td, "proc"))
+   old_procPath <- procPath(file.path(tmpdir, "proc"))
    on.exit(procPath(old_procPath), add = TRUE)
    message(sprintf(" - procPath(): %s", sQuote(procPath())))
 
    ## Adjust /sys/fs/cgroup root accordingly
    message(" - Adjust /proc/self/mounts accordingly:")
-   file <- file.path(td, "proc", "self", "mounts")
+   file <- file.path(tmpdir, "proc", "self", "mounts")
    bfr <- readLines(file, warn = FALSE)
-   bfr <- gsub("/sys/fs/cgroup", file.path(td, "sys/fs/cgroup"), bfr)
+   bfr <- gsub("/sys/fs/cgroup", file.path(tmpdir, "sys/fs/cgroup"), bfr)
    writeLines(bfr, con = file)
    bfr <- readLines(file, warn = FALSE)
    bfr <- sprintf("   %02d: %s", seq_along(bfr), bfr)
@@ -154,13 +159,25 @@ withCGroups <- function(tarball) {
    cgroups <- getCGroups()
    print(cgroups)
 
-   message(sprintf(" - getCGroupsVersion(): %s", getCGroupsVersion()))
+   message(" - getCGroupsVersion(): ", getCGroupsVersion())
+
+   message(" - length(getCGroups1CpuSet()): ", length(getCGroups1CpuSet()))
+   message(" - getCGroups1CpuQuota(): ", getCGroups1CpuQuota())
+   message(" - getCGroups2CpuMax(): ", getCGroups2CpuMax())
 
    message(" - availableCores(which = 'all'):")
    cores <- availableCores(which = "all")
    print(cores)
 
+   if (is.null(envir)) {
+     res <- eval(expr)
+   } else {
+     res <- eval(expr, envir = envir)
+   }
+   
    message(sprintf("CGroups for system %s ... done", sQuote(name)))
+   
+   invisible(res)
 }
 
 
@@ -314,8 +331,7 @@ getCGroupsPath <- function(controller) {
 
   set <- set$path
   path <- file.path(root, set)
-  top_root <- dirname(procPath())
-  while (set != top_root) {
+  while (set != "/") {
     if (file_test("-d", path)) {
       break
     }
