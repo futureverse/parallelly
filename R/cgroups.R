@@ -329,7 +329,10 @@ getCGroupsRoot <- local({
         pattern <- sprintf("\\b%s\\b", controller)
         mounts <- subset(mounts, grepl(pattern, mountpoint))
         if (nrow(mounts) == 0) {
-          stop(sprintf("Failed to identify mount point for CGroups v1 controller %s", sQuote(controller)))
+          ## No such CGroups v1 mount point for specified controller
+          path <- NA_character_
+          .cache[[controller]] <<- path
+          return(path)
         } else if (nrow(mounts) > 1) {
           warning(sprintf("Detected more than one 'cgroup' mount point for CGroups v1 controller %s; using the first one", sQuote(controller)))
           mounts <- mounts[1, ]
