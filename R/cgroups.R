@@ -108,19 +108,19 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
   
   ## Record /proc/self/
   src <- file.path("/proc", "self")
-  path <- file.path(dest, src)
-  dir.create(path, recursive = TRUE)
+  dir.create(file.path(dest, src), recursive = TRUE)
 
   ## Record /proc/self/cgroup
   file <- file.path(src, "cgroup")
   if (file_test("-f", file)) {
-    file.copy(from = file, to = file.path(path, file))
+    file.copy(from = file, to = file.path(dest, file))
   }
   
   ## Record /proc/self/mounts
   file <- file.path(src, "mounts")
   if (file_test("-f", file)) {
-    file.copy(from = file, to = file.path(path, file))
+    ## Avoid write-permission issues late
+    file.copy(from = file, to = file.path(dest, file), copy.mode = FALSE)
     
     mounts <- readMounts(file)
     
