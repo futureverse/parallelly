@@ -49,6 +49,7 @@ procPath <- local({
 })
 
 
+#' @importFrom utils read.table
 readMounts <- function(file) {
   stopifnot(file_test("-f", file))
   data <- read.table(file, sep = " ", stringsAsFactors = FALSE)
@@ -63,6 +64,7 @@ readMounts <- function(file) {
 }
 
 
+#' @importFrom utils write.table
 writeMounts <- function(mounts, file) {
   write.table(mounts, file = file, quote = FALSE, sep = " ", row.names = FALSE, col.names = FALSE)
 }
@@ -83,6 +85,9 @@ getUID <- local({
 
 #' @importFrom utils file_test tar
 cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
+  ## To please R CMD check
+  type <- NULL
+
   ## Temporarily reset overrides
   old_path <- procPath(NA)
   on.exit(procPath(old_path))
@@ -263,6 +268,9 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
 #
 #' @importFrom utils file_test
 getCGroupsRoot <- local({
+  ## To please R CMD check
+  type <- mountpoint <- NULL
+  
   .cache <- list()
   
   function(controller = "") {
