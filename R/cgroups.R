@@ -420,8 +420,8 @@ getCGroups2Value <- function(field) {
 getCGroupsVersion <- function() {
   cgroups <- getCGroups()
   if (nrow(cgroups) == 0) return(-1L)
-  if (nzchar(cgroups$controller)) return(1L)
-  2L
+  if (nrow(cgroups) == 1 && cgroups$controller == "") return(2L)
+  1L
 }
 
 
