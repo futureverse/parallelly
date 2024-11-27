@@ -1,16 +1,5 @@
 source("incl/start.R")
 
-path <- system.file(package = "parallelly", "test-data", "cgroups", mustWork = TRUE)
-tarballs <- dir(path = path, pattern = ".*[.]tar[.]gz", full.names = TRUE)
-names(tarballs) <- sub("[.]tar[.]gz$", "", basename(tarballs))
-print(tarballs)
-
-for (tarball in tarballs) {
-  res <- parallelly:::withCGroups(tarball)
-  print(res)
-}
-
-
 message("*** cgroups ...")
 
 message("- getCGroups()")
@@ -101,5 +90,22 @@ stopifnot(
 )
 
 message("*** cgroups ... DONE")
+
+message("cgroups - real-world ...")
+
+path <- system.file(package = "parallelly", "test-data", "cgroups", mustWork = TRUE)
+tarballs <- dir(path = path, pattern = ".*[.]tar[.]gz", full.names = TRUE)
+names(tarballs) <- sub("[.]tar[.]gz$", "", basename(tarballs))
+
+for (name in names(tarballs)) {
+  parallelly:::withCGroups(tarballs[name], {
+      file <- file.path(path, sprintf("%s.R", name))
+      if (file_test("-f", file)) {
+        source(file, local = FALSE)
+      }
+  })
+}
+
+message("cgroups - real-world ... done")
 
 source("incl/end.R")
