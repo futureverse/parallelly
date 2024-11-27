@@ -34,7 +34,7 @@ procPath <- local({
       .path <<- path
 
       ## Reset caches
-      environment(getCGroupsRoot)$.cache <- NULL
+      environment(getCGroupsRoot)$.cache <- list()
       environment(getCGroups)$.data <- NULL
       environment(maxCores)$.max <- NULL
 
@@ -119,9 +119,6 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
   ## Record /proc/self/mounts
   file <- file.path(src, "mounts")
   if (file_test("-f", file)) {
-    ## Avoid write-permission issues late
-    file.copy(from = file, to = file.path(dest, file), copy.mode = FALSE)
-    
     mounts <- readMounts(file)
     
     ## Keep CGroups mount points
@@ -140,6 +137,9 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
     } else {
       stop("Unknown CGroups version: ", sQuote(utypes))
     }
+
+    ## Write only CGroups mount points
+    mounts <- writeMounts(mounts, file = file.path(dest, file))
   }
 
   ## Record CGroups root folder for controller of interest
