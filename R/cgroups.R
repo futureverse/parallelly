@@ -253,7 +253,7 @@ getCGroups <- local({
 
     ## cgroups is not set?
     if (!file_test("-f", file)) {
-      data <- data.frame(hierarchy_id = integer(0L), controller = character(0L), path = character(0L))
+      data <- data.frame(hierarchy_id = integer(0L), controller = character(0L), path = character(0L), stringsAsFactors = FALSE)
       .data <<- data
       return(data)
     }
@@ -266,7 +266,7 @@ getCGroups <- local({
     ids <- as.integer(sub(pattern, "\\1", bfr))
     controllers <- sub(pattern, "\\2", bfr)
     paths <- sub(pattern, "\\3", bfr)
-    data <- data.frame(hierarchy_id = ids, controller = controllers, path = paths)
+    data <- data.frame(hierarchy_id = ids, controller = controllers, path = paths, stringsAsFactors = FALSE)
       
     ## Split multi-name entries into separate entries,
     ## e.g. 'cpuacct,cpu' -> 'cpuacct' and 'cpu'
