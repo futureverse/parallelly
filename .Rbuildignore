@@ -4,6 +4,7 @@
 ^.svn
 ^.git
 ^.make
+^README[.]md$
 ^INSTALL[.]md$
 ^OVERVIEW[.]md$
 ^CONDUCT[.]md$

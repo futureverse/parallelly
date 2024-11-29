@@ -1,10 +1,14 @@
 Package: parallelly
-Version: 1.39.0-9017
+Version: 1.39.0-9018
 Title: Enhancing the 'parallel' Package
 Imports:
     parallel,
     tools,
     utils
+Suggests:    
+    commonmark,
+    base64enc
+VignetteBuilder: parallelly
 Authors@R: c(
         person("Henrik", "Bengtsson",
                role = c("aut", "cre", "cph"),
