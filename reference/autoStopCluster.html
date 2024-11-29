@@ -24,7 +24,7 @@ be stopped when garbage collected"><meta property="og:image" content="https://pa
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9018</span>
       </span>
     </div>
 
@@ -32,6 +32,16 @@ be stopped when garbage collected"><meta property="og:image" content="https://pa
       <ul class="nav navbar-nav"><li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/parallelly-intro.html">parallelly: An Introduction</a>
+    </li>
+  </ul></li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -169,12 +179,12 @@ An alternative to explicitly call this function on an existing
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Manually, start worker #1 on local machine ‘localhost’ with:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions = "no-delay")' -e 'workRSOCK &lt;- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()' MASTER=localhost PORT=11021 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions = "no-delay")' -e 'workRSOCK &lt;- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()' MASTER=localhost PORT=11472 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Manually, start worker #2 on local machine ‘localhost’ with:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions = "no-delay")' -e 'workRSOCK &lt;- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()' MASTER=localhost PORT=11021 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions = "no-delay")' -e 'workRSOCK &lt;- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()' MASTER=localhost PORT=11472 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">autoStopCluster</span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span></span>
@@ -182,8 +192,8 @@ An alternative to explicitly call this function on an existing
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span>list <span class="op">=</span> <span class="st">"cl"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           used (Mb) gc trigger (Mb) max used (Mb)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ncells  937005 50.1    1753970 93.7  1753970 93.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Vcells 1737203 13.3    8388608 64.0  2418451 18.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ncells  938800 50.2    1758881   94  1758881 94.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Vcells 1740377 13.3    8388608   64  2408695 18.4</span>
 </code></pre></div>
     </div>
   </div>
