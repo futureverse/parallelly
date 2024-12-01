@@ -662,7 +662,7 @@ getCGroups1CpuQuota <- function() {
   value <- ms / total
 
   if (!is.na(value)) {
-    if (is.null(max_cores)) max_cores <- maxCores()
+    max_cores <- maxCores()
     if (!is.finite(value) || value <= 0.0 || value > max_cores) {
       warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
       value <- NA_real_
