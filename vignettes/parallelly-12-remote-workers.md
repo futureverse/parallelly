@@ -4,8 +4,6 @@
 %\VignetteKeyword{R}
 %\VignetteKeyword{package}
 %\VignetteKeyword{vignette}
-%\VignetteKeyword{Rprofile}
-%\VignetteKeyword{Renviron}
 %\VignetteEngine{parallelly::selfonly}
 -->
 
@@ -30,7 +28,7 @@ Regardless of running parallel workers on local or remote machines, we
 need a way to connect to the machines and launch R on them.
 
 
-## Setup (once)
+## SSH and R configuration (once)
 
 ### Verifying SSH access
 
@@ -190,7 +188,8 @@ from within R with the **parallelly** package using:
 
 ```sh
 {ally@local}$ R --quiet
-cl <- parallelly::makeClusterPSOCK("n1.remote.org", user = "alice")
+library(parallely)
+cl <- makeClusterPSOCK("n1.remote.org", user = "alice")
 print(cl)
 #> Socket cluster with 1 nodes where 1 node is on host 'n1.remote.org'
 #> (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)
@@ -202,13 +201,104 @@ above for each machine.  After this, you will be able to launch
 parallel R workers on these machines with little efforts.
 
 
+### Machine-specific SSH customization (recommended)
+
+Some machines do not use the default port 22 to answer on SSH
+connection requests. If the machine uses another port, say, port 2201,
+then we canspecify that via option `-p port`, when we connect to it,
+e.g.
+
+```sh
+{ally@local}$ ssh -p 2201 alice@n1.remote.org
+```
+
+In R, we can specify argument `port=port` as in:
+
+```sh
+cl <- makeClusterPSOCK("n1.remote.org", port = 2201, user = "alice")
+```
+
+Now, it can be tedious to have to remember custom SSH ports and
+usernames when setting up remote workers in R. It also adds noise and
+distraction having such details in the R script, and not to mention
+the fact that the R script has a specific username hardcoded into the
+code makes the script less reproducible for other users - they need to
+change the code to match their username. One way to avoid having to
+give specific SSH options when calling `ssh` in the terminal, or
+`makeClusterPSOCK()` in R, is to configure these settings in SSH. This
+can be done via a file called `~/.ssh/config` _on your local
+machine_. This file does not exist by default, so you would have to
+create it yourself, if missing. It is a plain text file, so you should
+use a plain text editor to create and edit it.
+
+To configure SSH to use port 2201 and username `alice` whenever
+connecting to `n1.remote.org`, the `~/.ssh/config` file should
+contain the following entry:
+
+```plain
+Host n1.remote.org
+  User alice
+  Port 2201
+```
+
+With this, we can connect to `n1.remote.org` just using:
+
+```sh
+{ally@local}$ ssh n1.remote.org
+```
+
+SSH will then connect to the machine as if we had specified also `-p
+2201` and `-l alice`. These settings will also be picked up when we
+connect via R, meaning the following will also work:
+
+```sh
+cl <- makeClusterPSOCK("n1.remote.org")
+```
+
+To achieve the same for other machines, add another entry for them,
+e.g.
+
+```plain
+Host n1.remote.org
+  User alice
+  Port 2201
+
+Host n2.remote.org
+  User alice
+  Port 2201
+
+Host hpc.my-university.edu
+  User alice.bobson
+```
+
+When hosts on the same system share the same setting, one can use
+globbing to configure them the same way.  For instance, the above can
+be shorted to:
+
+```plain
+Host n?.remote.org
+  User alice
+  Port 2201
+
+Host hpc.my-university.edu
+  User alice.bobson
+```
+
+Being able to connect to remote machines by just specifying their
+hostnames is convenient and simplies also the R code.  Because of
+this, we recommend setting up also `~/.ssh/config`.
+
+
 # Examples
 
 ## Example: Two parallel workers on a single remote machine
 
 Our first example sets up two parallel workers on the remote machine
 `n1.remote.org`. For this to work, we need SSH access to the machine,
-and it must have R installed, as explained in the above section. Contrary to local parallel workers, the number of parallel workers on remote machines is specified by repeating the machine name an equal number of times;
+and it must have R installed, as explained in the above
+section. Contrary to local parallel workers, the number of parallel
+workers on remote machines is specified by repeating the machine name
+an equal number of times;
 
 ```r
 library(parallelly)
@@ -273,19 +363,34 @@ case, we would see:
 '/usr/bin/ssh' -R 11465:localhost:11464 -l alice n2.remote.org Rscript ...
 ```
 
+Recall, if we have configured SSH to pick up the username `alice` from
+`~/.ssh/config` on our local machine, as shown in the previous
+section, we could have skipped the `user` argument, and just used:
+
+```r
+workers <- c("n1.remote.org", "n2.remote.org")
+cl <- makeClusterPSOCK(workers)
+```
+
+Note how these instructions for setting up a parallel cluster on these
+two machines would be the identical for another user that has
+configured their personal `~/.ssh/config` file.
+
 
 ## Example: Three parallel workers on two remote machines
 
 When we now understand that we control the number of parallel workers
 on a specific machine by replicate the machine name, we also know how
 to launch different number of parallel workers on different machines.
-For example, to sets up two parallel workers on `n1.remote.org` and
-one on `n2.remote.org`, we do:
+From now on, we will also assume that the remote username no longer
+has to be specified, because it has already been configured via the
+`~/.ssh/config` file.  With this, we can sets up two parallel workers
+on `n1.remote.org` and one on `n2.remote.org`, by:
 
 ```r
 library(parallelly)
 workers <- c("n1.remote.org", "n1.remote.org", "n2.remote.org")
-cl <- makeClusterPSOCK(workers, user = "alice")
+cl <- makeClusterPSOCK(workers)
 print(cl)
 #> Socket cluster with 3 nodes where 2 nodes are on host 'n1.remote.org'
 #> (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), 
@@ -293,15 +398,16 @@ print(cl)
 #> platform x86_64-pc-linux-gnu)
 ```
 
-To generalize to ar large number of workers, we can use the `rep()`
-function, e.g.
+Again, the `user` argument does not have to be specified, because it is configured in `~/.ssh/config`.
+
+To generalize to many workers, we can use the `rep()` function. For example,
 
 ```r
 workers <- c(rep("n1.remote.org", 3), rep("n2.remote.org", 4))
 ```
 
-will setup three workers on `n1.remote.org` and four on
-`n2.remote.org`, totaling seven parallel workers.
+sets up three workers on `n1.remote.org` and four on `n2.remote.org`,
+totaling seven parallel workers.
 
 
 ## Example: A mix of local and remote workers
@@ -348,8 +454,10 @@ print(cl)
 #> platform x86_64-pc-linux-gnu)
 ```
 
-If the username would be the same on the local and the remote
-machines, we would be able to set it all up with:
+To emphasize the usefulness of customizing our SSH connections via
+`~/.ssh/config`, if the remote username would already have been
+already configured there, we would be able to set up the full cluster
+in one single call, as in:
 
 ```sh
 library(parallelly)
@@ -373,7 +481,7 @@ referred to as a "jumphost".  For example, assume machine
 ```
 
 To achive the same in a single SSH call, we can specify the "jumphost"
-option for SSH, as in:
+`-J hostname` option for SSH, as in:
 
 ```sh
 {ally@local}$ ssh -J alice@login.remote.org alice@secret1.remote.org
@@ -393,90 +501,128 @@ cl <- makeClusterPSOCK(
 )
 ```
 
+A more convenient solution is to configure the jumphost in
+`~/.ssh/config`, as in:
+
+```plain
+Host *.remote.org
+  User alice
+
+Host secret?.remote.org
+  ProxyJump login.remote.org
+```
+
+This will cause any SSH connection to a machine on the `remote.org`
+network to use username `alice`.  It will also cause any SSH
+connection to machines `secret1.remote.org`, `secret2.remote.org`, and
+so on, to use jumphost `login.remote.org`.  You can verify that all
+this work by:
+
+```sh
+{ally@local}$ ssh login.remote.org
+{alice@login}$
+```
+
+and then:
+
+```sh
+{ally@local}$ ssh secret1.remote.org
+{alice@n1}$ 
+```
+
+If the above work, then the following will work from within R:
+
+```r
+library(parallelly)
+workers <- rep("secret1.remote.org", 3)
+cl <- makeClusterPSOCK(workers)
+```
+
+
+# Special needs and tweaks
+
+The above sections cover most common use cases for setting up a
+parallel cluster from a local Linux, macOS, and MS Windows
+machine. However, there are cases where there above does not work, or
+you prefer to use another solution. This section aims to cover such
+alternatives.
+
+
+## Example: Remote workers ignoring any remote .Rprofile settings
+
+To launch parallel workers skipping any `~/.Rprofile` settings on the
+remote machines, we can pass option `--no-init-file` to `Rscript` via
+argument `rscript_args`. For example,
+
+```r
+workers <- rep("n1.remote.org", 2)
+cl <- makeClusterPSOCK(workers, rscript_args = "--no-init-file")
+```
+
+will launch two parallel workers on `n1.remote.org` ignoring any
+`.Rprofile` files.
+
+
+## Example: Run remote workers with a lower process priority
+
+On Unix, we can run any process with a lower CPU priority using the
+`nice` command. This can be used when we want to lower the risk of
+negatively affecting other users and processes that run on the same
+machine from our R workers overusing the CPUs by mistake. To achieve
+this, we can prepend `nice` to the `Rscript` call via the `rscript`
+argument using:
+
+```r
+workers <- rep("n1.remote.org", 2)
+cl <- makeClusterPSOCK(workers, rscript = c("nice", "*"))
+```
+
+The special `*` value expands to `Rscript` on the remote machine.
+
+
+## Example: Use PuTTY on MS Windows to connect to remote worker
+
+If you run on an MS Windows machine and prefer to use PuTTY to manage
+your SSH connections, or for other reasons cannot use the built-in
+`ssh` client, you can tell `makeClusterPSOCK()` to use PuTTY and your
+PuTTY settings via various arguments.
+
+Here is an example that launches two parallel workers on
+`n1.remote.org` running under user `alice` connecting via SSH port
+2201 using PuTTY and public-private SSH keys in file
+`C:/Users/ally/.ssh/putty.ppk`:
+
+```r
+workers <- "n1.remote.org"
+cl <- makeClusterPSOCK(
+  workers, 
+  user = "alice",
+  rshcmd = "<putty-plink>",
+  rshopts = c("-P", 2201, "-i", "C:/Users/ally/.ssh/putty.ppk")
+)
+```
+
 
 ## Example: Two remote workers running on MS Windows
 
-To launch two parallel workers on two remove MS Windows machines,
+Thus far we have considered our remote machines to run a Unix-like
+operating system, e.g. Linux or macOS. If your remote machines run MS
+Windows, you can use similar techniques to launch parallel workers
+there as well.  For this to work, the remote MS Windows machines must
+accept incoming SSH connections, which is something most Windows
+machines are not configured to do by default. If you do not know set
+that up, or if you do not have the system permissions to do so, please
+reach out to you system administrator of those machines.
+
+Assuming we have SSH access to two MS Windows machines,
 `mswin1.remote.org` and `mswin2.remote.org`, everything works the same
-as above, except that we need to also specify `rscript_sh =
-"cmd"`. The specifies that the parallel R workers should be launched
-via MS Windows' `cmd.exe` shell.  For this example, the two MS Windows
-machines must accept incoming SSH connections.
+as before, except that we need to also specify also argument `rscript_sh =
+"cmd"`;
 
 ```r
 workers <- c("mswin1.remote.org", "mswin2.remote.org")
 cl <- makeClusterPSOCK(workers, rscript_sh = "cmd")
 ```
 
-
-## EXAMPLE: Local and remote workers
-
-```r
-## Same setup when the two machines are on the local network and
-## have identical software setups
-cl <- makeClusterPSOCK(
-  workers,
-  revtunnel = FALSE, homogeneous = TRUE,
-  dryrun = TRUE, quiet = TRUE
-)
-```
-
-
-## EXAMPLE: Remote worker running on Linux from MS Windows machine
-
-```r
-## Connect to remote Unix machine 'remote.server.org' on port 2200
-## as user 'bob' from a MS Windows machine with PuTTY installed.
-## Using the explicit special rshcmd = "<putty-plink>", will force
-## makeClusterPSOCK() to search for and use the PuTTY plink software,
-## preventing it from using other SSH clients on the system search PATH.
-## The parallel worker is launched as:
-## 'plink' -l bob -P 2200 -i C:/Users/bobby/.ssh/putty.ppk remote.server.org ...
-cl <- makeClusterPSOCK(
-  "remote.server.org", user = "bob",
-  rshcmd = "<putty-plink>",
-  rshopts = c("-P", 2200, "-i", "C:/Users/bobby/.ssh/putty.ppk"),
-  dryrun = TRUE, quiet = TRUE
-)
-
-```
-
-
-## EXAMPLE: Remote workers with specific setup
-
-
-```r
-## Setup of remote worker with more detailed control on
-## authentication and reverse SSH tunneling
-## The parallel worker is launched as:
-## '/usr/bin/ssh' -l johnny -v -R 11000:gateway:11942 remote.server.org ...
-## "R_DEFAULT_PACKAGES=... 'nice' '/path/to/Rscript' --no-init-file ...
-cl <- makeClusterPSOCK(
-  "remote.server.org", user = "johnny",
-  ## Manual configuration of reverse SSH tunneling
-  revtunnel = FALSE,
-  rshopts = c("-v", "-R 11000:gateway:11942"),
-  master = "gateway", port = 11942,
-  ## Run Rscript nicely and skip any startup scripts
-  rscript = c("nice", "/path/to/Rscript"),
-  rscript_args = c("--no-init-file"),
-  dryrun = TRUE, quiet = TRUE
-)
-```
-
-
-## EXAMPLE: Remote worker running on Linux from RStudio on MS Windows
-
-```r
-## Connect to remote Unix machine 'remote.server.org' on port 2200
-## as user 'bob' from a MS Windows machine via RStudio's SSH client.
-## Using the explicit special rshcmd = "<rstudio-ssh>", will force
-## makeClusterPSOCK() to use the SSH client that comes with RStudio,
-## preventing it from using other SSH clients on the system search PATH.
-## The parallel worker is launched as:
-## 'ssh' -l bob remote.server.org:2200 ...
-cl <- makeClusterPSOCK(
-  "remote.server.org:2200", user = "bob", rshcmd = "<rstudio-ssh>",
-  dryrun = TRUE, quiet = TRUE
-)
-```
+That argument specifies that the parallel R workers should be launched
+on the remote machines via MS Windows' `cmd.exe` shell.
