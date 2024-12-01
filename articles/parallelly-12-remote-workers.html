@@ -211,7 +211,7 @@ workers being local.</p>
 <p>Regardless of running parallel workers on local or remote machines,
 we need a way to connect to the machines and launch R on them.</p>
 <div class="section level3">
-<h3 id="setup-once">Setup (once)<a class="anchor" aria-label="anchor" href="#setup-once"></a>
+<h3 id="ssh-and-r-configuration-once">SSH and R configuration (once)<a class="anchor" aria-label="anchor" href="#ssh-and-r-configuration-once"></a>
 </h3>
 <div class="section level4">
 <h4 id="verifying-ssh-access">Verifying SSH access<a class="anchor" aria-label="anchor" href="#verifying-ssh-access"></a>
@@ -342,14 +342,76 @@ on machine <code>n1.remote.org</code> running under user
 <code>alice</code>. When can test this from within R with the
 <strong>parallelly</strong> package using:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> R <span class="at">--quiet</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="ex">cl</span> <span class="op">&lt;</span>- parallelly::makeClusterPSOCK<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> user = <span class="st">"alice"</span><span class="kw">)</span></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl</span><span class="kw">)</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 1 nodes where 1 node is on host 'n1.remote.org'</span></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="ex">parallel::stopCluster</span><span class="er">(</span><span class="ex">cl</span><span class="kw">)</span></span></code></pre></div>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallely</span><span class="kw">)</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="ex">cl</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> user = <span class="st">"alice"</span><span class="kw">)</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl</span><span class="kw">)</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 1 nodes where 1 node is on host 'n1.remote.org'</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="ex">parallel::stopCluster</span><span class="er">(</span><span class="ex">cl</span><span class="kw">)</span></span></code></pre></div>
 <p>If you want to run parallel workers on other machines, repeat the
 above for each machine. After this, you will be able to launch parallel
 R workers on these machines with little efforts.</p>
+</div>
+<div class="section level4">
+<h4 id="machine-specific-ssh-customization-recommended">Machine-specific SSH customization (recommended)<a class="anchor" aria-label="anchor" href="#machine-specific-ssh-customization-recommended"></a>
+</h4>
+<p>Some machines do not use the default port 22 to answer on SSH
+connection requests. If the machine uses another port, say, port 2201,
+then we canspecify that via option <code>-p port</code>, when we connect
+to it, e.g.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh <span class="at">-p</span> 2201 alice@n1.remote.org</span></code></pre></div>
+<p>In R, we can specify argument <code>port=port</code> as in:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="ex">cl</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> port = 2201, user = <span class="st">"alice"</span><span class="kw">)</span></span></code></pre></div>
+<p>Now, it can be tedious to have to remember custom SSH ports and
+usernames when setting up remote workers in R. It also adds noise and
+distraction having such details in the R script, and not to mention the
+fact that the R script has a specific username hardcoded into the code
+makes the script less reproducible for other users - they need to change
+the code to match their username. One way to avoid having to give
+specific SSH options when calling <code>ssh</code> in the terminal, or
+<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> in R, is to configure these settings in
+SSH. This can be done via a file called <code>~/.ssh/config</code>
+<em>on your local machine</em>. This file does not exist by default, so
+you would have to create it yourself, if missing. It is a plain text
+file, so you should use a plain text editor to create and edit it.</p>
+<p>To configure SSH to use port 2201 and username <code>alice</code>
+whenever connecting to <code>n1.remote.org</code>, the
+<code>~/.ssh/config</code> file should contain the following entry:</p>
+<pre class="plain"><code>Host n1.remote.org
+  User alice
+  Port 2201</code></pre>
+<p>With this, we can connect to <code>n1.remote.org</code> just
+using:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh n1.remote.org</span></code></pre></div>
+<p>SSH will then connect to the machine as if we had specified also
+<code>-p 2201</code> and <code>-l alice</code>. These settings will also
+be picked up when we connect via R, meaning the following will also
+work:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="ex">cl</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="kw">)</span></span></code></pre></div>
+<p>To achieve the same for other machines, add another entry for them,
+e.g.</p>
+<pre class="plain"><code>Host n1.remote.org
+  User alice
+  Port 2201
+
+Host n2.remote.org
+  User alice
+  Port 2201
+
+Host hpc.my-university.edu
+  User alice.bobson</code></pre>
+<p>When hosts on the same system share the same setting, one can use
+globbing to configure them the same way. For instance, the above can be
+shorted to:</p>
+<pre class="plain"><code>Host n?.remote.org
+  User alice
+  Port 2201
+
+Host hpc.my-university.edu
+  User alice.bobson</code></pre>
+<p>Being able to connect to remote machines by just specifying their
+hostnames is convenient and simplies also the R code. Because of this,
+we recommend setting up also <code>~/.ssh/config</code>.</p>
 </div>
 </div>
 </div>
@@ -365,7 +427,7 @@ machine, and it must have R installed, as explained in the above
 section. Contrary to local parallel workers, the number of parallel
 workers on remote machines is specified by repeating the machine name an
 equal number of times;</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1.remote.org"</span>, <span class="st">"n1.remote.org"</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, user <span class="op">=</span> <span class="st">"alice"</span><span class="op">)</span></span>
@@ -405,7 +467,7 @@ workers.</p>
 <code>n1.remote.org</code> and <code>n2.remote.org</code>. It works very
 similar to the previous example, but now the two SSH connections go to
 two different machiens rather than the same.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1.remote.org"</span>, <span class="st">"n2.remote.org"</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, user <span class="op">=</span> <span class="st">"alice"</span><span class="op">)</span></span>
@@ -418,29 +480,44 @@ two different machiens rather than the same.</p>
 <code>verbose = TRUE</code> also in this case, we would see:</p>
 <pre><code>'/usr/bin/ssh' -R 11464:localhost:11464 -l alice n1.remote.org Rscript ...
 '/usr/bin/ssh' -R 11465:localhost:11464 -l alice n2.remote.org Rscript ...</code></pre>
+<p>Recall, if we have configured SSH to pick up the username
+<code>alice</code> from <code>~/.ssh/config</code> on our local machine,
+as shown in the previous section, we could have skipped the
+<code>user</code> argument, and just used:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1.remote.org"</span>, <span class="st">"n2.remote.org"</span><span class="op">)</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span><span class="op">)</span></span></code></pre></div>
+<p>Note how these instructions for setting up a parallel cluster on
+these two machines would be the identical for another user that has
+configured their personal <code>~/.ssh/config</code> file.</p>
 </div>
 <div class="section level3">
 <h3 id="example-three-parallel-workers-on-two-remote-machines">Example: Three parallel workers on two remote machines<a class="anchor" aria-label="anchor" href="#example-three-parallel-workers-on-two-remote-machines"></a>
 </h3>
 <p>When we now understand that we control the number of parallel workers
 on a specific machine by replicate the machine name, we also know how to
-launch different number of parallel workers on different machines. For
-example, to sets up two parallel workers on <code>n1.remote.org</code>
-and one on <code>n2.remote.org</code>, we do:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+launch different number of parallel workers on different machines. From
+now on, we will also assume that the remote username no longer has to be
+specified, because it has already been configured via the
+<code>~/.ssh/config</code> file. With this, we can sets up two parallel
+workers on <code>n1.remote.org</code> and one on
+<code>n2.remote.org</code>, by:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1.remote.org"</span>, <span class="st">"n1.remote.org"</span>, <span class="st">"n2.remote.org"</span><span class="op">)</span></span>
-<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, user <span class="op">=</span> <span class="st">"alice"</span><span class="op">)</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Socket cluster with 3 nodes where 2 nodes are on host 'n1.remote.org'</span></span>
 <span><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), </span></span>
 <span><span class="co">#&gt; 1 node is on host 'n2.remote.org' (R version 4.4.2 (2024-10-31),</span></span>
 <span><span class="co">#&gt; platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
-<p>To generalize to ar large number of workers, we can use the
-<code><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep()</a></code> function, e.g.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>Again, the <code>user</code> argument does not have to be specified,
+because it is configured in <code>~/.ssh/config</code>.</p>
+<p>To generalize to many workers, we can use the <code><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep()</a></code>
+function. For example,</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"n1.remote.org"</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"n2.remote.org"</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>will setup three workers on <code>n1.remote.org</code> and four on
+<p>sets up three workers on <code>n1.remote.org</code> and four on
 <code>n2.remote.org</code>, totaling seven parallel workers.</p>
 </div>
 <div class="section level3">
@@ -451,38 +528,40 @@ and one on <code>n2.remote.org</code>, we do:</p>
 running on the local machine. By convention, the name
 <code>localhost</code> is an alias to your local machine. This means, we
 can use:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallelly</span><span class="kw">)</span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="ex">workers</span> <span class="op">&lt;</span>- rep<span class="er">(</span><span class="st">"localhost"</span><span class="ex">,</span> 4<span class="kw">)</span></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="ex">cl_local</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers</span><span class="kw">)</span></span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl_local</span><span class="kw">)</span></span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes where 4 nodes are on host 'localhost'</span></span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallelly</span><span class="kw">)</span></span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="ex">workers</span> <span class="op">&lt;</span>- rep<span class="er">(</span><span class="st">"localhost"</span><span class="ex">,</span> 4<span class="kw">)</span></span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="ex">cl_local</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers</span><span class="kw">)</span></span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl_local</span><span class="kw">)</span></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes where 4 nodes are on host 'localhost'</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p>to launch four local parallel workers. Note how we did not have to
 specify <code>user = "ally"</code>. This is because the default username
 is always the local username. Next, assume we want to add another four
 parallel workers running on <code>n1.remote.org</code>. We already know
 we can set these up as:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallelly</span><span class="kw">)</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="ex">workers</span> <span class="op">&lt;</span>- rep<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> 4<span class="kw">)</span></span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="ex">cl_remote</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers,</span> user = <span class="st">"alice"</span><span class="kw">)</span></span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl_remote</span><span class="kw">)</span></span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes where 4 nodes are on host 'n1.remote.org'</span></span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu).</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallelly</span><span class="kw">)</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="ex">workers</span> <span class="op">&lt;</span>- rep<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> 4<span class="kw">)</span></span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="ex">cl_remote</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers,</span> user = <span class="st">"alice"</span><span class="kw">)</span></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl_remote</span><span class="kw">)</span></span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes where 4 nodes are on host 'n1.remote.org'</span></span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu).</span></span></code></pre></div>
 <p>At this point, we have two independent clusters of parallel workers:
 <code>cl_local</code> and <code>cl_remote</code>. We can combine them
 into a single cluster using:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cl_local</span>, <span class="va">cl_remote</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Socket cluster with 8 nodes where 4 nodes are on host 'localhost'</span></span>
 <span><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), 4</span></span>
 <span><span class="co">#&gt; nodes are on host 'n1.remote.org' (R version 4.4.2 (2024-10-31),</span></span>
 <span><span class="co">#&gt; platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
-<p>If the username would be the same on the local and the remote
-machines, we would be able to set it all up with:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallelly</span><span class="kw">)</span></span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="ex">workers</span> <span class="op">&lt;</span>- c<span class="er">(</span><span class="ex">rep</span><span class="er">(</span><span class="st">"localhost"</span><span class="ex">,</span> 4<span class="kw">)</span><span class="ex">,</span> rep<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> 4<span class="kw">)</span></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="ex">cl</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers</span><span class="kw">)</span></span></code></pre></div>
+<p>To emphasize the usefulness of customizing our SSH connections via
+<code>~/.ssh/config</code>, if the remote username would already have
+been already configured there, we would be able to set up the full
+cluster in one single call, as in:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallelly</span><span class="kw">)</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="ex">workers</span> <span class="op">&lt;</span>- c<span class="er">(</span><span class="ex">rep</span><span class="er">(</span><span class="st">"localhost"</span><span class="ex">,</span> 4<span class="kw">)</span><span class="ex">,</span> rep<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> 4<span class="kw">)</span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="ex">cl</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers</span><span class="kw">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-parallel-workers-on-a-remote-machine-accessed-via-dedicated-login-machine">Example: Parallel workers on a remote machine accessed via dedicated
@@ -493,106 +572,127 @@ accessible via an intermediate login machine, which in SSH terms may
 also be referred to as a “jumphost”. For example, assume machine
 <code>secret1.remote.org</code> can only be accessed by first logging
 into <code>login.remote.org</code> as in:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh alice@login.remote.org</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="ex">{alice@login}$</span> ssh alice@secret1.remote.org</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="ex">{alice@secret1}$</span> </span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh alice@login.remote.org</span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a><span class="ex">{alice@login}$</span> ssh alice@secret1.remote.org</span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a><span class="ex">{alice@secret1}$</span> </span></code></pre></div>
 <p>To achive the same in a single SSH call, we can specify the
-“jumphost” option for SSH, as in:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh <span class="at">-J</span> alice@login.remote.org alice@secret1.remote.org</span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="ex">{alice@secret1}$</span> </span></code></pre></div>
+“jumphost” <code>-J hostname</code> option for SSH, as in:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh <span class="at">-J</span> alice@login.remote.org alice@secret1.remote.org</span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="ex">{alice@secret1}$</span> </span></code></pre></div>
 <p>We can use the <code>rshopts</code> argument of
 <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> to achieve the same when setting up
 parallel workers. To launch three parallel workers on
 <code>secret1.remote.org</code>, use:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"secret1.remote.org"</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="va">workers</span>,</span>
 <span>  rshopts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-J"</span>, <span class="st">"login.remote.org"</span><span class="op">)</span>,</span>
 <span>  user <span class="op">=</span> <span class="st">"alice"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p>A more convenient solution is to configure the jumphost in
+<code>~/.ssh/config</code>, as in:</p>
+<pre class="plain"><code>Host *.remote.org
+  User alice
+
+Host secret?.remote.org
+  ProxyJump login.remote.org</code></pre>
+<p>This will cause any SSH connection to a machine on the
+<code>remote.org</code> network to use username <code>alice</code>. It
+will also cause any SSH connection to machines
+<code>secret1.remote.org</code>, <code>secret2.remote.org</code>, and so
+on, to use jumphost <code>login.remote.org</code>. You can verify that
+all this work by:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh login.remote.org</span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a><span class="ex">{alice@login}$</span></span></code></pre></div>
+<p>and then:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh secret1.remote.org</span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a><span class="ex">{alice@n1}$</span> </span></code></pre></div>
+<p>If the above work, then the following will work from within R:</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
+<span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"secret1.remote.org"</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="special-needs-and-tweaks">Special needs and tweaks<a class="anchor" aria-label="anchor" href="#special-needs-and-tweaks"></a>
+</h2>
+<p>The above sections cover most common use cases for setting up a
+parallel cluster from a local Linux, macOS, and MS Windows machine.
+However, there are cases where there above does not work, or you prefer
+to use another solution. This section aims to cover such
+alternatives.</p>
+<div class="section level3">
+<h3 id="example-remote-workers-ignoring-any-remote--rprofile-settings">Example: Remote workers ignoring any remote .Rprofile settings<a class="anchor" aria-label="anchor" href="#example-remote-workers-ignoring-any-remote--rprofile-settings"></a>
+</h3>
+<p>To launch parallel workers skipping any <code>~/.Rprofile</code>
+settings on the remote machines, we can pass option
+<code>--no-init-file</code> to <code>Rscript</code> via argument
+<code>rscript_args</code>. For example,</p>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"n1.remote.org"</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, rscript_args <span class="op">=</span> <span class="st">"--no-init-file"</span><span class="op">)</span></span></code></pre></div>
+<p>will launch two parallel workers on <code>n1.remote.org</code>
+ignoring any <code>.Rprofile</code> files.</p>
+</div>
+<div class="section level3">
+<h3 id="example-run-remote-workers-with-a-lower-process-priority">Example: Run remote workers with a lower process priority<a class="anchor" aria-label="anchor" href="#example-run-remote-workers-with-a-lower-process-priority"></a>
+</h3>
+<p>On Unix, we can run any process with a lower CPU priority using the
+<code>nice</code> command. This can be used when we want to lower the
+risk of negatively affecting other users and processes that run on the
+same machine from our R workers overusing the CPUs by mistake. To
+achieve this, we can prepend <code>nice</code> to the
+<code>Rscript</code> call via the <code>rscript</code> argument
+using:</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"n1.remote.org"</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nice"</span>, <span class="st">"*"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The special <code>*</code> value expands to <code>Rscript</code> on
+the remote machine.</p>
+</div>
+<div class="section level3">
+<h3 id="example-use-putty-on-ms-windows-to-connect-to-remote-worker">Example: Use PuTTY on MS Windows to connect to remote worker<a class="anchor" aria-label="anchor" href="#example-use-putty-on-ms-windows-to-connect-to-remote-worker"></a>
+</h3>
+<p>If you run on an MS Windows machine and prefer to use PuTTY to manage
+your SSH connections, or for other reasons cannot use the built-in
+<code>ssh</code> client, you can tell <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> to
+use PuTTY and your PuTTY settings via various arguments.</p>
+<p>Here is an example that launches two parallel workers on
+<code>n1.remote.org</code> running under user <code>alice</code>
+connecting via SSH port 2201 using PuTTY and public-private SSH keys in
+file <code>C:/Users/ally/.ssh/putty.ppk</code>:</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="st">"n1.remote.org"</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
+<span>  <span class="va">workers</span>, </span>
+<span>  user <span class="op">=</span> <span class="st">"alice"</span>,</span>
+<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;putty-plink&gt;"</span>,</span>
+<span>  rshopts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-P"</span>, <span class="fl">2201</span>, <span class="st">"-i"</span>, <span class="st">"C:/Users/ally/.ssh/putty.ppk"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-two-remote-workers-running-on-ms-windows">Example: Two remote workers running on MS Windows<a class="anchor" aria-label="anchor" href="#example-two-remote-workers-running-on-ms-windows"></a>
 </h3>
-<p>To launch two parallel workers on two remove MS Windows machines,
+<p>Thus far we have considered our remote machines to run a Unix-like
+operating system, e.g. Linux or macOS. If your remote machines run MS
+Windows, you can use similar techniques to launch parallel workers there
+as well. For this to work, the remote MS Windows machines must accept
+incoming SSH connections, which is something most Windows machines are
+not configured to do by default. If you do not know set that up, or if
+you do not have the system permissions to do so, please reach out to you
+system administrator of those machines.</p>
+<p>Assuming we have SSH access to two MS Windows machines,
 <code>mswin1.remote.org</code> and <code>mswin2.remote.org</code>,
-everything works the same as above, except that we need to also specify
-<code>rscript_sh = "cmd"</code>. The specifies that the parallel R
-workers should be launched via MS Windows’ <code>cmd.exe</code> shell.
-For this example, the two MS Windows machines must accept incoming SSH
-connections.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+everything works the same as before, except that we need to also specify
+also argument <code>rscript_sh = "cmd"</code>;</p>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mswin1.remote.org"</span>, <span class="st">"mswin2.remote.org"</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, rscript_sh <span class="op">=</span> <span class="st">"cmd"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="example-local-and-remote-workers">EXAMPLE: Local and remote workers<a class="anchor" aria-label="anchor" href="#example-local-and-remote-workers"></a>
-</h3>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## Same setup when the two machines are on the local network and</span></span>
-<span><span class="co">## have identical software setups</span></span>
-<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
-<span>  <span class="va">workers</span>,</span>
-<span>  revtunnel <span class="op">=</span> <span class="cn">FALSE</span>, homogeneous <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  dryrun <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="example-remote-worker-running-on-linux-from-ms-windows-machine">EXAMPLE: Remote worker running on Linux from MS Windows machine<a class="anchor" aria-label="anchor" href="#example-remote-worker-running-on-linux-from-ms-windows-machine"></a>
-</h3>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## Connect to remote Unix machine 'remote.server.org' on port 2200</span></span>
-<span><span class="co">## as user 'bob' from a MS Windows machine with PuTTY installed.</span></span>
-<span><span class="co">## Using the explicit special rshcmd = "&lt;putty-plink&gt;", will force</span></span>
-<span><span class="co">## makeClusterPSOCK() to search for and use the PuTTY plink software,</span></span>
-<span><span class="co">## preventing it from using other SSH clients on the system search PATH.</span></span>
-<span><span class="co">## The parallel worker is launched as:</span></span>
-<span><span class="co">## 'plink' -l bob -P 2200 -i C:/Users/bobby/.ssh/putty.ppk remote.server.org ...</span></span>
-<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
-<span>  <span class="st">"remote.server.org"</span>, user <span class="op">=</span> <span class="st">"bob"</span>,</span>
-<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;putty-plink&gt;"</span>,</span>
-<span>  rshopts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-P"</span>, <span class="fl">2200</span>, <span class="st">"-i"</span>, <span class="st">"C:/Users/bobby/.ssh/putty.ppk"</span><span class="op">)</span>,</span>
-<span>  dryrun <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="example-remote-workers-with-specific-setup">EXAMPLE: Remote workers with specific setup<a class="anchor" aria-label="anchor" href="#example-remote-workers-with-specific-setup"></a>
-</h3>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## Setup of remote worker with more detailed control on</span></span>
-<span><span class="co">## authentication and reverse SSH tunneling</span></span>
-<span><span class="co">## The parallel worker is launched as:</span></span>
-<span><span class="co">## '/usr/bin/ssh' -l johnny -v -R 11000:gateway:11942 remote.server.org ...</span></span>
-<span><span class="co">## "R_DEFAULT_PACKAGES=... 'nice' '/path/to/Rscript' --no-init-file ...</span></span>
-<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
-<span>  <span class="st">"remote.server.org"</span>, user <span class="op">=</span> <span class="st">"johnny"</span>,</span>
-<span>  <span class="co">## Manual configuration of reverse SSH tunneling</span></span>
-<span>  revtunnel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  rshopts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-v"</span>, <span class="st">"-R 11000:gateway:11942"</span><span class="op">)</span>,</span>
-<span>  master <span class="op">=</span> <span class="st">"gateway"</span>, port <span class="op">=</span> <span class="fl">11942</span>,</span>
-<span>  <span class="co">## Run Rscript nicely and skip any startup scripts</span></span>
-<span>  rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nice"</span>, <span class="st">"/path/to/Rscript"</span><span class="op">)</span>,</span>
-<span>  rscript_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-init-file"</span><span class="op">)</span>,</span>
-<span>  dryrun <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="example-remote-worker-running-on-linux-from-rstudio-on-ms-windows">EXAMPLE: Remote worker running on Linux from RStudio on MS
-Windows<a class="anchor" aria-label="anchor" href="#example-remote-worker-running-on-linux-from-rstudio-on-ms-windows"></a>
-</h3>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## Connect to remote Unix machine 'remote.server.org' on port 2200</span></span>
-<span><span class="co">## as user 'bob' from a MS Windows machine via RStudio's SSH client.</span></span>
-<span><span class="co">## Using the explicit special rshcmd = "&lt;rstudio-ssh&gt;", will force</span></span>
-<span><span class="co">## makeClusterPSOCK() to use the SSH client that comes with RStudio,</span></span>
-<span><span class="co">## preventing it from using other SSH clients on the system search PATH.</span></span>
-<span><span class="co">## The parallel worker is launched as:</span></span>
-<span><span class="co">## 'ssh' -l bob remote.server.org:2200 ...</span></span>
-<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
-<span>  <span class="st">"remote.server.org:2200"</span>, user <span class="op">=</span> <span class="st">"bob"</span>, rshcmd <span class="op">=</span> <span class="st">"&lt;rstudio-ssh&gt;"</span>,</span>
-<span>  dryrun <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<p>That argument specifies that the parallel R workers should be
+launched on the remote machines via MS Windows’ <code>cmd.exe</code>
+shell.</p>
 </div>
 </div>
   </div>
