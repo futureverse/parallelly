@@ -91,21 +91,25 @@ stopifnot(
 
 message("*** cgroups ... DONE")
 
-message("cgroups - real-world ...")
+root <- system.file(package = "parallelly", "test-data", mustWork = TRUE)
+for (dir in c("no-cgroups", "cgroups1", "cgroups2")) {
+  message(sprintf("%s - real-world ...", dir))
+  path <- file.path(root, dir)
+  stopifnot(file_test("-d", path))
+  tarballs <- dir(path = path, pattern = ".*[.]tar[.]gz", full.names = TRUE)
+  names(tarballs) <- sub("[.]tar[.]gz$", "", basename(tarballs))
 
-path <- system.file(package = "parallelly", "test-data", "cgroups", mustWork = TRUE)
-tarballs <- dir(path = path, pattern = ".*[.]tar[.]gz", full.names = TRUE)
-names(tarballs) <- sub("[.]tar[.]gz$", "", basename(tarballs))
-
-for (name in names(tarballs)) {
-  parallelly:::withCGroups(tarballs[name], {
-      file <- file.path(path, sprintf("%s.R", name))
-      if (file_test("-f", file)) {
-        source(file, local = FALSE)
-      }
-  })
+  for (name in names(tarballs)) {
+    parallelly:::withCGroups(tarballs[name], {
+        file <- file.path(path, sprintf("%s.R", name))
+        if (file_test("-f", file)) {
+          source(file, local = FALSE)
+        }
+    })
+  }
+  message(sprintf("%s - real-world ... done", dir))
 }
 
-message("cgroups - real-world ... done")
+message("cgroups - real-world ... DONE")
 
 source("incl/end.R")
