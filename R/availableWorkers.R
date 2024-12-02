@@ -219,8 +219,8 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
       ## on the UCSF Wynton SGE cluster, 'qsub -pe mpi-8 16 ...' will produce
       ## a job with w=2 workers and NSLOTS=16. /HB 2023-02-01
       nslots <- as.integer(getenv("NSLOTS"))
-      if (length(w) > nslots) {
-        warnf("Identified %d workers from the %s file (%s), which is more than environment variable %s = %d", length(w), sQuote("PE_HOSTFILE"), sQuote(pathname), sQuote("NSLOTS"), nslots)
+      if (length(w) < nslots) {
+        warnf("Identified %d workers from the %s file (%s), which is less than environment variable %s = %d", length(w), sQuote("PE_HOSTFILE"), sQuote(pathname), sQuote("NSLOTS"), nslots)
       }
     } else if (method == "Slurm") {
       ## From 'man sbatch':
