@@ -6,9 +6,10 @@ articles:
   parallelly-11-limit-workers: parallelly-11-limit-workers.html
   parallelly-12-remote-workers: parallelly-12-remote-workers.html
   parallelly-15-cloud-workers: parallelly-15-cloud-workers.html
+  parallelly-17-hpc-workers: parallelly-17-hpc-workers.html
   parallelly-21-container-workers: parallelly-21-container-workers.html
   parallelly-22-wine-workers: parallelly-22-wine-workers.html
-last_built: 2024-12-02T04:01Z
+last_built: 2024-12-02T06:07Z
 urls:
   reference: https://parallelly.futureverse.org/reference
   article: https://parallelly.futureverse.org/articles

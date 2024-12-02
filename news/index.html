@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9026</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9028</span>
       </span>
     </div>
 
@@ -48,6 +48,9 @@
     </li>
     <li>
       <a href="../articles/parallelly-15-cloud-workers.html">Parallel Workers in the Cloud</a>
+    </li>
+    <li>
+      <a href="../articles/parallelly-17-hpc-workers.html">Parallel Workers on High-Performance Compute Environments</a>
     </li>
     <li>
       <a href="../articles/parallelly-21-container-workers.html">Parallel Workers Running in Linux Containers</a>
@@ -152,8 +155,12 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
-<ul><li>…</li>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> would produce invalid warning on “Identified 8 workers from the ‘PE_HOSTFILE’ file (…), which is more than environment variable ‘NSLOTS’ = 8` when running via a Grid Engine job scheduler.</li>
 </ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.39.0" id="version-1390">Version 1.39.0<small>2024-11-07</small><a class="anchor" aria-label="anchor" href="#version-1390"></a></h2>
 <div class="section level3">
