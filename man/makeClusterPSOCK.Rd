@@ -309,7 +309,7 @@ See \link{parallelly.options} for how to change the default thresholds.
 
 \section{Alternative usage}{
 
-In R (>= 4.4.0), an alternatively to using
+In R (>= 4.5.0), an alternatively to using
 \code{cl <- parallelly::makeClusterPSOCK(workers)} is:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{cl <- parallel::makeCluster(workers, type = parallelly::PSOCK)

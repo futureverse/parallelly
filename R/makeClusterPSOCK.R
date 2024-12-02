@@ -61,7 +61,7 @@
 #' inherit from `RichSOCKnode`).
 #'
 #' @section Alternative usage:
-#' In R (>= 4.4.0), an alternatively to using
+#' In R (>= 4.5.0), an alternatively to using
 #' `cl <- parallelly::makeClusterPSOCK(workers)` is:
 #'
 #' ```
