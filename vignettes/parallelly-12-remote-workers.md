@@ -563,23 +563,6 @@ will launch two parallel workers on `n1.remote.org` ignoring any
 `.Rprofile` files.
 
 
-## Example: Run remote workers with a lower process priority
-
-On Unix, we can run any process with a lower CPU priority using the
-`nice` command. This can be used when we want to lower the risk of
-negatively affecting other users and processes that run on the same
-machine from our R workers overusing the CPUs by mistake. To achieve
-this, we can prepend `nice` to the `Rscript` call via the `rscript`
-argument using:
-
-```r
-workers <- rep("n1.remote.org", 2)
-cl <- makeClusterPSOCK(workers, rscript = c("nice", "*"))
-```
-
-The special `*` value expands to `Rscript` on the remote machine.
-
-
 ## Example: Use PuTTY on MS Windows to connect to remote worker
 
 If you run on an MS Windows machine and prefer to use PuTTY to manage
