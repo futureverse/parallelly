@@ -24,7 +24,7 @@ be stopped when garbage collected"><meta property="og:image" content="https://pa
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9023</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9024</span>
       </span>
     </div>
 
@@ -46,6 +46,9 @@ be stopped when garbage collected"><meta property="og:image" content="https://pa
     </li>
     <li>
       <a href="../articles/parallelly-12-remote-workers.html">parallelly: Setting up parallel workers on other machines</a>
+    </li>
+    <li>
+      <a href="../articles/parallelly-22-wine-workers.html">parallelly: Parallel workers running MS Windows via Wine</a>
     </li>
   </ul></li>
 <li>
@@ -185,12 +188,12 @@ An alternative to explicitly call this function on an existing
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Manually, start worker #1 on local machine ‘localhost’ with:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions = "no-delay")' -e 'workRSOCK &lt;- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()' MASTER=localhost PORT=11641 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions = "no-delay")' -e 'workRSOCK &lt;- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()' MASTER=localhost PORT=11241 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Manually, start worker #2 on local machine ‘localhost’ with:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions = "no-delay")' -e 'workRSOCK &lt;- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()' MASTER=localhost PORT=11641 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   '/home/henrik/shared/software/CBI/_ubuntu22_04/R-4.4.2-gcc11/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions = "no-delay")' -e 'workRSOCK &lt;- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()' MASTER=localhost PORT=11241 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">autoStopCluster</span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span></span>
@@ -198,8 +201,8 @@ An alternative to explicitly call this function on an existing
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span>list <span class="op">=</span> <span class="st">"cl"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           used (Mb) gc trigger (Mb) max used (Mb)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ncells  930831 49.8    1736127 92.8  1736127 92.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Vcells 1723555 13.2    8388608 64.0  2389865 18.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ncells  930841 49.8    1736127 92.8  1736127 92.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Vcells 1723591 13.2    8388608 64.0  2390184 18.3</span>
 </code></pre></div>
     </div>
   </div>
