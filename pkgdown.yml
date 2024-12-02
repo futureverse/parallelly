@@ -3,13 +3,14 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   parallelly-01-intro: parallelly-01-intro.html
+  parallelly-10-local-workers: parallelly-10-local-workers.html
   parallelly-12-remote-workers: parallelly-12-remote-workers.html
   parallelly-15-cloud-workers: parallelly-15-cloud-workers.html
   parallelly-17-hpc-workers: parallelly-17-hpc-workers.html
   parallelly-20-limit-workers: parallelly-20-limit-workers.html
   parallelly-21-container-workers: parallelly-21-container-workers.html
   parallelly-22-wine-workers: parallelly-22-wine-workers.html
-last_built: 2024-12-02T06:10Z
+last_built: 2024-12-02T06:42Z
 urls:
   reference: https://parallelly.futureverse.org/reference
   article: https://parallelly.futureverse.org/articles
