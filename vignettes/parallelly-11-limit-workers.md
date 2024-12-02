@@ -94,7 +94,6 @@ rscript["cpu_group"] <- 1
 cl_1 <- makeClusterPSOCK(2, rscript = rscript)
 
 cl <- c(cl_0, cl_1)
-print(cl)
 ```
 
 The special `*` value expands to the proper `Rscript` on the machine
