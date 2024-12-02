@@ -1,5 +1,5 @@
 <!--
-%\VignetteIndexEntry{parallelly: Parallel workers running in Linux Containers}
+%\VignetteIndexEntry{parallelly: Parallel Workers Running in Linux Containers}
 %\VignetteAuthor{Henrik Bengtsson}
 %\VignetteKeyword{R}
 %\VignetteKeyword{package}
