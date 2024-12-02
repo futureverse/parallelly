@@ -68,6 +68,60 @@
 #' cl <- parallel::makeCluster(workers, type = parallelly::PSOCK)
 #' ```
 #'
+#' @section Protection against CPU overuse:
+#' Using too many parallel workers on the same machine may result in
+#' overusing the CPU.  For example, if an R script hard codes the
+#' number of parallel workers to 32, as in
+#'
+#' ```r
+#' cl <- makeClusterPSOCK(32)
+#' ```
+#'
+#' it will use more than 100% of the CPU cores when running on machine with
+#' fewer than 32 CPU cores.  For example, on a eight-core machine, this
+#' may run the CPU at 400% of its capacity, which has a significant
+#' negative effect on the current R process, but also on all other processes
+#' running on the same machine.  This also a problem on systems where R
+#' gets allotted a specific number of CPU cores, which is the case on
+#' high-performance compute (HPC) clusters, but also on other shared systems
+#' that limits user processes via Linux Control Groups (cgroups).
+#' For example, a free account on Posit Cloud is limited to a single
+#' CPU core. Parallelizing with 32 workers when only having access to
+#' a single core, will result in 3200% overuse and 32 concurrent R
+#' processes competing for this single CPU core.
+#'
+#' To protect against CPU overuse by mistake, `makeClusterPSOCK()` will
+#' warn when parallelizing above 100%;
+#'
+#' ```r
+#' cl <- parallelly::makeClusterPSOCK(12, dryrun = TRUE)
+#' Warning message:
+#' In checkNumberOfLocalWorkers(workers) :
+#'   Careful, you are setting up 12 localhost parallel workers with
+#' only 8 CPU cores available for this R process, which could result
+#' in a 150% load. The maximum is set to 100%. Overusing the CPUs has
+#' negative impact on the current R process, but also on all other
+#' processes of yours and others running on the same machine. See
+#' help("parallelly.options", package = "parallelly") for how to
+#' override this threshold
+#' ```
+#'
+#' Any attempts resulting in more than 300% overuse will be refused;
+#'
+#' ```r
+#' > cl <- parallelly::makeClusterPSOCK(25, dryrun = TRUE)
+#' Error in checkNumberOfLocalWorkers(workers) : 
+#'   Attempting to set up 25 localhost parallel workers with only
+#' 8 CPU cores available for this R process, which could result in
+#' a 312% load. The maximum is set to 300%. Overusing the CPUs has
+#' negative impact on the current R process, but also on all other
+#' processes of yours and others running on the same machine. See
+#' help("parallelly.options", package = "parallelly") for how to
+#' override this threshold
+#' ```
+#'
+#' See [parallelly.options] for how to change the default thresholds.
+#'
 #' @example incl/makeClusterPSOCK.R
 #'
 #' @aliases PSOCK
