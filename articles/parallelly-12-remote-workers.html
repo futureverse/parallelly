@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9022</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9023</span>
       </span>
     </div>
 
@@ -64,6 +64,9 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="../articles/parallelly-01-intro.html">parallelly: An Introduction</a>
+    </li>
+    <li>
+      <a href="../articles/parallelly-11-limit-workers.html">parallelly: Limit CPU and memory for parallel workers</a>
     </li>
     <li>
       <a href="../articles/parallelly-12-remote-workers.html">parallelly: Setting up parallel workers on other machines</a>
@@ -635,22 +638,6 @@ settings on the remote machines, we can pass option
 ignoring any <code>.Rprofile</code> files.</p>
 </div>
 <div class="section level3">
-<h3 id="example-run-remote-workers-with-a-lower-process-priority">Example: Run remote workers with a lower process priority<a class="anchor" aria-label="anchor" href="#example-run-remote-workers-with-a-lower-process-priority"></a>
-</h3>
-<p>On Unix, we can run any process with a lower CPU priority using the
-<code>nice</code> command. This can be used when we want to lower the
-risk of negatively affecting other users and processes that run on the
-same machine from our R workers overusing the CPUs by mistake. To
-achieve this, we can prepend <code>nice</code> to the
-<code>Rscript</code> call via the <code>rscript</code> argument
-using:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"n1.remote.org"</span>, <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nice"</span>, <span class="st">"*"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The special <code>*</code> value expands to <code>Rscript</code> on
-the remote machine.</p>
-</div>
-<div class="section level3">
 <h3 id="example-use-putty-on-ms-windows-to-connect-to-remote-worker">Example: Use PuTTY on MS Windows to connect to remote worker<a class="anchor" aria-label="anchor" href="#example-use-putty-on-ms-windows-to-connect-to-remote-worker"></a>
 </h3>
 <p>If you run on an MS Windows machine and prefer to use PuTTY to manage
@@ -661,7 +648,7 @@ use PuTTY and your PuTTY settings via various arguments.</p>
 <code>n1.remote.org</code> running under user <code>alice</code>
 connecting via SSH port 2201 using PuTTY and public-private SSH keys in
 file <code>C:/Users/ally/.ssh/putty.ppk</code>:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="st">"n1.remote.org"</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="va">workers</span>, </span>
@@ -685,7 +672,7 @@ system administrator of those machines.</p>
 <code>mswin1.remote.org</code> and <code>mswin2.remote.org</code>,
 everything works the same as before, except that we need to also specify
 also argument <code>rscript_sh = "cmd"</code>;</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mswin1.remote.org"</span>, <span class="st">"mswin2.remote.org"</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, rscript_sh <span class="op">=</span> <span class="st">"cmd"</span><span class="op">)</span></span></code></pre></div>
 <p>That argument specifies that the parallel R workers should be
