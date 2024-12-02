@@ -35,6 +35,7 @@ procPath <- local({
 
       ## Reset caches
       environment(getCGroupsRoot)$.cache <- list()
+      environment(getCGroupsMounts)$.cache <- NULL
       environment(getCGroups)$.data <- NULL
       environment(maxCores)$.max <- NULL
 
@@ -279,28 +280,9 @@ getCGroupsRoot <- local({
     path <- .cache[[controller]]
     if (!is.null(path)) return(path)
 
-    ## Look up the CGroups mount point, e.g.
-    ## $ grep cgroup /proc/$$/mounts
-    ## cgroup2 /sys/fs/cgroup cgroup2 rw,seclabel,nosuid,nodev,noexec,relatime,nsdelegate 0 0
-
-    file <- file.path(procPath(), "self", "mounts")
-    if (!file_test("-f", file)) {
-      path <- NA_character_
-      .cache[[controller]] <<- path
-      return(path)
-    }
-
-    ## Read all mount points
-    mounts <- readMounts(file)
+    ## Look up the CGroups mountpoint
+    mounts <- getCGroupsMounts()
     
-    ## Keep CGroups mount points
-    mounts <- subset(mounts, grepl("^cgroup", type))
-    if (nrow(mounts) == 0) {
-      path <- NA_character_
-      .cache[[controller]] <<- path
-      return(path)
-    }
-
     ## Mixed CGroups versions are not supported
     utypes <- unique(mounts$type)
     if (length(utypes) > 1) {
@@ -357,7 +339,40 @@ getCGroupsRoot <- local({
 })
 
 
-#  Get the CGroups hierarchy for a specific process
+#  Get the CGroups mountpoints
+#
+#  @return A data.frame with zero or more CGroups mountpoints.
+#
+#' @importFrom utils file_test
+getCGroupsMounts <- local({
+  ## To please R CMD check
+  type <- NULL
+
+  .cache <- NULL
+  
+  function() {
+    file <- file.path(procPath(), "self", "mounts")
+    
+    ## cgroups is not set?
+    if (!file_test("-f", file)) {
+      mounts <- data.frame(device = character(0), mountpoint = character(0), type = character(0),
+                           options = character(0), dump = integer(0), pass = integer(0))
+      .cache <<- mounts
+      return(mounts)
+    }
+
+    mounts <- readMounts(file)
+    
+    ## Keep CGroups mount points
+    mounts <- subset(mounts, grepl("^cgroup", type))
+  
+    .cache <<- mounts
+    mounts
+  }
+})
+
+
+#  Get the CGroups hierarchy
 #
 #  @return A data frame with three columns:
 #  * `hierarchy_id` (integer): 0 for cgroups v2.
