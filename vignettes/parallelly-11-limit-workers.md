@@ -10,7 +10,10 @@
 
 # Introduction
 
-...
+This vignette gives examples how to restrict CPU and memory usage of
+parallel workers. This can useful for optimizing the performance of
+the parallel workers, but also lower the risk that they overuse the
+CPU and memory on the machines they are running on.
 
 
 # Examples
