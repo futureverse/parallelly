@@ -163,10 +163,14 @@
 <ul><li>Argument <code>user</code> of <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> may now be a vector of username - one for each worker specified.</li>
 </ul></div>
 <div class="section level3">
+<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<ul><li>Add vignettes on how to setup a cluster of parallel workers on the local machine, on external machines, in the cloud, in HPC environments, and more.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p>Querying of cgroups v1 ‘cpuquota’ CPU limits were broken in the previous release (v1.39.0).</p></li>
 <li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> could produce error <code>Failed to identify mount    point for CGroups v1 controller 'cpuset'</code> on some systems.</p></li>
-<li><p><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> would produce invalid warning on “Identified 8 workers from the ‘PE_HOSTFILE’ file (…), which is more than environment variable ‘NSLOTS’ = 8` when running via a Grid Engine job scheduler.</p></li>
+<li><p><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> would produce invalid warning on <code>Identified 8    workers from the ‘PE_HOSTFILE’ file (...), which is more than    environment variable ‘NSLOTS’ = 8</code> when running via a Grid Engine job scheduler.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
