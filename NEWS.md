@@ -7,6 +7,12 @@
  
 ## Bug Fixes
 
+ * Querying of cgroups v1 'cpuquota' CPU limits were broken in the
+   previous release (v1.39.0).
+
+ * `availableCores()` could produce error `Failed to identify mount
+   point for CGroups v1 controller 'cpuset'` on some systems.
+ 
  * `availableWorkers()` would produce invalid warning on "Identified 8
    workers from the ‘PE_HOSTFILE’ file (...), which is more than
    environment variable ‘NSLOTS’ = 8` when running via a Grid Engine
