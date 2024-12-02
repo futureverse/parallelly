@@ -1,5 +1,5 @@
 <!--
-%\VignetteIndexEntry{parallelly: Parallel Workers on Other Machines}
+%\VignetteIndexEntry{Parallel Workers on Other Machines}
 %\VignetteAuthor{Henrik Bengtsson}
 %\VignetteKeyword{R}
 %\VignetteKeyword{package}

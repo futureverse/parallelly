@@ -1,5 +1,5 @@
 <!--
-%\VignetteIndexEntry{parallelly: Parallel Workers with CPU and Memory Limited}
+%\VignetteIndexEntry{Parallel Workers with CPU and Memory Limited}
 %\VignetteAuthor{Henrik Bengtsson}
 %\VignetteKeyword{R}
 %\VignetteKeyword{package}

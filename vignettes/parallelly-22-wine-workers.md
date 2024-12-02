@@ -1,5 +1,5 @@
 <!--
-%\VignetteIndexEntry{parallelly: Parallel Workers Running MS Windows via Wine}
+%\VignetteIndexEntry{Parallel Workers Running MS Windows via Wine}
 %\VignetteAuthor{Henrik Bengtsson}
 %\VignetteKeyword{R}
 %\VignetteKeyword{package}

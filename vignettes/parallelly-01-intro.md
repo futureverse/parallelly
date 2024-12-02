@@ -1,5 +1,5 @@
 <!--
-%\VignetteIndexEntry{parallelly: An Introduction}
+%\VignetteIndexEntry{An Introduction to 'parallelly'}
 %\VignetteAuthor{Henrik Bengtsson}
 %\VignetteKeyword{R}
 %\VignetteKeyword{package}
