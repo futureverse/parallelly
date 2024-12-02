@@ -31,7 +31,7 @@ background R workers, and how to connect to external machines."><meta property="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9028</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9030</span>
       </span>
     </div>
 
@@ -184,6 +184,7 @@ background <span style="R">R</span> workers, and how to connect to external mach
 <span>  <span class="va">workers</span>,</span>
 <span>  makeNode <span class="op">=</span> <span class="va">makeNodePSOCK</span>,</span>
 <span>  port <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"random"</span><span class="op">)</span>,</span>
+<span>  user <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  autoStop <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tries <span class="op">=</span> <span class="fu">getOption2</span><span class="op">(</span><span class="st">"parallelly.makeNodePSOCK.tries"</span>, <span class="fl">3L</span><span class="op">)</span>,</span>
@@ -255,6 +256,11 @@ used.
 runs on a different port than the default 22, specify the SSH port by
 appending it to the hostname, e.g. <code>"remote.server.org:2200"</code> or via
 SSH options <span class="option">-p</span>, e.g. <code>rshopts = c("-p", "2200")</code>.</em></p></dd>
+
+
+<dt id="arg-user">user<a class="anchor" aria-label="anchor" href="#arg-user"></a></dt>
+<dd><p>(optional) The user name to be used when communicating with
+another host.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -418,11 +424,6 @@ processes.</p></dd>
 to launch a process on another host and any additional arguments (character
 vector).  These arguments are only applied if <code>machine</code> is not
 <em>localhost</em>.  For more details, see below.</p></dd>
-
-
-<dt id="arg-user">user<a class="anchor" aria-label="anchor" href="#arg-user"></a></dt>
-<dd><p>(optional) The user name to be used when communicating with
-another host.</p></dd>
 
 
 <dt id="arg-revtunnel">revtunnel<a class="anchor" aria-label="anchor" href="#arg-revtunnel"></a></dt>
