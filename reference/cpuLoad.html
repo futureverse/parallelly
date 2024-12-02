@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9025</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.39.0-9026</span>
       </span>
     </div>
 
@@ -44,7 +44,10 @@
       <a href="../articles/parallelly-11-limit-workers.html">parallelly: Limit CPU and memory for parallel workers</a>
     </li>
     <li>
-      <a href="../articles/parallelly-12-remote-workers.html">parallelly: Setting up parallel workers on other machines</a>
+      <a href="../articles/parallelly-12-remote-workers.html">parallelly: Parallel workers on other machines</a>
+    </li>
+    <li>
+      <a href="../articles/parallelly-15-cloud-workers.html">parallelly: Parallel workers in the cloud</a>
     </li>
     <li>
       <a href="../articles/parallelly-21-container-workers.html">parallelly: Parallel workers running in Linux Containers</a>
@@ -183,7 +186,7 @@ Brendan Gregg's Blog, 2017-08-08,
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">loadavg</span> <span class="op">&lt;-</span> <span class="fu">cpuLoad</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loadavg</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1min  5min 15min </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.83  0.77  0.74 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.25  0.38  0.37 </span>
 </code></pre></div>
     </div>
   </div>
