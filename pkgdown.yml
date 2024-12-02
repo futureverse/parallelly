@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   parallelly-01-intro: parallelly-01-intro.html
   parallelly-12-remote-workers: parallelly-12-remote-workers.html
-last_built: 2024-12-01T00:40Z
+last_built: 2024-12-02T01:35Z
 urls:
   reference: https://parallelly.futureverse.org/reference
   article: https://parallelly.futureverse.org/articles
