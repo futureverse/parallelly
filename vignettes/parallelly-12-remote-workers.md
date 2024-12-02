@@ -527,7 +527,7 @@ and then:
 
 ```sh
 {ally@local}$ ssh secret1.remote.org
-{alice@n1}$ 
+{alice@secret1}$ 
 ```
 
 If the above work, then the following will work from within R:
