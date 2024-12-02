@@ -30,6 +30,12 @@
 #' appending it to the hostname, e.g. `"remote.server.org:2200"` or via
 #' SSH options \option{-p}, e.g. `rshopts = c("-p", "2200")`._
 #' 
+#' @param user (optional) The user name to be used when communicating with
+#' other hosts. If `NULL` or `"*"`, the system's default username is used.
+#' If `length(user) == 1`, then that user name is used for all hosts.
+#' If `length(user) == length(workers)`, then each worker may have a unique
+#' user name.
+#'
 #' @param \dots Optional arguments passed to
 #' `makeNode(workers[i], ..., rank = i)` where `i = seq_along(workers)`.
 #'
@@ -67,7 +73,7 @@
 #' @aliases PSOCK
 #' @importFrom parallel stopCluster
 #' @export
-makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto", "random"), ..., autoStop = FALSE, tries = getOption2("parallelly.makeNodePSOCK.tries", 3L), delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15.0), validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE), verbose = getOption2("parallelly.debug", FALSE)) {
+makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto", "random"), user = NULL, ..., autoStop = FALSE, tries = getOption2("parallelly.makeNodePSOCK.tries", 3L), delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15.0), validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE), verbose = getOption2("parallelly.debug", FALSE)) {
   verbose_prefix <- "[local output] "
   if (verbose) {
     oopts <- options(parallelly.debug = verbose)
@@ -91,6 +97,11 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     checkNumberOfLocalWorkers(workers)
     
     workers <- rep(localhostHostname, times = workers)
+  }
+
+  if (!is.null(user)) {
+    stop_if_not(is.character(user), length(user) == 1L || length(user) == length(workers))
+    user <- rep(user, length.out = length(user))
   }
 
   tries <- as.integer(tries)
@@ -137,7 +148,9 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
   if (verbose) mdebugf("%sGetting setup options for %d cluster nodes ...", verbose_prefix, n)
   for (ii in seq_len(n)) {
     if (verbose) mdebugf("%s - Node #%d of %d ...", verbose_prefix, ii, n)
-    options <- makeNode(workers[[ii]], port = port, ..., rank = ii, action = "options", verbose = verbose)
+    user_ii <- user[ii]
+    if (!is.null(user_ii) && user_ii == "*") user_ii <- NULL
+    options <- makeNode(workers[[ii]], port = port, user = user_ii, ..., rank = ii, action = "options", verbose = verbose)
     stop_if_not(inherits(options, "makeNodePSOCKOptions"))
     nodeOptions[[ii]] <- options
   }
@@ -175,7 +188,9 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
 
     for (ii in which(is_parallel)) {
       if (verbose) mdebugf("%s - Node #%d of %d ...", verbose_prefix, ii, n)
-      args <- list(workers[[ii]], port = port, ..., rank = ii, action = "options", verbose = verbose)
+      user_ii <- user[ii]
+      if (!is.null(user_ii) && user_ii == "*") user_ii <- NULL
+      args <- list(workers[[ii]], port = port, user = user_ii, ..., rank = ii, action = "options", verbose = verbose)
       args$setup_strategy <- "sequential"
       options <- do.call(makeNode, args = args)
       stop_if_not(inherits(options, "makeNodePSOCKOptions"))

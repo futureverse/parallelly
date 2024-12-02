@@ -1,5 +1,10 @@
 # Version (development version)
 
+## New Features
+
+ * Argument `user` of `makeClusterPSOCK()` may now be a vector of
+   username - one for each worker specified.
+ 
 ## Bug Fixes
 
  * `availableWorkers()` would produce invalid warning on "Identified 8

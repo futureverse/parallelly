@@ -14,6 +14,7 @@ makeClusterPSOCK(
   workers,
   makeNode = makeNodePSOCK,
   port = c("auto", "random"),
+  user = NULL,
   ...,
   autoStop = FALSE,
   tries = getOption2("parallelly.makeNodePSOCK.tries", 3L),
@@ -76,6 +77,9 @@ used.
 runs on a different port than the default 22, specify the SSH port by
 appending it to the hostname, e.g. \code{"remote.server.org:2200"} or via
 SSH options \option{-p}, e.g. \code{rshopts = c("-p", "2200")}.}}
+
+\item{user}{(optional) The user name to be used when communicating with
+another host.}
 
 \item{\dots}{Optional arguments passed to
 \code{makeNode(workers[i], ..., rank = i)} where \code{i = seq_along(workers)}.}
@@ -195,9 +199,6 @@ processes.}
 to launch a process on another host and any additional arguments (character
 vector).  These arguments are only applied if \code{machine} is not
 \emph{localhost}.  For more details, see below.}
-
-\item{user}{(optional) The user name to be used when communicating with
-another host.}
 
 \item{revtunnel}{If TRUE, a reverse SSH tunnel is set up for each worker such
 that the worker \R process sets up a socket connection to its local port
