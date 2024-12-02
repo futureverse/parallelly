@@ -1,7 +1,12 @@
 # Version (development version)
 
- * ...
- 
+## Bug Fixes
+
+ * `availableWorkers()` would produce invalid warning on "Identified 8
+   workers from the ‘PE_HOSTFILE’ file (...), which is more than
+   environment variable ‘NSLOTS’ = 8` when running via a Grid Engine
+   job scheduler.
+
 
 # Version 1.39.0 [2024-11-07]
 
