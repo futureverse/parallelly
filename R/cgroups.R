@@ -86,9 +86,6 @@ getUID <- local({
 
 #' @importFrom utils file_test tar
 cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
-  ## To please R CMD check
-  type <- NULL
-
   ## Temporarily reset overrides
   old_path <- procPath(NA)
   on.exit(procPath(old_path))
@@ -114,64 +111,114 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
   ## Record /proc/self/cgroup
   file <- file.path(src, "cgroup")
   if (file_test("-f", file)) {
-    file.copy(from = file, to = file.path(dest, file))
+    bfr <- readLines(file, warn = FALSE)
+    writeLines(bfr, con = file.path(dest, file))
   }
   
   ## Record /proc/self/mounts
-  file <- file.path(src, "mounts")
-  if (file_test("-f", file)) {
-    mounts <- readMounts(file)
-    
-    ## Keep CGroups mount points
-    mounts <- subset(mounts, grepl("^cgroup", type))
+  mounts <- getCGroupsMounts()
 
-    ## Mixed CGroups versions are not supported
-    utypes <- unique(mounts$type)
-    if (length(utypes) > 1) {
-      stop("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))	
-    }
+  ## Mixed CGroups versions are not supported
+  utypes <- unique(mounts$type)
+  if (length(utypes) > 1) {
+    stop("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))	
+  }
     
-    if (utypes == "cgroup") {
-      controller <- "cpuset"
-    } else if (utypes == "cgroup2") {
-      controller <- ""
-    } else {
-      stop("Unknown CGroups version: ", sQuote(utypes))
-    }
-
-    ## Write only CGroups mount points
-    mounts <- writeMounts(mounts, file = file.path(dest, file))
+  if (utypes == "cgroup") {
+    controllers <- c("cpu", "cpuset")
+  } else if (utypes == "cgroup2") {
+    controllers <- ""
+  } else {
+    stop("Unknown CGroups version: ", sQuote(utypes))
   }
 
-  ## Record CGroups root folder for controller of interest
-  root <- getCGroupsRoot(controller = controller)
-  path <- file.path(dest, root)
-  dir.create(path, recursive = TRUE)
-  
+  ## Write CGroups mountpoints
+  writeMounts(mounts, file = file.path(dest, file.path(src, "mounts")))
+
+  ## Get full CGroups folder structure
   cgroups <- getCGroups()
-  paths <- character(0)
-  for (dir in cgroups$path) {
-    paths <- c(paths, dir)
-    while (nzchar(dir) && dir != "/") {
-      dir <- dirname(dir)
-      paths <- c(paths, dir)
-    }
-  }
-  paths <- unique(paths)
 
-  ## Copy file structure
-  for (dir in paths) {
-    src <- file.path(root, dir)
-    if (!file_test("-d", src)) next
-    path <- file.path(dest, src)
-    if (!file_test("-d", path)) dir.create(path, recursive = TRUE)
-    files <- dir(path = src)
-    files <- files[file_test("-f", file.path(src, files))]
-    for (file in files) {
-      file.copy(file.path(src, file), file.path(path, file))
+  ## Record CGroups mountpoints for select controllers
+  for (controller in controllers) {
+    mounts_tt <- NULL
+    
+    ## CGroups v1 or v2?
+    if (nzchar(controller)) {
+      ## CGroups v1
+      pattern <- sprintf("\\b%s\\b", controller)
+      
+      mounts_tt <- mounts[grepl(pattern, mounts$mountpoint), ]
+      if (nrow(mounts_tt) == 0) {
+        ## No CGroups v1 mountpoint for specified controller
+	next
+      } else if (nrow(mounts_tt) > 1) {
+        warning(sprintf("Detected more than one 'cgroup' mountpoint for CGroups v1 controller %s; using the first one", sQuote(controller)))
+        mounts_tt <- mounts_tt[1, ]
+      }
+
+      cgroups_tt <- cgroups[cgroups$controller == controller, ]
+      if (nrow(cgroups_tt) == 0) {
+        ## No CGroups v1 for specified controller
+	next
+      } else if (nrow(cgroups_tt) > 1) {
+        warning(sprintf("Detected more than one 'cgroup' for CGroups v1 controller %s; using the first one", sQuote(controller)))
+        cgroups_tt <- cgroups_tt[1, ]
+      }
+    } else {
+      mounts_tt <- mounts
+      cgroups_tt <- cgroups
+      
+      if (nrow(mounts_tt) == 0) {
+        ## No CGroups v2 mountpoint for specified controller
+	next
+      } else if (nrow(mounts_tt) > 1) {
+        warning("Detected more than one 'cgroup2' mountpoint for CGroups v2; using the first one")
+        mounts_tt <- mounts_tt[1, ]
+      }
+      
+      if (nrow(cgroups_tt) == 0) {
+        ## No CGroups v2 for specified controller
+	next
+      } else if (nrow(cgroups_tt) > 1) {
+        warning("Detected more than one 'cgroup2' for CGroups v2; using the first one")
+        cgroups_tt <- cgroups_tt[1, ]
+      }
     }
-  }
-  
+    stopifnot(
+      is.data.frame(mounts_tt),
+      nrow(mounts_tt) == 1L,
+      is.data.frame(cgroups_tt),
+      nrow(cgroups_tt) == 1L
+    )
+    
+    root <- mounts_tt$mountpoint
+    path <- file.path(dest, root)
+    dir.create(path, recursive = TRUE)
+
+    paths <- character(0)
+    for (dir in cgroups_tt$path) {
+      paths <- c(paths, dir)
+      while (nzchar(dir) && dir != "/") {
+        dir <- dirname(dir)
+        paths <- c(paths, dir)
+      }
+    }
+    paths <- unique(paths)
+
+    ## Copy file structure
+    for (dir in paths) {
+      src <- file.path(root, dir)
+      if (!file_test("-d", src)) next
+      path <- file.path(dest, src)
+      if (!file_test("-d", path)) dir.create(path, recursive = TRUE)
+      files <- dir(path = src)
+      files <- files[file_test("-f", file.path(src, files))]
+      for (file in files) {
+        file.copy(file.path(src, file), file.path(path, file))
+      }
+    }
+  } ## for (controller ...)
+
   local({
     opwd <- setwd(dest)
     on.exit(setwd(opwd))
@@ -230,12 +277,10 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    writeLines(bfr)
 
    message(" - getCGroupsVersion(): ", getCGroupsVersion())
-   controller <- ""
-   if (getCGroupsVersion() == 1) {
-     controller <- "cpuset"
-   }
 
-   message(sprintf(" - getCGroupsRoot(controller = \"%s\"): %s", controller, sQuote(getCGroupsRoot(controller = controller))))
+   message(" - getCGroupsMounts():")
+   mounts <- getCGroupsMounts()
+   print(mounts)
 
    message(" - getCGroups():")
    cgroups <- getCGroups()
@@ -311,17 +356,17 @@ getCGroupsRoot <- local({
         pattern <- sprintf("\\b%s\\b", controller)
         mounts <- subset(mounts, grepl(pattern, mountpoint))
         if (nrow(mounts) == 0) {
-          ## No such CGroups v1 mount point for specified controller
+          ## No such CGroups v1 mountpoint for specified controller
           path <- NA_character_
           .cache[[controller]] <<- path
           return(path)
         } else if (nrow(mounts) > 1) {
-          warning(sprintf("Detected more than one 'cgroup' mount point for CGroups v1 controller %s; using the first one", sQuote(controller)))
+          warning(sprintf("Detected more than one 'cgroup' mountpoint for CGroups v1 controller %s; using the first one", sQuote(controller)))
           mounts <- mounts[1, ]
         }
       } else {
         ## CGroups v2
-        warning("Detected more than one 'cgroup2' mount point for CGroups v2; using the first one")
+        warning("Detected more than one 'cgroup2' mountpoint for CGroups v2; using the first one")
         mounts <- mounts[1, ]
       }
     }
@@ -363,7 +408,7 @@ getCGroupsMounts <- local({
 
     mounts <- readMounts(file)
     
-    ## Keep CGroups mount points
+    ## Keep CGroups mountpoints
     mounts <- subset(mounts, grepl("^cgroup", type))
   
     .cache <<- mounts
