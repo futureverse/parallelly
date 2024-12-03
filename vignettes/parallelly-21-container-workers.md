@@ -50,7 +50,7 @@ print(cl)
 
 ## Example: Two parallel workers running in Apptainer
 
-This example shows how sets up two parallel workers running Docker
+This example shows how to set up two parallel workers running Docker
 image 'rocker/r-parallel'
 (<https://hub.docker.com/r/rocker/r-parallel>) via Apptainer
 (<<https://apptainer.org/>).
@@ -73,7 +73,7 @@ print(cl)
 
 ## Example: Two parallel workers running in udocker
 
-This example shows how sets up two parallel workers running Docker
+This example shows how to set up two parallel workers running Docker
 image 'rocker/r-parallel'
 (<https://hub.docker.com/r/rocker/r-parallel>) via udocker
 (<https://indigo-dc.github.io/udocker/>).

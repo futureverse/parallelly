@@ -10,12 +10,12 @@
 
 # Introduction
 
-Sometimes it is not sufficient to parallization on a single computer -
-it cannot provide all of the compute power we are looking for. When we
+Sometimes it is not sufficient to parallize on a single computer - it
+cannot provide all of the compute power we are looking for. When we
 hit this limit, a natural next level is to look at other computers
 near us, e.g. desktops in an office or other computers we have access
 to remotely. In this vignette, we will cover how to run parallel R
-workers on other machines. Sometimes we distingush between local
+workers on other machines. Sometimes we distinguish between local
 machines and on remote machines, where _local_ machines are machines
 considered to be on the same local area network (LAN) and that might
 share a common file system. _Remote_ machines are machines that are on
@@ -76,7 +76,7 @@ the SSH password for each machine we wish to connect to. The solution
 is to configure SSH to connect with _public-private keys_, which
 pre-establish SSH authentication between the main machine and the
 machine to connect to. As this is common practice when working with
-SSH, there are numerous online tutorial explaining how to configure
+SSH, there are numerous online tutorials explaining how to configure
 private-public SSH key pairs. Please consult one of them for the
 details, but the gist is to use (i) `ssh-keygen` to generate the
 public-private SSH keys on your local machine, and then (ii)
@@ -183,7 +183,7 @@ Rscript (R) version 4.4.2 (2024-10-31)
 ```
 
 This is all that is needed to launch one or more parallel R workers on
-machine `n1.remote.org` running under user `alice`. When can test this
+machine `n1.remote.org` running under user `alice`. We can test this
 from within R with the **parallelly** package using:
 
 ```sh
@@ -241,10 +241,11 @@ Host n1.remote.org
   Port 2201
 ```
 
-With this, we can connect to `n1.remote.org` just using:
+With this, we can connect to `n1.remote.org` by just using:
 
 ```sh
 {ally@local}$ ssh n1.remote.org
+{alice@n1}$ 
 ```
 
 SSH will then connect to the machine as if we had specified also `-p
@@ -285,7 +286,7 @@ Host hpc.my-university.edu
 ```
 
 Being able to connect to remote machines by just specifying their
-hostnames is convenient and simplies also the R code.  Because of
+hostnames is convenient and simplifies also the R code.  Because of
 this, we recommend setting up also `~/.ssh/config`.
 
 
@@ -331,18 +332,20 @@ launched in the background by R using something like:
 This tells us that there is one active SSH connection per parallel
 worker. It also reveals that that each of these connections uses a so
 called _reverse tunnel_, which is used to establish a unique
-communication channel between the main R process and the correponding
+communication channel between the main R process and the corresponding
 parallel worker. It also this use of reverse tunneling that avoids
 having to configure dynamic DNS (DDNS) and port-forwarding in our
 local firewalls, which is cumbersome and requires administrative
 rights. When using **parallelly**, there is no need for administrative
-rights - any non-priviliged user can launch remote parallel R workers.
+rights - any non-privileged user can launch remote parallel R workers.
 
 
 ## Example: Two parallel workers on two remote machines
 
 This example sets up a parallel worker on each of two remote machines
-`n1.remote.org` and `n2.remote.org`. It works very similar to the previous example, but now the two SSH connections go to two different machiens rather than the same.
+`n1.remote.org` and `n2.remote.org`. It works very similar to the
+previous example, but now the two SSH connections go to two different
+machines rather than the same.
 
 ```r
 library(parallelly)
@@ -599,7 +602,7 @@ reach out to you system administrator of those machines.
 
 Assuming we have SSH access to two MS Windows machines,
 `mswin1.remote.org` and `mswin2.remote.org`, everything works the same
-as before, except that we need to also specify also argument `rscript_sh =
+as before, except that we need to specify also argument `rscript_sh =
 "cmd"`;
 
 ```r
