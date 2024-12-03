@@ -30,6 +30,12 @@
 #' appending it to the hostname, e.g. `"remote.server.org:2200"` or via
 #' SSH options \option{-p}, e.g. `rshopts = c("-p", "2200")`._
 #' 
+#' @param user (optional) The user name to be used when communicating with
+#' other hosts. If `NULL` or `"*"`, the system's default username is used.
+#' If `length(user) == 1`, then that user name is used for all hosts.
+#' If `length(user) == length(workers)`, then each worker may have a unique
+#' user name.
+#'
 #' @param \dots Optional arguments passed to
 #' `makeNode(workers[i], ..., rank = i)` where `i = seq_along(workers)`.
 #'
@@ -55,19 +61,73 @@
 #' inherit from `RichSOCKnode`).
 #'
 #' @section Alternative usage:
-#' In R (>= 4.4.0), an alternatively to using
+#' In R (>= 4.5.0), an alternatively to using
 #' `cl <- parallelly::makeClusterPSOCK(workers)` is:
 #'
 #' ```
 #' cl <- parallel::makeCluster(workers, type = parallelly::PSOCK)
 #' ```
 #'
+#' @section Protection against CPU overuse:
+#' Using too many parallel workers on the same machine may result in
+#' overusing the CPU.  For example, if an R script hard codes the
+#' number of parallel workers to 32, as in
+#'
+#' ```r
+#' cl <- makeClusterPSOCK(32)
+#' ```
+#'
+#' it will use more than 100% of the CPU cores when running on machine with
+#' fewer than 32 CPU cores.  For example, on a eight-core machine, this
+#' may run the CPU at 400% of its capacity, which has a significant
+#' negative effect on the current R process, but also on all other processes
+#' running on the same machine.  This also a problem on systems where R
+#' gets allotted a specific number of CPU cores, which is the case on
+#' high-performance compute (HPC) clusters, but also on other shared systems
+#' that limits user processes via Linux Control Groups (cgroups).
+#' For example, a free account on Posit Cloud is limited to a single
+#' CPU core. Parallelizing with 32 workers when only having access to
+#' a single core, will result in 3200% overuse and 32 concurrent R
+#' processes competing for this single CPU core.
+#'
+#' To protect against CPU overuse by mistake, `makeClusterPSOCK()` will
+#' warn when parallelizing above 100%;
+#'
+#' ```r
+#' cl <- parallelly::makeClusterPSOCK(12, dryrun = TRUE)
+#' Warning message:
+#' In checkNumberOfLocalWorkers(workers) :
+#'   Careful, you are setting up 12 localhost parallel workers with
+#' only 8 CPU cores available for this R process, which could result
+#' in a 150% load. The maximum is set to 100%. Overusing the CPUs has
+#' negative impact on the current R process, but also on all other
+#' processes of yours and others running on the same machine. See
+#' help("parallelly.options", package = "parallelly") for how to
+#' override this threshold
+#' ```
+#'
+#' Any attempts resulting in more than 300% overuse will be refused;
+#'
+#' ```r
+#' > cl <- parallelly::makeClusterPSOCK(25, dryrun = TRUE)
+#' Error in checkNumberOfLocalWorkers(workers) : 
+#'   Attempting to set up 25 localhost parallel workers with only
+#' 8 CPU cores available for this R process, which could result in
+#' a 312% load. The maximum is set to 300%. Overusing the CPUs has
+#' negative impact on the current R process, but also on all other
+#' processes of yours and others running on the same machine. See
+#' help("parallelly.options", package = "parallelly") for how to
+#' override this threshold
+#' ```
+#'
+#' See [parallelly.options] for how to change the default thresholds.
+#'
 #' @example incl/makeClusterPSOCK.R
 #'
 #' @aliases PSOCK
 #' @importFrom parallel stopCluster
 #' @export
-makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto", "random"), ..., autoStop = FALSE, tries = getOption2("parallelly.makeNodePSOCK.tries", 3L), delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15.0), validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE), verbose = getOption2("parallelly.debug", FALSE)) {
+makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto", "random"), user = NULL, ..., autoStop = FALSE, tries = getOption2("parallelly.makeNodePSOCK.tries", 3L), delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15.0), validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE), verbose = getOption2("parallelly.debug", FALSE)) {
   verbose_prefix <- "[local output] "
   if (verbose) {
     oopts <- options(parallelly.debug = verbose)
@@ -91,6 +151,11 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     checkNumberOfLocalWorkers(workers)
     
     workers <- rep(localhostHostname, times = workers)
+  }
+
+  if (!is.null(user)) {
+    stop_if_not(is.character(user), length(user) == 1L || length(user) == length(workers))
+    user <- rep(user, length.out = length(user))
   }
 
   tries <- as.integer(tries)
@@ -137,7 +202,9 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
   if (verbose) mdebugf("%sGetting setup options for %d cluster nodes ...", verbose_prefix, n)
   for (ii in seq_len(n)) {
     if (verbose) mdebugf("%s - Node #%d of %d ...", verbose_prefix, ii, n)
-    options <- makeNode(workers[[ii]], port = port, ..., rank = ii, action = "options", verbose = verbose)
+    user_ii <- user[ii]
+    if (!is.null(user_ii) && user_ii == "*") user_ii <- NULL
+    options <- makeNode(workers[[ii]], port = port, user = user_ii, ..., rank = ii, action = "options", verbose = verbose)
     stop_if_not(inherits(options, "makeNodePSOCKOptions"))
     nodeOptions[[ii]] <- options
   }
@@ -175,7 +242,9 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
 
     for (ii in which(is_parallel)) {
       if (verbose) mdebugf("%s - Node #%d of %d ...", verbose_prefix, ii, n)
-      args <- list(workers[[ii]], port = port, ..., rank = ii, action = "options", verbose = verbose)
+      user_ii <- user[ii]
+      if (!is.null(user_ii) && user_ii == "*") user_ii <- NULL
+      args <- list(workers[[ii]], port = port, user = user_ii, ..., rank = ii, action = "options", verbose = verbose)
       args$setup_strategy <- "sequential"
       options <- do.call(makeNode, args = args)
       stop_if_not(inherits(options, "makeNodePSOCKOptions"))

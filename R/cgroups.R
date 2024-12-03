@@ -1,76 +1,423 @@
 #-------------------------------------------------------
+# Utility functions with option to override for testing
+#-------------------------------------------------------
+maxCores <- local({
+  .max <- NULL
+  
+  function(max = NULL) {
+    ## Set new max?
+    if (!is.null(max)) {
+      ## Reset?
+      if (is.na(max)) max <- NULL
+      old_max <- .max
+      .max <<- max
+      return(old_max)
+    }
+
+    ## Update cache?
+    if (is.null(.max)) .max <<- parallel::detectCores(logical = TRUE)
+
+    .max
+  }
+})
+
+
+procPath <- local({
+  .path <- NULL
+  
+  function(path = NULL) {
+    ## Set new path?
+    if (!is.null(path)) {
+      ## Reset?
+      if (is.na(path)) path <- NULL
+      old_path <- .path
+      .path <<- path
+
+      ## Reset caches
+      environment(getCGroupsRoot)$.cache <- list()
+      environment(getCGroupsMounts)$.cache <- NULL
+      environment(getCGroups)$.data <- NULL
+      environment(maxCores)$.max <- NULL
+
+      return(old_path)
+    }
+
+    ## Update cache?
+    if (is.null(.path)) .path <<- "/proc"
+    
+    .path
+  }
+})
+
+
+#' @importFrom utils read.table
+readMounts <- function(file) {
+  stopifnot(file_test("-f", file))
+  data <- read.table(file, sep = " ", stringsAsFactors = FALSE)
+  names <- c("device", "mountpoint", "type", "options", "dump", "pass")
+  if (ncol(data) < length(names)) {
+    names <- names[seq_len(ncol(data))]
+  } else if (ncol(data) > length(names)) {
+    names <- c(names, rep("", ncol(data) - length(names)))
+  }
+  names(data) <- names  
+  data
+}
+
+
+#' @importFrom utils write.table
+writeMounts <- function(mounts, file) {
+  write.table(mounts, file = file, quote = FALSE, sep = " ", row.names = FALSE, col.names = FALSE)
+}
+
+getUID <- local({
+  .uid <- NULL
+  
+  function() {
+    if (!is.null(.uid)) return(.uid)
+    res <- system2("id", args = "-u", stdout = TRUE)
+    uid <- as.integer(res)
+    if (is.na(uid)) stop("id -u returned a non-integer: ", sQuote(res))
+    .uid <<- uid
+    uid
+  }
+})
+
+
+#' @importFrom utils file_test tar
+cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
+  ## Temporarily reset overrides
+  old_path <- procPath(NA)
+  on.exit(procPath(old_path))
+
+  ## Create a temporary directory
+  dest <- tempfile()
+  dir.create(dest)
+  stopifnot(file_test("-d", dest))
+  on.exit(unlink(dest, recursive = TRUE), add = TRUE)
+
+  ## Record current UID
+  uid <- getUID()
+  file <- file.path(dest, "uid")
+  cat(uid, file = file)
+
+  ## Cgroups controller
+  controller <- NA_character_
+  
+  ## Record /proc/self/
+  src <- file.path("/proc", "self")
+  dir.create(file.path(dest, src), recursive = TRUE)
+
+  ## Record /proc/self/cgroup
+  file <- file.path(src, "cgroup")
+  if (file_test("-f", file)) {
+    bfr <- readLines(file, warn = FALSE)
+    writeLines(bfr, con = file.path(dest, file))
+  }
+  
+  ## Record /proc/self/mounts
+  mounts <- getCGroupsMounts()
+
+  ## Mixed CGroups versions are not supported
+  utypes <- unique(mounts$type)
+  if (length(utypes) > 1) {
+    stop("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))	
+  }
+    
+  if (utypes == "cgroup") {
+    controllers <- c("cpu", "cpuset")
+  } else if (utypes == "cgroup2") {
+    controllers <- ""
+  } else {
+    stop("Unknown CGroups version: ", sQuote(utypes))
+  }
+
+  ## Write CGroups mountpoints
+  writeMounts(mounts, file = file.path(dest, file.path(src, "mounts")))
+
+  ## Get full CGroups folder structure
+  cgroups <- getCGroups()
+
+  ## Record CGroups mountpoints for select controllers
+  for (controller in controllers) {
+    mounts_tt <- NULL
+    
+    ## CGroups v1 or v2?
+    if (nzchar(controller)) {
+      ## CGroups v1
+      pattern <- sprintf("\\b%s\\b", controller)
+      
+      mounts_tt <- mounts[grepl(pattern, mounts$mountpoint), ]
+      if (nrow(mounts_tt) == 0) {
+        ## No CGroups v1 mountpoint for specified controller
+	next
+      } else if (nrow(mounts_tt) > 1) {
+        warning(sprintf("Detected more than one 'cgroup' mountpoint for CGroups v1 controller %s; using the first one", sQuote(controller)))
+        mounts_tt <- mounts_tt[1, ]
+      }
+
+      cgroups_tt <- cgroups[cgroups$controller == controller, ]
+      if (nrow(cgroups_tt) == 0) {
+        ## No CGroups v1 for specified controller
+	next
+      } else if (nrow(cgroups_tt) > 1) {
+        warning(sprintf("Detected more than one 'cgroup' for CGroups v1 controller %s; using the first one", sQuote(controller)))
+        cgroups_tt <- cgroups_tt[1, ]
+      }
+    } else {
+      mounts_tt <- mounts
+      cgroups_tt <- cgroups
+      
+      if (nrow(mounts_tt) == 0) {
+        ## No CGroups v2 mountpoint for specified controller
+	next
+      } else if (nrow(mounts_tt) > 1) {
+        warning("Detected more than one 'cgroup2' mountpoint for CGroups v2; using the first one")
+        mounts_tt <- mounts_tt[1, ]
+      }
+      
+      if (nrow(cgroups_tt) == 0) {
+        ## No CGroups v2 for specified controller
+	next
+      } else if (nrow(cgroups_tt) > 1) {
+        warning("Detected more than one 'cgroup2' for CGroups v2; using the first one")
+        cgroups_tt <- cgroups_tt[1, ]
+      }
+    }
+    stopifnot(
+      is.data.frame(mounts_tt),
+      nrow(mounts_tt) == 1L,
+      is.data.frame(cgroups_tt),
+      nrow(cgroups_tt) == 1L
+    )
+    
+    root <- mounts_tt$mountpoint
+    path <- file.path(dest, root)
+    dir.create(path, recursive = TRUE)
+
+    paths <- character(0)
+    for (dir in cgroups_tt$path) {
+      paths <- c(paths, dir)
+      while (nzchar(dir) && dir != "/") {
+        dir <- dirname(dir)
+        paths <- c(paths, dir)
+      }
+    }
+    paths <- unique(paths)
+
+    ## Copy file structure
+    for (dir in paths) {
+      src <- file.path(root, dir)
+      if (!file_test("-d", src)) next
+      path <- file.path(dest, src)
+      if (!file_test("-d", path)) dir.create(path, recursive = TRUE)
+      files <- dir(path = src)
+      files <- files[file_test("-f", file.path(src, files))]
+      for (file in files) {
+        file.copy(file.path(src, file), file.path(path, file))
+      }
+    }
+  } ## for (controller ...)
+
+  local({
+    opwd <- setwd(dest)
+    on.exit(setwd(opwd))
+    tar(file.path(opwd, tarfile), compression = "gzip")
+  })
+  
+  tarfile
+}
+
+
+#' @importFrom utils file_test untar
+withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = NULL) {
+   stopifnot(file_test("-f", tarball))
+   expr <- substitute(expr)
+
+   name <- sub("[.]tar[.]gz$", "", basename(tarball))
+   message(sprintf("CGroups for system %s ...", sQuote(name)))
+
+   ## Create a temporary temporary directory?
+   if (is.null(tmpdir)) {
+       tmpdir <- tempfile()
+       dir.create(tmpdir)
+       on.exit(unlink(tmpdir, recursive = TRUE))
+   }
+   message(" - Using temporary folder: ", sQuote(tmpdir))
+   
+   untar(tarball, exdir = tmpdir)
+
+   ## Read the UID
+   file <- file.path(tmpdir, "uid")
+   uid <- scan(file.path(tmpdir, "uid"), what = "integer", n = 1L, quiet = TRUE)
+   uid <- as.integer(uid)
+   message(sprintf(" - UID: %d", uid))
+
+   ## Adjust /proc accordingly
+   old_procPath <- procPath(file.path(tmpdir, "proc"))
+   on.exit(procPath(old_procPath), add = TRUE)
+   message(sprintf(" - procPath(): %s", sQuote(procPath())))
+
+   ## Disable max CPU cores validation
+   old_maxCores <- maxCores(Inf)
+   on.exit(maxCores(old_maxCores), add = TRUE)
+   message(sprintf(" - maxCores(): %s", maxCores()))
+
+   ## Adjust /sys/fs/cgroup root accordingly
+   message(" - Adjust /proc/self/mounts accordingly:")
+   file <- file.path(tmpdir, "proc", "self", "mounts")
+   mounts <- readMounts(file)
+   idxs <- which(mounts$type %in% c("cgroup", "cgroup2"))
+   for (idx in idxs) {
+     mounts[idx, "mountpoint"] <- normalizePath(file.path(tmpdir, mounts[idx, "mountpoint"]), winslash = "/", mustWork = FALSE)
+   }
+   writeMounts(mounts, file = file)
+   bfr <- readLines(file, warn = FALSE)
+   bfr <- sprintf("   %02d: %s", seq_along(bfr), bfr)
+   writeLines(bfr)
+
+   message(" - getCGroupsVersion(): ", getCGroupsVersion())
+
+   message(" - getCGroupsMounts():")
+   mounts <- getCGroupsMounts()
+   print(mounts)
+
+   message(" - getCGroups():")
+   cgroups <- getCGroups()
+   print(cgroups)
+
+   message(" - length(getCGroups1CpuSet()): ", length(getCGroups1CpuSet()))
+   message(" - getCGroups1CpuQuota(): ", getCGroups1CpuQuota())
+   message(" - getCGroups2CpuMax(): ", getCGroups2CpuMax())
+
+   message(" - availableCores(which = 'all'):")
+   cores <- availableCores(which = "all")
+   print(cores)
+
+   if (is.null(envir)) {
+     res <- eval(expr)
+   } else {
+     res <- eval(expr, envir = envir)
+   }
+   
+   message(sprintf("CGroups for system %s ... done", sQuote(name)))
+   
+   invisible(res)
+}
+
+
+#-------------------------------------------------------
 # Unix control groups ("cgroups")
 #-------------------------------------------------------
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return A character string to an existing CGroups root folder.
 #  If no such folder could be found, NA_character_ is returned.
 #
 #' @importFrom utils file_test
 getCGroupsRoot <- local({
+  ## To please R CMD check
+  type <- mountpoint <- NULL
+  
   .cache <- list()
   
-  function(controller = "", pid = Sys.getpid()) {
+  function(controller = "") {
     stopifnot(is.character(controller), length(controller) == 1L, !is.na(controller))
-    stopifnot(is.integer(pid), length(pid) == 1L, pid > 0L)
-    pid_str <- as.character(pid)
 
-    path <- .cache[[pid_str]]
+    path <- .cache[[controller]]
     if (!is.null(path)) return(path)
 
-    ## FIXME: Look up the CGroups mount point, e.g.
-    ## $ grep cgroup /proc/$$/mounts
-    ## cgroup2 /sys/fs/cgroup cgroup2 rw,seclabel,nosuid,nodev,noexec,relatime,nsdelegate 0 0
-
-    file <- file.path("/proc", pid, "mounts")
-    if (!file_test("-f", file)) {
+    ## Look up the CGroups mountpoint
+    mounts <- getCGroupsMounts()
+    
+    ## Mixed CGroups versions are not supported
+    utypes <- unique(mounts$type)
+    if (length(utypes) > 1) {
+      warning("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))
       path <- NA_character_
-      .cache[[pid_str]] <- path
+      .cache[[controller]] <<- path
       return(path)
-    }
-
-    bfr <- readLines(file, warn = FALSE)
-    bfr <- grep("^cgroup[^[:blank:]]*[[:blank:]]+", bfr, value = TRUE)
-    if (length(bfr) == 0) {
-      path <- NA_character_
-      .cache[[pid_str]] <- path
-      return(path)
-    }
-
-    ## CGroups v1?
-    if (length(bfr) > 1 && nzchar(controller)) {
-      pattern <- sprintf("\\b%s\\b", controller)
-      bfr <- grep(pattern, bfr, value = TRUE)
-      if (length(bfr) == 0) {
-        stop(sprintf("Failed to identify mount point for CGroups v1 controller %s", sQuote(controller)))
-      } else if (length(bfr) != 1) {
-        bfr <- bfr[1]
-        warning(sprintf("Detected more than one 'cgroup' mount point for CGroups v1 controller %s; using the first one",
-                sQuote(controller)))
-      }
     }
     
-    if (length(bfr) > 1) {
-      bfr <- bfr[1]
-      warning("Detected more than one 'cgroup' mount point; using the first one")
+    ## Filter by CGroups v1 or v2?
+    if (nzchar(controller)) {
+      mounts <- subset(mounts, type == "cgroup")
+    } else {
+      mounts <- subset(mounts, type == "cgroup2")
+    }
+    if (nrow(mounts) == 0) {
+      path <- NA_character_
+      .cache[[controller]] <<- path
+      return(path)
     }
 
-    path <- sub("^cgroup[^[:blank:]]*[[:blank:]]+", "", bfr)
-    path <- sub("^([^[:blank:]]+)[[:blank:]]+.*", "\\1", path)
+    if (nrow(mounts) > 1) {
+      ## CGroups v1 or v2?
+      if (nzchar(controller)) {
+        ## CGroups v1
+        pattern <- sprintf("\\b%s\\b", controller)
+        mounts <- subset(mounts, grepl(pattern, mountpoint))
+        if (nrow(mounts) == 0) {
+          ## No such CGroups v1 mountpoint for specified controller
+          path <- NA_character_
+          .cache[[controller]] <<- path
+          return(path)
+        } else if (nrow(mounts) > 1) {
+          warning(sprintf("Detected more than one 'cgroup' mountpoint for CGroups v1 controller %s; using the first one", sQuote(controller)))
+          mounts <- mounts[1, ]
+        }
+      } else {
+        ## CGroups v2
+        warning("Detected more than one 'cgroup2' mountpoint for CGroups v2; using the first one")
+        mounts <- mounts[1, ]
+      }
+    }
+
+    stopifnot(nrow(mounts) == 1L)
+    path <- mounts$mountpoint
     if (!file_test("-d", path)) {
       path <- NA_character_
     }
     
-    .cache[[pid_str]] <<- path
+    .cache[[controller]] <<- path
 
     path
   }
 })
 
 
-#  Get the CGroups hierarchy for a specific process
+#  Get the CGroups mountpoints
 #
-#  @param pid (integer) The ID of an existing process.
+#  @return A data.frame with zero or more CGroups mountpoints.
+#
+#' @importFrom utils file_test
+getCGroupsMounts <- local({
+  ## To please R CMD check
+  type <- NULL
+
+  .cache <- NULL
+  
+  function() {
+    file <- file.path(procPath(), "self", "mounts")
+    
+    ## cgroups is not set?
+    if (!file_test("-f", file)) {
+      mounts <- data.frame(device = character(0), mountpoint = character(0), type = character(0),
+                           options = character(0), dump = integer(0), pass = integer(0))
+      .cache <<- mounts
+      return(mounts)
+    }
+
+    mounts <- readMounts(file)
+    
+    ## Keep CGroups mountpoints
+    mounts <- subset(mounts, grepl("^cgroup", type))
+  
+    .cache <<- mounts
+    mounts
+  }
+})
+
+
+#  Get the CGroups hierarchy
 #
 #  @return A data frame with three columns:
 #  * `hierarchy_id` (integer): 0 for cgroups v2.
@@ -82,22 +429,19 @@ getCGroupsRoot <- local({
 # 
 #' @importFrom utils file_test
 getCGroups <- local({
-  .cache <- list()
+  .data <- NULL
   
-  function(pid = Sys.getpid()) {
-    stopifnot(is.integer(pid), length(pid) == 1L, pid > 0L)
-    pid_str <- as.character(pid)
-
-    data <- .cache[[pid_str]]
+  function() {
+    data <- .data
     if (!is.null(data)) return(data)
 
     ## Get cgroups
-    file <- file.path("/proc", pid, "cgroup")
+    file <- file.path(procPath(), "self", "cgroup")
 
     ## cgroups is not set?
     if (!file_test("-f", file)) {
-      data <- data.frame(hierarchy_id = integer(0L), controller = character(0L), path = character(0L))
-      .cache[[pid_str]] <- data
+      data <- data.frame(hierarchy_id = integer(0L), controller = character(0L), path = character(0L), stringsAsFactors = FALSE)
+      .data <<- data
       return(data)
     }
 
@@ -109,7 +453,7 @@ getCGroups <- local({
     ids <- as.integer(sub(pattern, "\\1", bfr))
     controllers <- sub(pattern, "\\2", bfr)
     paths <- sub(pattern, "\\3", bfr)
-    data <- data.frame(hierarchy_id = ids, controller = controllers, path = paths)
+    data <- data.frame(hierarchy_id = ids, controller = controllers, path = paths, stringsAsFactors = FALSE)
       
     ## Split multi-name entries into separate entries,
     ## e.g. 'cpuacct,cpu' -> 'cpuacct' and 'cpu'
@@ -129,7 +473,7 @@ getCGroups <- local({
     
     ## Order by hierarchy ID
     data <- data[order(data$hierarchy_id), ]
-    .cache[[pid_str]] <<- data
+    .data <<- data
     
     data
   }
@@ -140,17 +484,15 @@ getCGroups <- local({
 #
 #  @param controller (character) A cgroups v1 set or `""` for cgroups v2.
 # 
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return An character string to an existing cgroups folder.
 #  If no folder could be found, `NA_character_` is returned.
 # 
 #' @importFrom utils file_test
-getCGroupsPath <- function(controller, pid = Sys.getpid()) {
-  root <- getCGroupsRoot(controller = controller, pid = pid)
+getCGroupsPath <- function(controller) {
+  root <- getCGroupsRoot(controller = controller)
   if (is.na(root)) return(NA_character_)
 
-  data <- getCGroups(pid = pid)
+  data <- getCGroups()
 
   set <- data[data$controller == controller, ]
   if (nrow(set) == 0L) {
@@ -187,15 +529,13 @@ getCGroupsPath <- function(controller, pid = Sys.getpid()) {
 # 
 #  @param field (character) A cgroups field.
 # 
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return An character string.
 #  If the requested cgroups controller and field could not be queried,
 #  NA_character_ is returned.
 #
 #' @importFrom utils file_test
-getCGroupsValue <- function(controller, field, pid = Sys.getpid()) {
-  path <- getCGroupsPath(controller = controller, pid = pid)
+getCGroupsValue <- function(controller, field) {
+  path <- getCGroupsPath(controller = controller)
   if (is.na(path)) return(NA_character_)
 
   path_prev <- ""
@@ -221,13 +561,11 @@ getCGroupsValue <- function(controller, field, pid = Sys.getpid()) {
 #
 #  @param field (character) A cgroups v1 field.
 # 
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return An character string. If the requested cgroups v1 field could not be
 #  queried, NA_character_ is returned.
 #
-getCGroups1Value <- function(controller, field, pid = Sys.getpid()) {
-  getCGroupsValue(controller, field = field, pid = pid)
+getCGroups1Value <- function(controller, field) {
+  getCGroupsValue(controller, field = field)
 }
 
 
@@ -235,29 +573,25 @@ getCGroups1Value <- function(controller, field, pid = Sys.getpid()) {
 #
 #  @param field (character) A cgroups v2 field.
 # 
-#  @param pid (integer) The ID of an existing process.
-#
 #  @return An character string. If the requested cgroups v2 field could not be
 #  queried, NA_character_ is returned.
-getCGroups2Value <- function(field, pid = Sys.getpid()) {
-  getCGroupsValue("", field = field, pid = pid)
+getCGroups2Value <- function(field) {
+  getCGroupsValue("", field = field)
 }
 
 
 #  Get cgroups version
-#
-#  @param pid (integer) The ID of an existing process.
 #
 #  @return
 #  If the current process is under cgroups v1, then `1L` is returned.
 #  If it is under cgroups v2, then `2L` is returned.
 #  If not under cgroups control, then `-1L` is returned.
 #
-getCGroupsVersion <- function(pid = Sys.getpid()) {
-  cgroups <- getCGroups(pid = pid)
+getCGroupsVersion <- function() {
+  cgroups <- getCGroups()
   if (nrow(cgroups) == 0) return(-1L)
-  if (nzchar(cgroups$controller)) return(1L)
-  2L
+  if (nrow(cgroups) == 1 && cgroups$controller == "") return(2L)
+  1L
 }
 
 
@@ -307,7 +641,7 @@ getCGroups1CpuSet <- function() {
   })
 
   ## Sanity checks
-  max_cores <- parallel::detectCores(logical = TRUE)
+  max_cores <- maxCores()
   if (any(value < 0L | value >= max_cores)) {
     warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU set, because it contains one or more CPU indices that is out of range [0,%d]: %s", max_cores - 1L, value0))
     value <- integer(0L)
@@ -349,7 +683,7 @@ getCGroups1CpuSet <- function() {
 #
 #  [1] https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
 #
-getCGroups1CpuQuotaMicroseconds <- function(pid = Sys.getpid()) {
+getCGroups1CpuQuotaMicroseconds <- function() {
   value <- suppressWarnings({
     ## e.g. /sys/fs/cgroup/cpu/cpu.cfs_quota_us
     as.integer(getCGroups1Value("cpu", "cpu.cfs_quota_us"))
@@ -388,7 +722,7 @@ getCGroups1CpuQuota <- function() {
   value <- ms / total
 
   if (!is.na(value)) {
-    if (is.null(max_cores)) max_cores <- parallel::detectCores(logical = TRUE)
+    max_cores <- maxCores()
     if (!is.finite(value) || value <= 0.0 || value > max_cores) {
       warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
       value <- NA_real_
@@ -423,7 +757,7 @@ getCGroups1CpuQuota <- function() {
 #
 #  [1] https://docs.kernel.org/admin-guide/cgroup-v2.html
 #
-getCGroups2CpuMax <- function(pid = Sys.getpid()) {
+getCGroups2CpuMax <- function() {
   ## TEMPORARY: In case the cgroups options causes problems, make
   ## it possible to override their values via hidden options
   quota <- get_package_option("cgroups2.cpu.max", NULL)
@@ -432,7 +766,7 @@ getCGroups2CpuMax <- function(pid = Sys.getpid()) {
 
   raw <- suppressWarnings({
     ## e.g. /sys/fs/cgroup/cpu.max
-    getCGroups2Value("cpu.max", pid = pid)
+    getCGroups2Value("cpu.max")
   })
 
   if (is.na(raw)) {
@@ -457,7 +791,7 @@ getCGroups2CpuMax <- function(pid = Sys.getpid()) {
   max <- as.integer(max)
   value <- max / period
   if (!is.na(value)) {
-    max_cores <- parallel::detectCores(logical = TRUE)
+    max_cores <- maxCores()
     if (!is.finite(value) || value <= 0.0 || value > max_cores) {
       warning(sprintf("[INTERNAL]: Will ignore the cgroups v2 CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
       value <- NA_real_

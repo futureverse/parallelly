@@ -281,7 +281,7 @@ if (fullTest || covr_testing) {
 }
 
 
-## https://github.com/HenrikBengtsson/parallelly/issues/95
+## https://github.com/futureverse/parallelly/issues/95
 if (getRversion() >= "4.0.0") {
   res <- tryCatch({
     parallelly::makeClusterPSOCK(1L, rscript_startup = quote(Sys.sleep(6.0)),

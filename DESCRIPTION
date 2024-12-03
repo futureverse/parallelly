@@ -1,10 +1,14 @@
 Package: parallelly
-Version: 1.39.0
+Version: 1.40.0
 Title: Enhancing the 'parallel' Package
 Imports:
     parallel,
     tools,
     utils
+Suggests:    
+    commonmark,
+    base64enc
+VignetteBuilder: parallelly
 Authors@R: c(
         person("Henrik", "Bengtsson",
                role = c("aut", "cre", "cph"),
@@ -18,8 +22,8 @@ Description: Utility functions that enhance the 'parallel' package and support t
 License: LGPL (>= 2.1)
 LazyLoad: TRUE
 ByteCompile: TRUE
-URL: https://parallelly.futureverse.org, https://github.com/HenrikBengtsson/parallelly
-BugReports: https://github.com/HenrikBengtsson/parallelly/issues
+URL: https://parallelly.futureverse.org, https://github.com/futureverse/parallelly
+BugReports: https://github.com/futureverse/parallelly/issues
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)

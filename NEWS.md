@@ -1,3 +1,30 @@
+# Version 1.40.0 [2024-12-02]
+
+## New Features
+
+ * Argument `user` of `makeClusterPSOCK()` may now be a vector of
+   username - one for each worker specified.
+
+## Documentation
+
+ * Add vignettes on how to setup a cluster of parallel workers on the
+   local machine, on external machines, in the cloud, in HPC
+   environments, and more.
+   
+## Bug Fixes
+
+ * Querying of cgroups v1 'cpuquota' CPU limits were broken in the
+   previous release (v1.39.0).
+
+ * `availableCores()` could produce error `Failed to identify mount
+   point for CGroups v1 controller 'cpuset'` on some systems.
+ 
+ * `availableWorkers()` would produce invalid warning on `Identified 8
+   workers from the ‘PE_HOSTFILE’ file (...), which is more than
+   environment variable ‘NSLOTS’ = 8` when running via a Grid Engine
+   job scheduler.
+
+
 # Version 1.39.0 [2024-11-07]
 
 ## New Features
