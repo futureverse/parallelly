@@ -2,10 +2,10 @@
 
 <details>
 
-* Version: 1.5.1
+* Version: 1.5.2
 * GitHub: NA
 * Source code: https://github.com/cran/adea
-* Date/Publication: 2023-11-24 16:00:02 UTC
+* Date/Publication: 2024-11-12 18:00:02 UTC
 * Number of recursive dependencies: 54
 
 Run `revdepcheck::revdep_details(, "adea")` for more info
@@ -108,10 +108,10 @@ Run `revdepcheck::revdep_details(, "breathteststan")` for more info
 
 <details>
 
-* Version: 2.6.0
+* Version: 2.6.1
 * GitHub: https://github.com/seriph78/COTAN
 * Source code: https://github.com/cran/COTAN
-* Date/Publication: 2024-10-29
+* Date/Publication: 2024-11-12
 * Number of recursive dependencies: 276
 
 Run `revdepcheck::revdep_details(, "COTAN")` for more info
@@ -122,9 +122,9 @@ Run `revdepcheck::revdep_details(, "COTAN")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 13.8Mb
+      installed size is 13.7Mb
       sub-directories of 1Mb or more:
-        doc  12.0Mb
+        doc  11.9Mb
     ```
 
 *   checking dependencies in R code ... NOTE
@@ -161,29 +161,6 @@ Run `revdepcheck::revdep_details(, "COTAN")` for more info
       xmaxv xminv y zoomedNuPlot
     ```
 
-# dataquieR
-
-<details>
-
-* Version: 2.1.0
-* GitHub: NA
-* Source code: https://github.com/cran/dataquieR
-* Date/Publication: 2024-03-29 10:30:02 UTC
-* Number of recursive dependencies: 156
-
-Run `revdepcheck::revdep_details(, "dataquieR")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking installed package size ... NOTE
-    ```
-      installed size is  5.8Mb
-      sub-directories of 1Mb or more:
-        R   4.0Mb
-    ```
-
 # decoupleR
 
 <details>
@@ -199,54 +176,6 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 </details>
 
 ## In both
-
-*   checking examples ... ERROR
-    ```
-    Running examples in ‘decoupleR-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: run_gsva
-    > ### Title: Gene Set Variation Analysis (GSVA)
-    > ### Aliases: run_gsva
-    > 
-    > ### ** Examples
-    > 
-    > inputs_dir <- system.file("testdata", "inputs", package = "decoupleR")
-    > 
-    > mat <- readRDS(file.path(inputs_dir, "mat.rds"))
-    > net <- readRDS(file.path(inputs_dir, "net.rds"))
-    > 
-    > run_gsva(mat, net, minsize=1, verbose = FALSE)
-    Error in value[[3L]](cond) : 
-      No such method in GSVA: `gsva`. To learn more check ?gsva.No such method in GSVA: `plage`. To learn more check ?gsva.No such method in GSVA: `ssgsea`. To learn more check ?gsva.No such method in GSVA: `zscore`. To learn more check ?gsva.
-    Calls: run_gsva ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
-    Execution halted
-    ```
-
-*   checking tests ...
-    ```
-      Running ‘testthat.R’
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 50 lines of output:
-      <purrr_error_indexed/rlang_error/error/condition>
-      Error in `map2(.x, .y, .f, ...)`: i In index: 8.
-      Caused by error in `value[[3L]]()`:
-      ! No such method in GSVA: `gsva`. To learn more check ?gsva.No such method in GSVA: `plage`. To learn more check ?gsva.No such method in GSVA: `ssgsea`. To learn more check ?gsva.No such method in GSVA: `zscore`. To learn more check ?gsva.
-      Backtrace:
-           ▆
-    ...
-          ▆
-       1. └─decoupleR::run_gsva(mat, net, minsize = 1L, verbose = FALSE) at test-statistic-gsva.R:22:5
-       2.   └─base::tryCatch(...)
-       3.     └─base (local) tryCatchList(expr, classes, parentenv, handlers)
-       4.       └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-       5.         └─value[[3L]](cond)
-      
-      [ FAIL 2 | WARN 9 | SKIP 0 | PASS 33 ]
-      Error: Test failures
-      Execution halted
-    ```
 
 *   checking Rd cross-references ... WARNING
     ```
@@ -284,7 +213,7 @@ Run `revdepcheck::revdep_details(, "desla")` for more info
     ```
       installed size is  7.4Mb
       sub-directories of 1Mb or more:
-        libs   7.2Mb
+        libs   7.3Mb
     ```
 
 # gastempt
@@ -430,41 +359,6 @@ Run `revdepcheck::revdep_details(, "mappp")` for more info
       All declared Imports should be used.
     ```
 
-# mice
-
-<details>
-
-* Version: 3.16.0
-* GitHub: https://github.com/amices/mice
-* Source code: https://github.com/cran/mice
-* Date/Publication: 2023-06-05 14:40:02 UTC
-* Number of recursive dependencies: 130
-
-Run `revdepcheck::revdep_details(, "mice")` for more info
-
-</details>
-
-## In both
-
-*   checking Rd files ... NOTE
-    ```
-    checkRd: (-1) ampute.Rd:143: Lost braces
-       143 | we refer to \doi{10.1177/0049124118799376}{Schouten and Vink, 2018}.
-           |                                           ^
-    checkRd: (-1) ampute.Rd:188: Lost braces
-       188 | \doi{10.1080/00949655.2018.1491577}{Schouten, Lugtig and Vink, 2018}.
-           |                                    ^
-    checkRd: (-1) ampute.Rd:223: Lost braces
-       223 | Schouten, R.M. and Vink, G. (2018){The Dance of the Mechanisms: How Observed Information Influences the Validity of Missingness Assumptions}.
-           |                                   ^
-    checkRd: (-1) mice.Rd:348: Lost braces; missing escapes or markup?
-       348 | The \pkg{mice} software was published in the {Journal of Statistical Software} (Van Buuren and Groothuis-Oudshoorn, 2011). \doi{10.18637/jss.v045.i03}
-           |                                              ^
-    checkRd: (-1) mice.impute.pmm.Rd:87: Lost braces; missing escapes or markup?
-        87 | \item{Construct \eqn{n_0} sets \eqn{Z_j}, each containing \eqn{d} candidate donors, from Y_{obs} such that \eqn{\sum_d\dot\eta(i,j)} is minimum for all \eqn{j=1,\dots,n_0}. Break ties randomly.}
-           |                                                                                            ^
-    ```
-
 # mmrm
 
 <details>
@@ -553,7 +447,7 @@ Run `revdepcheck::revdep_details(, "outliers.ts.oga")` for more info
     ```
     Found the following significant warnings:
       Warning: no DISPLAY variable so Tk is not available
-    See ‘/c4/home/henrik/repositories/parallelly/revdep/checks/outliers.ts.oga/new/outliers.ts.oga.Rcheck/00install.out’ for details.
+    See ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/outliers.ts.oga/new/outliers.ts.oga.Rcheck/00install.out’ for details.
     ```
 
 # pmartR
@@ -579,8 +473,9 @@ Run `revdepcheck::revdep_details(, "pmartR")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 10.5Mb
+      installed size is 10.7Mb
       sub-directories of 1Mb or more:
+        R      1.0Mb
         libs   8.0Mb
     ```
 
@@ -672,6 +567,32 @@ Run `revdepcheck::revdep_details(, "ResIN")` for more info
 *   checking data for non-ASCII characters ... NOTE
     ```
       Note: found 1 marked UTF-8 string
+    ```
+
+# SCDB
+
+<details>
+
+* Version: 0.4.1
+* GitHub: https://github.com/ssi-dk/SCDB
+* Source code: https://github.com/cran/SCDB
+* Date/Publication: 2024-10-03 23:01:07 UTC
+* Number of recursive dependencies: 139
+
+Run `revdepcheck::revdep_details(, "SCDB")` for more info
+
+</details>
+
+## In both
+
+*   checking package dependencies ... NOTE
+    ```
+    Package suggested but not available for checking: ‘duckdb’
+    ```
+
+*   checking Rd cross-references ... NOTE
+    ```
+    Package unavailable to check Rd xrefs: ‘duckdb’
     ```
 
 # scruff
@@ -815,6 +736,27 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
     
     It looks like this package (or a package it requires) has a startup
     message which cannot be suppressed: see ?packageStartupMessage.
+    ```
+
+# targets
+
+<details>
+
+* Version: 1.9.0
+* GitHub: https://github.com/ropensci/targets
+* Source code: https://github.com/cran/targets
+* Date/Publication: 2024-11-20 08:30:03 UTC
+* Number of recursive dependencies: 160
+
+Run `revdepcheck::revdep_details(, "targets")` for more info
+
+</details>
+
+## In both
+
+*   checking Rd cross-references ... NOTE
+    ```
+    Package unavailable to check Rd xrefs: ‘qs’
     ```
 
 # TDApplied
