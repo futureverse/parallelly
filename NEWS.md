@@ -8,7 +8,7 @@
 ## New Features
 
  * Argument `user` of `makeClusterPSOCK()` may now be a vector of
-   username - one for each worker specified.
+   usernames - one for each worker specified.
 
 ## Documentation
 
@@ -18,8 +18,8 @@
    
 ## Bug Fixes
 
- * Querying of cgroups v1 'cpuquota' CPU limits were broken in the
-   previous release (v1.39.0).
+ * Querying of cgroups v1 'cpuquota' CPU limits broke in the previous
+   release (v1.39.0).
 
  * `availableCores()` could produce error `Failed to identify mount
    point for CGroups v1 controller 'cpuset'` on some systems.
