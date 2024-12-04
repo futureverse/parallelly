@@ -9,7 +9,6 @@ register_vignette_engine_during_build_only <- function(pkgname) {
     weave = function(file, ...) {
       output <- sprintf("%s.html", tools::file_path_sans_ext(basename(file)))
       md <- readLines(file)
-      writeLines(md, con = "~/foo.01.md")
 
       title <- grep("%\\VignetteIndexEntry{", md, fixed = TRUE, value = TRUE)
       title <- gsub(".*[{](.*)[}].*", "\\1", title)
@@ -21,7 +20,6 @@ register_vignette_engine_during_build_only <- function(pkgname) {
                                         smart = TRUE,
                                         extensions = c("table", "tasklist"),
                                         normalize = FALSE)
-      writeLines(html, con = "~/foo.01.html")
       
       ## Embed images as <img src="data:image/png;base64...">
       mimes <- list(
@@ -62,7 +60,6 @@ register_vignette_engine_during_build_only <- function(pkgname) {
                 "</head>",
                 "<body>", html, "</body>",
                 "</html>")
-      writeLines(html, con = "~/foo.02.html")
 
       writeLines(html, con = output)
       output
