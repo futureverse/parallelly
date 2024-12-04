@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.40.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.40.1-9001</span>
       </span>
     </div>
 
@@ -249,9 +249,8 @@ CGroups<a class="anchor" aria-label="anchor" href="#example-linux-parallel-worke
 quota and 50 MiB of memory using Linux CGroups management. The 100% CPU
 quota limit constrain each worker to use at most one CPU worth of
 processing preventing them from overusing the machine, e.g. through
-unintended nested parallelization. The 50 MiB memory limit is strict -
-if a worker use more than this, the operating system will terminate the
-worker instantly.</p>
+unintended nested parallelization. For more details, see
+<code>man systemd.resource-control</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
@@ -263,7 +262,38 @@ worker instantly.</p>
 <span>    <span class="st">"*"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>For more details, see <code>man systemd.resource-control</code>.</p>
+<p>The 50 MiB memory limit is strict - if a worker use more than this,
+the operating system will terminate the worker instantly. To illustrate
+what happens, we first start by generating 1 million numeric values each
+consuming 8 bytes, which in total consumes ~8 MB, and then calculate the
+mean, the memory consumption is within 50-MiB memory limit that each
+parallel worker has available;</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">parallel</span><span class="op">)</span></span>
+<span><span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">clusterEvalQ</a></span><span class="op">(</span><span class="va">cl</span>, <span class="op">{</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1e6</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1]  0.0008072657 -0.0019693992</span></span></code></pre></div>
+<p>However, if we generate 10 times more values, the memory consumption
+will grow to at least 80 MB, which is over then 50-MiB memory limit, and
+we will get an error:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">clusterEvalQ</a></span><span class="op">(</span><span class="va">cl</span>, <span class="op">{</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10e6</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in unserialize(node$con) : error reading from connection</span></span></code></pre></div>
+<p>This is because the operating system terminated the two background R
+processes, because they overused the memory. This is why the main R
+process no longer can communicate with the parallel workers. We can see
+that both workers are down, by calling:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/isNodeAlive.html">isNodeAlive</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] FALSE FALSE</span></span></code></pre></div>
+<p>We can use <code><a href="../reference/cloneNode.html">cloneNode()</a></code> to relaunch workers that are no
+longer alive, e.g.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">is_down</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="fu"><a href="../reference/isNodeAlive.html">isNodeAlive</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
+<span><span class="va">cl</span><span class="op">[</span><span class="va">is_down</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cloneNode.html">cloneNode</a></span><span class="op">(</span><span class="va">cl</span><span class="op">[</span><span class="va">is_down</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/isNodeAlive.html">isNodeAlive</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE TRUE</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-ms-windows-parallel-workers-with-specific-cpu-affinities">Example: MS Windows parallel workers with specific CPU
@@ -272,7 +302,7 @@ affinities<a class="anchor" aria-label="anchor" href="#example-ms-windows-parall
 <p>This example, works only on MS Windows machines. It launches four
 local workers, where two are running on CPU Group #0 and two on CPU
 Group #1.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="va">rscript</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COMSPEC"</span><span class="op">)</span>, <span class="st">"/c"</span>, </span>
