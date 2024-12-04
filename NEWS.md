@@ -1,6 +1,10 @@
 # Version (development version)
 
- * ...
+## Bug Fixes
+
+ * The internal vignette engine wrote files to user's home
+   directory. They were due to a brief debugging of the vignette
+   engine and then forgotten about.
 
 
 # Version 1.40.0 [2024-12-02]
