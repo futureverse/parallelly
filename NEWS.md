@@ -1,4 +1,4 @@
-# Version (development version)
+# Version 1.40.1 [2024-12-03]
 
 ## Bug Fixes
 
