@@ -1,5 +1,11 @@
 # Version (development version)
 
+## New Features
+
+ * `makeClusterPSOCK()` will now produce an error, rather than a
+   warning, when the local system command used to launch the parallel
+   worker failed with a non-zero exit code.
+ 
 ## Bug Fixes
 
  * `makeClusterPSOCK()` on MS Windows failed to launch remote workers,
