@@ -381,7 +381,11 @@ shQuote <- local({
   known_types <- c(known_types, "none")
   
   function(string, type = NULL) {
-    if (is.null(type)) type <- known_types
+    if (missing(type) && .Platform$OS.type == "windows") {
+        type <- "cmd"
+    } else if (is.null(type)) {
+      type <- known_types
+    }
     type <- match.arg(type, choices = known_types, several.ok = FALSE)
     if (type == "none") return(string)
     base::shQuote(string, type = type)

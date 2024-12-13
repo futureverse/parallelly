@@ -1,7 +1,12 @@
 # Version (development version)
 
- * ...
- 
+## Bug Fixes
+
+ * Using `makeClusterPSOCK()` on MS Windows to launch remote workers
+   failed, with warnings on `"In system(local_cmd, wait = FALSE, input
+   = input) : 'C:\WINDOWS\System32\OpenSSH\ssh.exe' not found"`. This
+   bug was introduced in version 1.38.0 (2024-07-27) when adding
+   richer support for the `rscript_sh` argument.
 
 # Version 1.40.1 [2024-12-03]
 
