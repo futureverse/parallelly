@@ -167,22 +167,21 @@ data <- data[, c(
   ## Input
   "ntasks", "nodes", "cpus_per_task", 
 
-  ## Slurm
-  ## (a) input
-  "SLURM_NTASKS", "SLURM_CPUS_PER_TASK",
-  
-  ## (b) allocations
-  "SLURM_JOB_NUM_NODES", "SLURM_JOB_NODELIST",
-  "SLURM_TASKS_PER_NODE", "SLURM_JOB_CPUS_PER_NODE",
-  
-  ## (c) "current-machine" view
-  "SLURM_CPUS_ON_NODE",
-
   ## parallelly output
   "availableCores", "availableWorkers",
+
+  ## Slurm
+  "SLURM_NTASKS",             # input
+  "SLURM_JOB_NUM_NODES",      # allocations
+  "SLURM_CPUS_PER_TASK",      # input
+  "SLURM_JOB_NODELIST",       # allocations
+  "SLURM_TASKS_PER_NODE",     # allocations
+  "SLURM_JOB_CPUS_PER_NODE",  # allocations
+  "SLURM_CPUS_ON_NODE",       # "current-machine" view
+
+  ## system tools output
   "nproc", "cgroups"
 )]
-
 
 ## Reorder rows
 data <- data[with(data, order(ntasks, cpus_per_task, nodes, na.last = FALSE)), ]
@@ -192,6 +191,11 @@ readr::write_csv(data, "sbatch-params-all.csv")
 
 ## Print without SLURM_ prefix
 data2 <- data
+## Add asterisk to env vars reflecting the Slurm input parameters
+cols <- c("SLURM_NTASKS", "SLURM_CPUS_PER_TASK")
+names <- colnames(data2)
+names[names %in% cols] <- paste0(names[names %in% cols], ".")
+colnames(data2) <- names
 colnames(data2) <- gsub("^SLURM_", "", colnames(data2))
 options(width = 200)
 print(data2, n = 100L)
