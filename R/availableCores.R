@@ -252,16 +252,16 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       n <- availableCoresPJM()
     } else if (method == "mc.cores") {
       ## Number of cores by option defined by 'parallel' package
-      n <- getopt("mc.cores")
+      n <- getopt_int("mc.cores")
       if (!is.na(n) && n == 0) n <- 1L  ## Because options(mc.cores = 0) may be set
     } else if (method == "mc.cores+1") {
       ## Number of cores by option defined by 'parallel' package
-      n <- getopt("mc.cores") + 1L
+      n <- getopt_int("mc.cores") + 1L
     } else if (method == "connections") {
       ## Number of available connections, which are needed by PSOCK clusters
       n <- freeConnections()
     } else if (method == "BiocParallel") {
-      n <- getenv("BIOCPARALLEL_WORKER_NUMBER")
+      n <- getenv_int("BIOCPARALLEL_WORKER_NUMBER")
     } else if (method == "_R_CHECK_LIMIT_CORES_") {
       ## A flag set by R CMD check for constraining number of
       ## cores allowed to be use in package tests.  Here we
@@ -340,8 +340,8 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       ## covr: skip=3
       ## Fall back to querying option and system environment variable
       ## with the given name
-      n <- getopt(method)
-      if (is.na(n)) n <- getenv(method)
+      n <- getopt_int(method)
+      if (is.na(n)) n <- getenv_int(method)
     }
     ncores[kk] <- n
   } ## for (kk in seq_along(methods))
@@ -508,21 +508,21 @@ checkNumberOfLocalWorkers <- function(workers) {
   }
 } ## checkNumberOfLocalWorkers()
 
-
+  
 # --------------------------------------------------------------------------
 # Utility functions
 # --------------------------------------------------------------------------
-getenv <- function(name, mode = "integer") {
+getenv_int <- function(name, mode = "integer") {
   value <- trim(getEnvVar2(name, default = NA_character_))
   storage.mode(value) <- mode
   value
-} # getenv()
+} # getenv_int()
 
-getopt <- function(name, mode = "integer") {
+getopt_int <- function(name, mode = "integer") {
   value <- getOption2(name, default = NA_integer_)
   storage.mode(value) <- mode
   value
-} # getopt()
+} # getopt_int()
 
 
 # --------------------------------------------------------------------------
@@ -530,17 +530,17 @@ getopt <- function(name, mode = "integer") {
 # --------------------------------------------------------------------------
 ## Number of slots assigned by LSF
 availableCoresLSF <- function() {      
-  n <- getenv("LSB_DJOB_NUMPROC")
+  n <- getenv_int("LSB_DJOB_NUMPROC")
   n
 }
 
 
 ## Number of cores assigned by TORQUE/PBS
 availableCoresPBS <- function() {      
-  n <- getenv("PBS_NUM_PPN")
+  n <- getenv_int("PBS_NUM_PPN")
   if (is.na(n)) {
     ## PBSPro sets 'NCPUS' but not 'PBS_NUM_PPN'
-    n <- getenv("NCPUS")
+    n <- getenv_int("NCPUS")
   }
   n
 }
@@ -553,14 +553,14 @@ availableCoresPJM <- function() {
   ## PJM_VNODE_CORE: e.g. pjsub -L vnode-core=8
   ## "This environment variable is set only when virtual nodes
   ##  are allocated, and it is not set when nodes are allocated."
-  n <- getenv("PJM_VNODE_CORE")
+  n <- getenv_int("PJM_VNODE_CORE")
   if (is.na(n)) {
     ## PJM_PROC_BY_NODE: e.g. pjsub -L vnode-core=8
     ## "Maximum number of processes that are generated per node by
     ##  an MPI program. However, if a single node (node=1) or virtual
     ##  node (vnode=1) is allocated and the mpi option of the pjsub
     ##  command is not specified, this environment variable is not set."
-    n <- getenv("PJM_PROC_BY_NODE")
+    n <- getenv_int("PJM_PROC_BY_NODE")
   }
   n
 }
@@ -568,7 +568,7 @@ availableCoresPJM <- function() {
 
 ## Number of cores assigned by Oracle/Son/Sun/Univa Grid Engine (SGE/UGE)
 availableCoresSGE <- function() {      
-  n <- getenv("NSLOTS")
+  n <- getenv_int("NSLOTS")
   n
 }
 
@@ -578,14 +578,14 @@ availableCoresSlurm <- function() {
   ## The assumption is that the following works regardless of
   ## number of nodes requested /HB 2020-09-18
   ## Example: --cpus-per-task={n}
-  n <- getenv("SLURM_CPUS_PER_TASK")
+  n <- getenv_int("SLURM_CPUS_PER_TASK")
   if (is.na(n)) {
     ## Example: --nodes={nnodes} (defaults to 1, short: -N {nnodes})
     ## From 'man sbatch':
     ## SLURM_JOB_NUM_NODES (and SLURM_NNODES for backwards compatibility)
     ## Total number of nodes in the job's resource allocation.
-    nnodes <- getenv("SLURM_JOB_NUM_NODES")
-    if (is.na(nnodes)) nnodes <- getenv("SLURM_NNODES")
+    nnodes <- getenv_int("SLURM_JOB_NUM_NODES")
+    if (is.na(nnodes)) nnodes <- getenv_int("SLURM_NNODES")
     if (is.na(nnodes)) nnodes <- 1L  ## Can this happen? /HB 2020-09-18
 
     if (nnodes == 1L) {
@@ -597,10 +597,10 @@ availableCoresSlurm <- function() {
       ## SLURM_JOB_CPUS_PER_NODE=6,2, no SLURM_CPUS_PER_TASK, and
       ## SLURM_TASKS_PER_NODE=5,2.
       ## Conclusions: We can only use 'SLURM_CPUS_ON_NODE' for nnodes = 1.
-      n <- getenv("SLURM_CPUS_ON_NODE")
+      n <- getenv_int("SLURM_CPUS_ON_NODE")
     } else {
       ## Parse `SLURM_TASKS_PER_NODE`
-      nodecounts <- getenv("SLURM_TASKS_PER_NODE", mode = "character")
+      nodecounts <- getenv_int("SLURM_TASKS_PER_NODE", mode = "character")
       if (!is.na(nodecounts)) {
         ## Examples:
         ## SLURM_TASKS_PER_NODE=5,2
@@ -623,8 +623,8 @@ availableCoresSlurm <- function() {
     ## From 'man sbatch':
     ## SLURM_NTASKS (and SLURM_NPROCS for backwards compatibility)
     ## Same as -n, --ntasks
-    ntasks <- getenv("SLURM_NTASKS")
-    if (is.na(ntasks)) ntasks <- getenv("SLURM_NPROCS")
+    ntasks <- getenv_int("SLURM_NTASKS")
+    if (is.na(ntasks)) ntasks <- getenv_int("SLURM_NPROCS")
   }
 
   n
