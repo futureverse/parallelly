@@ -162,7 +162,7 @@ keep <- !(colnames(data) %in% c("SLURM_JOB_ID"))
 data <- data[, keep]
 data0 <- data
 
-## Reorder
+## Reorder columns
 data <- data[, c(
   ## Input
   "ntasks", "cpus_per_task", "nodes",
@@ -180,6 +180,10 @@ data <- data[, c(
   "availableCores", "availableWorkers",
   "nproc", "cgroups"
 )]
+
+
+## Reorder rows
+data <- data[with(data, order(ntasks, cpus_per_task, nodes, na.last = FALSE)), ]
 
 ## Write to file
 readr::write_csv(data, "sbatch-params-all.csv")
