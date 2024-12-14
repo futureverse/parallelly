@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.40.1-9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.40.1-9004</span>
       </span>
     </div>
 
@@ -160,8 +160,8 @@
 <h2 class="page-header" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li>
-<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> will now produce an error, rather than a warning, when the local system command used to launch the parallel worker failed with a non-zero exit code.</li>
+<ul><li><p>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> queries also <code>/proc/self/status</code> for CPU affinity allotments.</p></li>
+<li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> will now produce an error, rather than a warning, when the local system command used to launch the parallel worker failed with a non-zero exit code.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
