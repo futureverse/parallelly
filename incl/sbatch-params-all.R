@@ -165,14 +165,16 @@ data0 <- data
 ## Reorder columns
 data <- data[, c(
   ## Input
-  "ntasks", "cpus_per_task", "nodes",
+  "ntasks", "nodes", "cpus_per_task", 
 
   ## Slurm
   ## (a) input
   "SLURM_NTASKS", "SLURM_CPUS_PER_TASK",
+  
   ## (b) allocations
   "SLURM_JOB_NUM_NODES", "SLURM_JOB_NODELIST",
-  "SLURM_TASKS_PER_NODE", "SLURM_JOB_CPUS_PER_NODE", 
+  "SLURM_TASKS_PER_NODE", "SLURM_JOB_CPUS_PER_NODE",
+  
   ## (c) "current-machine" view
   "SLURM_CPUS_ON_NODE",
 
@@ -191,5 +193,5 @@ readr::write_csv(data, "sbatch-params-all.csv")
 ## Print without SLURM_ prefix
 data2 <- data
 colnames(data2) <- gsub("^SLURM_", "", colnames(data2))
-options(width = 160)
+options(width = 200)
 print(data2, n = 100L)
