@@ -6,10 +6,10 @@
 \usage{
 availableCores(
   constraints = NULL,
-  methods = getOption2("parallelly.availableCores.methods", c("system", "cgroups.cpuset",
-    "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel",
-    "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm",
-    "fallback", "custom")),
+  methods = getOption2("parallelly.availableCores.methods", c("system",
+    "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max",
+    "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF",
+    "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
@@ -65,6 +65,9 @@ are supported:
 \itemize{
 \item \code{"system"} -
 Query \code{\link[parallel]{detectCores}(logical = logical)}.
+
+\item \code{"/proc/self/status"} -
+Query \code{Cpus_allowed_list} of \verb{/proc/self/status}.
 
 \item \code{"cgroups.cpuset"} -
 On Unix, query control group (cgroup v1) value \code{cpuset.set}.

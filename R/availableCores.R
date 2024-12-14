@@ -46,6 +46,9 @@
 #'  \item `"system"` -
 #'    Query \code{\link[parallel]{detectCores}(logical = logical)}.
 #'
+#'  \item `"/proc/self/status"` -
+#'    Query \code{Cpus_allowed_list} of `/proc/self/status`.
+#'
 #'  \item `"cgroups.cpuset"` -
 #'    On Unix, query control group (cgroup v1) value \code{cpuset.set}.
 #'
@@ -216,7 +219,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @export
-availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), omit = getOption2("parallelly.availableCores.omit", 0L)) {
+availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), omit = getOption2("parallelly.availableCores.omit", 0L)) {
   ## Local functions
   getenv <- function(name, mode = "integer") {
     value <- trim(getEnvVar2(name, default = NA_character_))
@@ -368,6 +371,19 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     } else if (method == "system") {
       ## Number of cores available according to parallel::detectCores()
       n <- detectCores(logical = logical)
+    } else if (method == "/proc/self/status") {
+      pathname <- "/proc/self/status"
+      if (file_test("-f", pathname)) {
+        bfr <- readLines(pathname, warn = FALSE)
+        bfr <- grep("^Cpus_allowed_list:", bfr, value = TRUE)
+        if (length(bfr) == 1) {
+          bfr <- sub("^Cpus_allowed_list:\t", "", bfr)
+          if (nzchar(bfr)) {
+            bfr <- slurm_expand_nodelist(sprintf("[%s]", bfr))
+            n <- length(bfr)
+          }
+        }
+      }
     } else if (method == "cgroups.cpuset") {
       ## Number of cores according to Unix cgroups v1 CPU set
       n <- length(getCGroups1CpuSet())
