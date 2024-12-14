@@ -73,6 +73,24 @@ task_specs_list <- list(
 )
 
 
+## --threads-per-core=n: n must be <= 2
+task_specs_list <- list(
+  list(ntasks = 4L, nodes = 1L, cpus_per_task = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = NA),
+  list(ntasks = 4L, nodes = 1L, cpus_per_task = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = NA),
+  list(ntasks = 4L, nodes = 1L, cpus_per_task = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = NA),
+  list(ntasks = 4L, nodes = 1L, cpus_per_task = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = 1),
+  list(ntasks = 4L, nodes = 1L, cpus_per_task = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = 1),
+  list(ntasks = 4L, nodes = 1L, cpus_per_task = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = 1),
+  list(ntasks = 4L, nodes = 1L, cpus_per_task = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = 2),
+  list(ntasks = 4L, nodes = 1L, cpus_per_task = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = 2),
+  list(ntasks = 4L, nodes = 1L, cpus_per_task = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = 2),
+
+  list(ntasks = 4L, nodes = 2L, cpus_per_task = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = NA),
+  list(ntasks = 4L, nodes = 2L, cpus_per_task = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = 1),
+  list(ntasks = 4L, nodes = 2L, cpus_per_task = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA, threads_per_core = 2)
+)
+
+
 vs <- local({
   p <- progressr::progressor(along = task_specs_list)
   
@@ -114,6 +132,7 @@ vs <- local({
       res$availableWorkers <- list(parallelly::availableWorkers())
       res$nproc            <- parallelly::availableCores(methods = "nproc")
       res$cgroups          <- parallelly::availableCores(methods = c("cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max"))
+      res$proc_status      <- parallelly::availableCores(methods = c("/proc/self/status"))
       res
     })
   })
@@ -136,12 +155,19 @@ data <- data[, keep]
 ## Assert redundancy assumptions
 ##   (i) SLURM_NTASKS == ntasks
 stopifnot(with(data, identical(as.integer(SLURM_NTASKS), ntasks)))
+
 ##  (ii) SLURM_CPUS_PER_TASK == cpus_per_task
-stopifnot(with(data, identical(as.integer(SLURM_CPUS_PER_TASK), cpus_per_task)))
+if ("SLURM_CPUS_PER_TASK" %in% colnames(data)) {
+  stopifnot(with(data, identical(as.integer(SLURM_CPUS_PER_TASK), cpus_per_task)))
+}
+
 ## (iii) HOSTNAME == availableWorkers()[1]
 void <- lapply(vs, FUN = function(job) with(job, stopifnot(availableWorkers[[1]][1] == HOSTNAME)))
 
-## NOT TRUE: (iv) availableCores() == sum(availableWorkers() == availableWorkers()[1])
+##  (iv) nproc = cgroups = proc.status
+stopifnot(with(data, identical(unname(nproc), as.integer(cgroups)), identical(unname(proc), proc_status)))
+
+## NOT TRUE: (v) availableCores() == sum(availableWorkers() == availableWorkers()[1])
 # ns_first <- vapply(vs, FUN.VALUE = NA_integer_, FUN = function(job) with(job, { sum(availableWorkers[[1]] == availableWorkers[[1]][1]) }))
 # void <- lapply(vs, FUN = function(job) with(job, { stopifnot(availableCores == sum(availableWorkers[[1]] == availableWorkers[[1]][1]) }))
 
@@ -155,7 +181,9 @@ data <- data[, keep]
 }
 
 ## Order by SLURM_CPUS_PER_TASK (== cpus_per_task)
-data <- data[with(data, order(cpus_per_task, na.last = FALSE)), ]
+if ("SLURM_CPUS_PER_TASK" %in% colnames(data)) {
+  data <- data[with(data, order(cpus_per_task, na.last = FALSE)), ]
+}  
 
 ## Drop other less-useful columns
 keep <- !(colnames(data) %in% c("SLURM_JOB_ID"))
@@ -163,9 +191,9 @@ data <- data[, keep]
 data0 <- data
 
 ## Reorder columns
-data <- data[, c(
+cols <- c(
   ## Input
-  "ntasks", "nodes", "cpus_per_task", 
+  "ntasks", "nodes", "cpus_per_task", "threads_per_core",
 
   ## parallelly output
   "availableCores", "availableWorkers",
@@ -180,14 +208,21 @@ data <- data[, c(
   "SLURM_CPUS_ON_NODE",       # "current-machine" view
 
   ## system tools output
-  "nproc", "cgroups"
-)]
+  "nproc", "cgroups", "proc_status"
+)
+
+cols <- intersect(cols, colnames(data))
+data <- data[, cols]
 
 ## Reorder rows
-data <- data[with(data, order(ntasks, cpus_per_task, nodes, na.last = FALSE)), ]
+if ("cpus_per_task" %in% colnames(data)) {
+  data <- data[with(data, order(ntasks, cpus_per_task, nodes, na.last = FALSE)), ]
+} else {
+  data <- data[with(data, order(ntasks, nodes, na.last = FALSE)), ]
+}
 
 ## Write to file
-readr::write_csv(data, "sbatch-params-all.csv")
+readr::write_csv(data, "sbatch-params-all-02.csv")
 
 ## Print without SLURM_ prefix
 data2 <- data
