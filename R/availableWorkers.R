@@ -658,7 +658,7 @@ slurm_expand_nodelist <- function(nodelist, manual = getOption2("parallelly.slur
 }
 
 
-SLURM_TASKS_PER_NODE="2(x2),1(x3)"  # Source: 'man sbatch'
+## SLURM_TASKS_PER_NODE="2(x2),1(x3)"  # Source: 'man sbatch'
 slurm_expand_nodecounts <- function(nodecounts) {
   counts <- strsplit(nodecounts, split = ",", fixed = TRUE)
   counts <- unlist(counts, use.names = TRUE)
