@@ -8,6 +8,12 @@
  * `makeClusterPSOCK()` will now produce an error, rather than a
    warning, when the local system command used to launch the parallel
    worker failed with a non-zero exit code.
+   
+ * Now `serializedSize()` always returns a double. Previously, it
+   would return an integer, if the value could be represented by an
+   integer. However, it turned out that returning an integer increased
+   the risk for integer overflow later on if, say, to such values were
+   added together.
  
 ## Bug Fixes
 

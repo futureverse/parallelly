@@ -71,9 +71,5 @@ R_xlen_t calc_serialized_size(SEXP robj) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 SEXP R_calc_serialized_size(SEXP robj) {
   R_xlen_t count = calc_serialized_size(robj);
-  if (count > R_INT_MAX) {
-    return(ScalarReal((double) count));
-  } else {
-    return(ScalarInteger(count));
-  }
+  return(ScalarReal((double) count));
 }

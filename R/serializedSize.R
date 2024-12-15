@@ -5,7 +5,7 @@
 #'
 #' @param obj An R object.
 #'
-#' @return (integer or double) Number of bytes needed to serialize this object.
+#' @return (double) Number of bytes needed to serialize this object.
 #'
 #' @examples
 #' object.size(mtcars)

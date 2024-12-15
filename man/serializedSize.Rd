@@ -10,7 +10,7 @@ serializedSize(obj)
 \item{obj}{An R object.}
 }
 \value{
-(integer or double) Number of bytes needed to serialize this object.
+(double) Number of bytes needed to serialize this object.
 }
 \description{
 This function goes through all the motions of serializing an object, but
