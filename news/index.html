@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.40.1-9006</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.40.1-9007</span>
       </span>
     </div>
 
@@ -162,6 +162,7 @@
 <h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li><p>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> queries also <code>/proc/self/status</code> for CPU affinity allotments.</p></li>
 <li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> will now produce an error, rather than a warning, when the local system command used to launch the parallel worker failed with a non-zero exit code.</p></li>
+<li><p>Now <code><a href="../reference/serializedSize.html">serializedSize()</a></code> always returns a double. Previously, it would return an integer, if the value could be represented by an integer. However, it turned out that returning an integer increased the risk for integer overflow later on if, say, to such values were added together.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
