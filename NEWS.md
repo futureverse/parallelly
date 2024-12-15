@@ -12,8 +12,8 @@
  * Now `serializedSize()` always returns a double. Previously, it
    would return an integer, if the value could be represented by an
    integer. However, it turned out that returning an integer increased
-   the risk for integer overflow later on if, say, to such values were
-   added together.
+   the risk for integer overflow later on if, say, two such values
+   were added together.
  
 ## Bug Fixes
 
