@@ -91,6 +91,48 @@ task_specs_list <- list(
 )
 
 
+## Single node (--nodes=1) study
+task_specs_list <- list(
+  list(nodes = 1L, ntasks = NA, cpus_per_task = 2L, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = NA, cpus_per_task = 2L, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = NA, cpus_per_task = 2L, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  
+  list(nodes = 1L, ntasks = NA, cpus_per_task = 4L, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = NA, cpus_per_task = 4L, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = NA, cpus_per_task = 4L, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  
+  list(nodes = 1L, ntasks = 1L, cpus_per_task = NA, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 1L, cpus_per_task = NA, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 1L, cpus_per_task = NA, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 1L, cpus_per_task = 1L, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 1L, cpus_per_task = 1L, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 1L, cpus_per_task = 1L, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+                   
+  list(nodes = 1L, ntasks = 2L, cpus_per_task = NA, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 2L, cpus_per_task = NA, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 2L, cpus_per_task = NA, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 2L, cpus_per_task = 1L, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 2L, cpus_per_task = 1L, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 2L, cpus_per_task = 1L, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 2L, cpus_per_task = 2L, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 2L, cpus_per_task = 2L, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 2L, cpus_per_task = 2L, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = NA, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = NA, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = NA, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = 1L, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = 1L, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = 1L, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = 2L, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = 2L, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = 2L, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = 4L, threads_per_core = NA, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = 4L, threads_per_core = 1L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA),
+  list(nodes = 1L, ntasks = 4L, cpus_per_task = 4L, threads_per_core = 2L, ntasks_per_core = NA, ntasks_per_node = NA, ntasks_per_socket = NA)
+)
+
+
 vs <- local({
   p <- progressr::progressor(along = task_specs_list)
   
@@ -153,8 +195,8 @@ keep <- apply(data, MARGIN=2L, FUN = function(x) !all(is.na(x)))
 data <- data[, keep]
 
 ## Assert redundancy assumptions
-##   (i) SLURM_NTASKS == ntasks
-stopifnot(with(data, identical(as.integer(SLURM_NTASKS), ntasks)))
+## NOT ALWAYS TRUE: (i) SLURM_NTASKS == ntasks
+# stopifnot(with(data, identical(as.integer(SLURM_NTASKS), ntasks)))
 
 ##  (ii) SLURM_CPUS_PER_TASK == cpus_per_task
 if ("SLURM_CPUS_PER_TASK" %in% colnames(data)) {
@@ -221,9 +263,6 @@ if ("cpus_per_task" %in% colnames(data)) {
   data <- data[with(data, order(ntasks, nodes, na.last = FALSE)), ]
 }
 
-## Write to file
-readr::write_csv(data, "sbatch-params-all-02.csv")
-
 ## Print without SLURM_ prefix
 data2 <- data
 ## Add asterisk to env vars reflecting the Slurm input parameters
@@ -232,5 +271,23 @@ names <- colnames(data2)
 names[names %in% cols] <- paste0(names[names %in% cols], ".")
 colnames(data2) <- names
 colnames(data2) <- gsub("^SLURM_", "", colnames(data2))
+
+## Prune
+## Single-node?
+if (all(data2$nodes == 1L)) {
+  data2$nodes <- NULL
+  data2$JOB_NUM_NODES <- NULL
+  data2$JOB_CPUS_PER_NODE <- NULL
+  data2$JOB_NODELIST <- NULL
+}
+if (TRUE) {
+  data2$NTASKS. <- NULL
+  data2$CPUS_PER_TASK. <- NULL
+}
+
 options(width = 200)
 print(data2, n = 100L)
+
+## Write to file
+readr::write_csv(data, "sbatch-params-all-single-node.csv")
+
