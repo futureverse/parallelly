@@ -66,6 +66,10 @@ cl <- makeClusterPSOCK(
 )
 ```
 
+Note, depending on your CGroups configuration, a non-privileged user
+may or may not be able to set the CPU quota. If not, the `-p
+CPUQuota=100%` will be silently ignored.
+
 The 50 MiB memory limit is strict - if a worker use more than this,
 the operating system will terminate the worker instantly. To
 illustrate what happens, we first start by generating 1 million
