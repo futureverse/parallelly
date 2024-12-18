@@ -138,22 +138,6 @@
 #' @importFrom utils file_test
 #' @export
 availableWorkers <- function(constraints = NULL, methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = getOption2("parallelly.localhost.hostname", "localhost"), which = c("auto", "min", "max", "all")) {
-  ## Local functions
-  getenv <- function(name) {
-    as.character(trim(getEnvVar2(name, default = NA_character_)))
-  }
-
-  getopt <- function(name) {
-    as.character(getOption2(name, default = NA_character_))
-  }
- 
-  split <- function(s) {
-    x <- unlist(strsplit(s, split = "[, ]", fixed = FALSE), use.names = FALSE)
-    x <- trim(x)
-    x <- x[nzchar(x)]
-    x
-  }
-
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
@@ -182,129 +166,20 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
   methodsT <- setdiff(methods, methods_localhost)
   for (method in methodsT) {
     if (method == "PBS") {
-      pathname <- getenv("PBS_NODEFILE")
-      if (is.na(pathname)) next
-      if (!file_test("-f", pathname)) {
-        warnf("Environment variable %s was set but no such file %s exists", sQuote("PBS_NODEFILE"), sQuote(pathname))
-        next
-      }
-      data <- read_pbs_nodefile(pathname)
-      w <- data$node
-
-      ## Sanity checks
-      pbs_np <- as.integer(getenv("PBS_NP"))
-      if (!identical(pbs_np, length(w))) {
-        warnf("Identified %d workers from the %s file (%s), which does not match environment variable %s = %d", length(w), sQuote("PBS_NODEFILE"), sQuote(pathname), sQuote("PBS_NP"), pbs_np)
-      }
-
-      pbs_nodes <- as.integer(getenv("PBS_NUM_NODES"))
-      pbs_ppn <- as.integer(getenv("PBS_NUM_PPN"))
-      pbs_np <- pbs_nodes * pbs_ppn
-      if (!identical(pbs_np, length(w))) {
-        warnf("Identified %d workers from the %s file (%s), which does not match environment variables %s * %s = %d * %d = %d", length(w), sQuote("PBS_NODEFILE"), sQuote(pathname), sQuote("PBS_NUM_NODES"), sQuote("PBS_NUM_PPN"), pbs_nodes, pbs_ppn, pbs_np)
-      }
-
-      ## TO DO: Add validation of 'w' (from PBS_HOSTFILE) toward
-      ## counts in PBS_NP and / or PBS_NUM_NODES * PBS_NUM_PPN.
+      w <- availableWorkersPBS()
+      if (anyNA(w)) next
     } else if (method == "SGE") {
-      pathname <- getenv("PE_HOSTFILE")
-      if (is.na(pathname)) next
-      if (!file_test("-f", pathname)) {
-        warnf("Environment variable %s was set but no such file %s exists", sQuote("PE_HOSTFILE"), sQuote(pathname))
-        next
-      }
-      w <- read_pe_hostfile(pathname, expand = TRUE)
-
-      ## Sanity checks: It is not always true that length(w) == $NSLOTS, e.g.
-      ## on the UCSF Wynton SGE cluster, 'qsub -pe mpi-8 16 ...' will produce
-      ## a job with w=2 workers and NSLOTS=16. /HB 2023-02-01
-      nslots <- as.integer(getenv("NSLOTS"))
-      if (length(w) < nslots) {
-        warnf("Identified %d workers from the %s file (%s), which is less than environment variable %s = %d", length(w), sQuote("PE_HOSTFILE"), sQuote(pathname), sQuote("NSLOTS"), nslots)
-      }
+      w <- availableWorkersSGE()
+      if (anyNA(w)) next
     } else if (method == "Slurm") {
-      ## From 'man sbatch':
-      ## SLURM_JOB_NODELIST (and SLURM_NODELIST for backwards compatibility)
-      ## List of nodes allocated to the job.
-      ## Example:
-      ## SLURM_JOB_NODELIST=n1,n[3-8],n[23-25]
-      nodelist <- getenv("SLURM_JOB_NODELIST")
-      if (is.na(nodelist)) data <- getenv("SLURM_NODELIST")
-      if (is.na(nodelist)) next
-
-      ## Parse and expand nodelist
-      w <- slurm_expand_nodelist(nodelist)
-
-      ## Failed to parse?
-      if (length(w) == 0) next
-
-      ## SLURM_JOB_CPUS_PER_NODE=64,12,...
-      nodecounts <- getenv("SLURM_JOB_CPUS_PER_NODE")
-      if (is.na(nodecounts)) nodecounts <- getenv("SLURM_TASKS_PER_NODE")
-      if (is.na(nodecounts)) {
-        warning("Expected either environment variable 'SLURM_JOB_CPUS_PER_NODE' or 'SLURM_TASKS_PER_NODE' to be set. Will assume one core per node.")
-      } else {
-        ## Parse counts
-	c <- slurm_expand_nodecounts(nodecounts)
-        if (anyNA(c)) {
-          warnf("Failed to parse 'SLURM_JOB_CPUS_PER_NODE' or 'SLURM_TASKS_PER_NODE': %s", sQuote(nodecounts))
-          next
-        }
-
-        if (length(c) != length(w)) {
-          warnf("Skipping Slurm settings because the number of elements in 'SLURM_JOB_CPUS_PER_NODE'/'SLURM_TASKS_PER_NODE' (%s) does not match parsed 'SLURM_JOB_NODELIST'/'SLURM_NODELIST' (%s): %d != %d", nodelist, nodecounts, length(c), length(w))
-          next
-        }
-
-        ## Always respect 'SLURM_CPUS_PER_TASK' (always a scalar), if that exists
-        n <- getenv("SLURM_CPUS_PER_TASK")
-        if (!is.na(n)) {
-          c0 <- c
-          c <- rep(n, times = length(w))
-          ## Is our assumption that SLURM_CPUS_PER_TASK <= SLURM_JOB_NODELIST, correct?
-          if (any(c < n)) {
-            c <- pmin(c, n)
-            warnf("Unexpected values of Slurm environment variable. 'SLURM_CPUS_PER_TASK' specifies CPU counts on one or more nodes that is strictly less than what 'SLURM_CPUS_PER_TASK' specifies. Will use the minimum of the two for each node: %s < %s", sQuote(nodecounts), n)
-          }
-        }
-
-        ## Expand workers list
-        w <- as.list(w)
-        for (kk in seq_along(w)) {
-          w[[kk]] <- rep(w[[kk]], times = c[kk])
-        }
-        w <- unlist(w, use.names = FALSE)
-      }
+      w <- availableWorkersSlurm()
+      if (anyNA(w)) next
     } else if (method == "LSF") {
-      data <- getenv("LSB_HOSTS")
-      if (is.na(data)) next
-      w <- split(data)
+      w <- availableWorkersLSF()
+      if (anyNA(w)) next
     } else if (method == "PJM") {
-      pathname <- getenv("PJM_O_NODEINF")
-      if (is.na(pathname)) next
-      if (!file_test("-f", pathname)) {
-        warnf("Environment variable %s was set but no such file %s exists", sQuote("PJM_O_NODEINF"), sQuote(pathname))
-        next
-      }
-      data <- read_pjm_nodefile(pathname, sort = FALSE)
-
-      ## Sanity check against PJM_VNODE
-      n <- suppressWarnings(as.integer(getenv("PJM_VNODE")))
-      if (!is.na(n) && n != nrow(data)) {
-        warnf("Environment variable %s does not agree with the number of hosts in file %s: %s != %s", sQuote("PJM_VNODE"), sQuote("PJM_O_NODEINF"), getenv("PJM_VNODE"), nrow(data))
-      }
-
-      ## This will query PJM for the number of cores per worker, which we
-      ## assume is the same for all workers, because I don't think it can
-      ## be different across workers, but not 100% sure.  If for some 
-      ## reason availableCores() don't find a PJM environment variable of
-      ## interest, it'll fall back to the default (=1).  If so, we give
-      ## an informative warning with troubleshooting info. /HB 2022-05-28
-      cores_per_worker <- availableCores(methods = method)
-      if (!grepl("PJM", names(cores_per_worker))) {
-        warnf("Inferred parallel workers from the hostname file given by environment variable %s, but could not find a corresponding 'PJM_*' environment variable for inferring the number of cores per worker: %s", sQuote("PJM_O_NODEINF"), paste(sQuote(grep("^PJM_", names(Sys.getenv()), value = TRUE)), collapse = ", "))
-      }
-      w <- rep(data$node, each = cores_per_worker)
+      w <- availableWorkersPJM()
+      if (anyNA(w)) next
     } else if (method == "custom") {
       fcn <- getOption2("parallelly.availableWorkers.custom", NULL)
       if (!is.function(fcn)) next
@@ -318,10 +193,10 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
     } else {
       ## Fall back to querying option and system environment variable
       ## with the given name
-      w <- getopt(method)
-      if (is.na(w)) w <- getenv(method)
+      w <- getopt_chr(method)
+      if (is.na(w)) w <- getenv_chr(method)
       if (is.na(w)) next
-      w <- split(w)
+      w <- split_trim(w)
     }
 
     ## Drop missing values?
@@ -382,6 +257,84 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
 
 
 
+## Used by availableWorkers()
+apply_fallback <- function(workers) {
+  ## No 'fallback'?
+  idx_fallback <- which(names(workers) == "fallback")
+  if (length(idx_fallback) == 0) return(workers)
+
+  ## Number of workers per set
+  nnodes <- unlist(lapply(workers, FUN = length), use.names = TRUE)
+
+  ## No 'fallback' workers?
+  if (nnodes[idx_fallback] == 0) return(workers)
+  
+  ## Only consider non-empty sets
+  nonempty <- which(nnodes > 0)
+  workers_nonempty <- workers[nonempty]
+
+  ## Nothing to do?
+  n_nonempty <- length(workers_nonempty)
+  if (n_nonempty <= 1) return(workers)
+  
+  ## Drop 'fallback'?
+  if (n_nonempty > 2) {
+    workers <- workers[-idx_fallback]
+    return(workers)
+  }
+  
+  ## No 'system' to override?
+  idx_system <- which(names(workers) == "system")
+  if (length(idx_system) == 0) return(workers)
+
+  ## Drop 'system' in favor or 'fallback'
+  workers <- workers[-idx_system]
+
+  workers
+} ## apply_fallback()
+
+
+
+# --------------------------------------------------------------------------
+# Utility functions
+# --------------------------------------------------------------------------
+## Local functions
+getenv_chr <- function(name) {
+  as.character(trim(getEnvVar2(name, default = NA_character_)))
+}
+
+getopt_chr <- function(name) {
+  as.character(getOption2(name, default = NA_character_))
+}
+
+
+split_trim <- function(s) {
+  x <- unlist(strsplit(s, split = "[, ]", fixed = FALSE), use.names = FALSE)
+  x <- trim(x)
+  x <- x[nzchar(x)]
+  x
+}
+
+
+# --------------------------------------------------------------------------
+# High-Performance Compute (HPC) Schedulers
+# --------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
+# LSF
+# --------------------------------------------------------------------------
+availableWorkersLSF <- function() {      
+  data <- getenv_chr("LSB_HOSTS")
+  if (is.na(data)) return(NA_character_)
+  w <- split_trim(data)
+  w
+} ## availableWorkersLSF()
+
+
+
+# --------------------------------------------------------------------------
+# PBS
+# --------------------------------------------------------------------------
 #' @importFrom utils read.table
 read_pbs_nodefile <- function(pathname, sort = TRUE) {
   ## One (node) per line
@@ -404,13 +357,85 @@ read_pbs_nodefile <- function(pathname, sort = TRUE) {
   data
 }
 
+availableWorkersPBS <- function() {    
+  pathname <- getenv_chr("PBS_NODEFILE")
+  if (is.na(pathname)) return(NA_character_)
+  
+  if (!file_test("-f", pathname)) {
+    warnf("Environment variable %s was set but no such file %s exists", sQuote("PBS_NODEFILE"), sQuote(pathname))
+    return(NA_character_)
+  }
+  
+  data <- read_pbs_nodefile(pathname)
+  w <- data$node
 
+  ## Sanity checks
+  pbs_np <- getenv_int("PBS_NP")
+  if (!identical(pbs_np, length(w))) {
+    warnf("Identified %d workers from the %s file (%s), which does not match environment variable %s = %d", length(w), sQuote("PBS_NODEFILE"), sQuote(pathname), sQuote("PBS_NP"), pbs_np)
+  }
+
+  pbs_nodes <- getenv_int("PBS_NUM_NODES")
+  pbs_ppn <- getenv_int("PBS_NUM_PPN")
+  pbs_np <- pbs_nodes * pbs_ppn
+  if (!identical(pbs_np, length(w))) {
+    warnf("Identified %d workers from the %s file (%s), which does not match environment variables %s * %s = %d * %d = %d", length(w), sQuote("PBS_NODEFILE"), sQuote(pathname), sQuote("PBS_NUM_NODES"), sQuote("PBS_NUM_PPN"), pbs_nodes, pbs_ppn, pbs_np)
+  }
+
+  ## TO DO: Add validation of 'w' (from PBS_HOSTFILE) toward
+  ## counts in PBS_NP and / or PBS_NUM_NODES * PBS_NUM_PPN.
+  
+  w
+} ## availableWorkersPBS()      
+
+
+
+
+# --------------------------------------------------------------------------
+# PJM
+# --------------------------------------------------------------------------
 #' @importFrom utils read.table
 read_pjm_nodefile <- function(pathname, sort = TRUE) {
   read_pbs_nodefile(pathname, sort = sort)
 }
 
+availableWorkersPJM <- function() {      
+  pathname <- getenv_chr("PJM_O_NODEINF")
+  if (is.na(pathname)) return(NA_character_)
+  
+  if (!file_test("-f", pathname)) {
+    warnf("Environment variable %s was set but no such file %s exists", sQuote("PJM_O_NODEINF"), sQuote(pathname))
+    return(NA_character_)
+  }
+  
+  data <- read_pjm_nodefile(pathname, sort = FALSE)
 
+  ## Sanity check against PJM_VNODE
+  n <- suppressWarnings(getenv_int("PJM_VNODE"))
+  if (!is.na(n) && n != nrow(data)) {
+    warnf("Environment variable %s does not agree with the number of hosts in file %s: %s != %s", sQuote("PJM_VNODE"), sQuote("PJM_O_NODEINF"), getenv_chr("PJM_VNODE"), nrow(data))
+  }
+
+  ## This will query PJM for the number of cores per worker, which we
+  ## assume is the same for all workers, because I don't think it can
+  ## be different across workers, but not 100% sure.  If for some 
+  ## reason availableCores() don't find a PJM environment variable of
+  ## interest, it'll fall back to the default (=1).  If so, we give
+  ## an informative warning with troubleshooting info. /HB 2022-05-28
+  cores_per_worker <- availableCores(methods = "PJM")
+  if (!grepl("PJM", names(cores_per_worker))) {
+    warnf("Inferred parallel workers from the hostname file given by environment variable %s, but could not find a corresponding 'PJM_*' environment variable for inferring the number of cores per worker: %s", sQuote("PJM_O_NODEINF"), paste(sQuote(grep("^PJM_", names(Sys.getenv()), value = TRUE)), collapse = ", "))
+  }
+  w <- rep(data$node, each = cores_per_worker)
+  w
+} ## availableWorkersPJM()
+
+
+
+
+# --------------------------------------------------------------------------
+# SGE
+# --------------------------------------------------------------------------
 #' @importFrom utils read.table
 read_pe_hostfile <- function(pathname, sort = TRUE, expand = FALSE) {
   ## One (node, ncores, queue, comment) per line, e.g.
@@ -447,6 +472,7 @@ read_pe_hostfile <- function(pathname, sort = TRUE, expand = FALSE) {
   data
 }
 
+
 ## Used after read_pe_hostfile()
 sge_expand_node_count_pairs <- function(data) {
   nodes <- mapply(data$node, data$count, FUN = function(node, count) {
@@ -455,7 +481,33 @@ sge_expand_node_count_pairs <- function(data) {
   unlist(nodes, recursive = FALSE, use.names = FALSE)
 }
 
+availableWorkersSGE <- function() {      
+  pathname <- getenv_chr("PE_HOSTFILE")
+  if (is.na(pathname)) return(NA_character_)
+  
+  if (!file_test("-f", pathname)) {
+    warnf("Environment variable %s was set but no such file %s exists", sQuote("PE_HOSTFILE"), sQuote(pathname))
+    return(NA_character_)
+  }
+  
+  w <- read_pe_hostfile(pathname, expand = TRUE)
 
+  ## Sanity checks: It is not always true that length(w) == $NSLOTS, e.g.
+  ## on the UCSF Wynton SGE cluster, 'qsub -pe mpi-8 16 ...' will produce
+  ## a job with w=2 workers and NSLOTS=16. /HB 2023-02-01
+  nslots <- getenv_int("NSLOTS")
+  if (length(w) < nslots) {
+    warnf("Identified %d workers from the %s file (%s), which is less than environment variable %s = %d", length(w), sQuote("PE_HOSTFILE"), sQuote(pathname), sQuote("NSLOTS"), nslots)
+  }
+
+  w
+} ## availableWorkersSGE()      
+
+
+
+# --------------------------------------------------------------------------
+# Slurm
+# --------------------------------------------------------------------------
 #' @importFrom utils file_test
 call_slurm_show_hostname <- function(nodelist, bin = Sys.which("scontrol")) {
   stop_if_not(file_test("-x", bin))
@@ -606,7 +658,7 @@ slurm_expand_nodelist <- function(nodelist, manual = getOption2("parallelly.slur
 }
 
 
-SLURM_TASKS_PER_NODE="2(x2),1(x3)"  # Source: 'man sbatch'
+## SLURM_TASKS_PER_NODE="2(x2),1(x3)"  # Source: 'man sbatch'
 slurm_expand_nodecounts <- function(nodecounts) {
   counts <- strsplit(nodecounts, split = ",", fixed = TRUE)
   counts <- unlist(counts, use.names = TRUE)
@@ -640,39 +692,59 @@ slurm_expand_nodecounts <- function(nodecounts) {
 }
 
 
+availableWorkersSlurm <- function() {
+  ## From 'man sbatch':
+  ## SLURM_JOB_NODELIST (and SLURM_NODELIST for backwards compatibility)
+  ## List of nodes allocated to the job.
+  ## Example:
+  ## SLURM_JOB_NODELIST=n1,n[3-8],n[23-25]
+  nodelist <- getenv_chr("SLURM_JOB_NODELIST")
+  if (is.na(nodelist)) data <- getenv_chr("SLURM_NODELIST")
+  if (is.na(nodelist)) return(NA_character_)
 
-## Used by availableWorkers()
-apply_fallback <- function(workers) {
-  ## No 'fallback'?
-  idx_fallback <- which(names(workers) == "fallback")
-  if (length(idx_fallback) == 0) return(workers)
+  ## Parse and expand nodelist
+  w <- slurm_expand_nodelist(nodelist)
 
-  ## Number of workers per set
-  nnodes <- unlist(lapply(workers, FUN = length), use.names = TRUE)
+  ## Failed to parse?
+  if (length(w) == 0) return(NA_character_)
 
-  ## No 'fallback' workers?
-  if (nnodes[idx_fallback] == 0) return(workers)
-  
-  ## Only consider non-empty sets
-  nonempty <- which(nnodes > 0)
-  workers_nonempty <- workers[nonempty]
+  ## SLURM_JOB_CPUS_PER_NODE=64,12,...
+  nodecounts <- getenv_chr("SLURM_JOB_CPUS_PER_NODE")
+  if (is.na(nodecounts)) nodecounts <- getenv_chr("SLURM_TASKS_PER_NODE")
+  if (is.na(nodecounts)) {
+    warning("Expected either environment variable 'SLURM_JOB_CPUS_PER_NODE' or 'SLURM_TASKS_PER_NODE' to be set. Will assume one core per node.")
+  } else {
+    ## Parse counts
+    c <- slurm_expand_nodecounts(nodecounts)
+    if (anyNA(c)) {
+      warnf("Failed to parse 'SLURM_JOB_CPUS_PER_NODE' or 'SLURM_TASKS_PER_NODE': %s", sQuote(nodecounts))
+      return(NA_character_)
+    }
 
-  ## Nothing to do?
-  n_nonempty <- length(workers_nonempty)
-  if (n_nonempty <= 1) return(workers)
-  
-  ## Drop 'fallback'?
-  if (n_nonempty > 2) {
-    workers <- workers[-idx_fallback]
-    return(workers)
+    if (length(c) != length(w)) {
+      warnf("Skipping Slurm settings because the number of elements in 'SLURM_JOB_CPUS_PER_NODE'/'SLURM_TASKS_PER_NODE' (%s) does not match parsed 'SLURM_JOB_NODELIST'/'SLURM_NODELIST' (%s): %d != %d", nodelist, nodecounts, length(c), length(w))
+      return(NA_character_)
+    }
+
+    ## Always respect 'SLURM_CPUS_PER_TASK' (always a scalar), if that exists
+    n <- getenv_chr("SLURM_CPUS_PER_TASK")
+    if (!is.na(n)) {
+      c0 <- c
+      c <- rep(n, times = length(w))
+      ## Is our assumption that SLURM_CPUS_PER_TASK <= SLURM_JOB_NODELIST, correct?
+      if (any(c < n)) {
+        c <- pmin(c, n)
+        warnf("Unexpected values of Slurm environment variable. 'SLURM_CPUS_PER_TASK' specifies CPU counts on one or more nodes that is strictly less than what 'SLURM_CPUS_PER_TASK' specifies. Will use the minimum of the two for each node: %s < %s", sQuote(nodecounts), n)
+      }
+    }
+
+    ## Expand workers list
+    w <- as.list(w)
+    for (kk in seq_along(w)) {
+      w[[kk]] <- rep(w[[kk]], times = c[kk])
+    }
+    w <- unlist(w, use.names = FALSE)
   }
   
-  ## No 'system' to override?
-  idx_system <- which(names(workers) == "system")
-  if (length(idx_system) == 0) return(workers)
-
-  ## Drop 'system' in favor or 'fallback'
-  workers <- workers[-idx_system]
-
-  workers
-} ## apply_fallback()
+  w
+} ## availableWorkersSlurm()

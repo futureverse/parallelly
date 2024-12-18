@@ -63,7 +63,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
       mdebugf("%s- Exit code of system() call: %s", verbose_prefix, res)
     }
     if (res != 0) {
-      warnf("system(%s) had a non-zero exit code: %d", local_cmd, res)
+      stopf("Failed to launch PSOCK node. Reason: system(%s) had a non-zero exit code (%d)", local_cmd, res)
     }
   }
 

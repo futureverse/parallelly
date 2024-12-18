@@ -50,40 +50,14 @@ Run `revdepcheck::revdep_details(, "bootUR")` for more info
     GNU make is a SystemRequirements.
     ```
 
-# breathtestcore
-
-<details>
-
-* Version: 0.8.7
-* GitHub: https://github.com/dmenne/breathtestcore
-* Source code: https://github.com/cran/breathtestcore
-* Date/Publication: 2024-01-24 15:02:47 UTC
-* Number of recursive dependencies: 129
-
-Run `revdepcheck::revdep_details(, "breathtestcore")` for more info
-
-</details>
-
-## In both
-
-*   checking package dependencies ... NOTE
-    ```
-    Package suggested but not available for checking: ‘breathteststan’
-    ```
-
-*   checking Rd cross-references ... NOTE
-    ```
-    Package unavailable to check Rd xrefs: ‘breathteststan’
-    ```
-
 # breathteststan
 
 <details>
 
-* Version: 0.8.5
+* Version: 0.8.8
 * GitHub: https://github.com/dmenne/breathteststan
 * Source code: https://github.com/cran/breathteststan
-* Date/Publication: 2024-01-13 17:20:06 UTC
+* Date/Publication: 2024-12-03 16:10:02 UTC
 * Number of recursive dependencies: 152
 
 Run `revdepcheck::revdep_details(, "breathteststan")` for more info
@@ -94,7 +68,7 @@ Run `revdepcheck::revdep_details(, "breathteststan")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 64.2Mb
+      installed size is 64.3Mb
       sub-directories of 1Mb or more:
         libs  64.0Mb
     ```
@@ -220,10 +194,10 @@ Run `revdepcheck::revdep_details(, "desla")` for more info
 
 <details>
 
-* Version: 0.6.1
+* Version: 0.6.2
 * GitHub: https://github.com/dmenne/gastempt
 * Source code: https://github.com/cran/gastempt
-* Date/Publication: 2024-09-27 16:30:01 UTC
+* Date/Publication: 2024-12-04 07:50:02 UTC
 * Number of recursive dependencies: 109
 
 Run `revdepcheck::revdep_details(, "gastempt")` for more info
@@ -473,9 +447,8 @@ Run `revdepcheck::revdep_details(, "pmartR")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 10.7Mb
+      installed size is 10.5Mb
       sub-directories of 1Mb or more:
-        R      1.0Mb
         libs   8.0Mb
     ```
 
@@ -569,32 +542,6 @@ Run `revdepcheck::revdep_details(, "ResIN")` for more info
       Note: found 1 marked UTF-8 string
     ```
 
-# SCDB
-
-<details>
-
-* Version: 0.4.1
-* GitHub: https://github.com/ssi-dk/SCDB
-* Source code: https://github.com/cran/SCDB
-* Date/Publication: 2024-10-03 23:01:07 UTC
-* Number of recursive dependencies: 139
-
-Run `revdepcheck::revdep_details(, "SCDB")` for more info
-
-</details>
-
-## In both
-
-*   checking package dependencies ... NOTE
-    ```
-    Package suggested but not available for checking: ‘duckdb’
-    ```
-
-*   checking Rd cross-references ... NOTE
-    ```
-    Package unavailable to check Rd xrefs: ‘duckdb’
-    ```
-
 # scruff
 
 <details>
@@ -653,10 +600,10 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 
 <details>
 
-* Version: 2.17.1
+* Version: 2.18
 * GitHub: https://github.com/philchalmers/SimDesign
 * Source code: https://github.com/cran/SimDesign
-* Date/Publication: 2024-08-17 05:00:02 UTC
+* Date/Publication: 2024-12-14 08:10:07 UTC
 * Number of recursive dependencies: 135
 
 Run `revdepcheck::revdep_details(, "SimDesign")` for more info
@@ -742,10 +689,10 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
 
 <details>
 
-* Version: 1.9.0
+* Version: 1.9.1
 * GitHub: https://github.com/ropensci/targets
 * Source code: https://github.com/cran/targets
-* Date/Publication: 2024-11-20 08:30:03 UTC
+* Date/Publication: 2024-12-04 12:40:02 UTC
 * Number of recursive dependencies: 160
 
 Run `revdepcheck::revdep_details(, "targets")` for more info

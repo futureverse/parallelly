@@ -1,3 +1,29 @@
+# Version 1.41.0 [2024-12-17]
+
+## New Features
+
+ * Now `availableCores()` queries also `/proc/self/status` for CPU
+   affinity allotments.
+ 
+ * `makeClusterPSOCK()` will now produce an error, rather than a
+   warning, when the local system command used to launch the parallel
+   worker failed with a non-zero exit code.
+   
+ * Now `serializedSize()` always returns a double. Previously, it
+   would return an integer, if the value could be represented by an
+   integer. However, it turned out that returning an integer increased
+   the risk for integer overflow later on if, say, two such values
+   were added together.
+ 
+## Bug Fixes
+
+ * `makeClusterPSOCK()` on MS Windows failed to launch remote workers,
+   with warnings on `"In system(local_cmd, wait = FALSE, input =
+   input) : 'C:\WINDOWS\System32\OpenSSH\ssh.exe' not found"`. This
+   bug was introduced in version 1.38.0 (2024-07-27), when adding
+   richer support for the `rscript_sh` argument.
+
+
 # Version 1.40.1 [2024-12-03]
 
 ## Bug Fixes
