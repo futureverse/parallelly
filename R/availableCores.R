@@ -122,8 +122,8 @@
 #'
 #'  \item `"SGE"` -
 #'    Query Sun Grid Engine/Oracle Grid Engine/Son of Grid Engine (SGE)
-#'    and Altair Grid Engine (AGE; formerly known as Univa Grid Engine [UGE])
-#'    environment variable \env{NSLOTS}.
+#'    and Univa Grid Engine (UGE)/Altair Grid Engine (AGE) environment
+#'    variable \env{NSLOTS}.
 #'    An example of a job submission that results in this is
 #'    `qsub -pe smp 2` (or `qsub -pe by_node 2`), which
 #'    requests two cores on a single machine.
