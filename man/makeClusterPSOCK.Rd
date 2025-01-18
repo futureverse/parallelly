@@ -153,8 +153,8 @@ to set the working directory to \file{/path/to} on \emph{all} workers.}
 \item{rscript_sh}{The type of shell used where \code{rscript} is launched,
 which should be \code{"sh"} is launched via a POSIX shell and \code{"cmd"} if
 launched via an MS Windows shell.  This controls how shell command-line
-options are quoted, via
-\code{\link[base:shQuote]{shQuote(..., type = rscript_sh)}}.
+options are quoted, but also how R string expression are quoted when
+passed to \code{Rscript}.
 If \code{"none"}, then no quoting is done.
 If \code{"auto"} (default), and the cluster node is launched locally, then it
 is set to \code{"sh"} or \code{"cmd"} according to the current platform.

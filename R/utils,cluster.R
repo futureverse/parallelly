@@ -385,7 +385,7 @@ shQuote <- local({
       if (.Platform$OS.type == "windows") {
         type <- "cmd"
       } else {
-        type <- known_types
+        type <- known_types[1]
       }
     }
     type <- match.arg(type, choices = known_types, several.ok = FALSE)

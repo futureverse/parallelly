@@ -99,7 +99,7 @@ isNodeAlive.RichSOCKnode <- function(x, timeout = 0.0, ...) {
 
   ## Command to call Rscript -e 
   code <- sprintf("cat(%s:::pid_exists(%d))", .packageName, pid)
-  rscript_args <- paste(c("-e", shQuote(code, type = rscript_sh)), collapse = " ")
+  rscript_args <- paste(c("-e", shQuote(code, type = rscript_sh[1])), collapse = " ")
   cmd <- paste(rscript, rscript_args)
   debug && mdebugf("- Rscript command to be called on the other host: %s", cmd)
   stop_if_not(length(cmd) == 1L)
@@ -110,7 +110,7 @@ isNodeAlive.RichSOCKnode <- function(x, timeout = 0.0, ...) {
   debug && mdebugf("- Command to connect to the other host: %s", rsh_call)
   stop_if_not(length(rsh_call) == 1L)
 
-  local_cmd <- paste(rsh_call, shQuote(cmd, type = rscript_sh))
+  local_cmd <- paste(rsh_call, shQuote(cmd, type = rscript_sh[2]))
   debug && mdebugf("- System call: %s", local_cmd)
   stop_if_not(length(local_cmd) == 1L)
 
