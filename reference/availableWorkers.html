@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.41.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.41.0-9009</span>
       </span>
     </div>
 
@@ -245,7 +245,8 @@ An example of a job submission that results in this is
 with two cores.</p></li>
 <li><p><code>"SGE"</code> -
 Query Sun Grid Engine/Oracle Grid Engine/Son of Grid Engine (SGE)
-and Univa Grid Engine (UGE) environment variable <code class="env">PE_HOSTFILE</code>.
+and Univa Grid Engine (UGE)/Altair Grid Engine (AGE) environment
+variable <code class="env">PE_HOSTFILE</code>.
 An example of a job submission that results in this is
 <code>qsub -pe mpi 8</code> (or <code>qsub -pe ompi 8</code>), which
 requests eight cores on a any number of machines.</p></li>

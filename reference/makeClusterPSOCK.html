@@ -31,7 +31,7 @@ background R workers, and how to connect to external machines."><meta property="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.41.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.41.0-9009</span>
       </span>
     </div>
 
@@ -365,8 +365,8 @@ to set the working directory to <code class="file">/path/to</code> on <em>all</e
 <dd><p>The type of shell used where <code>rscript</code> is launched,
 which should be <code>"sh"</code> is launched via a POSIX shell and <code>"cmd"</code> if
 launched via an MS Windows shell.  This controls how shell command-line
-options are quoted, via
-<code><a href="https://rdrr.io/r/base/shQuote.html" class="external-link">shQuote(..., type = rscript_sh)</a></code>.
+options are quoted, but also how R string expression are quoted when
+passed to <code>Rscript</code>.
 If <code>"none"</code>, then no quoting is done.
 If <code>"auto"</code> (default), and the cluster node is launched locally, then it
 is set to <code>"sh"</code> or <code>"cmd"</code> according to the current platform.

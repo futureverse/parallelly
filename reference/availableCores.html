@@ -24,7 +24,7 @@ number of cores available is always at least one."><meta property="og:image" con
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.41.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.41.0-9009</span>
       </span>
     </div>
 
@@ -302,7 +302,8 @@ An example of a job submission that results in this is
 <code>qsub -l nodes=1:ppn=2</code>, which requests one node with two cores.</p></li>
 <li><p><code>"SGE"</code> -
 Query Sun Grid Engine/Oracle Grid Engine/Son of Grid Engine (SGE)
-and Univa Grid Engine (UGE) environment variable <code class="env">NSLOTS</code>.
+and Univa Grid Engine (UGE)/Altair Grid Engine (AGE) environment
+variable <code class="env">NSLOTS</code>.
 An example of a job submission that results in this is
 <code>qsub -pe smp 2</code> (or <code>qsub -pe by_node 2</code>), which
 requests two cores on a single machine.</p></li>
