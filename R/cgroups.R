@@ -325,15 +325,6 @@ getCGroupsRoot <- local({
     ## Look up the CGroups mountpoint
     mounts <- getCGroupsMounts()
     
-    ## Mixed CGroups versions are not supported
-    utypes <- unique(mounts$type)
-    if (length(utypes) > 1) {
-      warning("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))
-      path <- NA_character_
-      .cache[[controller]] <<- path
-      return(path)
-    }
-    
     ## Filter by CGroups v1 or v2?
     if (nzchar(controller)) {
       mounts <- subset(mounts, type == "cgroup")
