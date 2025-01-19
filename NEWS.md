@@ -1,5 +1,12 @@
 # Version (development version)
 
+## New Features
+
+ * Now `availableCores()` and `availableWorkers()` support also when
+   both CGroups v1 and CGroups v2 are enabled on the
+   machine. Previously, such configurations were completely ignored.
+
+
 ## Bug Fixes
 
  * Call `isNodeAlive()` and `killNode()` on cluster nodes running on
