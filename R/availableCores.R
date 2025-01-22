@@ -306,14 +306,18 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     } else if (method == "cgroups.cpuquota") {
       ## Number of cores according to Unix cgroups v1 CPU quota
       n <- getCGroups1CpuQuota()
-      if (!is.na(n)) {
+      if (is.na(n)) {
+        n <- NA_integer_
+      } else {
         n <- as.integer(floor(n + 0.5))
 	if (n == 0L) n <- 1L  ## If CPU quota < 0.5, round up to one CPU
       }
     } else if (method == "cgroups2.cpu.max") {
       ## Number of cores according to Unix cgroups v2 CPU max quota
       n <- getCGroups2CpuMax()
-      if (!is.na(n)) {
+      if (is.na(n)) {
+        n <- NA_integer_
+      } else {
         n <- as.integer(floor(n + 0.5))
 	if (n == 0L) n <- 1L  ## If CPU max quota < 0.5, round up to one CPU
       }
@@ -333,10 +337,10 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
         on.exit(options(oopts))
         fcn()
       })
-      n <- as.integer(n)
       if (length(n) != 1L) {
         stop("Function specified by option 'parallelly.availableCores.custom' does not a single value")
       }
+      n <- as.integer(n)
     } else {
       ## covr: skip=3
       ## Fall back to querying option and system environment variable

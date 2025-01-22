@@ -10,7 +10,7 @@ stopifnot(length(n) == 1, is.numeric(n))
 ## Default
 n <- availableCores()
 message(sprintf("availableCores() = %d", n))
-stopifnot(length(n) == 1, is.numeric(n), n >= 1)
+stopifnot(length(n) == 1, is.integer(n), n >= 1)
 
 ## Minimium of all known settings (default)
 print(availableCores(which = "min"))
@@ -19,12 +19,13 @@ print(availableCores(which = "min"))
 print(availableCores(which = "max"))
 
 ## All known settings
-print(availableCores(na.rm = FALSE, which = "all"))
+ns <- availableCores(na.rm = FALSE, which = "all")
+stopifnot(length(ns) >= 1, is.integer(ns), all(is.na(ns) | ns >= 0L))
 
 ## System settings
 n <- availableCores(methods = "system")
 print(n)
-stopifnot(length(n) == 1, is.numeric(n), is.finite(n), n >= 1)
+stopifnot(length(n) == 1, is.integer(n), n >= 1)
 
 ## Predefined ones for known cluster schedulers
 print(availableCores(methods = "PBS"))
