@@ -13,7 +13,11 @@
    known_types, several.ok = FALSE) : 'arg' must be of length 1`. This
    bug was introduced in version 1.38.0 (2024-07-27), when adding
    richer support for the `rscript_sh` argument.
-   
+
+ * Call `isNodeAlive()` and `killNode()` on cluster nodes running on
+   external machines would produce `Error: ‘length(rsh_call) == 1L’ is
+   not TRUE` if options `rshopts` were specified during creation.
+
  * The value of `availableCores()` was numeric rather than integer as
    documented. This harmless bug was introduced in version 1.31.0
    (2022-04-07).
