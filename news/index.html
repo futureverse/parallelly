@@ -165,7 +165,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error in match.arg(type, choices =    known_types, several.ok = FALSE) : 'arg' must be of length 1</code>. This bug was introduced in version 1.38.0 (2024-07-27), when adding richer support for the <code>rscript_sh</code> argument.</p></li>
-<li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error: ‘length(rsh_call) == 1L’ is    not TRUE</code> if options <code>rshopts</code> were specified during creation.</p></li>
+<li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error: ‘length(rsh_call) == 1L’ is    not TRUE</code> if option <code>rshopts</code> were specified during creation.</p></li>
 <li><p>The value of <code><a href="../reference/availableCores.html">availableCores()</a></code> was numeric rather than integer as documented. This harmless bug was introduced in version 1.31.0 (2022-04-07).</p></li>
 </ul></div>
 </div>
