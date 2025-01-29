@@ -16,7 +16,7 @@
 
  * Call `isNodeAlive()` and `killNode()` on cluster nodes running on
    external machines would produce `Error: ‘length(rsh_call) == 1L’ is
-   not TRUE` if options `rshopts` were specified during creation.
+   not TRUE` if option `rshopts` were specified during creation.
 
  * The value of `availableCores()` was numeric rather than integer as
    documented. This harmless bug was introduced in version 1.31.0
