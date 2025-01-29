@@ -40,9 +40,9 @@ Run `revdepcheck::revdep_details(, "bootUR")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  6.7Mb
+      installed size is  6.6Mb
       sub-directories of 1Mb or more:
-        libs   6.3Mb
+        libs   6.2Mb
     ```
 
 *   checking for GNU extensions in Makefiles ... NOTE
@@ -54,10 +54,10 @@ Run `revdepcheck::revdep_details(, "bootUR")` for more info
 
 <details>
 
-* Version: 0.8.8
+* Version: 0.8.9
 * GitHub: https://github.com/dmenne/breathteststan
 * Source code: https://github.com/cran/breathteststan
-* Date/Publication: 2024-12-03 16:10:02 UTC
+* Date/Publication: 2025-01-08 09:00:07 UTC
 * Number of recursive dependencies: 152
 
 Run `revdepcheck::revdep_details(, "breathteststan")` for more info
@@ -68,9 +68,9 @@ Run `revdepcheck::revdep_details(, "breathteststan")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 64.3Mb
+      installed size is 64.0Mb
       sub-directories of 1Mb or more:
-        libs  64.0Mb
+        libs  63.7Mb
     ```
 
 *   checking for GNU extensions in Makefiles ... NOTE
@@ -82,10 +82,10 @@ Run `revdepcheck::revdep_details(, "breathteststan")` for more info
 
 <details>
 
-* Version: 2.6.1
+* Version: 2.6.2
 * GitHub: https://github.com/seriph78/COTAN
 * Source code: https://github.com/cran/COTAN
-* Date/Publication: 2024-11-12
+* Date/Publication: 2025-01-19
 * Number of recursive dependencies: 276
 
 Run `revdepcheck::revdep_details(, "COTAN")` for more info
@@ -96,9 +96,9 @@ Run `revdepcheck::revdep_details(, "COTAN")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 13.7Mb
+      installed size is 13.6Mb
       sub-directories of 1Mb or more:
-        doc  11.9Mb
+        doc  11.8Mb
     ```
 
 *   checking dependencies in R code ... NOTE
@@ -151,6 +151,79 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 
 ## In both
 
+*   checking examples ... ERROR
+    ```
+    Running examples in ‘decoupleR-Ex.R’ failed
+    The error most likely occurred in:
+    
+    > ### Name: get_collectri
+    > ### Title: CollecTRI gene regulatory network. Wrapper to access CollecTRI
+    > ###   gene regulatory network. CollecTRI is a comprehensive resource
+    > ###   containing a curated collection of transcription factors (TFs) and
+    > ###   their target genes. It is an expansion of DoRothEA. Each interaction
+    > ###   is weighted by its mode of regulation (either positive or negative).
+    > ### Aliases: get_collectri
+    > 
+    > ### ** Examples
+    > 
+    > collectri <- get_collectri(organism='human', split_complexes=FALSE)
+    [2025-01-29 07:41:10] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+    Error in if (.keep) . else select(., -!!evs_col) : 
+      argument is of length zero
+    Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
+    Execution halted
+    ```
+
+*   checking tests ...
+    ```
+      Running ‘testthat.R’
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 50 lines of output:
+       25. ├─OmnipathR:::has_column(., "evidences")
+       26. │ ├─col %in% colnames(data)
+       27. │ └─base::colnames(data)
+       28. │   └─base::is.data.frame(x)
+       29. ├─OmnipathR::filter_evidences(...)
+       30. │ └─expr(...) %>% eval_select(data) %>% names %>% ...
+    ...
+       25. ├─OmnipathR:::is_empty_2(.)
+       26. │ └─value %>% ...
+       27. ├─tidyselect::eval_select(., data)
+       28. │ └─tidyselect::tidyselect_data_has_predicates(data)
+       29. └─OmnipathR::unnest_evidences(., .keep = .keep)
+       30.   └─... %>% ...
+      
+      [ FAIL 5 | WARN 7 | SKIP 0 | PASS 29 ]
+      Error: Test failures
+      Execution halted
+    ```
+
+*   checking re-building of vignette outputs ... ERROR
+    ```
+    Error(s) in re-building vignettes:
+    --- re-building ‘decoupleR.Rmd’ using rmarkdown
+    [WARNING] Could not fetch resource https://github.com/saezlab/decoupleR/blob/master/inst/figures/net_plot.png?raw=1: HttpExceptionRequest Request {
+        host                 = "github.com"
+        port                 = 443
+        secure               = True
+        requestHeaders       = []
+        path                 = "/saezlab/decoupleR/blob/master/inst/figures/net_plot.png"
+        queryString          = "?raw=1"
+        method               = "GET"
+    ...
+    Quitting from lines 86-88 [collectri] (tf_sc.Rmd)
+    Error: processing vignette 'tf_sc.Rmd' failed with diagnostics:
+    argument is of length zero
+    --- failed re-building ‘tf_sc.Rmd’
+    
+    SUMMARY: processing the following files failed:
+      ‘tf_bk.Rmd’ ‘tf_sc.Rmd’
+    
+    Error: Vignette re-building failed.
+    Execution halted
+    ```
+
 *   checking Rd cross-references ... WARNING
     ```
     Missing link or links in Rd file 'run_gsva.Rd':
@@ -161,9 +234,9 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  9.1Mb
+      installed size is 11.1Mb
       sub-directories of 1Mb or more:
-        doc       6.9Mb
+        doc       8.9Mb
         extdata   1.4Mb
     ```
 
@@ -194,10 +267,10 @@ Run `revdepcheck::revdep_details(, "desla")` for more info
 
 <details>
 
-* Version: 0.6.2
+* Version: 0.7.0
 * GitHub: https://github.com/dmenne/gastempt
 * Source code: https://github.com/cran/gastempt
-* Date/Publication: 2024-12-04 07:50:02 UTC
+* Date/Publication: 2024-12-20 07:50:02 UTC
 * Number of recursive dependencies: 109
 
 Run `revdepcheck::revdep_details(, "gastempt")` for more info
@@ -208,9 +281,9 @@ Run `revdepcheck::revdep_details(, "gastempt")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 177.2Mb
+      installed size is 176.3Mb
       sub-directories of 1Mb or more:
-        libs  176.7Mb
+        libs  175.8Mb
     ```
 
 *   checking for GNU extensions in Makefiles ... NOTE
@@ -222,11 +295,11 @@ Run `revdepcheck::revdep_details(, "gastempt")` for more info
 
 <details>
 
-* Version: 1.3.0
+* Version: 1.4.0
 * GitHub: https://github.com/ipeaGIT/gtfstools
 * Source code: https://github.com/cran/gtfstools
-* Date/Publication: 2024-10-07 18:40:02 UTC
-* Number of recursive dependencies: 89
+* Date/Publication: 2025-01-09 00:40:02 UTC
+* Number of recursive dependencies: 90
 
 Run `revdepcheck::revdep_details(, "gtfstools")` for more info
 
@@ -243,10 +316,10 @@ Run `revdepcheck::revdep_details(, "gtfstools")` for more info
 
 <details>
 
-* Version: 2.14.0
+* Version: 2.14.1
 * GitHub: NA
 * Source code: https://github.com/cran/InPAS
-* Date/Publication: 2024-10-29
+* Date/Publication: 2024-12-23
 * Number of recursive dependencies: 165
 
 Run `revdepcheck::revdep_details(, "InPAS")` for more info
@@ -296,7 +369,7 @@ Run `revdepcheck::revdep_details(, "InPAS")` for more info
 * GitHub: https://github.com/drizopoulos/JMbayes2
 * Source code: https://github.com/cran/JMbayes2
 * Date/Publication: 2024-05-30 07:30:03 UTC
-* Number of recursive dependencies: 76
+* Number of recursive dependencies: 77
 
 Run `revdepcheck::revdep_details(, "JMbayes2")` for more info
 
@@ -351,9 +424,9 @@ Run `revdepcheck::revdep_details(, "mmrm")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 188.7Mb
+      installed size is 188.8Mb
       sub-directories of 1Mb or more:
-        libs  186.9Mb
+        libs  187.0Mb
     ```
 
 # NCC
@@ -364,7 +437,7 @@ Run `revdepcheck::revdep_details(, "mmrm")` for more info
 * GitHub: https://github.com/pavlakrotka/NCC
 * Source code: https://github.com/cran/NCC
 * Date/Publication: 2023-03-03 09:10:10 UTC
-* Number of recursive dependencies: 113
+* Number of recursive dependencies: 116
 
 Run `revdepcheck::revdep_details(, "NCC")` for more info
 
@@ -623,10 +696,10 @@ Run `revdepcheck::revdep_details(, "SimDesign")` for more info
 
 <details>
 
-* Version: 1.0.3
+* Version: 1.0.5
 * GitHub: NA
 * Source code: https://github.com/cran/streetscape
-* Date/Publication: 2024-08-31 06:10:02 UTC
+* Date/Publication: 2025-01-21 14:50:03 UTC
 * Number of recursive dependencies: 139
 
 Run `revdepcheck::revdep_details(, "streetscape")` for more info
@@ -645,8 +718,8 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
       code for methods in class “Rcpp_SpatExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
       code for methods in class “Rcpp_SpatFactor” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
       code for methods in class “Rcpp_SpatFactor” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatGraph” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatGraph” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+      code for methods in class “Rcpp_SpatMessages” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+      code for methods in class “Rcpp_SpatMessages” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
     ...
       code for methods in class “Rcpp_SpatVectorProxy” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
       code for methods in class “Rcpp_SpatVectorProxy” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
@@ -670,8 +743,8 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
     code for methods in class “Rcpp_SpatExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
     code for methods in class “Rcpp_SpatFactor” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
     code for methods in class “Rcpp_SpatFactor” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatGraph” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatGraph” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+    code for methods in class “Rcpp_SpatMessages” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+    code for methods in class “Rcpp_SpatMessages” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
     ...
     code for methods in class “Rcpp_SpExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
     code for methods in class “Rcpp_SpPoly” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
@@ -689,10 +762,10 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
 
 <details>
 
-* Version: 1.9.1
+* Version: 1.10.0
 * GitHub: https://github.com/ropensci/targets
 * Source code: https://github.com/cran/targets
-* Date/Publication: 2024-12-04 12:40:02 UTC
+* Date/Publication: 2025-01-13 15:00:01 UTC
 * Number of recursive dependencies: 160
 
 Run `revdepcheck::revdep_details(, "targets")` for more info
