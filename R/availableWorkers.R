@@ -57,7 +57,8 @@
 #'
 #'  \item `"SGE"` -
 #'    Query Sun Grid Engine/Oracle Grid Engine/Son of Grid Engine (SGE)
-#'    and Univa Grid Engine (UGE) environment variable \env{PE_HOSTFILE}.
+#'    and Univa Grid Engine (UGE)/Altair Grid Engine (AGE) environment
+#'    variable \env{PE_HOSTFILE}.
 #'    An example of a job submission that results in this is
 #'    `qsub -pe mpi 8` (or `qsub -pe ompi 8`), which
 #'    requests eight cores on a any number of machines.

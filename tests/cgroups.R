@@ -92,7 +92,7 @@ stopifnot(
 message("*** cgroups ... DONE")
 
 root <- system.file(package = "parallelly", "test-data", mustWork = TRUE)
-for (dir in c("no-cgroups", "cgroups1", "cgroups2")) {
+for (dir in c("no-cgroups", "mixed-cgroups", "cgroups1", "cgroups2")) {
   message(sprintf("%s - real-world ...", dir))
   path <- file.path(root, dir)
   stopifnot(file_test("-d", path))

@@ -53,8 +53,8 @@
 #' @param rscript_sh The type of shell used where `rscript` is launched,
 #' which should be `"sh"` is launched via a POSIX shell and `"cmd"` if 
 #' launched via an MS Windows shell.  This controls how shell command-line
-#' options are quoted, via
-#' \code{\link[base:shQuote]{shQuote(..., type = rscript_sh)}}.
+#' options are quoted, but also how R string expression are quoted when
+#' passed to `Rscript`.
 #' If `"none"`, then no quoting is done.
 #' If `"auto"` (default), and the cluster node is launched locally, then it
 #' is set to `"sh"` or `"cmd"` according to the current platform.

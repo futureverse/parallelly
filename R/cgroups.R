@@ -120,16 +120,13 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
 
   ## Mixed CGroups versions are not supported
   utypes <- unique(mounts$type)
-  if (length(utypes) > 1) {
-    stop("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))	
+
+  controllers <- c()
+   if ("cgroup" %in% utypes) {
+    controllers <- c(controllers, "cpu", "cpuset")
   }
-    
-  if (utypes == "cgroup") {
-    controllers <- c("cpu", "cpuset")
-  } else if (utypes == "cgroup2") {
-    controllers <- ""
-  } else {
-    stop("Unknown CGroups version: ", sQuote(utypes))
+  if ("cgroup2" %in% utypes) {
+    controllers <- c(controllers, "")
   }
 
   ## Write CGroups mountpoints
@@ -327,15 +324,6 @@ getCGroupsRoot <- local({
 
     ## Look up the CGroups mountpoint
     mounts <- getCGroupsMounts()
-    
-    ## Mixed CGroups versions are not supported
-    utypes <- unique(mounts$type)
-    if (length(utypes) > 1) {
-      warning("Mixed CGroups versions are not supported: ", paste(sQuote(utypes), collapse = ", "))
-      path <- NA_character_
-      .cache[[controller]] <<- path
-      return(path)
-    }
     
     ## Filter by CGroups v1 or v2?
     if (nzchar(controller)) {

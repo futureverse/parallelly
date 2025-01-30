@@ -128,3 +128,8 @@ This will install the package from source.  Because of this and because this pac
 
 <!-- pkgdown-drop-below -->
 
+
+## Contributing
+
+To contribute to this package, please see [CONTRIBUTING.md](CONTRIBUTING.md).
+

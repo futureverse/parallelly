@@ -131,18 +131,19 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
   signal_str <- paste(sprintf("%s", signal), collapse = ", ")
   if (length(signal) > 1) signal_str <- sprintf("c(%s)", signal_str)
   code <- sprintf("cat(tools::pskill(%d, signal = %s))", pid, signal_str)
-  rscript_args <- paste(c("-e", shQuote(code, type = rscript_sh)), collapse = " ")
+  rscript_args <- paste(c("-e", shQuote(code, type = rscript_sh[1])), collapse = " ")
   cmd <- paste(rscript, rscript_args)
   debug && mdebugf("- Rscript command to be called on the other host: %s", cmd)
   stop_if_not(length(cmd) == 1L)
 
   rshopts <- args_org$rshopts
   if (length(args_org$user) == 1L) rshopts <- c("-l", args_org$user, rshopts)
+  rshopts <- paste(rshopts, collapse = " ")
   rsh_call <- paste(paste(shQuote(rshcmd), collapse = " "), rshopts, worker)
   debug && mdebugf("- Command to connect to the other host: %s", rsh_call)
   stop_if_not(length(rsh_call) == 1L)
 
-  local_cmd <- paste(rsh_call, shQuote(cmd, type = rscript_sh))
+  local_cmd <- paste(rsh_call, shQuote(cmd, type = rscript_sh[2]))
   debug && mdebugf("- System call: %s", local_cmd)
   stop_if_not(length(local_cmd) == 1L)
 

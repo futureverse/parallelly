@@ -1,3 +1,28 @@
+# Version 1.42.0 [2025-01-30]
+
+## New Features
+
+ * Now `availableCores()` and `availableWorkers()` support also when
+   both CGroups v1 and CGroups v2 are enabled on the
+   machine. Previously, such configurations were completely ignored.
+
+## Bug Fixes
+
+ * Call `isNodeAlive()` and `killNode()` on cluster nodes running on
+   external machines would produce `Error in match.arg(type, choices =
+   known_types, several.ok = FALSE) : 'arg' must be of length 1`. This
+   bug was introduced in version 1.38.0 (2024-07-27), when adding
+   richer support for the `rscript_sh` argument.
+
+ * Call `isNodeAlive()` and `killNode()` on cluster nodes running on
+   external machines would produce `Error: ‘length(rsh_call) == 1L’ is
+   not TRUE` if option `rshopts` were specified during creation.
+
+ * The value of `availableCores()` was numeric rather than integer as
+   documented. This harmless bug was introduced in version 1.31.0
+   (2022-04-07).
+
+
 # Version 1.41.0 [2024-12-17]
 
 ## New Features
