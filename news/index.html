@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.41.0-9011</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.42.0</span>
       </span>
     </div>
 
@@ -157,13 +157,13 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<h2 class="page-header" data-toc-text="1.42.0" id="version-1420">Version 1.42.0<a class="anchor" aria-label="anchor" href="#version-1420"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-1-42-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-42-0"></a></h3>
 <ul><li>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> support also when both CGroups v1 and CGroups v2 are enabled on the machine. Previously, such configurations were completely ignored.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-1-42-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-42-0"></a></h3>
 <ul><li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error in match.arg(type, choices =    known_types, several.ok = FALSE) : 'arg' must be of length 1</code>. This bug was introduced in version 1.38.0 (2024-07-27), when adding richer support for the <code>rscript_sh</code> argument.</p></li>
 <li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error: ‘length(rsh_call) == 1L’ is    not TRUE</code> if option <code>rshopts</code> were specified during creation.</p></li>
 <li><p>The value of <code><a href="../reference/availableCores.html">availableCores()</a></code> was numeric rather than integer as documented. This harmless bug was introduced in version 1.31.0 (2022-04-07).</p></li>
