@@ -53,7 +53,8 @@ current machine that \code{\link[=availableCores]{availableCores()}} allows for 
 In addition, the following settings ("methods") are also acknowledged:
 \itemize{
 \item \code{"LSF"} -
-Query LSF/OpenLava environment variable \env{LSB_HOSTS}.
+Query Platform Load Sharing Facility (LSF)/OpenLava environment variable
+\env{LSB_HOSTS}.
 
 \item \code{"PJM"} -
 Query Fujitsu Technical Computing Suite (that we choose to shorten

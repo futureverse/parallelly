@@ -102,7 +102,7 @@
 #'    true, then a maximum of 4 cores is considered.
 #'
 #'  \item `"LSF"` - 
-#'    Query Platform Load Sharing Facility (LSF) environment variable
+#'    Query Platform Load Sharing Facility (LSF)/OpenLava environment variable
 #'    \env{LSB_DJOB_NUMPROC}.
 #'    Jobs with multiple (CPU) slots can be submitted on LSF using
 #'    `bsub -n 2 -R "span[hosts=1]" < hello.sh`.

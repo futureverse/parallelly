@@ -32,7 +32,8 @@
 #' In addition, the following settings ("methods") are also acknowledged:
 #' \itemize{
 #'  \item `"LSF"` -
-#'    Query LSF/OpenLava environment variable \env{LSB_HOSTS}.
+#'    Query Platform Load Sharing Facility (LSF)/OpenLava environment variable
+#'    \env{LSB_HOSTS}.
 #'
 #'  \item `"PJM"` - 
 #'    Query Fujitsu Technical Computing Suite (that we choose to shorten
