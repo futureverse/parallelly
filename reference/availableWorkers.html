@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.42.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.42.0-9001</span>
       </span>
     </div>
 
@@ -223,7 +223,8 @@ of names of machines / compute nodes, but may also be IP numbers.</p>
 which means that each will at least use as many parallel workers on the
 current machine that <code><a href="availableCores.html">availableCores()</a></code> allows for that method.</p>
 <p>In addition, the following settings ("methods") are also acknowledged:</p><ul><li><p><code>"LSF"</code> -
-Query LSF/OpenLava environment variable <code class="env">LSB_HOSTS</code>.</p></li>
+Query Platform Load Sharing Facility (LSF)/OpenLava environment variable
+<code class="env">LSB_HOSTS</code>.</p></li>
 <li><p><code>"PJM"</code> -
 Query Fujitsu Technical Computing Suite (that we choose to shorten
 as "PJM") the hostname file given by environment variable
