@@ -78,7 +78,7 @@
 #' The below \R options and environment variables control the default results of [makeClusterPSOCK()] and its helper function [makeNodePSOCK()] that creates the individual cluster nodes.
 #'
 #' \describe{
-#'  \item{`parallelly.maxWorkers.localhost`:}{(two numerics) Maximum number of localhost workers, relative to `availableCores()`, accepted and allowed. The first element corresponds to the threshold where a warning is produced, the second where an error is produced. Thresholds may be `+Inf`. If only the first exist, no error is produced (defaults to `c(1.0, 3.0)` corresponding to a maximum 100% and 300% use).}
+#'  \item{`parallelly.maxWorkers.localhost`:}{(two numerics) Maximum number of localhost workers, relative to `availableCores()`, accepted and allowed. The first element specifies the "soft" limit, which triggers a warning, if exceeded. The second element specifies the "hard" limit, which triggers an error if exceeded. These limits exist to protect against CPU overuse of the current machine, which sometimes happens by mistake without the user causing it being aware. These limits can be disabled by setting them to `+Inf` (not recommended). If only the first exist, no error is produced (defaults to `c(1.0, 3.0)` corresponding to a maximum 100% and 300% use).}
 #'  
 #'  \item{`parallelly.makeNodePSOCK.setup_strategy`:}{(character) If `"parallel"` (default), the PSOCK cluster nodes are set up concurrently.  If `"sequential"`, they are set up sequentially.}
 #'

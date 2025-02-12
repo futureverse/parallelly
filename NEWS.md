@@ -1,6 +1,10 @@
 # Version (development version)
 
- * ...
+## Documentation
+
+* Add more help on the R option `parallelly.maxWorkers.localhost`
+  limits. Improved the warning and error messages that are produced
+  when these settings are exceeded.
 
 
 # Version 1.42.0 [2025-01-30]
