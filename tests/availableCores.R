@@ -48,6 +48,8 @@ ncores0 <- 42L
 message("*** LSF ...")
 message(" - LSB_DJOB_NUMPROC")
 Sys.setenv(LSB_DJOB_NUMPROC = as.character(ncores0))
+env <- environment(parallelly:::availableCoresLSF)
+env$n <- NULL
 ncores <- availableCores(methods = "LSF")
 print(ncores)
 stopifnot(ncores == ncores0)
@@ -56,6 +58,8 @@ message("*** LSF ... done")
 message("*** PJM (Fujitsu Technical Computing Suite) ...")
 message(" - PJM_VNODE_CORE")
 Sys.setenv(PJM_VNODE_CORE = as.character(ncores0))
+env <- environment(parallelly:::availableCoresPJM)
+env$n <- NULL
 ncores <- availableCores(methods = "PJM")
 print(ncores)
 stopifnot(ncores == ncores0)
@@ -63,6 +67,8 @@ Sys.unsetenv("PJM_VNODE_CORE")
 
 message(" - PJM_PROC_BY_NODE")
 Sys.setenv(PJM_PROC_BY_NODE = as.character(ncores0))
+env <- environment(parallelly:::availableCoresPJM)
+env$n <- NULL
 ncores <- availableCores(methods = "PJM")
 print(ncores)
 stopifnot(ncores == ncores0)
@@ -76,7 +82,7 @@ message("*** Internal detectCores() ...")
 
 ## Reset internal cache
 env <- environment(parallelly:::detectCores)
-env$cache <- list()
+env$cache <- list(NULL, NULL)
 
 options(parallelly.availableCores.system = 2L)
 n <- detectCores()
@@ -86,7 +92,7 @@ options(parallelly.availableCores.system = NULL)
 
 ## Reset
 env <- environment(parallelly:::detectCores)
-env$cache <- list()
+env$cache <- list(NULL, NULL)
 
 n <- detectCores()
 print(n)

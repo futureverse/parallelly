@@ -438,36 +438,50 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
 } # availableCores()
 
 
-getNproc <- function(ignore = c("OMP_NUM_THREADS", "OMP_THREAD_LIMIT")) {
-  ## 'nproc' is limited by 'OMP_NUM_THREADS' and 'OMP_THREAD_LIMIT', if set.
-  ## However, that is not what we want for availableCores().  Because of
-  ## this, we unset those while querying 'nproc'.
-  if (length(ignore) > 0) {
-    ignore <- intersect(ignore, names(Sys.getenv()))
+getNproc <- local({
+  res <- NULL
+  
+  function(ignore = c("OMP_NUM_THREADS", "OMP_THREAD_LIMIT")) {
+    if (!is.null(res)) return(res)
+    
+    ## 'nproc' is limited by 'OMP_NUM_THREADS' and 'OMP_THREAD_LIMIT', if set.
+    ## However, that is not what we want for availableCores().  Because of
+    ## this, we unset those while querying 'nproc'.
     if (length(ignore) > 0) {
-      oignore <- Sys.getenv(ignore, names = TRUE)
-      oignore <- as.list(oignore)
-      on.exit(do.call(Sys.setenv, args = oignore), add = TRUE)
-      Sys.unsetenv(ignore)
+      ignore <- intersect(ignore, names(Sys.getenv()))
+      if (length(ignore) > 0) {
+        oignore <- Sys.getenv(ignore, names = TRUE)
+        oignore <- as.list(oignore)
+        on.exit(do.call(Sys.setenv, args = oignore), add = TRUE)
+        Sys.unsetenv(ignore)
+      }
     }
-  }
+    
+    systems <- list(linux = "nproc 2>/dev/null")
+    os <- names(systems)
+    m <- pmatch(os, table = R.version$os, nomatch = NA_integer_)
+    m <- os[!is.na(m)]
+    if (length(m) == 0L) {
+      res <<- NA_integer_
+      return(res)
+    }
   
-  systems <- list(linux = "nproc 2>/dev/null")
-  os <- names(systems)
-  m <- pmatch(os, table = R.version$os, nomatch = NA_integer_)
-  m <- os[!is.na(m)]
-  if (length(m) == 0L) return(NA_integer_)
-
-  for (cmd in systems[[m]]) {
-    tryCatch({
-      res <- suppressWarnings(system(cmd, intern=TRUE))
-      res <- gsub("(^[[:space:]]+|[[:space:]]+$)", "", res[1])
-      if (grepl("^[[:digit:]]+$", res)) return(as.integer(res))
-    }, error = identity)
+    for (cmd in systems[[m]]) {
+      tryCatch({
+        value <- suppressWarnings(system(cmd, intern=TRUE))
+        value <- gsub("(^[[:space:]]+|[[:space:]]+$)", "", value[1])
+        if (grepl("^[[:digit:]]+$", value)) {
+          res <<- as.integer(value)
+          return(res)
+        }
+      }, error = identity)
+    }
+    
+    res <<- NA_integer_
+    
+    res
   }
-  
-  NA_integer_
-}
+})
 
 
 checkNumberOfLocalWorkers <- function(workers) {
@@ -534,103 +548,122 @@ getopt_int <- function(name, mode = "integer") {
 # High-Performance Compute (HPC) Schedulers
 # --------------------------------------------------------------------------
 ## Number of slots assigned by LSF
-availableCoresLSF <- function() {      
-  n <- getenv_int("LSB_DJOB_NUMPROC")
-  n
-}
+availableCoresLSF <- local({
+  n <- NULL
+  function() {
+    if (!is.null(n)) return(n)
+    n <<- getenv_int("LSB_DJOB_NUMPROC")
+    n
+  }
+})
 
 
 ## Number of cores assigned by TORQUE/PBS
-availableCoresPBS <- function() {      
-  n <- getenv_int("PBS_NUM_PPN")
-  if (is.na(n)) {
-    ## PBSPro sets 'NCPUS' but not 'PBS_NUM_PPN'
-    n <- getenv_int("NCPUS")
+availableCoresPBS <- local({
+  n <- NULL
+  function() {
+    n <<- getenv_int("PBS_NUM_PPN")
+    if (is.na(n)) {
+      ## PBSPro sets 'NCPUS' but not 'PBS_NUM_PPN'
+      n <<- getenv_int("NCPUS")
+    }
+    n
   }
-  n
-}
+})
 
 
 ## Number of slots assigned by Fujitsu Technical Computing Suite
 ## We choose to call this job scheduler "PJM" based on the prefix
 ## it's environment variables use.
-availableCoresPJM <- function() {      
-  ## PJM_VNODE_CORE: e.g. pjsub -L vnode-core=8
-  ## "This environment variable is set only when virtual nodes
-  ##  are allocated, and it is not set when nodes are allocated."
-  n <- getenv_int("PJM_VNODE_CORE")
-  if (is.na(n)) {
-    ## PJM_PROC_BY_NODE: e.g. pjsub -L vnode-core=8
-    ## "Maximum number of processes that are generated per node by
-    ##  an MPI program. However, if a single node (node=1) or virtual
-    ##  node (vnode=1) is allocated and the mpi option of the pjsub
-    ##  command is not specified, this environment variable is not set."
-    n <- getenv_int("PJM_PROC_BY_NODE")
+availableCoresPJM <- local({
+  n <- NULL
+  function() {
+    ## PJM_VNODE_CORE: e.g. pjsub -L vnode-core=8
+    ## "This environment variable is set only when virtual nodes
+    ##  are allocated, and it is not set when nodes are allocated."
+    n <<- getenv_int("PJM_VNODE_CORE")
+    if (is.na(n)) {
+      ## PJM_PROC_BY_NODE: e.g. pjsub -L vnode-core=8
+      ## "Maximum number of processes that are generated per node by
+      ##  an MPI program. However, if a single node (node=1) or virtual
+      ##  node (vnode=1) is allocated and the mpi option of the pjsub
+      ##  command is not specified, this environment variable is not set."
+      n <<- getenv_int("PJM_PROC_BY_NODE")
+    }
+    n
   }
-  n
-}
+})
 
 
 ## Number of cores assigned by Oracle/Son/Sun/Univa Grid Engine (SGE/UGE)
-availableCoresSGE <- function() {      
-  n <- getenv_int("NSLOTS")
-  n
-}
+availableCoresSGE <- local({
+  n <- NULL
+  function() {
+    n <<- getenv_int("NSLOTS")
+    n
+  }
+})
 
 
 ## Number of cores assigned by Slurm
-availableCoresSlurm <- function() {
-  ## The assumption is that the following works regardless of
-  ## number of nodes requested /HB 2020-09-18
-  ## Example: --cpus-per-task={n}
-  n <- getenv_int("SLURM_CPUS_PER_TASK")
-  if (is.na(n)) {
-    ## Example: --nodes={nnodes} (defaults to 1, short: -N {nnodes})
-    ## From 'man sbatch':
-    ## SLURM_JOB_NUM_NODES (and SLURM_NNODES for backwards compatibility)
-    ## Total number of nodes in the job's resource allocation.
-    nnodes <- getenv_int("SLURM_JOB_NUM_NODES")
-    if (is.na(nnodes)) nnodes <- getenv_int("SLURM_NNODES")
-    if (is.na(nnodes)) nnodes <- 1L  ## Can this happen? /HB 2020-09-18
-
-    if (nnodes == 1L) {
-      ## Example: --nodes=1 --ntasks={n} (short: -n {n})
-      ## IMPORTANT: 'SLURM_CPUS_ON_NODE' appears to be rounded up when nodes > 1.
-      ## Example 1: With --nodes=2 --cpus-per-task=3 we see SLURM_CPUS_ON_NODE=4
-      ## although SLURM_CPUS_PER_TASK=3. 
-      ## Example 2: With --nodes=2 --ntasks=7, we see SLURM_CPUS_ON_NODE=6,
-      ## SLURM_JOB_CPUS_PER_NODE=6,2, no SLURM_CPUS_PER_TASK, and
-      ## SLURM_TASKS_PER_NODE=5,2.
-      ## Conclusions: We can only use 'SLURM_CPUS_ON_NODE' for nnodes = 1.
-      n <- getenv_int("SLURM_CPUS_ON_NODE")
-    } else {
-      ## Parse `SLURM_TASKS_PER_NODE`
-      nodecounts <- getenv_int("SLURM_TASKS_PER_NODE", mode = "character")
-      if (!is.na(nodecounts)) {
-        ## Examples:
-        ## SLURM_TASKS_PER_NODE=5,2
-        ## SLURM_TASKS_PER_NODE=2(x2),1(x3)  # Source: 'man sbatch'
-        n <- slurm_expand_nodecounts(nodecounts)
-        if (anyNA(n)) return(NA_real_)
-
-        ## ASSUMPTION: We assume that it is the first component on the list that
-        ## corresponds to the current machine. /HB 2021-03-05
-        n <- n[1]
+availableCoresSlurm <- local({
+  n <- NULL
+  function() {
+    ## The assumption is that the following works regardless of
+    ## number of nodes requested /HB 2020-09-18
+    ## Example: --cpus-per-task={n}
+    n <<- getenv_int("SLURM_CPUS_PER_TASK")
+    if (is.na(n)) {
+      ## Example: --nodes={nnodes} (defaults to 1, short: -N {nnodes})
+      ## From 'man sbatch':
+      ## SLURM_JOB_NUM_NODES (and SLURM_NNODES for backwards compatibility)
+      ## Total number of nodes in the job's resource allocation.
+      nnodes <- getenv_int("SLURM_JOB_NUM_NODES")
+      if (is.na(nnodes)) nnodes <- getenv_int("SLURM_NNODES")
+      if (is.na(nnodes)) nnodes <- 1L  ## Can this happen? /HB 2020-09-18
+  
+      if (nnodes == 1L) {
+        ## Example: --nodes=1 --ntasks={n} (short: -n {n})
+        ## IMPORTANT: 'SLURM_CPUS_ON_NODE' appears to be rounded up when nodes > 1.
+        ## Example 1: With --nodes=2 --cpus-per-task=3 we see SLURM_CPUS_ON_NODE=4
+        ## although SLURM_CPUS_PER_TASK=3. 
+        ## Example 2: With --nodes=2 --ntasks=7, we see SLURM_CPUS_ON_NODE=6,
+        ## SLURM_JOB_CPUS_PER_NODE=6,2, no SLURM_CPUS_PER_TASK, and
+        ## SLURM_TASKS_PER_NODE=5,2.
+        ## Conclusions: We can only use 'SLURM_CPUS_ON_NODE' for nnodes = 1.
+        n <<- getenv_int("SLURM_CPUS_ON_NODE")
+      } else {
+        ## Parse `SLURM_TASKS_PER_NODE`
+        nodecounts <- getenv_int("SLURM_TASKS_PER_NODE", mode = "character")
+        if (!is.na(nodecounts)) {
+          ## Examples:
+          ## SLURM_TASKS_PER_NODE=5,2
+          ## SLURM_TASKS_PER_NODE=2(x2),1(x3)  # Source: 'man sbatch'
+          n <<- slurm_expand_nodecounts(nodecounts)
+          if (anyNA(n)) {
+            n <<- NA_real_
+            return(n)
+          }
+  
+          ## ASSUMPTION: We assume that it is the first component on the list that
+          ## corresponds to the current machine. /HB 2021-03-05
+          n <<- n[1]
+        }
       }
     }
+  
+    ## TODO?: Can we validate above assumptions/results? /HB 2020-09-18
+    if (FALSE && !is.na(n)) {
+      ## Is any of the following useful?
+  
+      ## Example: --ntasks={ntasks} (no default, short: -n {ntasks})
+      ## From 'man sbatch':
+      ## SLURM_NTASKS (and SLURM_NPROCS for backwards compatibility)
+      ## Same as -n, --ntasks
+      ntasks <- getenv_int("SLURM_NTASKS")
+      if (is.na(ntasks)) ntasks <- getenv_int("SLURM_NPROCS")
+    }
+
+    n
   }
-
-  ## TODO?: Can we validate above assumptions/results? /HB 2020-09-18
-  if (FALSE && !is.na(n)) {
-    ## Is any of the following useful?
-
-    ## Example: --ntasks={ntasks} (no default, short: -n {ntasks})
-    ## From 'man sbatch':
-    ## SLURM_NTASKS (and SLURM_NPROCS for backwards compatibility)
-    ## Same as -n, --ntasks
-    ntasks <- getenv_int("SLURM_NTASKS")
-    if (is.na(ntasks)) ntasks <- getenv_int("SLURM_NPROCS")
-  }
-
-  n
-} ## availableCoresSlurm()
+}) ## availableCoresSlurm()

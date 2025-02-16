@@ -101,10 +101,10 @@ for (dir in c("no-cgroups", "mixed-cgroups", "cgroups1", "cgroups2")) {
 
   for (name in names(tarballs)) {
     parallelly:::withCGroups(tarballs[name], {
-        file <- file.path(path, sprintf("%s.R", name))
-        if (file_test("-f", file)) {
-          source(file, local = FALSE)
-        }
+      file <- file.path(path, sprintf("%s.R", name))
+      if (file_test("-f", file)) {
+        source(file, local = FALSE)
+      }
     })
   }
   message(sprintf("%s - real-world ... done", dir))
