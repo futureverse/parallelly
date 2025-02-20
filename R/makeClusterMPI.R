@@ -1,4 +1,4 @@
-#' Create a Message Passing Interface (MPI) Cluster of R Workers for Parallel Processing
+#' Create a Rich Message Passing Interface (MPI) Cluster of R Workers for Parallel Processing
 #' 
 #' The `makeClusterMPI()` function creates an MPI cluster of \R workers
 #' for parallel processing.  This function utilizes 
@@ -47,7 +47,7 @@
 #' @seealso
 #' [makeClusterPSOCK()] and [parallel::makeCluster()].
 #'
-#' @aliases MPI
+#' @aliases RMPI
 #' @importFrom parallel makeCluster
 #' @export
 makeClusterMPI <- function(workers, ..., autoStop = FALSE, verbose = getOption2("parallelly.debug", FALSE)) {

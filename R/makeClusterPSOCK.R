@@ -1,4 +1,4 @@
-#' Create a PSOCK Cluster of R Workers for Parallel Processing
+#' Create a Rich PSOCK Cluster of R Workers for Parallel Processing
 #' 
 #' The `makeClusterPSOCK()` function creates a cluster of \R workers
 #' for parallel processing.  These \R workers may be background \R sessions
@@ -128,7 +128,7 @@
 #'
 #' @example incl/makeClusterPSOCK.R
 #'
-#' @aliases PSOCK
+#' @aliases RPSOCK
 #' @importFrom parallel stopCluster
 #' @export
 makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto", "random"), user = NULL, ..., autoStop = FALSE, tries = getOption2("parallelly.makeNodePSOCK.tries", 3L), delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15.0), validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE), verbose = getOption2("parallelly.debug", FALSE)) {

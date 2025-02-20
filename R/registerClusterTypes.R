@@ -1,12 +1,12 @@
 ## Register makeClusterMPI() and makeClusterPSOCK() as a cluster types
 ## such that they can be created using parallel::makeCluster(), e.g.
-## cl <- parallel::makeCluster(..., type = parallelly::PSOCK)
+## cl <- parallel::makeCluster(..., type = parallelly::RPSOCK)
 
-#' @rawNamespace export(MPI)
-MPI   <- "parallelly::MPI"
+#' @rawNamespace export(RMPI)
+RMPI   <- "parallelly::RMPI"
 
-#' @rawNamespace export(PSOCK)
-PSOCK <- "parallelly::PSOCK"
+#' @rawNamespace export(RPSOCK)
+RPSOCK <- "parallelly::RPSOCK"
  
 #' @rawNamespace if (getRversion() >= "4.4") export(SEQ)
 SEQ <- "parallelly::SEQ"
@@ -26,9 +26,9 @@ registerClusterTypes <- local({
     ## WORKAROUND: 'R CMD build' somehow creates and calls this function
     ## twice, resulting in warnings from parallel::registerClusterType().
     suppressWarnings({
-      registerClusterType(MPI,   makeClusterMPI,        make.default = FALSE)
-      registerClusterType(PSOCK, makeClusterPSOCK,      make.default = FALSE)
-      registerClusterType(SEQ,   makeClusterSequential, make.default = FALSE)
+      registerClusterType(RMPI,   makeClusterMPI,        make.default = FALSE)
+      registerClusterType(RPSOCK, makeClusterPSOCK,      make.default = FALSE)
+      registerClusterType(SEQ,    makeClusterSequential, make.default = FALSE)
     })
     done <<- TRUE
   }

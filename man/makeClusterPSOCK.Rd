@@ -3,9 +3,9 @@
 %   R/makeZZZ.R
 \name{makeClusterPSOCK}
 \alias{makeClusterPSOCK}
-\alias{PSOCK}
+\alias{RPSOCK}
 \alias{makeNodePSOCK}
-\title{Create a PSOCK Cluster of R Workers for Parallel Processing}
+\title{Create a Rich PSOCK Cluster of R Workers for Parallel Processing}
 \usage{
 makeClusterPSOCK(
   workers,

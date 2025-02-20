@@ -2,8 +2,8 @@
 % Please edit documentation in R/makeClusterMPI.R
 \name{makeClusterMPI}
 \alias{makeClusterMPI}
-\alias{MPI}
-\title{Create a Message Passing Interface (MPI) Cluster of R Workers for Parallel Processing}
+\alias{RMPI}
+\title{Create a Rich Message Passing Interface (MPI) Cluster of R Workers for Parallel Processing}
 \usage{
 makeClusterMPI(
   workers,
