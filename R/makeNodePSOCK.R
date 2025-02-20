@@ -764,7 +764,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
   }
 
   if (length(socketOptions) == 1L) {
-    code <- sprintf("options(socketOptions = \"%s\")", socketOptions)
+    code <- sprintf("options(socketOptions=\"%s\")", socketOptions)
     rscript_expr <- c("-e", shQuote(code, type = rscript_sh[1]))
     rscript_args_internal <- c(rscript_args_internal, rscript_expr)
   }
@@ -830,7 +830,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
       tryCatch({
         parse(text = code)
       }, error = function(ex) {
-        stopf("Argument 'rscript_envs' appears to contain invalid values: %s", paste(sprintf("%s=%s", sQuote(names), sQuote(rscript_envs)), collapse = ", "))
+        stopf("Argument 'rscript_envs' appears to contain invalid values: %s", paste(sprintf("%s=%s", sQuote(names), sQuote(rscript_envs)), collapse = ","))
       })
       rscript_args_internal <- c(rscript_args_internal, "-e", shQuote(code, type = rscript_sh[1]))
     }
@@ -854,7 +854,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
   ## .{slave,work}RSOCK() command already specified?
   if (!any(grepl("parallel:::[.](slave|work)RSOCK[(][)]", rscript_args))) {
     ## In R (>= 4.1.0), parallel:::.slaveRSOCK() was renamed to .workRSOCK()
-    cmd <- "workRSOCK <- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()"
+    cmd <- "workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"
     rscript_args_internal <- c(rscript_args_internal, "-e", shQuote(cmd, type = rscript_sh[1]))
   }
 

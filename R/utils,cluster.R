@@ -274,7 +274,7 @@ useWorkerPID <- local({
     pidfile <- tempfile(pattern = sprintf("worker.rank=%d.parallelly.parent=%d.",
                    rank, parent_pid), fileext = ".pid")
     pidfile <- normalizePath(pidfile, winslash = "/", mustWork = FALSE)
-    pidcode <- sprintf('try(suppressWarnings(cat(Sys.getpid(),file="%s")), silent = TRUE)', pidfile)
+    pidcode <- sprintf('try(suppressWarnings(cat(Sys.getpid(),file="%s")),silent=TRUE)', pidfile)
     rscript_pid_args <- c("-e", shQuote(pidcode, type = rscript_sh))
     list(pidfile = pidfile, rscript_pid_args = rscript_pid_args)
   }
