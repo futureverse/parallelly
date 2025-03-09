@@ -36,7 +36,7 @@
 #' If `length(user) == length(workers)`, then each worker may have a unique
 #' user name.
 #'
-#' @param \dots Optional arguments passed to
+#' @param \ldots Optional arguments passed to
 #' `makeNode(workers[i], ..., rank = i)` where `i = seq_along(workers)`.
 #'
 #' @param autoStop If TRUE, the cluster will be automatically stopped

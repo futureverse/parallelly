@@ -15,7 +15,7 @@
 #'
 #' @param workers The number workers (as a positive integer).
 #' 
-#' @param \dots Optional arguments passed to
+#' @param \ldots Optional arguments passed to
 #' \code{\link[parallel:makeCluster]{makeCluster}(workers, type = "MPI", ...)}.
 #' 
 #' @return An object of class `c("RichMPIcluster", "MPIcluster", "cluster")` consisting

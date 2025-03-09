@@ -78,9 +78,6 @@ SSH options \option{-p}, e.g. \code{rshopts = c("-p", "2200")}.}}
 \item{user}{(optional) The user name to be used when communicating with
 another host.}
 
-\item{\dots}{Optional arguments passed to
-\code{makeNode(workers[i], ..., rank = i)} where \code{i = seq_along(workers)}.}
-
 \item{autoStop}{If TRUE, the cluster will be automatically stopped
 using \code{\link[parallel:makeCluster]{stopCluster}()} when it is
 garbage collected, unless already stopped.  See also \code{\link[=autoStopCluster]{autoStopCluster()}}.}
@@ -231,6 +228,9 @@ concurrently, one after the other.  If \code{"sequential"}, they are set up
 sequentially.}
 
 \item{action}{This is an internal argument.}
+
+\item{\ldots}{Optional arguments passed to
+\code{makeNode(workers[i], ..., rank = i)} where \code{i = seq_along(workers)}.}
 }
 \value{
 An object of class \code{c("RichSOCKcluster", "SOCKcluster", "cluster")}
