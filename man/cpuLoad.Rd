@@ -29,7 +29,7 @@ print(loadavg)
 \enumerate{
 \item Linux Load Averages: Solving the Mystery,
 Brendan Gregg's Blog, 2017-08-08,
-\url{http://www.brendangregg.com/blog/2017-08-08/linux-load-averages.html}
+\url{https://www.brendangregg.com/blog/2017-08-08/linux-load-averages.html}
 }
 }
 \keyword{internal}
