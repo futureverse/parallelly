@@ -559,7 +559,11 @@ getCGroupsValue <- local({
       res <- cache_controller[[field]]
       if (!is.null(res)) return(res)
     }
-    
+
+    if (is.null(cache_controller)) {
+      cache_controller <- list()
+    }
+
     path <- getCGroupsPath(controller = controller)
     if (is.na(path)) {
       res <- NA_character_
