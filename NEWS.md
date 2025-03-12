@@ -22,6 +22,12 @@
    limits. Improved the warning and error messages that are produced
    when these settings are exceeded.
 
+## Bug Fixes
+
+ * `availableCores()` could produce `Error: Error in
+   cache_controller[[field]] : subscript out of bounds` in
+   `... getCGroups1CpuQuota -> getCGroups1CpuPeriodMicroseconds`.
+
 
 # Version 1.42.0 [2025-01-30]
 
