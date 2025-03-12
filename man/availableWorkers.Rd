@@ -83,7 +83,7 @@ An example of a job submission that results in this is
 \verb{qsub -pe mpi 8} (or \verb{qsub -pe ompi 8}), which
 requests eight cores on a any number of machines.
 Known Grid Engine schedulers are
-Oracle Grid Engine (OGE; acquires Sun Microsystems in 2010),
+Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
 Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
 Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and

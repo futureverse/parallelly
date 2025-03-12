@@ -146,7 +146,7 @@ An example of a job submission that results in this is
 \verb{qsub -pe smp 2} (or \verb{qsub -pe by_node 2}), which
 requests two cores on a single machine.
 Known Grid Engine schedulers are
-Oracle Grid Engine (OGE; acquires Sun Microsystems in 2010),
+Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
 Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
 Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
