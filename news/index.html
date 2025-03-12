@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.42.0-9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.42.0-9005</span>
       </span>
     </div>
 
@@ -158,6 +158,11 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<div class="section level3">
+<h3 id="significant-changes-development-version">Significant Changes<a class="anchor" aria-label="anchor" href="#significant-changes-development-version"></a></h3>
+<ul><li><p>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> memoizes the values of all its components. This means that as soon as it has been called, environment variables such as <code>NSLOTS</code> will no longer be queried.</p></li>
+<li><p>Starting with R 4.5.0 (currently R-devel), one can use <code>parallel::makeCluster(n, type = parallelly::RPSOCK)</code> as an alternative to <code>parallelly::makeClusterPSOCK(n)</code>. Similarly, <code>type    = parallelly::RMPI</code> creates a cluster using <code><a href="../reference/makeClusterMPI.html">parallelly::makeClusterMPI()</a></code>, and <code>type = parallelly::SEQ</code> creates a cluster using <code><a href="../reference/makeClusterSequential.html">parallelly::makeClusterSequential()</a></code>. This was first introduced in <strong>parallelly</strong> 1.38.0, but here we rename <code>PSOCK</code> to <code>RPSOCK</code> and <code>MPI</code> to <code>RMPI</code> to minimize the risk for mistaking them from the built-in types in the <strong>parallel</strong> package.</p></li>
+</ul></div>
 <div class="section level3">
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
 <ul><li>Add more help on the R option <code>parallelly.maxWorkers.localhost</code> limits. Improved the warning and error messages that are produced when these settings are exceeded.</li>
