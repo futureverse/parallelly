@@ -121,12 +121,17 @@
 #'    `qsub -l nodes=1:ppn=2`, which requests one node with two cores.
 #'
 #'  \item `"SGE"` -
-#'    Query Sun Grid Engine/Oracle Grid Engine/Son of Grid Engine (SGE)
-#'    and Univa Grid Engine (UGE)/Altair Grid Engine (AGE) environment
-#'    variable \env{NSLOTS}.
+#'    Query the "Grid Engine" scheduler environment variable \env{NSLOTS}.
 #'    An example of a job submission that results in this is
 #'    `qsub -pe smp 2` (or `qsub -pe by_node 2`), which
 #'    requests two cores on a single machine.
+#'    Known Grid Engine schedulers are
+#     Sun Grid Engine (SGE; open source; acquires Gridware, Inc. in 2000),
+#'    Oracle Grid Engine (OGE; acquires Sun Microsystems in 2010),
+#'    Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
+#'    Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+#'    Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
+#     Open Grid Scheduler (OGS; open-source fork of SGE 6.2u5).
 #'
 #'  \item `"Slurm"` -
 #'    Query Simple Linux Utility for Resource Management (Slurm)

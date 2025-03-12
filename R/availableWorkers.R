@@ -57,12 +57,17 @@
 #'    with two cores.
 #'
 #'  \item `"SGE"` -
-#'    Query Sun Grid Engine/Oracle Grid Engine/Son of Grid Engine (SGE)
-#'    and Univa Grid Engine (UGE)/Altair Grid Engine (AGE) environment
-#'    variable \env{PE_HOSTFILE}.
+#'    Query the "Grid Engine" scheduler environment variable \env{PE_HOSTFILE}.
 #'    An example of a job submission that results in this is
 #'    `qsub -pe mpi 8` (or `qsub -pe ompi 8`), which
 #'    requests eight cores on a any number of machines.
+#'    Known Grid Engine schedulers are
+#     Sun Grid Engine (SGE; open source; acquires Gridware, Inc. in 2000),
+#'    Oracle Grid Engine (OGE; acquires Sun Microsystems in 2010),
+#'    Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
+#'    Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+#'    Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
+#     Open Grid Scheduler (OGS; open-source fork of SGE 6.2u5).
 #'
 #'  \item `"Slurm"` -
 #'    Query Slurm environment variable \env{SLURM_JOB_NODELIST} (fallback
