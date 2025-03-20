@@ -43,7 +43,7 @@ isNodeAlive.default <- function(x, ...) NA
 
 #' @export
 isNodeAlive.RichSOCKnode <- function(x, timeout = 0.0, ...) {
-  debug <- getOption2("parallelly.debug", FALSE)
+  debug <- getOption("parallelly.debug", FALSE)
   if (debug) {
     mdebugf("isNodeAlive() for RichSOCKnode ...")
     on.exit(mdebugf("isNodeAlive() for RichSOCKnode ... DONE"))

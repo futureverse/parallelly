@@ -4,7 +4,7 @@
 \alias{pid_exists}
 \title{Check whether a process PID exists or not}
 \usage{
-pid_exists(pid, debug = getOption2("parallelly.debug", FALSE))
+pid_exists(pid, debug = getOption("parallelly.debug", FALSE))
 }
 \arguments{
 \item{pid}{A positive integer.}

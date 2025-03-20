@@ -52,6 +52,7 @@ pid_exists <- local({
         ##  validity of pid." [1]
         res <- pskill(pid, signal = 0L)
         if (debug) {
+          ## FIXME: Turn these into messages going to stderr
           cat(sprintf("Call: tools::pskill(%s, signal = 0L)\n", pid))
           print(res)
         }
@@ -70,6 +71,7 @@ pid_exists <- local({
         system2("ps", args = pid, stdout = TRUE, stderr = FALSE)
       })
       if (debug) {
+        ## FIXME: Turn these into messages going to stderr
         cat(sprintf("Call: ps %s\n", pid))
         print(out)
         str(out)
@@ -79,6 +81,7 @@ pid_exists <- local({
       out <- gsub("(^[ ]+|[ ]+$)", "", out)
       out <- out[nzchar(out)]
       if (debug) {
+        ## FIXME: Turn these into messages going to stderr
         cat("Trimmed:\n")
         print(out)
         str(out)
@@ -87,10 +90,12 @@ pid_exists <- local({
       out <- lapply(out, FUN = function(x) x[1])
       out <- unlist(out, use.names = FALSE)
       if (debug) {
+        ## FIXME: Turn these into messages going to stderr
         cat("Extracted: ", paste(sQuote(out), collapse = ", "), "\n", sep = "")
       }
       out <- suppressWarnings(as.integer(out))
       if (debug) {
+        ## FIXME: Turn these into messages going to stderr
         cat("Parsed: ", paste(sQuote(out), collapse = ", "), "\n", sep = "")
       }
       any(out == pid)
@@ -107,6 +112,7 @@ pid_exists <- local({
         args = c("/FI", shQuote(sprintf("PID eq %.0f", pid)), "/NH")
         out <- system2("tasklist", args = args, stdout = TRUE, stderr = "")
         if (debug) {
+          ## FIXME: Turn these into messages going to stderr
           cat(sprintf("Call: tasklist %s\n", paste(args, collapse = " ")))
           print(out)
           str(out)
@@ -114,12 +120,14 @@ pid_exists <- local({
         out <- gsub("(^[ ]+|[ ]+$)", "", out)
         out <- out[nzchar(out)]
         if (debug) {
+          ## FIXME: Turn these into messages going to stderr
           cat("Trimmed:\n")
           print(out)
           str(out)
         }
         out <- grepl(sprintf(" %.0f ", pid), out)
         if (debug) {
+          ## FIXME: Turn these into messages going to stderr
           cat("Contains PID: ", paste(out, collapse = ", "), "\n", sep = "")
         }
         any(out)
@@ -136,6 +144,7 @@ pid_exists <- local({
       res <- tryCatch({
         out <- system2("tasklist", stdout = TRUE, stderr = "")
         if (debug) {
+          ## FIXME: Turn these into messages going to stderr
           cat("Call: tasklist\n")
           print(out)
           str(out)
@@ -145,6 +154,7 @@ pid_exists <- local({
         skip <- grep("^====", out)[1]
         if (!is.na(skip)) out <- out[seq(from = skip + 1L, to = length(out))]
         if (debug) {
+          ## FIXME: Turn these into messages going to stderr
           cat("Trimmed:\n")
           print(out)
           str(out)
@@ -162,14 +172,17 @@ pid_exists <- local({
         out <- lapply(out, FUN = function(x) rev(x)[-seq_len(drop)][1])
         out <- unlist(out, use.names = FALSE)
         if (debug) {
+          ## FIXME: Turn these into messages going to stderr
           cat("Extracted: ", paste(sQuote(out), collapse = ", "), "\n", sep = "")
         }
         out <- as.integer(out)
         if (debug) {
+          ## FIXME: Turn these into messages going to stderr
           cat("Parsed: ", paste(sQuote(out), collapse = ", "), "\n", sep = "")
         }
         out <- (out == pid)
         if (debug) {
+          ## FIXME: Turn these into messages going to stderr
           cat("Equals PID: ", paste(out, collapse = ", "), "\n", sep = "")
         }
         any(out)
@@ -182,7 +195,7 @@ pid_exists <- local({
 
   cache <- list()
 
-  function(pid, debug = getOption2("parallelly.debug", FALSE)) {
+  function(pid, debug = getOption("parallelly.debug", FALSE)) {
     stop_if_not(is.numeric(pid), length(pid) == 1L, is.finite(pid), pid > 0L)
 
     pid_check <- cache$pid_check

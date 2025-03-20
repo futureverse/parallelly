@@ -37,7 +37,7 @@ cloneNode.default <- function(x, ...) {
 
 #' @export
 cloneNode.RichSOCKnode <- function(x, ..., method = c("as-is", "vanilla")) {
-  debug <- getOption2("parallelly.debug", FALSE)
+  debug <- getOption("parallelly.debug", FALSE)
   if (debug) {
     mdebugf("cloneNode() for RichSOCKnode ...")
     on.exit(mdebugf("cloneNode() for RichSOCKnode ... DONE"))
