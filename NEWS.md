@@ -30,6 +30,11 @@
 
 ## Bug Fixes
 
+ * `isNodeAlive()` could produce warnings on `doTryCatch(return(expr),
+   name, parentenv, handler) : NAs introduced by coercion` on MS
+   Windows. Improved the internal `tasklist` parses used to test
+   whether a process is alive.
+ 
  * `availableCores()` could produce `Error: Error in
    cache_controller[[field]] : subscript out of bounds` in
    `... getCGroups1CpuQuota -> getCGroups1CpuPeriodMicroseconds`.

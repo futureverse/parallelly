@@ -134,24 +134,33 @@ pid_exists <- local({
         out <- gsub("(^[ ]+|[ ]+$)", "", out)
         out <- out[nzchar(out)]
         skip <- grep("^====", out)[1]
-        if (!is.na(skip)) out <- out[seq(from = skip + 1L, to = length(out))]
+        if (!is.na(skip)) {
+	  ## Parse the ===== bar to identify column widths
+	  bar <- out[skip]
+	  idxs <- which(strsplit(bar, split = "", fixed = TRUE)[[1]] == " ")
+	  from <- c(1L, idxs + 1L)
+	  to <- c(idxs-1L, nchar(bar))
+	  cols <- rbind(from, to)
+	  bar2 <- apply(cols, MARGIN = 2L, FUN = function(x) { substr(bar, start = x[1], stop = x[2]) })
+          if (debug) {
+            mdebug("Column widths:")
+            mprint(bar)
+            mprint(cols)
+            mprint(bar2)
+          }
+	  stop_if_not(all(grepl("^=+$", bar2)))
+	  out <- out[seq(from = skip + 1L, to = length(out))]
+	  out <- apply(cols, MARGIN = 2L, FUN = function(x) {
+	    value <- substr(out, start = x[1], stop = x[2])
+            gsub("(^[ ]+|[ ]+$)", "", value)
+	  })
+	}
         if (debug) {
           mdebug("Trimmed:")
           mprint(out)
-          mstr(out)
         }
-        out <- strsplit(out, split = "[ ]+", fixed = FALSE)
-        ## WORKAROUND: The 'Image Name' column may contain spaces, making
-        ## it hard to locate the second column.  Instead, we will identify
-        ## the most common number of column (typically six) and the count
-        ## how many columns we should drop at the end in order to find the
-        ## second as the last
-        ## 
-        n <- lengths(out)
-        n <- sort(n)[round(length(n) / 2)] ## "median" without using 'stats'
-        drop <- n - 2L
-        out <- lapply(out, FUN = function(x) rev(x)[-seq_len(drop)][1])
-        out <- unlist(out, use.names = FALSE)
+        out <- out[, 2]
+        out <- grep("^[[:digit:]]+$", out, value = TRUE)	
         if (debug) mdebugf("Extracted: %s", commaq(out))
         out <- as.integer(out)
         if (debug) mdebugf("Parsed: %s", commaq(out))
