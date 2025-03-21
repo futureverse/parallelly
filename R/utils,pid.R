@@ -51,11 +51,7 @@ pid_exists <- local({
         ##  signal is actually sent. The null signal can be used to check the 
         ##  validity of pid." [1]
         res <- pskill(pid, signal = 0L)
-        if (debug) {
-          ## FIXME: Turn these into messages going to stderr
-          cat(sprintf("Call: tools::pskill(%s, signal = 0L)\n", pid))
-          print(res)
-        }
+        if (debug) mdebugf("Call: tools::pskill(%s, signal = 0L): %s", pid, res)
         as.logical(res)
       }, error = function(ex) NA)
     }
@@ -71,33 +67,25 @@ pid_exists <- local({
         system2("ps", args = pid, stdout = TRUE, stderr = FALSE)
       })
       if (debug) {
-        ## FIXME: Turn these into messages going to stderr
-        cat(sprintf("Call: ps %s\n", pid))
-        print(out)
-        str(out)
+        mdebugf("Call: ps %s", pid)
+        mprint(out)
+        mstr(out)
       }
       status <- attr(out, "status")
       if (is.numeric(status) && status < 0) return(NA)
       out <- gsub("(^[ ]+|[ ]+$)", "", out)
       out <- out[nzchar(out)]
       if (debug) {
-        ## FIXME: Turn these into messages going to stderr
-        cat("Trimmed:\n")
-        print(out)
-        str(out)
+        mdebug("Trimmed:")
+        mprint(out)
+        mstr(out)
       }
       out <- strsplit(out, split = "[ ]+", fixed = FALSE)
       out <- lapply(out, FUN = function(x) x[1])
       out <- unlist(out, use.names = FALSE)
-      if (debug) {
-        ## FIXME: Turn these into messages going to stderr
-        cat("Extracted: ", paste(sQuote(out), collapse = ", "), "\n", sep = "")
-      }
+      if (debug) mdebugf("Extracted: %s", commaq(out))
       out <- suppressWarnings(as.integer(out))
-      if (debug) {
-        ## FIXME: Turn these into messages going to stderr
-        cat("Parsed: ", paste(sQuote(out), collapse = ", "), "\n", sep = "")
-      }
+      if (debug) mdebugf("Parsed: %s", commaq(out))
       any(out == pid)
     }, error = function(ex) NA)
   }
@@ -112,24 +100,19 @@ pid_exists <- local({
         args = c("/FI", shQuote(sprintf("PID eq %.0f", pid)), "/NH")
         out <- system2("tasklist", args = args, stdout = TRUE, stderr = "")
         if (debug) {
-          ## FIXME: Turn these into messages going to stderr
-          cat(sprintf("Call: tasklist %s\n", paste(args, collapse = " ")))
-          print(out)
-          str(out)
+          mdebugf("Call: tasklist %s", paste(args, collapse = " "))
+          mprint(out)
+          mstr(out)
         }
         out <- gsub("(^[ ]+|[ ]+$)", "", out)
         out <- out[nzchar(out)]
         if (debug) {
-          ## FIXME: Turn these into messages going to stderr
-          cat("Trimmed:\n")
-          print(out)
-          str(out)
+          mdebug("Trimmed:")
+          mprint(out)
+          mstr(out)
         }
         out <- grepl(sprintf(" %.0f ", pid), out)
-        if (debug) {
-          ## FIXME: Turn these into messages going to stderr
-          cat("Contains PID: ", paste(out, collapse = ", "), "\n", sep = "")
-        }
+        if (debug) mdebugf("Contains PID: %s", commaq(out))
         any(out)
       }, error = function(ex) NA)
       if (isTRUE(res)) return(res)
@@ -144,20 +127,18 @@ pid_exists <- local({
       res <- tryCatch({
         out <- system2("tasklist", stdout = TRUE, stderr = "")
         if (debug) {
-          ## FIXME: Turn these into messages going to stderr
-          cat("Call: tasklist\n")
-          print(out)
-          str(out)
+          mdebug("Call: tasklist")
+          mprint(out)
+          mstr(out)
         }
         out <- gsub("(^[ ]+|[ ]+$)", "", out)
         out <- out[nzchar(out)]
         skip <- grep("^====", out)[1]
         if (!is.na(skip)) out <- out[seq(from = skip + 1L, to = length(out))]
         if (debug) {
-          ## FIXME: Turn these into messages going to stderr
-          cat("Trimmed:\n")
-          print(out)
-          str(out)
+          mdebug("Trimmed:")
+          mprint(out)
+          mstr(out)
         }
         out <- strsplit(out, split = "[ ]+", fixed = FALSE)
         ## WORKAROUND: The 'Image Name' column may contain spaces, making
@@ -171,20 +152,11 @@ pid_exists <- local({
         drop <- n - 2L
         out <- lapply(out, FUN = function(x) rev(x)[-seq_len(drop)][1])
         out <- unlist(out, use.names = FALSE)
-        if (debug) {
-          ## FIXME: Turn these into messages going to stderr
-          cat("Extracted: ", paste(sQuote(out), collapse = ", "), "\n", sep = "")
-        }
+        if (debug) mdebugf("Extracted: %s", commaq(out))
         out <- as.integer(out)
-        if (debug) {
-          ## FIXME: Turn these into messages going to stderr
-          cat("Parsed: ", paste(sQuote(out), collapse = ", "), "\n", sep = "")
-        }
+        if (debug) mdebugf("Parsed: %s", commaq(out))
         out <- (out == pid)
-        if (debug) {
-          ## FIXME: Turn these into messages going to stderr
-          cat("Equals PID: ", paste(out, collapse = ", "), "\n", sep = "")
-        }
+        if (debug) mdebugf("Equals PID: %s", commaq(out))
         any(out)
       }, error = function(ex) NA)
       if (isTRUE(res)) return(res)
