@@ -75,39 +75,6 @@ hexpr <- function(expr, trim = TRUE, collapse = "; ", maxHead = 6L, maxTail = 3L
 } # hexpr()
 
 
-now <- function(x = Sys.time(), format = "[%H:%M:%OS3] ") {
-  ## format(x, format = format) ## slower
-  format(as.POSIXlt(x, tz = ""), format = format)
-}
-
-mdebug <- function(..., debug = getOption("parallelly.debug", FALSE)) {
-  if (!debug) return(invisible(FALSE))
-  message(now(), ...)
-  invisible(TRUE)
-}
-
-mdebugf <- function(..., appendLF = TRUE,
-                    debug = getOption("parallelly.debug", FALSE)) {
-  if (!debug) return(invisible(FALSE))
-  message(now(), sprintf(...), appendLF = appendLF)
-  invisible(TRUE)
-}
-
-#' @importFrom utils capture.output
-mprint <- function(..., appendLF = TRUE, debug = getOption("parallelly.debug", FALSE)) {
-  if (!debug) return(invisible(FALSE))
-  message(paste(now(), capture.output(print(...)), sep = "", collapse = "\n"), appendLF = appendLF)
-  invisible(TRUE)
-}
-
-#' @importFrom utils capture.output str
-mstr <- function(..., appendLF = TRUE, debug = getOption("parallelly.debug", FALSE)) {
-  if (!debug) return(invisible(FALSE))
-  message(paste(now(), capture.output(str(...)), sep = "", collapse = "\n"), appendLF = appendLF)
-  invisible(TRUE)
-}
-
-
 ## From R.utils 2.7.0 (2018-08-26)
 queryRCmdCheck <- function(...) {
   evidences <- list()

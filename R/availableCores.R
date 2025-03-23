@@ -362,7 +362,6 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
   if (length(ncoresT) > 0) {
     msg <- sprintf("Detected invalid (zero or less) core settings: %s",
          paste(paste0(sQuote(names(ncoresT)), " = ", ncoresT), collapse = ", "))
-    mdebug(msg)
     stop(msg)
   }
 

@@ -17,7 +17,7 @@ makeClusterPSOCK(
   tries = getOption2("parallelly.makeNodePSOCK.tries", 3L),
   delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15),
   validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE),
-  verbose = getOption2("parallelly.debug", FALSE)
+  verbose = isTRUE(getOption("parallelly.debug"))
 )
 
 makeNodePSOCK(

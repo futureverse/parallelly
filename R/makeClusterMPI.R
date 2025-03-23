@@ -50,7 +50,7 @@
 #' @aliases RMPI
 #' @importFrom parallel makeCluster
 #' @export
-makeClusterMPI <- function(workers, ..., autoStop = FALSE, verbose = getOption2("parallelly.debug", FALSE)) {
+makeClusterMPI <- function(workers, ..., autoStop = FALSE, verbose = isTRUE(getOption("parallelly.debug"))) {
   if (is.numeric(workers)) {
     if (length(workers) != 1L) {
       stopf("When numeric, argument 'workers' must be a single value: %s", length(workers))

@@ -34,10 +34,10 @@ autoStopCluster <- function(cl, debug = FALSE) {
 
   if (debug) {
     reg.finalizer(env, function(e) {
-      message("Finalizing cluster ...")
-      message(capture.output(print(e$cluster)))
+      mdebug_push("Finalizing cluster ...")
+      on.exit(mdebug_pop("Finalizing cluster ... done"))
+      mprint(e$cluster)
       try(stopCluster(e$cluster), silent = FALSE)
-      message("Finalizing cluster ... done")
     })
   } else {
     reg.finalizer(env, function(e) {
