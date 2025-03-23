@@ -51,6 +51,11 @@
 #' @importFrom parallel makeCluster
 #' @export
 makeClusterMPI <- function(workers, ..., autoStop = FALSE, verbose = isTRUE(getOption("parallelly.debug"))) {
+  if (verbose) {
+    mdebug_push("smakeClusterMPI() ...")
+    on.exit(mdebug_pop("makeClusterMPI() ... done"))
+  }
+
   if (is.numeric(workers)) {
     if (length(workers) != 1L) {
       stopf("When numeric, argument 'workers' must be a single value: %s", length(workers))
@@ -62,24 +67,22 @@ makeClusterMPI <- function(workers, ..., autoStop = FALSE, verbose = isTRUE(getO
   } else {
     stopf("Argument 'workers' must be an integer: %s", mode(workers))
   }
-  if (verbose) {
-    message(sprintf("Number of workers: %d", workers))
-  }
+  if (verbose) mdebugf("Number of workers: %d", workers)
 
   ## FIXME: Re-implement locally using below for loop
   cl <- makeCluster(workers, type = "MPI", ...)
 
   n <- length(cl)
   for (ii in seq_along(cl)) {
-    if (verbose) message(sprintf("Updating node %d of %d ...", ii, n))
+    if (verbose) mdebugf_push("Updating node %d of %d ...", ii, n)
 
     ## Attaching session information for each worker.  This is done to assert
     ## that we have a working cluster already here.  It will also collect
     ## useful information otherwise not available, e.g. the PID.
-    if (verbose) message("- collecting session information")
+    if (verbose) mdebug("collecting session information")
     cl[ii] <- add_cluster_session_info(cl[ii])
     
-    if (verbose) message(sprintf("Updating node %d of %d ... DONE", ii, n))
+    if (verbose) mdebugf_pop("Updating node %d of %d ... done", ii, n)
   }
 
   ## AD HOC/WORKAROUND:

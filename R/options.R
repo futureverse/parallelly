@@ -214,16 +214,21 @@ get_package_option <- function(name, default = NULL, package = .packageName) {
 
 # Set an R option from an environment variable
 update_package_option <- function(name, mode = "character", default = NULL, package = .packageName, split = NULL, trim = TRUE, disallow = c("NA"), force = FALSE, debug = FALSE) {
+  if (debug) {
+    mdebugf_push("update_package_option('%s', ...) ...", name)
+    on.exit(mdebugf_pop("update_package_option('%s', ...) ... done", name))
+  }
+  
   if (!is.null(package)) {
     name <- paste(package, name, sep = ".")
   }
   
-  mdebugf("Set package option %s", sQuote(name))
+  if (debug) mdebugf("Set package option %s", sQuote(name))
 
   ## Already set? Nothing to do?
   value <- getOption2(name, NULL)
   if (!force && !is.null(value)) {
-    mdebugf("Already set: %s", sQuote(value))
+    if (debug) mdebugf("Already set: %s", sQuote(value))
     return(value)
   }
 
@@ -302,6 +307,11 @@ update_package_option <- function(name, mode = "character", default = NULL, pack
 
 ## Set package options based on environment variables
 update_package_options <- function(debug = FALSE) {
+  if (debug) {
+    mdebug_push("update_package_options() ...")
+    on.exit(mdebug_pop("update_package_options() ... done"))
+  }
+
   update_package_option("availableCores.methods", mode = "character", split = ",", debug = debug)
   update_package_option("availableCores.fallback", mode = "integer", disallow = NULL, debug = debug)
   update_package_option("availableCores.min", mode = "integer", disallow = "NA", debug = debug)
