@@ -29,7 +29,7 @@ only be used if parallel::makeCluster(..., type = "MPI") fails.'><meta property=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">parallelly</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.42.0-9006</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.42.0-9010</span>
       </span>
     </div>
 
@@ -178,7 +178,7 @@ only be used if <code>parallel::makeCluster(..., type = "MPI")</code> fails.</em
 <span>  <span class="va">workers</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  autoStop <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="fu">getOption2</span><span class="op">(</span><span class="st">"parallelly.debug"</span>, <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"parallelly.debug"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
