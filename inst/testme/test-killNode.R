@@ -1,3 +1,5 @@
+#' @tags detrius-files
+
 library(parallelly)
 
 if (on_windows) {
@@ -68,7 +70,7 @@ if (getRversion() >= "3.5.0") {
 message("- Waiting for cluster nodes to terminate")
 ## It might take a moment before the background
 ## workers are shutdown after having been signaled
-timeout <- Sys.time() + 5.0
+timeout <- Sys.time() + 30.0
 repeat {
   alive <- isNodeAlive(cl)
   print(alive)
@@ -78,8 +80,9 @@ repeat {
   )
   if (!any(alive, na.rm = TRUE)) break
   if (Sys.time() > timeout) {
-    stop("One or more cluster nodes are still running after 5 seconds")
+    stop("One or more cluster nodes are still running after 30 seconds")
   }
+  Sys.sleep(0.5)
 }
 
 ## Remove any stray Rscript<hexcode> files
