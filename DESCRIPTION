@@ -1,5 +1,5 @@
 Package: parallelly
-Version: 1.42.0-9012
+Version: 1.43.0
 Title: Enhancing the 'parallel' Package
 Imports:
     parallel,
