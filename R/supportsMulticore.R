@@ -14,7 +14,7 @@
 #' This function checks whether or not forked (aka "multicore") processing
 #' is supported in the current \R session.
 #'
-#' @param \dots Internal usage only.
+#' @param \ldots Internal usage only.
 #'
 #' @return TRUE if forked processing is supported and not disabled,
 #'         otherwise FALSE.

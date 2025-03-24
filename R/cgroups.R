@@ -250,6 +250,20 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    uid <- as.integer(uid)
    message(sprintf(" - UID: %d", uid))
 
+   ## Clear all memoization caches
+   fcns <- list(
+     getCGroupsMounts, getCGroups, getCGroupsVersion,
+     getCGroups1CpuSet, getCGroups1CpuPeriodMicroseconds, getCGroups1CpuQuota,
+     getCGroups2CpuMax
+   )
+   for (fcn in fcns) {
+     environment(fcn)$.cache <- NULL
+   }
+   fcns <- list(getCGroupsRoot, getCGroupsPath, getCGroupsValue)
+   for (fcn in fcns) {
+     environment(fcn)$.cache <- list()
+   }
+
    ## Adjust /proc accordingly
    old_procPath <- procPath(file.path(tmpdir, "proc"))
    on.exit(procPath(old_procPath), add = TRUE)
@@ -417,10 +431,10 @@ getCGroupsMounts <- local({
 # 
 #' @importFrom utils file_test
 getCGroups <- local({
-  .data <- NULL
+  .cache <- NULL
   
   function() {
-    data <- .data
+    data <- .cache
     if (!is.null(data)) return(data)
 
     ## Get cgroups
@@ -429,7 +443,7 @@ getCGroups <- local({
     ## cgroups is not set?
     if (!file_test("-f", file)) {
       data <- data.frame(hierarchy_id = integer(0L), controller = character(0L), path = character(0L), stringsAsFactors = FALSE)
-      .data <<- data
+      .cache <<- data
       return(data)
     }
 
@@ -461,7 +475,7 @@ getCGroups <- local({
     
     ## Order by hierarchy ID
     data <- data[order(data$hierarchy_id), ]
-    .data <<- data
+    .cache <<- data
     
     data
   }
@@ -476,39 +490,53 @@ getCGroups <- local({
 #  If no folder could be found, `NA_character_` is returned.
 # 
 #' @importFrom utils file_test
-getCGroupsPath <- function(controller) {
-  root <- getCGroupsRoot(controller = controller)
-  if (is.na(root)) return(NA_character_)
-
-  data <- getCGroups()
-
-  set <- data[data$controller == controller, ]
-  if (nrow(set) == 0L) {
-    return(NA_character_)
-  }
-
-  set <- set$path
-  path <- file.path(root, set)
-  while (set != "/") {
-    if (file_test("-d", path)) {
-      break
+getCGroupsPath <- local({
+  .cache <- list()
+  
+  function(controller) {
+    res <- .cache[[controller]]
+    if (!is.null(res)) return(res)
+    
+    root <- getCGroupsRoot(controller = controller)
+    if (is.na(root)) {
+      res <- NA_character_
+      .cache[[controller]] <<- res
+      return(res)
     }
-    ## Should this ever happen?
-    set_prev <- set
-    set <- dirname(set)
-    if (set == set_prev) break
+  
+    data <- getCGroups()
+  
+    set <- data[data$controller == controller, ]
+    if (nrow(set) == 0L) {
+      res <- NA_character_
+      .cache[[controller]] <<- res
+      return(res)
+    }
+  
+    set <- set$path
     path <- file.path(root, set)
-  }
-
-  ## Should the following ever happen?
-  if (!file_test("-d", path)) {
-    return(NA_character_)
-  }
+    while (set != "/") {
+      if (file_test("-d", path)) {
+        break
+      }
+      ## Should this ever happen?
+      set_prev <- set
+      set <- dirname(set)
+      if (set == set_prev) break
+      path <- file.path(root, set)
+    }
   
-  path <- normalizePath(path, mustWork = FALSE)
-  
-  path
-}
+    ## Should the following ever happen?
+    if (!file_test("-d", path)) {
+      res <- NA_character_
+      .cache[[controller]] <<- res
+    }
+    
+    res <- normalizePath(path, mustWork = FALSE)
+    .cache[[controller]] <<- res
+    res
+  }
+})
 
 
 #  Get the value of specific cgroups controller and field
@@ -522,25 +550,49 @@ getCGroupsPath <- function(controller) {
 #  NA_character_ is returned.
 #
 #' @importFrom utils file_test
-getCGroupsValue <- function(controller, field) {
-  path <- getCGroupsPath(controller = controller)
-  if (is.na(path)) return(NA_character_)
-
-  path_prev <- ""
-  while (path != path_prev) {
-    file <- file.path(path, field)
-    if (file_test("-f", file)) {
-      value <- readLines(file, warn = FALSE)
-      if (length(value) == 0L) value <- NA_character_
-      attr(value, "path") <- path
-      return(value)
-    }
-    path_prev <- path
-    path <- dirname(path)
-  }
+getCGroupsValue <- local({
+  .cache <- list()
   
-  NA_character_
-}
+  function(controller, field) {
+    cache_controller <- .cache[[controller]]
+    if (!is.null(cache_controller)) {
+      res <- cache_controller[[field]]
+      if (!is.null(res)) return(res)
+    }
+
+    if (is.null(cache_controller)) {
+      cache_controller <- list()
+    }
+
+    path <- getCGroupsPath(controller = controller)
+    if (is.na(path)) {
+      res <- NA_character_
+      cache_controller[[field]] <- res
+      .cache[[controller]] <<- cache_controller
+      return(res)
+    }
+  
+    path_prev <- ""
+    while (path != path_prev) {
+      file <- file.path(path, field)
+      if (file_test("-f", file)) {
+        value <- readLines(file, warn = FALSE)
+        if (length(value) == 0L) value <- NA_character_
+        attr(value, "path") <- path
+        cache_controller[[field]] <- value
+        .cache[[controller]] <<- cache_controller
+        return(value)
+      }
+      path_prev <- path
+      path <- dirname(path)
+    }
+
+    res <- NA_character_
+    cache_controller[[field]] <- res
+    .cache[[controller]] <<- cache_controller
+    res
+  }
+})
 
 
 #  Get the value of specific cgroups v1 field
@@ -575,12 +627,28 @@ getCGroups2Value <- function(field) {
 #  If it is under cgroups v2, then `2L` is returned.
 #  If not under cgroups control, then `-1L` is returned.
 #
-getCGroupsVersion <- function() {
-  cgroups <- getCGroups()
-  if (nrow(cgroups) == 0) return(-1L)
-  if (nrow(cgroups) == 1 && cgroups$controller == "") return(2L)
-  1L
-}
+getCGroupsVersion <- local({
+  .cache <- NULL
+  
+  function() {
+    res <- .cache
+    
+    if (!is.null(res)) return(res)
+    
+    cgroups <- getCGroups()
+    if (nrow(cgroups) == 0) {
+      res <- -1L
+    } else if (nrow(cgroups) == 1 && cgroups$controller == "") {
+      res <- 2L
+    } else {
+      res <- 1L
+    }
+
+    .cache <<- res
+    
+    res
+  }
+})
 
 
 
@@ -598,55 +666,65 @@ getCGroupsVersion <- function() {
 #
 #  [1] https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
 #
-getCGroups1CpuSet <- function() {
-  ## TEMPORARY: In case the cgroups options causes problems, make
-  ## it possible to override their values via hidden options
-  cpuset <- get_package_option("cgroups.cpuset", NULL)
-
-  if (!is.null(cpuset)) return(cpuset)
-
-  ## e.g. /sys/fs/cgroup/cpuset/cpuset.cpus
-  value0 <- getCGroups1Value("cpuset", "cpuset.cpus")
-  if (is.na(value0)) {
-    return(integer(0L))
-  }
+getCGroups1CpuSet <- local({
+  .cache <- NULL
   
-  ## Parse 0-63; 0-7,9; 0-7,10-12; etc.
-  code <- gsub("-", ":", value0, fixed = TRUE)
-  code <- sprintf("c(%s)", code)
-  expr <- tryCatch({
-    parse(text = code)
-  }, error = function(ex) {
-    warning(sprintf("Syntax error parsing %s: %s", sQuote(file), sQuote(value0)))
-    integer(0L)
-  })
-
-  value <- tryCatch({
-    suppressWarnings(as.integer(eval(expr)))
-  }, error = function(ex) {
-    warning(sprintf("Failed to parse %s: %s", sQuote(file), sQuote(value0)))
-    integer(0L)
-  })
-
-  ## Sanity checks
-  max_cores <- maxCores()
-  if (any(value < 0L | value >= max_cores)) {
-    warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU set, because it contains one or more CPU indices that is out of range [0,%d]: %s", max_cores - 1L, value0))
-    value <- integer(0L)
-  }
-
-  if (any(duplicated(value))) {
-    warning(sprintf("[INTERNAL]: Detected and dropped duplicated CPU indices in the cgroups CPU set: %s", value0))
-    value <- unique(value)
-  }
-
-  cpuset <- value
+  function() {
+    res <- .cache
+    if (!is.null(res)) return(res)
+    
+    ## TEMPORARY: In case the cgroups options causes problems, make
+    ## it possible to override their values via hidden options
+    cpuset <- get_package_option("cgroups.cpuset", NULL)
+    if (!is.null(cpuset)) return(cpuset)
   
-  ## Should never happen, but just in case
-  stop_if_not(length(cpuset) <= max_cores)
+    ## e.g. /sys/fs/cgroup/cpuset/cpuset.cpus
+    value0 <- getCGroups1Value("cpuset", "cpuset.cpus")
+    if (is.na(value0)) {
+      res <- integer(0L)
+      .cache <<- res
+      return(res)
+    }
+    
+    ## Parse 0-63; 0-7,9; 0-7,10-12; etc.
+    code <- gsub("-", ":", value0, fixed = TRUE)
+    code <- sprintf("c(%s)", code)
+    expr <- tryCatch({
+      parse(text = code)
+    }, error = function(ex) {
+      warning(sprintf("Syntax error parsing %s: %s", sQuote(file), sQuote(value0)))
+      integer(0L)
+    })
+  
+    value <- tryCatch({
+      suppressWarnings(as.integer(eval(expr)))
+    }, error = function(ex) {
+      warning(sprintf("Failed to parse %s: %s", sQuote(file), sQuote(value0)))
+      integer(0L)
+    })
+  
+    ## Sanity checks
+    max_cores <- maxCores()
+    if (any(value < 0L | value >= max_cores)) {
+      warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU set, because it contains one or more CPU indices that is out of range [0,%d]: %s", max_cores - 1L, value0))
+      value <- integer(0L)
+    }
+  
+    if (any(duplicated(value))) {
+      warning(sprintf("[INTERNAL]: Detected and dropped duplicated CPU indices in the cgroups CPU set: %s", value0))
+      value <- unique(value)
+    }
+  
+    cpuset <- value
+    
+    ## Should never happen, but just in case
+    stop_if_not(length(cpuset) <= max_cores)
 
-  cpuset
-}
+    .cache <<- cpuset
+
+    cpuset
+  }
+})
 
 
 #
@@ -681,46 +759,60 @@ getCGroups1CpuQuotaMicroseconds <- function() {
 }
 
 
-getCGroups1CpuPeriodMicroseconds <- function() {
-  value <- suppressWarnings({
-    ## e.g. /sys/fs/cgroup/cpu/cpu.cfs_period_us
-    as.integer(getCGroups1Value("cpu", "cpu.cfs_period_us"))
-  })
+getCGroups1CpuPeriodMicroseconds <- local({
+  .cache <- NULL
+  
+  function() {
+    res <- .cache
+    if (!is.null(res)) return(res)
 
-  value
-}
+    value <- suppressWarnings({
+      ## e.g. /sys/fs/cgroup/cpu/cpu.cfs_period_us
+      as.integer(getCGroups1Value("cpu", "cpu.cfs_period_us"))
+    })
+
+    .cache <<- value
+    value
+  }
+})
 
 
 #  @return A non-negative numeric.
 #  If cgroups is not in use, or could not be queried, NA_real_ is returned.
 #
-getCGroups1CpuQuota <- function() {
-  ## TEMPORARY: In case the cgroups options causes problems, make
-  ## it possible to override their values via hidden options
-  quota <- get_package_option("cgroups.cpuquota", NULL)
+getCGroups1CpuQuota <- local({
+  .cache <- NULL
   
-  if (!is.null(quota)) return(quota)
+  function() {
+    res <- .cache
+    if (!is.null(res)) return(res)
+    
+    ## TEMPORARY: In case the cgroups options causes problems, make
+    ## it possible to override their values via hidden options
+    quota <- get_package_option("cgroups.cpuquota", NULL)
+    if (!is.null(quota)) return(quota)
 
-  ms <- getCGroups1CpuQuotaMicroseconds()
-  if (!is.na(ms) && ms < 0) ms <- NA_integer_
+    ms <- getCGroups1CpuQuotaMicroseconds()
+    if (!is.na(ms) && ms < 0) ms <- NA_integer_
+    
+    total <- getCGroups1CpuPeriodMicroseconds()
+    if (!is.na(total) && total < 0) total <- NA_integer_
+    
+    value <- ms / total
   
-  total <- getCGroups1CpuPeriodMicroseconds()
-  if (!is.na(total) && total < 0) total <- NA_integer_
-  
-  value <- ms / total
-
-  if (!is.na(value)) {
-    max_cores <- maxCores()
-    if (!is.finite(value) || value <= 0.0 || value > max_cores) {
-      warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
-      value <- NA_real_
+    if (!is.na(value)) {
+      max_cores <- maxCores()
+      if (!is.finite(value) || value <= 0.0 || value > max_cores) {
+        warning(sprintf("[INTERNAL]: Will ignore the cgroups CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
+        value <- NA_real_
+      }
     }
-  }
-
-  quota <- value
   
-  quota
-}
+    .cache <<- value
+    
+    value
+  }
+})
 
 
 # --------------------------------------------------------------------------
@@ -745,48 +837,58 @@ getCGroups1CpuQuota <- function() {
 #
 #  [1] https://docs.kernel.org/admin-guide/cgroup-v2.html
 #
-getCGroups2CpuMax <- function() {
-  ## TEMPORARY: In case the cgroups options causes problems, make
-  ## it possible to override their values via hidden options
-  quota <- get_package_option("cgroups2.cpu.max", NULL)
+getCGroups2CpuMax <- local({
+  .cache <- NULL
   
-  if (!is.null(quota)) return(quota)
-
-  raw <- suppressWarnings({
-    ## e.g. /sys/fs/cgroup/cpu.max
-    getCGroups2Value("cpu.max")
-  })
-
-  if (is.na(raw)) {
-    return(NA_real_)
-  }
+  function() {
+    res <- .cache
+    if (!is.null(res)) return(res)
+    
+    ## TEMPORARY: In case the cgroups options causes problems, make
+    ## it possible to override their values via hidden options
+    quota <- get_package_option("cgroups2.cpu.max", NULL)
+    if (!is.null(quota)) return(quota)
   
-  values <- strsplit(raw, split = "[[:space:]]+")[[1]]
-  if (length(values) != 2L) {
-    return(NA_real_)
-  }
-
-  period <- as.integer(values[2])
-  if (is.na(period) && period <= 0L) {
-    return(NA_real_)
-  }
+    raw <- suppressWarnings({
+      ## e.g. /sys/fs/cgroup/cpu.max
+      getCGroups2Value("cpu.max")
+    })
   
-  max <- values[1]
-  if (max == "max") {
-    return(NA_real_)
-  }
-  
-  max <- as.integer(max)
-  value <- max / period
-  if (!is.na(value)) {
-    max_cores <- maxCores()
-    if (!is.finite(value) || value <= 0.0 || value > max_cores) {
-      warning(sprintf("[INTERNAL]: Will ignore the cgroups v2 CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
-      value <- NA_real_
+    if (is.na(raw)) {
+      .cache <<- NA_real_
+      return(.cache)
     }
-  }
-
-  quota <- value
+    
+    values <- strsplit(raw, split = "[[:space:]]+")[[1]]
+    if (length(values) != 2L) {
+      .cache <<- NA_real_
+      return(.cache)
+    }
   
-  quota
-}
+    period <- as.integer(values[2])
+    if (is.na(period) && period <= 0L) {
+      .cache <<- NA_real_
+      return(.cache)
+    }
+    
+    max <- values[1]
+    if (max == "max") {
+      .cache <<- NA_real_
+      return(.cache)
+    }
+    
+    max <- as.integer(max)
+    value <- max / period
+    if (!is.na(value)) {
+      max_cores <- maxCores()
+      if (!is.finite(value) || value <= 0.0 || value > max_cores) {
+        warning(sprintf("[INTERNAL]: Will ignore the cgroups v2 CPU quota, because it is out of range [1,%d]: %s", max_cores, value))
+        value <- NA_real_
+      }
+    }
+  
+    .cache <<- value
+    
+    value
+  }
+})

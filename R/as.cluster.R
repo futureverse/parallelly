@@ -2,7 +2,7 @@
 #'
 #' @param x An object to be coerced.
 #'
-#' @param \dots Additional arguments passed to the underlying coercion method.
+#' @param \ldots Additional arguments passed to the underlying coercion method.
 #'            For `c(...)`, the clusters and cluster nodes to be combined.
 #'
 #' @return An object of class `cluster`.

@@ -442,7 +442,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
   is_auto <- (rscript_sh == "auto")
   if (any(is_auto)) {
     if (localMachine) {
-      rscript_sh[is_auto] <- if (.Platform$OS.type == "windows") "cmd" else "sh"
+      rscript_sh[is_auto] <- if (.Platform[["OS.type"]] == "windows") "cmd" else "sh"
     } else {
       ## Assume remote machine uses as POSIX shell
      rscript_sh[is_auto] <- "sh"
@@ -764,7 +764,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
   }
 
   if (length(socketOptions) == 1L) {
-    code <- sprintf("options(socketOptions = \"%s\")", socketOptions)
+    code <- sprintf("options(socketOptions=\"%s\")", socketOptions)
     rscript_expr <- c("-e", shQuote(code, type = rscript_sh[1]))
     rscript_args_internal <- c(rscript_args_internal, rscript_expr)
   }
@@ -830,7 +830,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
       tryCatch({
         parse(text = code)
       }, error = function(ex) {
-        stopf("Argument 'rscript_envs' appears to contain invalid values: %s", paste(sprintf("%s=%s", sQuote(names), sQuote(rscript_envs)), collapse = ", "))
+        stopf("Argument 'rscript_envs' appears to contain invalid values: %s", paste(sprintf("%s=%s", sQuote(names), sQuote(rscript_envs)), collapse = ","))
       })
       rscript_args_internal <- c(rscript_args_internal, "-e", shQuote(code, type = rscript_sh[1]))
     }
@@ -854,7 +854,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
   ## .{slave,work}RSOCK() command already specified?
   if (!any(grepl("parallel:::[.](slave|work)RSOCK[(][)]", rscript_args))) {
     ## In R (>= 4.1.0), parallel:::.slaveRSOCK() was renamed to .workRSOCK()
-    cmd <- "workRSOCK <- tryCatch(parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK); workRSOCK()"
+    cmd <- "workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"
     rscript_args_internal <- c(rscript_args_internal, "-e", shQuote(cmd, type = rscript_sh[1]))
   }
 
@@ -912,7 +912,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
       ## to use "127.0.0.1" instead, or force IPv4 by using ssh option '-4'.
       ## For more details, see 
       ## https://github.com/PowerShell/Win32-OpenSSH/issues/1265#issuecomment-855234326 for 
-      if (is_localhost(master) && .Platform$OS.type == "windows" && (
+      if (is_localhost(master) && .Platform[["OS.type"]] == "windows" && (
            isTRUE(attr(rshcmd, "OpenSSH_for_Windows")) ||
            basename(rshcmd[1]) == "ssh"
          )) {

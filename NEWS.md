@@ -1,3 +1,45 @@
+# Version 1.43.0 [2025-03-24]
+
+## Significant Changes
+
+ * Now `availableCores()` memoizes the values of all its components.
+   This means that as soon as it has been called, environment variables 
+   such as `NSLOTS` will no longer be queried.
+
+ * Starting with R 4.5.0, one can use `parallel::makeCluster(n, type =
+   parallelly::RPSOCK)` as an alternative to
+   `parallelly::makeClusterPSOCK(n)`.  Similarly, `type =
+   parallelly::RMPI` creates a cluster using
+   `parallelly::makeClusterMPI()`, and `type = parallelly::SEQ`
+   creates a cluster using `parallelly::makeClusterSequential()`.
+   This was first introduced in **parallelly** 1.38.0, but here we
+   rename `PSOCK` to `RPSOCK` and `MPI` to `RMPI` to minimize the risk
+   for mistaking them from the built-in types in the **parallel**
+   package. The `R` stands for "Rich".
+
+## Documentation
+
+ * Add more help on the R option `parallelly.maxWorkers.localhost`
+   limits. Improved the warning and error messages that are produced
+   when these settings are exceeded.
+
+## Miscellaneous
+
+ * R option `future.debug` is no longer used as a fallback for option
+   `parallelly.debug`.
+
+## Bug Fixes
+
+ * `isNodeAlive()` could produce warnings on `doTryCatch(return(expr),
+   name, parentenv, handler) : NAs introduced by coercion` on MS
+   Windows. Improved the internal `tasklist` parses used to test
+   whether a process is alive.
+ 
+ * `availableCores()` could produce `Error: Error in
+   cache_controller[[field]] : subscript out of bounds` in
+   `... getCGroups1CpuQuota -> getCGroups1CpuPeriodMicroseconds`.
+
+
 # Version 1.42.0 [2025-01-30]
 
 ## New Features

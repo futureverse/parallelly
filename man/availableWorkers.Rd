@@ -53,7 +53,8 @@ current machine that \code{\link[=availableCores]{availableCores()}} allows for 
 In addition, the following settings ("methods") are also acknowledged:
 \itemize{
 \item \code{"LSF"} -
-Query LSF/OpenLava environment variable \env{LSB_HOSTS}.
+Query Platform Load Sharing Facility (LSF)/OpenLava environment variable
+\env{LSB_HOSTS}.
 
 \item \code{"PJM"} -
 Query Fujitsu Technical Computing Suite (that we choose to shorten
@@ -77,12 +78,15 @@ An example of a job submission that results in this is
 with two cores.
 
 \item \code{"SGE"} -
-Query Sun Grid Engine/Oracle Grid Engine/Son of Grid Engine (SGE)
-and Univa Grid Engine (UGE)/Altair Grid Engine (AGE) environment
-variable \env{PE_HOSTFILE}.
+Query the "Grid Engine" scheduler environment variable \env{PE_HOSTFILE}.
 An example of a job submission that results in this is
 \verb{qsub -pe mpi 8} (or \verb{qsub -pe ompi 8}), which
 requests eight cores on a any number of machines.
+Known Grid Engine schedulers are
+Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
+Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
+Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 
 \item \code{"Slurm"} -
 Query Slurm environment variable \env{SLURM_JOB_NODELIST} (fallback

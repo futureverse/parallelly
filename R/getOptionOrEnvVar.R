@@ -3,16 +3,16 @@ getOption2 <- local({
   prefixes <- paste(c(.packageName, "future"), ".", sep = "")
   
   function(name, default = NULL) {
-    value <- getOption(name, NULL)
+    value <- getOption(name)
     if (!is.null(value)) return(value)
-    
+
     ## Backward compatibility with the 'future' package
     basename <- sub(re, "", name)
     names <- unique(c(name, paste(prefixes, basename, sep="")))
   
     ## Is there an R option set?
     for (name in names) {
-      value <- getOption(name, NULL)
+      value <- getOption(name)
       if (!is.null(value)) return(value)
     }
   

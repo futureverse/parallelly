@@ -55,7 +55,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
     if (verbose) {
       mdebugf("%sStarting worker #%s on %s: %s", verbose_prefix, rank, sQuote(worker), local_cmd)
     }
-    input <- if (.Platform$OS.type == "windows") "" else NULL
+    input <- if (.Platform[["OS.type"]] == "windows") "" else NULL
 
     assert_system_is_supported()
     res <- system(local_cmd, wait = FALSE, input = input)
@@ -70,7 +70,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
   if (verbose) {
     mdebugf("%sWaiting for worker #%s on %s to connect back", verbose_prefix, rank, sQuote(worker))
     if (is_worker_output_visible) {
-      if (.Platform$OS.type == "windows") {
+      if (.Platform[["OS.type"]] == "windows") {
         mdebugf("%s- Detected 'outfile=NULL' on Windows: this will make the output from the background worker visible when running R from a terminal, but it will most likely not be visible when using a GUI.", verbose_prefix)
       } else {
         mdebugf("%s- Detected 'outfile=NULL': this will make the output from the background worker visible", verbose_prefix)
@@ -161,7 +161,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
        }
 
        ## outfile=NULL?
-       if (.Platform$OS.type == "windows") {
+       if (.Platform[["OS.type"]] == "windows") {
          if (is_worker_output_visible) {
            suggestions <- c(suggestions, "On Windows, to see output from worker, set 'outfile=NULL' and run R from a terminal (not a GUI).")
          } else {

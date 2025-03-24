@@ -18,9 +18,9 @@ jobs:
         config:
           - {os: windows-latest, r: 'devel'    }
           - {os: windows-latest, r: 'release'  }
-#          - {os: macOS-latest,   r: 'devel'    }
-#          - {os: macOS-latest,   r: 'release'  }
-#          - {os: macOS-latest,   r: 'oldrel'   }
+          - {os: macOS-latest,   r: 'devel'    }
+          - {os: macOS-latest,   r: 'release'  }
+          - {os: macOS-latest,   r: 'oldrel'   }
           - {os: ubuntu-latest,  r: 'devel'    }
           - {os: ubuntu-latest,  r: 'release'  }
           - {os: ubuntu-latest,  r: 'oldrel'   }
@@ -87,7 +87,7 @@ jobs:
       - name: Check
         run: |
           rcmdcheck::rcmdcheck(
-            args = c("--as-cran", if (.Platform$OS.type == "windows") "--no-manual"),
+            args = c("--as-cran", if (.Platform[["OS.type"]] == "windows" || grepl("darwin", R.version[["os"]], ignore.case = TRUE)) "--no-manual"),
             error_on = "note",
             check_dir = "check"
           )

@@ -122,7 +122,7 @@ used by the Bioconductor (>= 3.16) build and check system. If set to
 true, then a maximum of 4 cores is considered.
 
 \item \code{"LSF"} -
-Query Platform Load Sharing Facility (LSF) environment variable
+Query Platform Load Sharing Facility (LSF)/OpenLava environment variable
 \env{LSB_DJOB_NUMPROC}.
 Jobs with multiple (CPU) slots can be submitted on LSF using
 \verb{bsub -n 2 -R "span[hosts=1]" < hello.sh}.
@@ -141,12 +141,15 @@ An example of a job submission that results in this is
 \verb{qsub -l nodes=1:ppn=2}, which requests one node with two cores.
 
 \item \code{"SGE"} -
-Query Sun Grid Engine/Oracle Grid Engine/Son of Grid Engine (SGE)
-and Univa Grid Engine (UGE)/Altair Grid Engine (AGE) environment
-variable \env{NSLOTS}.
+Query the "Grid Engine" scheduler environment variable \env{NSLOTS}.
 An example of a job submission that results in this is
 \verb{qsub -pe smp 2} (or \verb{qsub -pe by_node 2}), which
 requests two cores on a single machine.
+Known Grid Engine schedulers are
+Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
+Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
+Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 
 \item \code{"Slurm"} -
 Query Simple Linux Utility for Resource Management (Slurm)

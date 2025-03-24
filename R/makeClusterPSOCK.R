@@ -1,4 +1,4 @@
-#' Create a PSOCK Cluster of R Workers for Parallel Processing
+#' Create a Rich PSOCK Cluster of R Workers for Parallel Processing
 #' 
 #' The `makeClusterPSOCK()` function creates a cluster of \R workers
 #' for parallel processing.  These \R workers may be background \R sessions
@@ -36,7 +36,7 @@
 #' If `length(user) == length(workers)`, then each worker may have a unique
 #' user name.
 #'
-#' @param \dots Optional arguments passed to
+#' @param \ldots Optional arguments passed to
 #' `makeNode(workers[i], ..., rank = i)` where `i = seq_along(workers)`.
 #'
 #' @param autoStop If TRUE, the cluster will be automatically stopped
@@ -97,13 +97,14 @@
 #' cl <- parallelly::makeClusterPSOCK(12, dryrun = TRUE)
 #' Warning message:
 #' In checkNumberOfLocalWorkers(workers) :
-#'   Careful, you are setting up 12 localhost parallel workers with
-#' only 8 CPU cores available for this R process, which could result
-#' in a 150% load. The maximum is set to 100%. Overusing the CPUs has
-#' negative impact on the current R process, but also on all other
-#' processes of yours and others running on the same machine. See
-#' help("parallelly.options", package = "parallelly") for how to
-#' override this threshold
+#'   Careful, you are setting up 12 localhost parallel workers with only
+#' 8 CPU cores available for this R process (per 'system'), which could
+#' result in a 150% load. The soft limit is set to 100%. Overusing the
+#' CPUs has negative impact on the current R process, but also on all
+#' other processes of yours and others running on the same machine. See
+#' help("parallelly.maxWorkers.localhost", package = "parallelly") for
+#' further explanations and how to override the soft limit that triggered
+#" this warning
 #' ```
 #'
 #' Any attempts resulting in more than 300% overuse will be refused;
@@ -111,28 +112,34 @@
 #' ```r
 #' > cl <- parallelly::makeClusterPSOCK(25, dryrun = TRUE)
 #' Error in checkNumberOfLocalWorkers(workers) : 
-#'   Attempting to set up 25 localhost parallel workers with only
-#' 8 CPU cores available for this R process, which could result in
-#' a 312% load. The maximum is set to 300%. Overusing the CPUs has
+#'   Attempting to set up 25 localhost parallel workers with only 8 CPU
+#' cores available for this R process (per 'system'), which could result
+#' in a 312% load. The hard limit is set to 300%. Overusing the CPUs has
 #' negative impact on the current R process, but also on all other
 #' processes of yours and others running on the same machine. See
-#' help("parallelly.options", package = "parallelly") for how to
-#' override this threshold
+#' help("parallelly.maxWorkers.localhost", package = "parallelly") for
+#' further explanations and how to override the hard limit that triggered
+#' this error
 #' ```
 #'
 #' See [parallelly.options] for how to change the default thresholds.
+#' This built-in protection can be circumvented by specifying argument
+#' `workers` as an `AsIs` object, e.g. `workers = I(25)` (not recommended).
 #'
 #' @example incl/makeClusterPSOCK.R
 #'
-#' @aliases PSOCK
+#' @aliases RPSOCK
 #' @importFrom parallel stopCluster
 #' @export
-makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto", "random"), user = NULL, ..., autoStop = FALSE, tries = getOption2("parallelly.makeNodePSOCK.tries", 3L), delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15.0), validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE), verbose = getOption2("parallelly.debug", FALSE)) {
-  verbose_prefix <- "[local output] "
+makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto", "random"), user = NULL, ..., autoStop = FALSE, tries = getOption2("parallelly.makeNodePSOCK.tries", 3L), delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15.0), validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE), verbose = isTRUE(getOption("parallelly.debug"))) {
   if (verbose) {
+    verbose_prefix <- "[local output] "
     oopts <- options(parallelly.debug = verbose)
-    on.exit(options(oopts))
-    mdebugf("%smakeClusterPSOCK() ...", verbose_prefix)
+    mdebugf_push("%smakeClusterPSOCK() ...", verbose_prefix)
+    on.exit({
+      mdebugf_pop("%smakeClusterPSOCK() ... done", verbose_prefix)
+      options(oopts)
+    })
   }
   
   localhostHostname <- getOption2("parallelly.localhost.hostname", "localhost")
@@ -201,7 +208,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
   nodeOptions <- vector("list", length = n)
   if (verbose) mdebugf("%sGetting setup options for %d cluster nodes ...", verbose_prefix, n)
   for (ii in seq_len(n)) {
-    if (verbose) mdebugf("%s - Node #%d of %d ...", verbose_prefix, ii, n)
+    if (verbose) mdebugf("%sNode #%d of %d ...", verbose_prefix, ii, n)
     user_ii <- user[ii]
     if (!is.null(user_ii) && user_ii == "*") user_ii <- NULL
     options <- makeNode(workers[[ii]], port = port, user = user_ii, ..., rank = ii, action = "options", verbose = verbose)
@@ -221,16 +228,16 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
   is_parallel <- (setup_strategy == "parallel")
   force_sequential <- FALSE
   if (any(is_parallel)) {
-    if (verbose) mdebugf("%s - Parallel setup requested for some PSOCK nodes", verbose_prefix)
+    if (verbose) mdebugf("%sParallel setup requested for some PSOCK nodes", verbose_prefix)
 
     if (!all(is_parallel)) {
-      if (verbose) mdebugf("%s - Parallel setup requested only for some PSOCK nodes; will revert to a sequential setup for all", verbose_prefix)
+      if (verbose) mdebugf("%sParallel setup requested only for some PSOCK nodes; will revert to a sequential setup for all", verbose_prefix)
       force_sequential <- TRUE
     } else {
       ## Force setup_strategy = "sequential"?
       affected <- affected_by_bug18119()
       if (!is.na(affected) && affected) {
-        if (verbose) mdebugf("%s - Parallel setup requested but not supported on this version of R: %s", verbose_prefix, getRversion())
+        if (verbose) mdebugf("%sParallel setup requested but not supported on this version of R: %s", verbose_prefix, getRversion())
         force_sequential <- TRUE
       }
     }
@@ -241,7 +248,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     setup_strategy <- "sequential"
 
     for (ii in which(is_parallel)) {
-      if (verbose) mdebugf("%s - Node #%d of %d ...", verbose_prefix, ii, n)
+      if (verbose) mdebugf("%sNode #%d of %d ...", verbose_prefix, ii, n)
       user_ii <- user[ii]
       if (!is.null(user_ii) && user_ii == "*") user_ii <- NULL
       args <- list(workers[[ii]], port = port, user = user_ii, ..., rank = ii, action = "options", verbose = verbose)
@@ -316,7 +323,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
 
     assert_system_is_supported()
 
-    if (.Platform$OS.type == "windows") {
+    if (.Platform[["OS.type"]] == "windows") {
       for (ii in seq_along(cl)) {
         ## See parallel::newPSOCKnode() for the input = ""
         system(cmd, wait = FALSE, input = "")
@@ -345,11 +352,11 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
       cl <- NULL
     }, add = TRUE)
 
-    if (verbose) mdebugf("%sWaiting for workers to connect back", verbose_prefix)
+    if (verbose) mdebugf_push("%sWaiting for workers to connect back ...", verbose_prefix)
 
     t0 <- Sys.time()
     while (ready < length(cl)) {
-      if (verbose) mdebugf(" - %s%d workers out of %d ready", verbose_prefix, ready, length(cl))
+      if (verbose) mdebugf("%s%d workers out of %d ready", verbose_prefix, ready, length(cl))
 
       cons <- lapply(pending, FUN = function(x) x$con)
 
@@ -395,20 +402,23 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
       }
       if (length(canReceive) > 0L) pending <- pending[-canReceive]
     } ## while()
-    if (verbose) mdebugf(" - %s%d workers out of %d ready", verbose_prefix, ready, length(cl))
+    if (verbose) {
+      mdebugf("%s%d workers out of %d ready", verbose_prefix, ready, length(cl))
+      mdebugf_pop("%sWaiting for workers to connect back ... done", verbose_prefix)
+    }
   } else if (setup_strategy == "sequential") {
     retryPort <- getOption2("parallelly.makeNodePSOCK.tries.port", "same")
     for (ii in seq_along(cl)) {
       if (verbose) {
-        mdebugf("%sCreating node #%d of %d ...", verbose_prefix, ii, n)
-        mdebugf("%s- setting up node", verbose_prefix)
+        mdebugf_push("%sCreating node #%d of %d ...", verbose_prefix, ii, n)
+        mdebugf("%ssetting up node", verbose_prefix)
       }
 
       options <- nodeOptions[[ii]]
 
       for (kk in 1:tries) {
         if (verbose) {
-          mdebugf("%s- attempt #%d of %d", verbose_prefix, kk, tries)
+          mdebugf("%sattempt #%d of %d", verbose_prefix, kk, tries)
         }
         node <- tryCatch({
           makeNode(options, verbose = verbose)
@@ -418,14 +428,14 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
         
         if (kk < tries) {
           if (verbose) {
-            message(conditionMessage(node))
+            mdebug(conditionMessage(node))
             ## Retry with a new random port?
             if (retryPort == "next") {
               options$port <- max(options$port + 1L, 65535L)
             } else if (retryPort == "available") {
               options$port <- freePort()
             }
-            mdebugf("%s- waiting %g seconds before trying again",
+            mdebugf("%swaiting %g seconds before trying again",
                     verbose_prefix, delay)
           }
           Sys.sleep(delay)
@@ -435,7 +445,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
         ex <- node
         if (inherits(node, "PSOCKConnectionError")) {
           if (verbose) {
-            mdebugf("%s  Failed %d attempts with %g seconds delay",
+            mdebugf("%sFailed %d attempts with %g seconds delay",
                     verbose_prefix, tries, delay)
           }
           ex$message <- sprintf("%s\n * Number of attempts: %d (%gs delay)",
@@ -451,7 +461,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
       stopifnot(length(cl) == n)
   
       if (verbose) {
-        mdebugf("%sCreating node #%d of %d ... done", verbose_prefix, ii, n)
+        mdebugf_pop("%sCreating node #%d of %d ... done", verbose_prefix, ii, n)
       }
     }
   }
@@ -473,30 +483,33 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     ## that we have a working cluster already here.  It will also collect
     ## useful information otherwise not available, e.g. the PID.
     if (verbose) {
-      mdebugf("%sCollecting session information from %d workers", verbose_prefix, length(cl))
+      mdebugf_push("%sCollecting session information from %d workers", verbose_prefix, length(cl))
     }
     for (ii in seq_along(cl)) {
       cl[ii] <- add_cluster_session_info(cl[ii])
-      if (verbose) mdebugf("%s - Worker #%d of %d", verbose_prefix, ii, length(cl))
+      if (verbose) mdebugf("%sWorker #%d of %d", verbose_prefix, ii, length(cl))
     }
     stopifnot(length(cl) == n)
+    if (verbose) {
+      mdebugf_pop("%sCollecting session information from %d workers", verbose_prefix, length(cl))
+    }
   }
 
   if (autoStop) {
-    if (verbose) mdebugf("%sAdding automatic stop of cluster on garbage collection", verbose_prefix)
     cl <- autoStopCluster(cl)
     stopifnot(length(cl) == n)
-  }
-
-  if (verbose) {
-    options(oopts)
-    mdebugf("%smakeClusterPSOCK() ... done", verbose_prefix)
+    if (verbose) mdebugf("%sAdded automatic stop of cluster on garbage collection", verbose_prefix)
   }
 
   stopifnot(length(cl) == n)
 
   ## Success, remove automatic cleanup of nodes
   on.exit()
+
+  if (verbose) {
+    mdebugf_pop("%smakeClusterPSOCK() ... done", verbose_prefix)
+    options(oopts)
+  }
 
   cl
 } ## makeClusterPSOCK()

@@ -22,6 +22,29 @@ Run `revdepcheck::revdep_details(, "adea")` for more info
     manual.
     ```
 
+# apsimx
+
+<details>
+
+* Version: 2.8.235
+* GitHub: https://github.com/femiguez/apsimx
+* Source code: https://github.com/cran/apsimx
+* Date/Publication: 2025-03-10 05:40:02 UTC
+* Number of recursive dependencies: 185
+
+Run `revdepcheck::revdep_details(, "apsimx")` for more info
+
+</details>
+
+## In both
+
+*   checking installed package size ... NOTE
+    ```
+      installed size is  7.0Mb
+      sub-directories of 1Mb or more:
+        extdata   5.4Mb
+    ```
+
 # bootUR
 
 <details>
@@ -58,7 +81,7 @@ Run `revdepcheck::revdep_details(, "bootUR")` for more info
 * GitHub: https://github.com/dmenne/breathteststan
 * Source code: https://github.com/cran/breathteststan
 * Date/Publication: 2025-01-08 09:00:07 UTC
-* Number of recursive dependencies: 152
+* Number of recursive dependencies: 153
 
 Run `revdepcheck::revdep_details(, "breathteststan")` for more info
 
@@ -82,11 +105,11 @@ Run `revdepcheck::revdep_details(, "breathteststan")` for more info
 
 <details>
 
-* Version: 2.6.2
+* Version: 2.6.3
 * GitHub: https://github.com/seriph78/COTAN
 * Source code: https://github.com/cran/COTAN
-* Date/Publication: 2025-01-19
-* Number of recursive dependencies: 276
+* Date/Publication: 2025-02-27
+* Number of recursive dependencies: 271
 
 Run `revdepcheck::revdep_details(, "COTAN")` for more info
 
@@ -125,14 +148,14 @@ Run `revdepcheck::revdep_details(, "COTAN")` for more info
     ...
       ‘clusterData’
     Undefined global functions or variables:
-      . .x CellNumber Cluster Condition ExpGenes GCS GDI PC1 PC2 UDEPLot a
-      bGroupGenesPlot cl1 cl2 clName1 clName2 clusterData clusters coex
-      condName conditions expectedN expectedNN expectedNY expectedYN
-      expectedYY g2 group hk keys lambda means mit.percentage n nu nuPlot
-      obj objSeurat observedNN observedNY observedY observedYN observedYY
-      pcaCellsPlot permMap rankGenes rawNorm secondaryMarkers sum.raw.norm
-      type types useTorch usedMaxResolution values violinwidth width x xmax
-      xmaxv xminv y zoomedNuPlot
+      . .x CellNumber Cluster Condition ExpGenes GCS GDI PC PC1 PC2 UDEPLot
+      Variance a bGroupGenesPlot cl1 cl2 clName1 clName2 clusterData
+      clusters coex condName conditions expectedN expectedNN expectedNY
+      expectedYN expectedYY g2 group hk keys lambda means mit.percentage n
+      nu nuPlot obj objSeurat observedNN observedNY observedY observedYN
+      observedYY pcaCellsPlot permMap rankGenes rawNorm secondaryMarkers
+      sum.raw.norm type types useTorch usedMaxResolution values violinwidth
+      width x xmax xmaxv xminv y zoomedNuPlot
     ```
 
 # decoupleR
@@ -167,7 +190,7 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
     > ### ** Examples
     > 
     > collectri <- get_collectri(organism='human', split_complexes=FALSE)
-    [2025-01-29 07:41:10] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+    [2025-03-23 21:44:02] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
     Error in if (.keep) . else select(., -!!evs_col) : 
       argument is of length zero
     Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
@@ -203,16 +226,16 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
     ```
     Error(s) in re-building vignettes:
     --- re-building ‘decoupleR.Rmd’ using rmarkdown
-    [WARNING] Could not fetch resource https://github.com/saezlab/decoupleR/blob/master/inst/figures/net_plot.png?raw=1: HttpExceptionRequest Request {
-        host                 = "github.com"
-        port                 = 443
-        secure               = True
-        requestHeaders       = []
-        path                 = "/saezlab/decoupleR/blob/master/inst/figures/net_plot.png"
-        queryString          = "?raw=1"
-        method               = "GET"
+    --- finished re-building ‘decoupleR.Rmd’
+    
+    --- re-building ‘pw_bk.Rmd’ using rmarkdown
+    [2025-03-23 21:48:58] [WARN]    [OmnipathR] Accessing `PROGENy` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+    [2025-03-23 21:49:03] [SUCCESS] [OmnipathR] Loaded 700239 annotation records from cache.
+    Warning: ggrepel: 445 unlabeled data points (too many overlaps). Consider increasing max.overlaps
+    --- finished re-building ‘pw_bk.Rmd’
+    
     ...
-    Quitting from lines 86-88 [collectri] (tf_sc.Rmd)
+    
     Error: processing vignette 'tf_sc.Rmd' failed with diagnostics:
     argument is of length zero
     --- failed re-building ‘tf_sc.Rmd’
@@ -234,9 +257,9 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 11.1Mb
+      installed size is  9.1Mb
       sub-directories of 1Mb or more:
-        doc       8.9Mb
+        doc       6.9Mb
         extdata   1.4Mb
     ```
 
@@ -258,7 +281,7 @@ Run `revdepcheck::revdep_details(, "desla")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  7.4Mb
+      installed size is  7.5Mb
       sub-directories of 1Mb or more:
         libs   7.3Mb
     ```
@@ -320,7 +343,7 @@ Run `revdepcheck::revdep_details(, "gtfstools")` for more info
 * GitHub: NA
 * Source code: https://github.com/cran/InPAS
 * Date/Publication: 2024-12-23
-* Number of recursive dependencies: 165
+* Number of recursive dependencies: 166
 
 Run `revdepcheck::revdep_details(, "InPAS")` for more info
 
@@ -365,10 +388,10 @@ Run `revdepcheck::revdep_details(, "InPAS")` for more info
 
 <details>
 
-* Version: 0.5-0
+* Version: 0.5-2
 * GitHub: https://github.com/drizopoulos/JMbayes2
 * Source code: https://github.com/cran/JMbayes2
-* Date/Publication: 2024-05-30 07:30:03 UTC
+* Date/Publication: 2025-02-28 06:10:01 UTC
 * Number of recursive dependencies: 77
 
 Run `revdepcheck::revdep_details(, "JMbayes2")` for more info
@@ -379,9 +402,9 @@ Run `revdepcheck::revdep_details(, "JMbayes2")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 12.6Mb
+      installed size is 13.0Mb
       sub-directories of 1Mb or more:
-        libs  11.8Mb
+        libs  12.2Mb
     ```
 
 # mappp
@@ -406,6 +429,27 @@ Run `revdepcheck::revdep_details(, "mappp")` for more info
       All declared Imports should be used.
     ```
 
+# mlr3
+
+<details>
+
+* Version: 0.23.0
+* GitHub: https://github.com/mlr-org/mlr3
+* Source code: https://github.com/cran/mlr3
+* Date/Publication: 2025-03-12 12:30:02 UTC
+* Number of recursive dependencies: 49
+
+Run `revdepcheck::revdep_details(, "mlr3")` for more info
+
+</details>
+
+## In both
+
+*   checking Rd cross-references ... NOTE
+    ```
+    Package unavailable to check Rd xrefs: ‘mlr3oml’
+    ```
+
 # mmrm
 
 <details>
@@ -414,7 +458,7 @@ Run `revdepcheck::revdep_details(, "mappp")` for more info
 * GitHub: https://github.com/openpharma/mmrm
 * Source code: https://github.com/cran/mmrm
 * Date/Publication: 2024-09-27 23:30:01 UTC
-* Number of recursive dependencies: 176
+* Number of recursive dependencies: 177
 
 Run `revdepcheck::revdep_details(, "mmrm")` for more info
 
@@ -459,7 +503,7 @@ Run `revdepcheck::revdep_details(, "NCC")` for more info
 * GitHub: https://github.com/lhe17/nebula
 * Source code: https://github.com/cran/nebula
 * Date/Publication: 2024-02-15 23:00:02 UTC
-* Number of recursive dependencies: 173
+* Number of recursive dependencies: 172
 
 Run `revdepcheck::revdep_details(, "nebula")` for more info
 
@@ -478,11 +522,11 @@ Run `revdepcheck::revdep_details(, "nebula")` for more info
 
 <details>
 
-* Version: 0.0.1
+* Version: 1.0.1
 * GitHub: NA
 * Source code: https://github.com/cran/outliers.ts.oga
-* Date/Publication: 2024-05-28 17:00:02 UTC
-* Number of recursive dependencies: 155
+* Date/Publication: 2025-02-27 09:50:02 UTC
+* Number of recursive dependencies: 157
 
 Run `revdepcheck::revdep_details(, "outliers.ts.oga")` for more info
 
@@ -520,9 +564,9 @@ Run `revdepcheck::revdep_details(, "pmartR")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 10.5Mb
+      installed size is 10.6Mb
       sub-directories of 1Mb or more:
-        libs   8.0Mb
+        libs   8.1Mb
     ```
 
 # QDNAseq
@@ -615,6 +659,55 @@ Run `revdepcheck::revdep_details(, "ResIN")` for more info
       Note: found 1 marked UTF-8 string
     ```
 
+# rivnet
+
+<details>
+
+* Version: 0.6.0
+* GitHub: https://github.com/lucarraro/rivnet
+* Source code: https://github.com/cran/rivnet
+* Date/Publication: 2025-02-12 13:20:02 UTC
+* Number of recursive dependencies: 136
+
+Run `revdepcheck::revdep_details(, "rivnet")` for more info
+
+</details>
+
+## In both
+
+*   checking installed package size ... NOTE
+    ```
+      installed size is  6.8Mb
+      sub-directories of 1Mb or more:
+        libs   4.3Mb
+    ```
+
+# SCDB
+
+<details>
+
+* Version: 0.5.1
+* GitHub: https://github.com/ssi-dk/SCDB
+* Source code: https://github.com/cran/SCDB
+* Date/Publication: 2025-02-27 12:50:02 UTC
+* Number of recursive dependencies: 164
+
+Run `revdepcheck::revdep_details(, "SCDB")` for more info
+
+</details>
+
+## In both
+
+*   checking package dependencies ... NOTE
+    ```
+    Package suggested but not available for checking: ‘RPostgres’
+    ```
+
+*   checking Rd cross-references ... NOTE
+    ```
+    Package unavailable to check Rd xrefs: ‘RPostgres’
+    ```
+
 # scruff
 
 <details>
@@ -673,11 +766,11 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 
 <details>
 
-* Version: 2.18
+* Version: 2.19.1
 * GitHub: https://github.com/philchalmers/SimDesign
 * Source code: https://github.com/cran/SimDesign
-* Date/Publication: 2024-12-14 08:10:07 UTC
-* Number of recursive dependencies: 135
+* Date/Publication: 2025-03-17 12:40:02 UTC
+* Number of recursive dependencies: 138
 
 Run `revdepcheck::revdep_details(, "SimDesign")` for more info
 
@@ -687,9 +780,9 @@ Run `revdepcheck::revdep_details(, "SimDesign")` for more info
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  7.3Mb
+      installed size is  7.5Mb
       sub-directories of 1Mb or more:
-        doc   6.5Mb
+        doc   6.6Mb
     ```
 
 # streetscape
@@ -762,11 +855,11 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
 
 <details>
 
-* Version: 1.10.0
+* Version: 1.10.1
 * GitHub: https://github.com/ropensci/targets
 * Source code: https://github.com/cran/targets
-* Date/Publication: 2025-01-13 15:00:01 UTC
-* Number of recursive dependencies: 160
+* Date/Publication: 2025-01-31 16:50:02 UTC
+* Number of recursive dependencies: 158
 
 Run `revdepcheck::revdep_details(, "targets")` for more info
 

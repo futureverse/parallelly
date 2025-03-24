@@ -78,7 +78,7 @@
 #' The below \R options and environment variables control the default results of [makeClusterPSOCK()] and its helper function [makeNodePSOCK()] that creates the individual cluster nodes.
 #'
 #' \describe{
-#'  \item{`parallelly.maxWorkers.localhost`:}{(two numerics) Maximum number of localhost workers, relative to `availableCores()`, accepted and allowed. The first element corresponds to the threshold where a warning is produced, the second where an error is produced. Thresholds may be `+Inf`. If only the first exist, no error is produced (defaults to `c(1.0, 3.0)` corresponding to a maximum 100% and 300% use).}
+#'  \item{`parallelly.maxWorkers.localhost`:}{(two numerics) Maximum number of localhost workers, relative to `availableCores()`, accepted and allowed. The first element specifies the "soft" limit, which triggers a warning, if exceeded. The second element specifies the "hard" limit, which triggers an error if exceeded. These limits exist to protect against CPU overuse of the current machine, which sometimes happens by mistake without the user causing it being aware. These limits can be disabled by setting them to `+Inf` (not recommended). If only the first exist, no error is produced (defaults to `c(1.0, 3.0)` corresponding to a maximum 100% and 300% use).}
 #'  
 #'  \item{`parallelly.makeNodePSOCK.setup_strategy`:}{(character) If `"parallel"` (default), the PSOCK cluster nodes are set up concurrently.  If `"sequential"`, they are set up sequentially.}
 #'
@@ -214,16 +214,21 @@ get_package_option <- function(name, default = NULL, package = .packageName) {
 
 # Set an R option from an environment variable
 update_package_option <- function(name, mode = "character", default = NULL, package = .packageName, split = NULL, trim = TRUE, disallow = c("NA"), force = FALSE, debug = FALSE) {
+  if (debug) {
+    mdebugf_push("update_package_option('%s', ...) ...", name)
+    on.exit(mdebugf_pop("update_package_option('%s', ...) ... done", name))
+  }
+  
   if (!is.null(package)) {
     name <- paste(package, name, sep = ".")
   }
   
-  mdebugf("Set package option %s", sQuote(name))
+  if (debug) mdebugf("Set package option %s", sQuote(name))
 
   ## Already set? Nothing to do?
   value <- getOption2(name, NULL)
   if (!force && !is.null(value)) {
-    mdebugf("Already set: %s", sQuote(value))
+    if (debug) mdebugf("Already set: %s", sQuote(value))
     return(value)
   }
 
@@ -302,6 +307,11 @@ update_package_option <- function(name, mode = "character", default = NULL, pack
 
 ## Set package options based on environment variables
 update_package_options <- function(debug = FALSE) {
+  if (debug) {
+    mdebug_push("update_package_options() ...")
+    on.exit(mdebug_pop("update_package_options() ... done"))
+  }
+
   update_package_option("availableCores.methods", mode = "character", split = ",", debug = debug)
   update_package_option("availableCores.fallback", mode = "integer", disallow = NULL, debug = debug)
   update_package_option("availableCores.min", mode = "integer", disallow = "NA", debug = debug)

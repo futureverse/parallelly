@@ -3,9 +3,9 @@
 %   R/makeZZZ.R
 \name{makeClusterPSOCK}
 \alias{makeClusterPSOCK}
-\alias{PSOCK}
+\alias{RPSOCK}
 \alias{makeNodePSOCK}
-\title{Create a PSOCK Cluster of R Workers for Parallel Processing}
+\title{Create a Rich PSOCK Cluster of R Workers for Parallel Processing}
 \usage{
 makeClusterPSOCK(
   workers,
@@ -17,7 +17,7 @@ makeClusterPSOCK(
   tries = getOption2("parallelly.makeNodePSOCK.tries", 3L),
   delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15),
   validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE),
-  verbose = getOption2("parallelly.debug", FALSE)
+  verbose = isTRUE(getOption("parallelly.debug"))
 )
 
 makeNodePSOCK(
@@ -77,9 +77,6 @@ SSH options \option{-p}, e.g. \code{rshopts = c("-p", "2200")}.}}
 
 \item{user}{(optional) The user name to be used when communicating with
 another host.}
-
-\item{\dots}{Optional arguments passed to
-\code{makeNode(workers[i], ..., rank = i)} where \code{i = seq_along(workers)}.}
 
 \item{autoStop}{If TRUE, the cluster will be automatically stopped
 using \code{\link[parallel:makeCluster]{stopCluster}()} when it is
@@ -231,6 +228,9 @@ concurrently, one after the other.  If \code{"sequential"}, they are set up
 sequentially.}
 
 \item{action}{This is an internal argument.}
+
+\item{\ldots}{Optional arguments passed to
+\code{makeNode(workers[i], ..., rank = i)} where \code{i = seq_along(workers)}.}
 }
 \value{
 An object of class \code{c("RichSOCKcluster", "SOCKcluster", "cluster")}
@@ -288,29 +288,32 @@ warn when parallelizing above 100\%;
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{cl <- parallelly::makeClusterPSOCK(12, dryrun = TRUE)
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
-  Careful, you are setting up 12 localhost parallel workers with
-only 8 CPU cores available for this R process, which could result
-in a 150\% load. The maximum is set to 100\%. Overusing the CPUs has
-negative impact on the current R process, but also on all other
-processes of yours and others running on the same machine. See
-help("parallelly.options", package = "parallelly") for how to
-override this threshold
+  Careful, you are setting up 12 localhost parallel workers with only
+8 CPU cores available for this R process (per 'system'), which could
+result in a 150\% load. The soft limit is set to 100\%. Overusing the
+CPUs has negative impact on the current R process, but also on all
+other processes of yours and others running on the same machine. See
+help("parallelly.maxWorkers.localhost", package = "parallelly") for
+further explanations and how to override the soft limit that triggered
 }\if{html}{\out{</div>}}
 
 Any attempts resulting in more than 300\% overuse will be refused;
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{> cl <- parallelly::makeClusterPSOCK(25, dryrun = TRUE)
 Error in checkNumberOfLocalWorkers(workers) : 
-  Attempting to set up 25 localhost parallel workers with only
-8 CPU cores available for this R process, which could result in
-a 312\% load. The maximum is set to 300\%. Overusing the CPUs has
+  Attempting to set up 25 localhost parallel workers with only 8 CPU
+cores available for this R process (per 'system'), which could result
+in a 312\% load. The hard limit is set to 300\%. Overusing the CPUs has
 negative impact on the current R process, but also on all other
 processes of yours and others running on the same machine. See
-help("parallelly.options", package = "parallelly") for how to
-override this threshold
+help("parallelly.maxWorkers.localhost", package = "parallelly") for
+further explanations and how to override the hard limit that triggered
+this error
 }\if{html}{\out{</div>}}
 
 See \link{parallelly.options} for how to change the default thresholds.
+This built-in protection can be circumvented by specifying argument
+\code{workers} as an \code{AsIs} object, e.g. \code{workers = I(25)} (not recommended).
 }
 
 \section{Definition of \emph{localhost}}{

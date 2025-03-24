@@ -37,14 +37,14 @@ cloneNode.default <- function(x, ...) {
 
 #' @export
 cloneNode.RichSOCKnode <- function(x, ..., method = c("as-is", "vanilla")) {
-  debug <- getOption2("parallelly.debug", FALSE)
+  debug <- isTRUE(getOption("parallelly.debug"))
   if (debug) {
-    mdebugf("cloneNode() for RichSOCKnode ...")
-    on.exit(mdebugf("cloneNode() for RichSOCKnode ... DONE"))
+    mdebug_push("cloneNode() for RichSOCKnode ...")
+    on.exit(mdebug_pop("cloneNode() for RichSOCKnode ... DONE"))
   }
 
   method <- match.arg(method)
-  debug && mdebugf(" - method: %s", method)
+  debug && mdebugf("method: %s", method)
   
   ## Get the arguments used for creating the node to be cloned
   options <- attr(x, "options")
@@ -75,7 +75,7 @@ cloneNode.RichSOCKnode <- function(x, ..., method = c("as-is", "vanilla")) {
   node <- do.call(make_fcn, args = make_args)
 
   if (!is.null(x$session_info)) {
-    debug && mdebug("- Adding node session information")
+    debug && mdebug("Adding node session information")
     node <- add_cluster_session_info(node)
   }
 

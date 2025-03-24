@@ -27,10 +27,10 @@ as.cluster(x, ...)
 \arguments{
 \item{x}{An object to be coerced.}
 
-\item{\dots}{Additional arguments passed to the underlying coercion method.
-For \code{c(...)}, the clusters and cluster nodes to be combined.}
-
 \item{recursive}{Not used.}
+
+\item{\ldots}{Additional arguments passed to the underlying coercion method.
+For \code{c(...)}, the clusters and cluster nodes to be combined.}
 }
 \value{
 An object of class \code{cluster}.
