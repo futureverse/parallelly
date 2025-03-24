@@ -16,10 +16,15 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { r: "release", pkg: "future", error_on: note    }
-          - { r: "release", pkg: "future.batchtools", error_on: note    }
-          - { r: "release", pkg: "future.mirai", error_on: note    }
-          - { r: "release", pkg: "mlr3"  , error_on: warning }
+          - { r: "release", pkg: "future", error_on: note            }
+          - { r: "release", pkg: "future.batchtools", error_on: note }
+          - { r: "release", pkg: "future.mirai", error_on: note      }
+          - { r: "release", pkg: "future.tests", error_on: note      }
+          - { r: "release", pkg: "future.apply", error_on: note      }
+          - { r: "release", pkg: "furrr", error_on: note             }
+          - { r: "release", pkg: "doFuture", error_on: note          }
+          - { r: "release", pkg: "future.callr", error_on: note      }
+          - { r: "release", pkg: "mlr3", error_on: warning           }
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
