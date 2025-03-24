@@ -87,7 +87,7 @@ jobs:
       - name: Check
         run: |
           rcmdcheck::rcmdcheck(
-            args = c("--as-cran", if (.Platform$OS.type == "windows") "--no-manual"),
+            args = c("--as-cran", if (.Platform[["OS.type"]] == "windows" || grepl("darwin", R.version[["os"]], ignore.case = TRUE)) "--no-manual"),
             error_on = "note",
             check_dir = "check"
           )
