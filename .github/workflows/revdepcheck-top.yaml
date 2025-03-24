@@ -17,6 +17,8 @@ jobs:
       matrix:
         config:
           - { r: "release", pkg: "future", error_on: note    }
+          - { r: "release", pkg: "future.batchtools", error_on: note    }
+          - { r: "release", pkg: "future.mirai", error_on: note    }
           - { r: "release", pkg: "mlr3"  , error_on: warning }
 
     env:
