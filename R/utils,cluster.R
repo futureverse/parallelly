@@ -161,7 +161,7 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
   stop_if_not(is.logical(must_work), length(must_work) == 1L, !is.na(must_work))
 
   if (is.null(which)) {
-    if (.Platform$OS.type == "windows") {
+    if (.Platform[["OS.type"]] == "windows") {
       which <- c("ssh", "putty-plink", "rstudio-ssh")
     } else {
       which <- c("ssh")
@@ -199,7 +199,7 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
 session_info <- function(pkgs = getOption2("parallelly.makeNodePSOCK.sessionInfo.pkgs", FALSE)) {
   libs <- .libPaths()
   info <- list(
-    r = c(R.version, os.type = .Platform$OS.type),
+    r = c(R.version, os.type = .Platform[["OS.type"]]),
     system = as.list(Sys.info()),
     libs = libs,
     pkgs = if (isTRUE(pkgs)) {
@@ -251,7 +251,7 @@ add_cluster_session_info <- local({
 ## Gets the Windows build version, e.g. '10.0.17134.523' (Windows 10 v1803)
 ## and '10.0.17763.253' (Windows 10 v1809).
 windows_build_version <- local({
-  if (.Platform$OS.type != "windows") return(function() NULL)
+  if (.Platform[["OS.type"]] != "windows") return(function() NULL)
   function() {
     res <- shell("ver", intern = TRUE)
     if (length(res) == 0) return(NULL)
@@ -382,7 +382,7 @@ shQuote <- local({
   
   function(string, type = NULL) {
     if (is.null(type) || missing(type)) {
-      if (.Platform$OS.type == "windows") {
+      if (.Platform[["OS.type"]] == "windows") {
         type <- "cmd"
       } else {
         type <- known_types[1]

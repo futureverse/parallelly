@@ -39,7 +39,7 @@
 #' @importFrom utils str
 #' @keywords internal
 pid_exists <- local({
-  os <- .Platform$OS.type
+  os <- .Platform[["OS.type"]]
 
   ## The value of tools::pskill() is incorrect in R (< 3.5.0).
   ## This was fixed in R (>= 3.5.0).

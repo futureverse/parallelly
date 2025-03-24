@@ -38,7 +38,7 @@ importParallel <- local({
 
       if (!exists(name, mode = "function", envir = ns, inherits = FALSE)) {
         ## covr: skip=3
-        msg <- sprintf("parallel:::%s() is not available in R %s on this system (%s)", name, getRversion(), sQuote(.Platform$OS.type))
+        msg <- sprintf("parallel:::%s() is not available in R %s on this system (%s)", name, getRversion(), sQuote(.Platform[["OS.type"]]))
         mdebug(msg)
         stop(msg, call. = FALSE)
       }

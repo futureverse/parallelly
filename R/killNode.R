@@ -39,7 +39,7 @@
 #' is returned and an informative warning is produced.
 #'
 #' @examples
-#' \dontshow{if (.Platform$OS.type != "windows" || interactive()) \{}
+#' \dontshow{if (.Platform[["OS.type"]] != "windows" || interactive()) \{}
 #' cl <- makeClusterPSOCK(2)
 #' print(isNodeAlive(cl))  ## [1] TRUE TRUE
 #' 

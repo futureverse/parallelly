@@ -102,7 +102,7 @@ queryRCmdCheck <- function(...) {
   evidences[["examples"]] <- is.element("CheckExEnv", search())
   
   # SPECIAL: win-builder?
-  evidences[["win-builder"]] <- (.Platform$OS.type == "windows" && grepl("Rterm[.]exe$", args[1]))
+  evidences[["win-builder"]] <- (.Platform[["OS.type"]] == "windows" && grepl("Rterm[.]exe$", args[1]))
 
   if (evidences[["win-builder"]]) {
     n <- length(args)

@@ -16,7 +16,7 @@ check_types <- function(cmd = "foo bar", os = NULL) {
     message(sprintf("- sQuote(... type = %s)%s", type_str, info))
     if (is.null(type)) {
       value <- shQuote(cmd, type = type)
-      if (is.null(os) || os == .Platform$OS.type) {
+      if (is.null(os) || os == .Platform[["OS.type"]]) {
         truth <- base::shQuote(cmd)
       } else if (os == "unix") {
         truth <- base::shQuote(cmd, type = "sh")
@@ -25,7 +25,7 @@ check_types <- function(cmd = "foo bar", os = NULL) {
       }
     } else if (is.na(type)) {
       value <- shQuote(cmd)
-      if (is.null(os) || os == .Platform$OS.type) {
+      if (is.null(os) || os == .Platform[["OS.type"]]) {
         truth <- base::shQuote(cmd)
       } else if (os == "unix") {
         truth <- base::shQuote(cmd, type = "sh")

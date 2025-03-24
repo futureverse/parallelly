@@ -323,7 +323,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
 
     assert_system_is_supported()
 
-    if (.Platform$OS.type == "windows") {
+    if (.Platform[["OS.type"]] == "windows") {
       for (ii in seq_along(cl)) {
         ## See parallel::newPSOCKnode() for the input = ""
         system(cmd, wait = FALSE, input = "")

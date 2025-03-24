@@ -442,7 +442,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
   is_auto <- (rscript_sh == "auto")
   if (any(is_auto)) {
     if (localMachine) {
-      rscript_sh[is_auto] <- if (.Platform$OS.type == "windows") "cmd" else "sh"
+      rscript_sh[is_auto] <- if (.Platform[["OS.type"]] == "windows") "cmd" else "sh"
     } else {
       ## Assume remote machine uses as POSIX shell
      rscript_sh[is_auto] <- "sh"
@@ -912,7 +912,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
       ## to use "127.0.0.1" instead, or force IPv4 by using ssh option '-4'.
       ## For more details, see 
       ## https://github.com/PowerShell/Win32-OpenSSH/issues/1265#issuecomment-855234326 for 
-      if (is_localhost(master) && .Platform$OS.type == "windows" && (
+      if (is_localhost(master) && .Platform[["OS.type"]] == "windows" && (
            isTRUE(attr(rshcmd, "OpenSSH_for_Windows")) ||
            basename(rshcmd[1]) == "ssh"
          )) {

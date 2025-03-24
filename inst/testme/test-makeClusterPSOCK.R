@@ -146,7 +146,7 @@ parallel::stopCluster(cl)
 
 message("- makeClusterPSOCK() - launch via the R executable")
 
-if (.Platform$OS.type == "windows") {
+if (on_windows) {
   ## R and R.exe fails on MS Windows, cf. R-devel thread "MS Windows: R does
   ## not escape quotes in CLI options the same way as Rterm and Rscript"
   ## on 2021-12-15.
@@ -168,7 +168,7 @@ for (rscript in rscripts) {
 
 message("- makeClusterPSOCK() - default packages")
 
-if (.Platform$OS.type == "windows") {
+if (on_windows) {
   ## R and R.exe fails on MS Windows, cf. R-devel thread "MS Windows: R does
   ## not escape quotes in CLI options the same way as Rterm and Rscript"
   ## on 2021-12-15.
@@ -193,7 +193,7 @@ for (rscript in rscripts) {
   parallel::stopCluster(cl)
 }
 
-if (.Platform$OS.type == "windows") {
+if (on_windows) {
   ## R and R.exe fails on MS Windows, cf. R-devel thread "MS Windows: R does
   ## not escape quotes in CLI options the same way as Rterm and Rscript"
   ## on 2021-12-15.
@@ -295,7 +295,7 @@ if (getRversion() >= "4.0.0") {
 
   ## Make sure to wait for background process to timeout before continuing,
   ## when on MS Windows
-  if (.Platform$OS.type == "windows") Sys.sleep(5.0)
+  if (on_windows) Sys.sleep(5.0)
 }
 
 message("*** makeClusterPSOCK() ... DONE")

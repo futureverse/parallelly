@@ -1,6 +1,6 @@
 library(parallelly)
 
-if (.Platform$OS.type == "windows") {
+if (on_windows) {
   killNode <- function(cl) {
     parallel::stopCluster(cl)
     rep(TRUE, times = length(cl))
@@ -22,7 +22,7 @@ print(cl)
 ## file. In this test we terminate the workers such that these temporary files
 ## are not cleaned up, which will trigger a NOTE by 'R CMD check'. Because of
 ## this, we have to make sure to remove such files manually in this test.
-if (.Platform$OS.type == "windows") {
+if (on_windows) {
   files <- setdiff(dir(path = tempdir(), all.files = TRUE), c(".", ".."))
   files <- file.path(tempdir(), files)
   tmpfiles <- files
@@ -83,7 +83,7 @@ repeat {
 }
 
 ## Remove any stray Rscript<hexcode> files
-if (.Platform$OS.type == "windows") {
+if (on_windows) {
   if (!isNodeAliveSupported) Sys.sleep(5.0)
   tmpfiles <- tmpfiles[utils::file_test("-f", tmpfiles)]
   if (length(tmpfiles) > 0L) {
