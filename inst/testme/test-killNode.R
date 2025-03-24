@@ -80,7 +80,7 @@ repeat {
   )
   if (!any(alive, na.rm = TRUE)) break
   if (Sys.time() > timeout) {
-    stop("One or more cluster nodes are still running after 5 seconds")
+    stop("One or more cluster nodes are still running after 30 seconds")
   }
   Sys.sleep(0.5)
 }
