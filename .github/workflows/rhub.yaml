@@ -92,7 +92,9 @@ jobs:
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
-          extra-packages: parallelly
+          extra-packages: |
+            rcmdcheck
+            parallelly
       - uses: r-hub/actions/run-check@v1
         with:
           job-config: ${{ matrix.config.job-config }}
