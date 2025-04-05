@@ -2,7 +2,7 @@
 
 ## New Features
 
- * Add `all.equal()` for `connection`, which distinguish between
+ * Add `all.equal()` for `connection`, which can distinguish between
    two connections that share the same connection index, but are not
    the same connection, e.g. when one was created, then closed, and
    another one of the same kind is created.
