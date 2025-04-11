@@ -37,7 +37,7 @@ is supported in the current R session."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.43.0-9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.43.0-9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,7 @@ is supported in the current R session."><meta property="og:image" content="https
     <div class="ref-description section level2">
     <p>Certain parallelization methods in R rely on <em>forked</em> processing, e.g.
 <code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">parallel::mclapply()</a></code>, <code>parallel::makeCluster(n, type = "FORK")</code>,
-<code><a href="https://rdrr.io/pkg/doMC/man/registerDoMC.html" class="external-link">doMC::registerDoMC()</a></code>, and <code>future::plan("multicore")</code>.
+<code>doMC::registerDoMC()</code>, and <code>future::plan("multicore")</code>.
 Process forking is done by the operating system and support for it in
 <span style="R">R</span> is restricted to Unix-like operating systems such as Linux, Solaris,
 and macOS.  R running on Microsoft Windows does not support forked
