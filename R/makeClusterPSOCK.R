@@ -65,8 +65,12 @@
 #' `cl <- parallelly::makeClusterPSOCK(workers)` is:
 #'
 #' ```
-#' cl <- parallel::makeCluster(workers, type = parallelly::PSOCK)
+#' cl <- parallel::makeCluster(workers, type = parallelly::RPSOCK)
 #' ```
+#'
+#' where the 'R' in RPSOCK stands for "Rich", which reflects that the cluster
+#' returned is of class `RichSOCKcluster`, whereas the default is of class
+#' `SOCKcluster`.
 #'
 #' @section Protection against CPU overuse:
 #' Using too many parallel workers on the same machine may result in
