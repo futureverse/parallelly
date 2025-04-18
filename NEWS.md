@@ -6,7 +6,12 @@
    two connections that share the same connection index, but are not
    the same connection, e.g. when one was created, then closed, and
    another one of the same kind is created.
-   
+
+## Bug Fixes
+
+ * `availableCores()` would not respect `method = "fallback"` since
+   v1.41.0 on system with a value for `method = "/proc/self/status"`.
+
 
 # Version 1.43.0 [2025-03-24]
 

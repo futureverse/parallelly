@@ -380,7 +380,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     idx_fallback <- which(names(ncores) == "fallback")
     if (length(idx_fallback) == 1) {
       ## Use 'fallback' if and only there are only "special" options specified
-      special <- c("system", "cgroups.cpuset", "cgroups.cpuquote", "nproc")
+      special <- c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc")
       others <- setdiff(names(ncores), c("fallback", special))
       use_fallback <- (length(others) == 0L)
 
