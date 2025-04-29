@@ -154,10 +154,12 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
 
   methods_localhost <- c("BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "mc.cores", "mc.cores+1", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system")
 
-  if ("connections" %in% constraints) {
-    methods <- unique(c(methods, "connections"))
-    methods_localhost <- unique(c(methods_localhost, "connections"))
-    constraints <- setdiff(constraints, "connections")
+  pattern_connections <- "^connections(|-[[:digit:]]+)$"
+  idxs <- grep(pattern_connections, constraints)
+  if (length(idxs) > 0) {
+    methods <- unique(c(methods, constraints[idxs]))
+    methods_localhost <- unique(c(methods_localhost, constraints[idxs]))
+    constraints <- setdiff(constraints, constraints[idxs])
   }
 
   ## Default is to use the current machine

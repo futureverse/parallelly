@@ -2,6 +2,11 @@
 
 ## New Features
 
+ * Add support to `availableCores()` and `availableWorkers()` to
+   specify `constraints = "connections-N"`, where `N` specifies the
+   number of connections to leave free after launching a PSOCK cluster
+   with this number of cores.
+
  * Add `all.equal()` for `connection`, which can distinguish between
    two connections that share the same connection index, but are not
    the same connection, e.g. when one was created, then closed, and
