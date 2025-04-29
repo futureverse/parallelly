@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.43.0-9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.43.0-9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,7 +79,8 @@
 <h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li>Add <code><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal()</a></code> for <code>connection</code>, which can distinguish between two connections that share the same connection index, but are not the same connection, e.g. when one was created, then closed, and another one of the same kind is created.</li>
+<ul><li><p>Add support to <code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> to specify <code>constraints = "connections-N"</code>, where <code>N</code> specifies the number of connections to leave free after launching a PSOCK cluster with this number of cores.</p></li>
+<li><p>Add <code><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal()</a></code> for <code>connection</code>, which can distinguish between two connections that share the same connection index, but are not the same connection, e.g. when one was created, then closed, and another one of the same kind is created.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
