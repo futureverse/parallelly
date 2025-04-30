@@ -129,8 +129,9 @@
 #' To set \R options when \R starts (even before the \pkg{parallelly} package is loaded), see the \link[base]{Startup} help page.  The \href{https://cran.r-project.org/package=startup}{\pkg{startup}} package provides a friendly mechanism for configuring \R's startup process.
 #'
 #' @aliases
+#' parallelly.options 
 #' parallelly.debug
-#'
+
 #' parallelly.availableCores.custom
 #' parallelly.availableCores.methods
 #' parallelly.availableCores.min
@@ -201,7 +202,7 @@
 ## R_PARALLELLY_MAKENODEPSOCK_PORT_INCREMENT
 ## R_PARALLELLY_MAKENODEPSOCK_TRIES_PORT
 #'
-#' @name parallelly.options
+#' @name zzz-parallelly.options
 NULL
 
 
