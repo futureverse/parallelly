@@ -184,12 +184,15 @@ The <code>mc.cores</code> option defaults to environment variable
 package is loaded).  The <code>mc.cores</code> option is used by for
 instance <code>mclapply()</code> of the <span class="pkg">parallel</span>
 package.</p></li>
-<li><p><code>"connections"</code> -
+<li><p><code>"connections"</code> or <code>"connections-N"</code> -
 Query the current number of available R connections per
 <code><a href="availableConnections.html">freeConnections()</a></code>.  This is the maximum number of socket-based
 <strong>parallel</strong> cluster nodes that are possible launch, because each
 one needs its own R connection.
-The exception is when <code><a href="availableConnections.html">freeConnections()</a></code> is zero, then <code>1L</code> is
+The <code>"connections-N"</code> form (e.g. <code>connections-16</code>) works like
+<code>"connections"</code> but uses <code>freeConnections() - N</code> as the upper limit,
+leaving <code>N</code> connections free for other purposes.
+The exception is when the result is zero or less, then <code>1L</code> is
 still returned, because <code>availableCores()</code> should always return a
 positive integer.</p></li>
 <li><p><code>"BiocParallel"</code> -
