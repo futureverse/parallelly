@@ -29,7 +29,7 @@ background R workers, and how to connect to external machines."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.43.0-9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.43.0-9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -467,7 +467,7 @@ help("parallelly.maxWorkers.localhost", package = "parallelly") for
 further explanations and how to override the hard limit that triggered
 this error
 </code></pre><p></p></div>
-<p>See <a href="parallelly.options.html">parallelly.options</a> for how to change the default thresholds.
+<p>See <a href="zzz-parallelly.options.html">parallelly.options</a> for how to change the default thresholds.
 This built-in protection can be circumvented by specifying argument
 <code>workers</code> as an <code>AsIs</code> object, e.g. <code>workers = I(25)</code> (not recommended).</p>
     </div>
@@ -490,7 +490,7 @@ to an external host.</p>
 <p>The default method for connecting to an external host is via SSH and the
 system executable for this is given by argument <code>rshcmd</code>.  The default
 is given by option
-<code><a href="parallelly.options.html">parallelly.makeNodePSOCK.rshcmd</a></code>.
+<code><a href="zzz-parallelly.options.html">parallelly.makeNodePSOCK.rshcmd</a></code>.
 If that is not
 set, then the default is to use <code class="command">ssh</code> on Unix-like systems,
 including macOS as well as Windows 10.  On older MS Windows versions, which
@@ -514,7 +514,7 @@ To use this SSH client outside of RStudio, set <code class="env">RSTUDIO_MSYS_SS
 accordingly.</p>
 <p>You can override the default set of SSH clients that are searched for
 by specifying them in argument <code>rshcmd</code> or via option
-<code><a href="parallelly.options.html">parallelly.makeNodePSOCK.rshcmd</a></code>
+<code><a href="zzz-parallelly.options.html">parallelly.makeNodePSOCK.rshcmd</a></code>
 using the format <code>&lt;...&gt;</code>, e.g.
 <code>rshcmd = c("&lt;rstudio-ssh&gt;", "&lt;putty-plink&gt;", "&lt;ssh&gt;")</code>.  See
 below for examples.</p>
