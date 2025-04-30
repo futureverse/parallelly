@@ -76,12 +76,15 @@
 #'    instance \code{\link[=mclapply]{mclapply}()} of the \pkg{parallel}
 #'    package.
 #'
-#'  \item `"connections"` -
+#'  \item `"connections"` or `"connections-N"` -
 #'    Query the current number of available R connections per
 #'    [freeConnections()].  This is the maximum number of socket-based
 #'    **parallel** cluster nodes that are possible launch, because each
 #'    one needs its own R connection.
-#'    The exception is when `freeConnections()` is zero, then `1L` is
+#'    The `"connections-N"` form (e.g. `connections-16`) works like
+#'    `"connections"` but uses `freeConnections() - N` as the upper limit,
+#'    leaving `N` connections free for other purposes.
+#'    The exception is when the result is zero or less, then `1L` is
 #'    still returned, because `availableCores()` should always return a
 #'    positive integer.
 #'
