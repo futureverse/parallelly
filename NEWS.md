@@ -14,8 +14,9 @@
 
 ## Bug Fixes
 
- * `availableCores()` would not respect `method = "fallback"` since
-   v1.41.0 on system with a value for `method = "/proc/self/status"`.
+ * `availableCores()` would not respect `method = "fallback"`, since
+   v1.41.0 (2024-12-18), on system with a value for `method =
+   "/proc/self/status"`.
 
 
 # Version 1.43.0 [2025-03-24]
@@ -85,7 +86,7 @@
    (2022-04-07).
 
 
-# Version 1.41.0 [2024-12-17]
+# Version 1.41.0 [2024-12-18]
 
 ## New Features
 
@@ -111,7 +112,7 @@
    richer support for the `rscript_sh` argument.
 
 
-# Version 1.40.1 [2024-12-03]
+# Version 1.40.1 [2024-12-04]
 
 ## Bug Fixes
 
