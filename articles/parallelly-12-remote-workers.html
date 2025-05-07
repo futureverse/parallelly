@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -251,7 +251,7 @@ them, you have the other too.</p>
 machine and call <code>Rscript --version</code>;</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh alice@n1.remote.org</span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="ex">{alice@n1}$</span> Rscript <span class="at">--version</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.4.2 <span class="er">(</span><span class="ex">2024-10-31</span><span class="kw">)</span></span></code></pre></div>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.5.0 <span class="er">(</span><span class="ex">2025-04-11</span><span class="kw">)</span></span></code></pre></div>
 <p>If you get:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="ex">{alice@n1}$</span> Rscript <span class="at">--version</span></span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="ex">Rscript:</span> command not found</span></code></pre></div>
@@ -267,18 +267,18 @@ machine.</p>
 machine, we should be able to SSH into the other machine and query the R
 version in a single call:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh alice@n1.remote.org Rscript <span class="at">--version</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.4.2 <span class="er">(</span><span class="ex">2024-10-31</span><span class="kw">)</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.5.0 <span class="er">(</span><span class="ex">2025-04-11</span><span class="kw">)</span></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="ex">{ally@local}$</span></span></code></pre></div>
 <p>This is all that is needed to launch one or more parallel R workers
 on machine <code>n1.remote.org</code> running under user
 <code>alice</code>. We can test this from within R with the
 <strong>parallelly</strong> package using:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> R <span class="at">--quiet</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallely</span><span class="kw">)</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallelly</span><span class="kw">)</span></span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="ex">cl</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> user = <span class="st">"alice"</span><span class="kw">)</span></span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl</span><span class="kw">)</span></span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 1 nodes where 1 node is on host 'n1.remote.org'</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)</span></span>
 <span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="ex">parallel::stopCluster</span><span class="er">(</span><span class="ex">cl</span><span class="kw">)</span></span></code></pre></div>
 <p>If you want to run parallel workers on other machines, repeat the
 above for each machine. After this, you will be able to launch parallel
@@ -366,7 +366,7 @@ equal number of times;</p>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, user <span class="op">=</span> <span class="st">"alice"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Socket cluster with 2 nodes where 2 nodes are on host 'n1.remote.org'</span></span>
-<span><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu).</span></span></code></pre></div>
+<span><span class="co">#&gt; (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p><em>Comment</em>: In the <strong>parallel</strong> package, a
 parallel worker is referred to a parallel node, or short <em>node</em>,
 which is why we use the same term in the <strong>parallelly</strong>
@@ -406,8 +406,8 @@ two different machines rather than the same.</p>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, user <span class="op">=</span> <span class="st">"alice"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Socket cluster with 2 nodes where 1 node is on host 'n1.remote.org'</span></span>
-<span><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), </span></span>
-<span><span class="co">#&gt; 1 node is on host 'n2.remote.org' (R version 4.4.2 (2024-10-31),</span></span>
+<span><span class="co">#&gt; (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)</span></span>
+<span><span class="co">#&gt; 1 node is on host 'n2.remote.org' (R version 4.5.0 (2025-04-11),</span></span>
 <span><span class="co">#&gt; platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p><em>Technical details</em>: If we would add
 <code>verbose = TRUE</code> also in this case, we would see:</p>
@@ -441,8 +441,8 @@ workers on <code>n1.remote.org</code> and one on
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Socket cluster with 3 nodes where 2 nodes are on host 'n1.remote.org'</span></span>
-<span><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), </span></span>
-<span><span class="co">#&gt; 1 node is on host 'n2.remote.org' (R version 4.4.2 (2024-10-31),</span></span>
+<span><span class="co">#&gt; (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)</span></span>
+<span><span class="co">#&gt; 1 node is on host 'n2.remote.org' (R version 4.5.0 (2025-04-11),</span></span>
 <span><span class="co">#&gt; platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p>Again, the <code>user</code> argument does not have to be specified,
 because it is configured in <code>~/.ssh/config</code>.</p>
@@ -466,7 +466,7 @@ can use:</p>
 <span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="ex">cl_local</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers</span><span class="kw">)</span></span>
 <span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl_local</span><span class="kw">)</span></span>
 <span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes where 4 nodes are on host 'localhost'</span></span>
-<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p>to launch four local parallel workers. Note how we did not have to
 specify <code>user = "ally"</code>. This is because the default username
 is always the local username. Next, assume we want to add another four
@@ -477,7 +477,7 @@ we can set these up as:</p>
 <span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="ex">cl_remote</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers,</span> user = <span class="st">"alice"</span><span class="kw">)</span></span>
 <span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl_remote</span><span class="kw">)</span></span>
 <span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes where 4 nodes are on host 'n1.remote.org'</span></span>
-<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu).</span></span></code></pre></div>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p>At this point, we have two independent clusters of parallel workers:
 <code>cl_local</code> and <code>cl_remote</code>. We can combine them
 into a single cluster using:</p>
@@ -485,8 +485,8 @@ into a single cluster using:</p>
 <code class="sourceCode R"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cl_local</span>, <span class="va">cl_remote</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Socket cluster with 8 nodes where 4 nodes are on host 'localhost'</span></span>
-<span><span class="co">#&gt; (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), 4</span></span>
-<span><span class="co">#&gt; nodes are on host 'n1.remote.org' (R version 4.4.2 (2024-10-31),</span></span>
+<span><span class="co">#&gt; (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)</span></span>
+<span><span class="co">#&gt; nodes are on host 'n1.remote.org' (R version 4.5.0 (2025-04-11),</span></span>
 <span><span class="co">#&gt; platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p>To emphasize the usefulness of customizing our SSH connections via
 <code>~/.ssh/config</code>, if the remote username would already have

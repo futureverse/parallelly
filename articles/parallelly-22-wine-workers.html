@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,12 +137,12 @@ Windows 10;</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">$</span> winecfg</span></code></pre></div>
 <p>In the GUI, set ‘Windows version’ to ‘Windows 10’. Then, install R
 for Windows in Wine, by:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">$</span> wget https://cran.r-project.org/bin/windows/base/R-4.4.2-win.exe</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">$</span> wine R-4.4.2-win.exe /SILENT</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">$</span> wget https://cran.r-project.org/bin/windows/base/R-4.5.0-win.exe</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">$</span> wine R-4.5.0-win.exe /SILENT</span></code></pre></div>
 <p>Finally, verify that R is available in Wine;</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">$</span> wine <span class="st">"C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe"</span> <span class="at">--version</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">$</span> wine <span class="st">"C:/Program Files/R/R-4.5.0/bin/x64/Rscript.exe"</span> <span class="at">--version</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.4.2 <span class="er">(</span><span class="ex">2024-10-31</span><span class="kw">)</span></span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.5.0 <span class="er">(</span><span class="ex">2025-04-11</span><span class="kw">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -162,12 +162,12 @@ on the local machine.</p>
 <span>    <span class="co">## Don't pass LC_* and R_LIBS* environments from host to Wine</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s="</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^(LC_|R_LIBS)"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="st">"wine"</span>,</span>
-<span>    <span class="st">"C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe"</span></span>
+<span>    <span class="st">"C:/Program Files/R/R-4.5.0/bin/x64/Rscript.exe"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Socket cluster with 1 nodes where 1 node is on host 'localhost'</span></span>
-<span><span class="co">#&gt; (R version 4.4.2 (2024-10-31 ucrt), platform x86_64-w64-mingw32)</span></span></code></pre></div>
+<span><span class="co">#&gt; (R version 4.5.0 (2025-04-11 ucrt), platform x86_64-w64-mingw32)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
