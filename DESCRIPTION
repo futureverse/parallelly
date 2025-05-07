@@ -24,6 +24,7 @@ LazyLoad: TRUE
 ByteCompile: TRUE
 URL: https://parallelly.futureverse.org, https://github.com/futureverse/parallelly
 BugReports: https://github.com/futureverse/parallelly/issues
+Language: en-US
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
