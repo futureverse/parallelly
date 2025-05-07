@@ -96,12 +96,15 @@ package is loaded).  The \code{mc.cores} option is used by for
 instance \code{\link[=mclapply]{mclapply}()} of the \pkg{parallel}
 package.
 
-\item \code{"connections"} -
+\item \code{"connections"} or \code{"connections-N"} -
 Query the current number of available R connections per
 \code{\link[=freeConnections]{freeConnections()}}.  This is the maximum number of socket-based
 \strong{parallel} cluster nodes that are possible launch, because each
 one needs its own R connection.
-The exception is when \code{freeConnections()} is zero, then \code{1L} is
+The \code{"connections-N"} form (e.g. \code{connections-16}) works like
+\code{"connections"} but uses \code{freeConnections() - N} as the upper limit,
+leaving \code{N} connections free for other purposes.
+The exception is when the result is zero or less, then \code{1L} is
 still returned, because \code{availableCores()} should always return a
 positive integer.
 

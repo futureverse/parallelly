@@ -76,12 +76,15 @@
 #'    instance \code{\link[=mclapply]{mclapply}()} of the \pkg{parallel}
 #'    package.
 #'
-#'  \item `"connections"` -
+#'  \item `"connections"` or `"connections-N"` -
 #'    Query the current number of available R connections per
 #'    [freeConnections()].  This is the maximum number of socket-based
 #'    **parallel** cluster nodes that are possible launch, because each
 #'    one needs its own R connection.
-#'    The exception is when `freeConnections()` is zero, then `1L` is
+#'    The `"connections-N"` form (e.g. `connections-16`) works like
+#'    `"connections"` but uses `freeConnections() - N` as the upper limit,
+#'    leaving `N` connections free for other purposes.
+#'    The exception is when the result is zero or less, then `1L` is
 #'    still returned, because `availableCores()` should always return a
 #'    positive integer.
 #'
@@ -230,8 +233,10 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
 
-  if ("connections" %in% constraints) {
-    methods <- unique(c(methods, "connections"))
+  pattern_connections <- "^connections(|-[[:digit:]]+)$"
+  idxs <- grep(pattern_connections, constraints)
+  if (length(idxs) > 0) {
+    methods <- unique(c(methods, constraints[idxs]))
   }
 
   which <- match.arg(which, choices = c("min", "max", "all"))
@@ -263,9 +268,14 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     } else if (method == "mc.cores+1") {
       ## Number of cores by option defined by 'parallel' package
       n <- getopt_int("mc.cores") + 1L
-    } else if (method == "connections") {
+    } else if (grepl(pattern_connections, method)) {
       ## Number of available connections, which are needed by PSOCK clusters
       n <- freeConnections()
+      delta <- sub(pattern_connections, "\\1", method)
+      if (nzchar(omit)) {
+        delta <- as.integer(delta)
+        n <- max(0L, n + delta)
+      }
     } else if (method == "BiocParallel") {
       n <- getenv_int("BIOCPARALLEL_WORKER_NUMBER")
     } else if (method == "_R_CHECK_LIMIT_CORES_") {
@@ -380,7 +390,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     idx_fallback <- which(names(ncores) == "fallback")
     if (length(idx_fallback) == 1) {
       ## Use 'fallback' if and only there are only "special" options specified
-      special <- c("system", "cgroups.cpuset", "cgroups.cpuquote", "nproc")
+      special <- c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc")
       others <- setdiff(names(ncores), c("fallback", special))
       use_fallback <- (length(others) == 0L)
 

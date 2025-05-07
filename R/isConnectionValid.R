@@ -109,7 +109,7 @@ isConnectionValid <- function(con) {
   ## No such connection index?
   if (!is.element(index, getAllConnections())) {
     res <- FALSE
-    attr(res, "reason") <- sprintf("Connection (%s) is no longer valid. There is currently no registered R connection with that index %d", connectionInfo(con), index)
+    attr(res, "reason") <- sprintf("Connection (%s) is no longer valid. There is currently no registered R connection with that index %d among the known ones (%s)", connectionInfo(con), index, paste(getAllConnections(), collapse = ", "))
     return(res)
   }
 
@@ -171,3 +171,5 @@ connectionInfo <- function(con) {
   info <- sprintf("connection: index=%d, %s", index, info)
   info
 }
+
+

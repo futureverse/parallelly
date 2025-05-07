@@ -1,3 +1,24 @@
+# Version 1.44.0 [2025-05-06]
+
+## New Features
+
+ * Add support to `availableCores()` and `availableWorkers()` to
+   specify `constraints = "connections-N"`, where `N` specifies the
+   number of connections to leave free after launching a PSOCK cluster
+   with this number of cores.
+
+ * Add `all.equal()` for `connection`, which can distinguish between
+   two connections that share the same connection index, but are not
+   the same connection, e.g. when one was created, then closed, and
+   another one of the same kind is created.
+
+## Bug Fixes
+
+ * `availableCores()` would not respect `method = "fallback"`, since
+   v1.41.0 (2024-12-18), on system with a value for `method =
+   "/proc/self/status"`.
+
+
 # Version 1.43.0 [2025-03-24]
 
 ## Significant Changes
@@ -65,7 +86,7 @@
    (2022-04-07).
 
 
-# Version 1.41.0 [2024-12-17]
+# Version 1.41.0 [2024-12-18]
 
 ## New Features
 
@@ -91,7 +112,7 @@
    richer support for the `rscript_sh` argument.
 
 
-# Version 1.40.1 [2024-12-03]
+# Version 1.40.1 [2024-12-04]
 
 ## Bug Fixes
 
