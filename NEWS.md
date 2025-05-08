@@ -1,7 +1,10 @@
 # Version (development version)
 
- * ...
- 
+## Bug Fixes
+
+ * `availableCores()` would not respect `method = "fallback"` if
+   `constraints` specified `"connections"` or `"connections-N"`.
+         
 
 # Version 1.44.0 [2025-05-07]
 
