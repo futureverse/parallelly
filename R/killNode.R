@@ -107,6 +107,13 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
     ## Try to signal the process
     res <- pskill(pid, signal = signal)
     if (getRversion() < "3.5.0") res <- NA
+
+    ## Close socket connection, if it exists
+    con <- x$con
+    if (inherits(con, "connection")) {
+      tryCatch(close(con), error = identity)
+    }
+    
     return(res)
   }
 
@@ -160,6 +167,7 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
   if (debug) mdebugf("Results: %s", res)
   status <- attr(res, "status")
   res <- as.logical(res)
+
   if (length(res) != 1L || is.na(res)) {
     res <- NA
     attr(res, "status") <- status
@@ -176,6 +184,12 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
     }
 
     warning(msg)
+  } else if (isTRUE(res)) {
+    ## Close socket connection, if it exists
+    con <- x$con
+    if (inherits(con, "connection")) {
+      tryCatch(close(con), error = identity)
+    }
   }
 
   res

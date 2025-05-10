@@ -1,5 +1,11 @@
 # Version (development version)
 
+## New Features
+
+ * `killNode()` on RichSOCKcluster and RichSOCKnode will now close any
+   socket connections, if they exists, immediately after it has
+   successfully terminated a cluster node.
+
 ## Bug Fixes
 
  * `availableCores()` would not respect `method = "fallback"` if
