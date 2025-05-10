@@ -44,7 +44,7 @@ cloneNode.RichSOCKnode <- function(x, ..., method = c("as-is", "vanilla")) {
   }
 
   method <- match.arg(method)
-  debug && mdebugf("method: %s", method)
+  if (debug) mdebugf("method: %s", method)
   
   ## Get the arguments used for creating the node to be cloned
   options <- attr(x, "options")
@@ -75,7 +75,7 @@ cloneNode.RichSOCKnode <- function(x, ..., method = c("as-is", "vanilla")) {
   node <- do.call(make_fcn, args = make_args)
 
   if (!is.null(x$session_info)) {
-    debug && mdebug("Adding node session information")
+    if (debug) mdebug("Adding node session information")
     node <- add_cluster_session_info(node)
   }
 
