@@ -72,8 +72,30 @@ killNode.default <- function(x, signal = tools::SIGTERM, ...) {
 killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...) {
   debug <- isTRUE(getOption("parallelly.debug"))
   if (debug) {
-    mdebug_push("killNode() for RichSOCKnode ...")
-    on.exit(mdebug_pop("killNode() for RichSOCKnode ... DONE"))
+    mdebugf_push("killNode() for %s ...", class(x)[1])
+  }
+
+  ## If successfully killed, and node has a socket connection, close it
+  success <- NA
+  if (inherits(x$con, "connection")) {
+    on.exit({
+      ## Close socket connection, if it exists
+      if (isTRUE(success)) {
+        if (debug) mdebug_push("Closing node socket connection ...")
+        res <- tryCatch({ close(x$con); TRUE }, error = function(ex) FALSE)
+        if (debug) {
+          mdebugf("Socket connection closed successfully: %s", res)
+          mdebug_pop("Closing node socket connection ... done")
+        }
+      }
+    })
+  }
+
+  if (debug) {
+    on.exit({
+      mdebugf("%s killed successfully: %s", class(x)[1], success)
+      mdebugf_pop("killNode() for %s ... DONE", class(x)[1])
+    }, add = TRUE)
   }
 
   stop_if_not(length(signal) > 0, is.numeric(signal), !anyNA(signal),
@@ -105,16 +127,9 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
   if (identical(hostname, Sys.info()[["nodename"]])) {
     if (debug) mdebug("The R worker is running on the current host")
     ## Try to signal the process
-    res <- pskill(pid, signal = signal)
-    if (getRversion() < "3.5.0") res <- NA
-
-    ## Close socket connection, if it exists
-    con <- x$con
-    if (inherits(con, "connection")) {
-      tryCatch(close(con), error = identity)
-    }
-    
-    return(res)
+    success <- pskill(pid, signal = signal)
+    if (getRversion() < "3.5.0") success <- NA
+    return(success)
   }
 
   if (debug) mdebug("The R worker is running on another host")
@@ -168,6 +183,7 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
   status <- attr(res, "status")
   res <- as.logical(res)
 
+  success <- FALSE
   if (length(res) != 1L || is.na(res)) {
     res <- NA
     attr(res, "status") <- status
@@ -185,14 +201,10 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
 
     warning(msg)
   } else if (isTRUE(res)) {
-    ## Close socket connection, if it exists
-    con <- x$con
-    if (inherits(con, "connection")) {
-      tryCatch(close(con), error = identity)
-    }
+    success <- TRUE
   }
 
-  res
+  success
 }
 
 #' @export
