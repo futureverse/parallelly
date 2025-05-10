@@ -33,8 +33,7 @@
 #' which were created by [makeClusterPSOCK()].  It does not work when
 #' using [parallel::makeCluster()] and friends.
 #'
-#' @examples
-#' \dontshow{if (.Platform[["OS.type"]] != "windows" || interactive()) \{}
+#' @examplesIf (interactive() || .Platform[["OS.type"]] != "windows")
 #' cl <- makeClusterPSOCK(2)
 #' print(isNodeAlive(cl))  ## [1] TRUE TRUE
 #' 
@@ -46,7 +45,6 @@
 #' Sys.sleep(1.0)
 #' 
 #' print(isNodeAlive(cl))  ## [1] FALSE FALSE
-#' \dontshow{\}}
 #'
 #' @seealso
 #' Use [isNodeAlive()] to check whether one or more cluster nodes are alive.

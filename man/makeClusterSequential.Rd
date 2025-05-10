@@ -20,7 +20,7 @@ This function is only defined for R (>= 4.4.0).
 }
 
 \examples{
-\dontshow{if (getRversion() >= "4.4.0") \{}
+\dontshow{if ((getRversion() >= "4.4.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(parallel)
 
 cl <- makeClusterSequential()
@@ -38,7 +38,5 @@ abc <- 3.14
 y <- clusterEvalQ(cl, { abc <- 42; abc })
 str(y)
 stopifnot(abc == 3.14)
-
-\dontshow{\}}
-
+\dontshow{\}) # examplesIf}
 }

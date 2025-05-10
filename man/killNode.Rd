@@ -46,7 +46,7 @@ using \code{\link[parallel:makeCluster]{parallel::makeCluster()}} and friends.
 }
 
 \examples{
-\dontshow{if (.Platform[["OS.type"]] != "windows" || interactive()) \{}
+\dontshow{if ((interactive() || .Platform[["OS.type"]] != "windows")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 cl <- makeClusterPSOCK(2)
 print(isNodeAlive(cl))  ## [1] TRUE TRUE
 
@@ -58,8 +58,7 @@ print(res)
 Sys.sleep(1.0)
 
 print(isNodeAlive(cl))  ## [1] FALSE FALSE
-\dontshow{\}}
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 Use \code{\link[=isNodeAlive]{isNodeAlive()}} to check whether one or more cluster nodes are alive.
