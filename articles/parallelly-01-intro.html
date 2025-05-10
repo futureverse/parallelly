@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -309,7 +309,7 @@ is to use:</p>
 <h3 id="availablecores-vs-paralleldetectcores">availableCores() vs parallel::detectCores()<a class="anchor" aria-label="anchor" href="#availablecores-vs-paralleldetectcores"></a>
 </h3>
 <p>The <code><a href="../reference/availableCores.html">availableCores()</a></code> function is designed as a better,
-safer alternative to <code>detectCores()</code> of the
+safer alternative to <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores()</a></code> of the
 <strong>parallel</strong> package. It is designed to be a worry-free
 solution for developers and end-users to query the number of available
 cores - a solution that plays nice on multi-tenant systems, in Linux
@@ -325,11 +325,11 @@ guaranteed to return a positive integer, and you can use
 <code>parallelly::availableCores(omit = 1)</code> to return all but one
 core and always at least one.</p>
 <p>Just like other software tools that “hijacks” all cores by default, R
-scripts, and packages that defaults to <code>detectCores()</code> number
+scripts, and packages that defaults to <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores()</a></code> number
 of parallel workers cause lots of suffering for fellow end-users and
 system administrators. For instance, a shared server with 48 cores will
 come to a halt already after a few users run parallel processing using
-<code>detectCores()</code> number of parallel workers. This problem gets
+<code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores()</a></code> number of parallel workers. This problem gets
 worse on machines with many cores because they can host even more
 concurrent users. If these R users would have used
 <code><a href="../reference/availableCores.html">availableCores()</a></code> instead, then the system administrator can
