@@ -98,6 +98,9 @@
 #'    `"warn"`) used by `R CMD check` and set to true by
 #'    `R CMD check --as-cran`. If set to a non-false value, then a maximum
 #'    of 2 cores is considered.
+#'    Note that `_R_CHECK_LIMIT_CORES_` is _not_ set when `R CMD build`
+#'    builds vignettes or when `R CMD check --as-cran` re-builds then as
+#'    part of the package checks.
 #'
 #'  \item `"Bioconductor"` -
 #'    Query environment variable \env{IS_BIOC_BUILD_MACHINE} (logical)

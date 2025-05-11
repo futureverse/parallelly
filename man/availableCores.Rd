@@ -118,6 +118,9 @@ Query environment variable \env{_R_CHECK_LIMIT_CORES_} (logical or
 \code{"warn"}) used by \verb{R CMD check} and set to true by
 \verb{R CMD check --as-cran}. If set to a non-false value, then a maximum
 of 2 cores is considered.
+Note that \verb{_R_CHECK_LIMIT_CORES_} is \emph{not} set when \verb{R CMD build}
+builds vignettes or when \verb{R CMD check --as-cran} re-builds then as
+part of the package checks.
 
 \item \code{"Bioconductor"} -
 Query environment variable \env{IS_BIOC_BUILD_MACHINE} (logical)
