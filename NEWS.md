@@ -7,7 +7,8 @@
    successfully terminated a cluster node.
    
  * The session information collected by `makeClusterPSOCK()` now
-   contains also information on each worker's `tempdir()` folder.
+   contains more details on each worker, e.g. the `tempdir()` folder,
+   `capabilities()`, `extSoftVersion()`, and LAPACK details.
 
 ## Bug Fixes
 
