@@ -210,6 +210,7 @@ session_info <- function(pkgs = getOption2("parallelly.makeNodePSOCK.sessionInfo
       }), names = libs)
     },
     pwd = getwd(),
+    tempdir = tempdir(),
     process = list(pid = Sys.getpid())
   )
   info

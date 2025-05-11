@@ -5,6 +5,9 @@
  * `killNode()` on RichSOCKcluster and RichSOCKnode will now close any
    socket connections, if they exist, immediately after it has
    successfully terminated a cluster node.
+   
+ * The session information collected by `makeClusterPSOCK()` now
+   contains also information on each worker's `tempdir()` folder.
 
 ## Bug Fixes
 
