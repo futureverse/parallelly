@@ -8,6 +8,25 @@
 #' supported on all operating systems (i.e. Unix, macOS, and MS Windows).
 #' All other signals are platform specific, cf. [tools::pskill()].
 #'
+#' With the exception for MS Windows, as explained below, using `SIGINT`
+#' will trigger an R [base::conditions][`interrupt` condition] that can
+#' be caught with [tryCatch()] and [withCallingHandlers()] using an
+#' `interrupt` calling handler.
+#' 
+#' When using `SIGTERM`, there will be no `interrupt` condition signaled,
+#' meaning your parallel R code does _not_ have a chance to exit gracefully.
+#' Instead, the R process terminates rather abruptly, leaving behind its
+#' temporary folder.
+#'
+#' Importantly, contrary to Linux and macOS, it is not possible to get a
+#' cluster node running on MS Windows to exit gracefully. For example,
+#' despite using `SIGINT`, there is no `interrupt` condition signaled.
+#' As a matter of fact, on MS Windows, `SIGINT` works identically to
+#' `SIGTERM`, where they both terminate the cluster node abruptly without
+#' giving the R process a chance to exit gracefully. This means that R will
+#' _not_ clean up after itself, e.g. there its temporary directory will
+#' remain also after R terminates. 
+#'
 #' @param \ldots Not used.
 #'
 #' @return

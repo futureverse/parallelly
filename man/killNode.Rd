@@ -13,7 +13,26 @@ killNode(x, signal = tools::SIGTERM, ...)
 to the parallel R process.
 It's only \code{tools::SIGINT} (2) and \code{tools::SIGTERM} (15) that are
 supported on all operating systems (i.e. Unix, macOS, and MS Windows).
-All other signals are platform specific, cf. \code{\link[tools:pskill]{tools::pskill()}}.}
+All other signals are platform specific, cf. \code{\link[tools:pskill]{tools::pskill()}}.
+
+With the exception for MS Windows, as explained below, using \code{SIGINT}
+will trigger an R \link[=`interrupt` condition]{base::conditions} that can
+be caught with \code{\link[=tryCatch]{tryCatch()}} and \code{\link[=withCallingHandlers]{withCallingHandlers()}} using an
+\code{interrupt} calling handler.
+
+When using \code{SIGTERM}, there will be no \code{interrupt} condition signaled,
+meaning your parallel R code does \emph{not} have a chance to exit gracefully.
+Instead, the R process terminates rather abruptly, leaving behind its
+temporary folder.
+
+Importantly, contrary to Linux and macOS, it is not possible to get a
+cluster node running on MS Windows to exit gracefully. For example,
+despite using \code{SIGINT}, there is no \code{interrupt} condition signaled.
+As a matter of fact, on MS Windows, \code{SIGINT} works identically to
+\code{SIGTERM}, where they both terminate the cluster node abruptly without
+giving the R process a chance to exit gracefully. This means that R will
+\emph{not} clean up after itself, e.g. there its temporary directory will
+remain also after R terminates.}
 
 \item{\ldots}{Not used.}
 }
