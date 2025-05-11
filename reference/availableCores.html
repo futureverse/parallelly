@@ -15,7 +15,7 @@ number of cores available is always at least one."><meta property="og:image" con
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -203,7 +203,10 @@ If the former is set, this is the number of cores considered.</p></li>
 Query environment variable <code class="env">_R_CHECK_LIMIT_CORES_</code> (logical or
 <code>"warn"</code>) used by <code>R CMD check</code> and set to true by
 <code>R CMD check --as-cran</code>. If set to a non-false value, then a maximum
-of 2 cores is considered.</p></li>
+of 2 cores is considered.
+Note that <code>_R_CHECK_LIMIT_CORES_</code> is <em>not</em> set when <code>R CMD build</code>
+builds vignettes or when <code>R CMD check --as-cran</code> re-builds then as
+part of the package checks.</p></li>
 <li><p><code>"Bioconductor"</code> -
 Query environment variable <code class="env">IS_BIOC_BUILD_MACHINE</code> (logical)
 used by the Bioconductor (&gt;= 3.16) build and check system. If set to
