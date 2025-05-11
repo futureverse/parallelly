@@ -16,7 +16,7 @@ supported on all operating systems (i.e. Unix, macOS, and MS Windows).
 All other signals are platform specific, cf. \code{\link[tools:pskill]{tools::pskill()}}.
 
 With the exception for MS Windows, as explained below, using \code{SIGINT}
-will trigger an R \link[=`interrupt` condition]{base::conditions} that can
+will trigger an R \link[base:conditions]{\code{interrupt}} condition that can
 be caught with \code{\link[=tryCatch]{tryCatch()}} and \code{\link[=withCallingHandlers]{withCallingHandlers()}} using an
 \code{interrupt} calling handler.
 
