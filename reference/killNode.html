@@ -100,7 +100,7 @@ It's only <code><a href="https://rdrr.io/r/tools/pskill.html" class="external-li
 supported on all operating systems (i.e. Unix, macOS, and MS Windows).
 All other signals are platform specific, cf. <code><a href="https://rdrr.io/r/tools/pskill.html" class="external-link">tools::pskill()</a></code>.</p>
 <p>With the exception for MS Windows, as explained below, using <code>SIGINT</code>
-will trigger an R base::conditions that can
+will trigger an R <a href="https://rdrr.io/r/base/conditions.html" class="external-link"><code>interrupt</code></a> condition that can
 be caught with <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch()</a></code> and <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers()</a></code> using an
 <code>interrupt</code> calling handler.</p>
 <p>When using <code>SIGTERM</code>, there will be no <code>interrupt</code> condition signaled,
