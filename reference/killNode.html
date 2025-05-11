@@ -98,7 +98,23 @@
 to the parallel R process.
 It's only <code><a href="https://rdrr.io/r/tools/pskill.html" class="external-link">tools::SIGINT</a></code> (2) and <code><a href="https://rdrr.io/r/tools/pskill.html" class="external-link">tools::SIGTERM</a></code> (15) that are
 supported on all operating systems (i.e. Unix, macOS, and MS Windows).
-All other signals are platform specific, cf. <code><a href="https://rdrr.io/r/tools/pskill.html" class="external-link">tools::pskill()</a></code>.</p></dd>
+All other signals are platform specific, cf. <code><a href="https://rdrr.io/r/tools/pskill.html" class="external-link">tools::pskill()</a></code>.</p>
+<p>With the exception for MS Windows, as explained below, using <code>SIGINT</code>
+will trigger an R base::conditions that can
+be caught with <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch()</a></code> and <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers()</a></code> using an
+<code>interrupt</code> calling handler.</p>
+<p>When using <code>SIGTERM</code>, there will be no <code>interrupt</code> condition signaled,
+meaning your parallel R code does <em>not</em> have a chance to exit gracefully.
+Instead, the R process terminates rather abruptly, leaving behind its
+temporary folder.</p>
+<p>Importantly, contrary to Linux and macOS, it is not possible to get a
+cluster node running on MS Windows to exit gracefully. For example,
+despite using <code>SIGINT</code>, there is no <code>interrupt</code> condition signaled.
+As a matter of fact, on MS Windows, <code>SIGINT</code> works identically to
+<code>SIGTERM</code>, where they both terminate the cluster node abruptly without
+giving the R process a chance to exit gracefully. This means that R will
+<em>not</em> clean up after itself, e.g. there its temporary directory will
+remain also after R terminates.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
