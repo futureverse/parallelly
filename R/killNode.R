@@ -9,8 +9,8 @@
 #' All other signals are platform specific, cf. [tools::pskill()].
 #'
 #' With the exception for MS Windows, as explained below, using `SIGINT`
-#' will trigger an R \link[base:conditions]{`interrupt`} condition that can
-#' be caught with [tryCatch()] and [withCallingHandlers()] using an
+#' will trigger an R \code{\link[base:conditions]{interrupt}} condition that
+#' can be caught with [tryCatch()] and [withCallingHandlers()] using an
 #' `interrupt` calling handler.
 #' 
 #' When using `SIGTERM`, there will be no `interrupt` condition signaled,
