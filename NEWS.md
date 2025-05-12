@@ -2,7 +2,7 @@
 
 ## New Features
 
- * If `killNode(..., signal = tools::SIGTERM)` successfully signalled
+ * If `killNode(..., signal = tools::SIGTERM)` successfully signaled
    the cluster node, it will now close any any existing socket
    connection to the node. If the node is running on local host, it
    will also remove its temporary directory, because the the node's R
