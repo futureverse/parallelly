@@ -53,26 +53,6 @@
 #' using [parallel::makeCluster()] and friends.
 #'
 #' @examplesIf (interactive() || .Platform[["OS.type"]] != "windows")
-#' library(parallel)
-#' cl <- makeCluster(1L)
-#' 
-#' res <- clusterEvalQ(cl, tryCatch(capabilities(), error = identity))
-#' print(res)
-#' 
-#' res <- clusterEvalQ(cl, tryCatch(l10n_info(), error = identity))
-#' print(res)
-#' 
-#' res <- clusterEvalQ(cl, tryCatch(La_version(), error = identity))
-#' print(res)
-#' 
-#' res <- clusterEvalQ(cl, tryCatch(La_library(), error = identity))
-#' print(res)
-#' 
-#' res <- clusterEvalQ(cl, tryCatch(extSoftVersion(), error = identity))
-#' print(res)
-#' 
-#' stopCluster(cl)
-#' 
 #' cl <- makeClusterPSOCK(2)
 #' print(isNodeAlive(cl))  ## [1] TRUE TRUE
 #' 

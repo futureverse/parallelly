@@ -8,7 +8,7 @@
    
  * The session information collected by `makeClusterPSOCK()` now
    contains more details on each worker, e.g. the `tempdir()` folder,
-   `capabilities()`, `extSoftVersion()`, and LAPACK details.
+   `capabilities()`, and `extSoftVersion()`.
 
 ## Bug Fixes
 
