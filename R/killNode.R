@@ -87,6 +87,7 @@ killNode.default <- function(x, signal = tools::SIGTERM, ...) {
 }
 
 #' @importFrom tools pskill
+#' @importFrom utils file_test
 #' @export
 killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...) {
   debug <- isTRUE(getOption("parallelly.debug"))
@@ -96,19 +97,82 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
 
   ## If successfully killed, and node has a socket connection, close it
   success <- NA
-  if (inherits(x$con, "connection")) {
-    on.exit({
-      ## Close socket connection, if it exists
-      if (isTRUE(success)) {
-        if (debug) mdebug_push("Closing node socket connection ...")
-        res <- tryCatch({ close(x$con); TRUE }, error = function(ex) FALSE)
-        if (debug) {
-          mdebugf("Socket connection closed successfully: %s", res)
-          mdebug_pop("Closing node socket connection ... done")
-        }
+  on.exit({
+    ## Epilogue cleanups, if successfully signaled
+    if (isTRUE(success)) local({
+      if (debug) {
+        mdebug_push("Post-kill cleanup ...")
+        mdebugf("Signal: %d", signal)
+        on.exit(mdebug_pop("Post-kill cleanup ... done"))
       }
-    })
-  }
+
+      ## We can only assue worker has been terminates if
+      ## SIGTERM or SIGKILL was used
+      if (signal %in% c(tools::SIGTERM, tools::SIGKILL)) {
+        ## (a) Close socket connection, if it exists
+        if (inherits(x[["con"]], "connection")) {
+          local({
+            res <- FALSE
+            if (debug) {
+              mdebug_push("Closing node socket connection ...")
+              on.exit({
+                mdebugf("Socket connection closed successfully: %s", res)
+                mdebug_pop("Closing node socket connection ... done")
+              })
+            }
+            res <- tryCatch({
+              close(x[["con"]])
+              TRUE
+            }, error = function(ex) FALSE)
+          })
+        }
+        
+        ## (b) Remove node's temporary folder, it exists
+        tempdir <- x[["session_info"]][["tempdir"]]
+        if (length(tempdir) == 1L) {
+          ## Importantly, we can delete this even if the parallel
+          ## worker is still running. This has been confirmed on
+          ## Linux. Given that we wish to terminate the node,
+          ## I guess that's alright. If the node tries to create
+          ## or write more temporary files, it will produce an
+          ## error on the node, which will cause the worker to
+          ## terminate.
+
+          local({
+            mdebug_push("Remove node's temporary directory ...")
+            on.exit({
+              mdebug_pop("Remove node's temporary directory ... done")
+            })
+            
+            host <- x[["host"]]
+            localhost <- isTRUE(attr(host, "localhost"))
+            mdebugf("Host: %s (%s)", sQuote(host),
+                    if (localhost) "localhost" else "remote")
+            mdebugf("Directory: %s", sQuote(tempdir))
+
+            res <- FALSE
+
+            ## Are we running on local host?
+            if (localhost) {
+              if (file_test("-d", tempdir)) {
+                res <- tryCatch({
+                  unlink(tempdir, recursive = TRUE, force = TRUE)
+                  TRUE
+                }, error = function(ex) FALSE)
+                mdebugf("Directory removed successfully: %s", res)
+              } else {
+                mdebug("Skipping. Directory does not exist")
+              }
+            } else {
+              mdebug("Skipping. Deletion of remote temporary folders is not yet implemented")
+            } ## if (localhost)
+          }) ## local()
+        } ## if (length(tempdir) == 1)
+      } else {
+        if (debug) mdebug("Skipping, because signal was %d", signal)
+      } ## if (signal %in% ...)
+    }) ## if (isTRUE(success)) local({ ... })
+  }) ## on.exit()
 
   if (debug) {
     on.exit({

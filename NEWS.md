@@ -2,9 +2,11 @@
 
 ## New Features
 
- * `killNode()` on RichSOCKcluster and RichSOCKnode will now close any
-   socket connections, if they exist, immediately after it has
-   successfully terminated a cluster node.
+ * If `killNode(..., signal = tools::SIGTERM)` successfully signalled
+   the cluster node, it will now close any any existing socket
+   connection to the node. If the node is running on local host, it
+   will also remove its temporary directory, because the the node's R
+   process might not have been exited gracefully.
    
  * The session information collected by `makeClusterPSOCK()` now
    contains more details on each worker, e.g. the `tempdir()` folder,
