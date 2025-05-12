@@ -1,24 +1,3 @@
-library(parallel)
-cl <- makeCluster(1L)
-
-res <- clusterEvalQ(cl, tryCatch(capabilities(), error = identity))
-print(res)
-
-res <- clusterEvalQ(cl, tryCatch(l10n_info(), error = identity))
-print(res)
-
-res <- clusterEvalQ(cl, tryCatch(La_version(), error = identity))
-print(res)
-
-res <- clusterEvalQ(cl, tryCatch(La_library(), error = identity))
-print(res)
-
-res <- clusterEvalQ(cl, tryCatch(extSoftVersion(), error = identity))
-print(res)
-
-stopCluster(cl)
-
-
 ## NOTE: Drop 'dryrun = TRUE' below in order to actually connect.  Add
 ## 'verbose = TRUE' if you run into problems and need to troubleshoot.
 

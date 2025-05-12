@@ -66,6 +66,26 @@ using \code{\link[parallel:makeCluster]{parallel::makeCluster()}} and friends.
 
 \examples{
 \dontshow{if ((interactive() || .Platform[["OS.type"]] != "windows")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(parallel)
+cl <- makeCluster(1L)
+
+res <- clusterEvalQ(cl, tryCatch(capabilities(), error = identity))
+print(res)
+
+res <- clusterEvalQ(cl, tryCatch(l10n_info(), error = identity))
+print(res)
+
+res <- clusterEvalQ(cl, tryCatch(La_version(), error = identity))
+print(res)
+
+res <- clusterEvalQ(cl, tryCatch(La_library(), error = identity))
+print(res)
+
+res <- clusterEvalQ(cl, tryCatch(extSoftVersion(), error = identity))
+print(res)
+
+stopCluster(cl)
+
 cl <- makeClusterPSOCK(2)
 print(isNodeAlive(cl))  ## [1] TRUE TRUE
 
