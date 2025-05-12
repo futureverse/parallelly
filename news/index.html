@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9011</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,8 +79,8 @@
 <h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/killNode.html">killNode()</a></code> on RichSOCKcluster and RichSOCKnode will now close any socket connections, if they exist, immediately after it has successfully terminated a cluster node.</p></li>
-<li><p>The session information collected by <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> now contains also information on each worker’s <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code> folder.</p></li>
+<ul><li><p>If <code>killNode(..., signal = tools::SIGTERM)</code> successfully signalled the cluster node, it will now close any any existing socket connection to the node. If the node is running on local host, it will also remove its temporary directory, because the the node’s R process might not have been exited gracefully.</p></li>
+<li><p>The session information collected by <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> now contains more details on each worker, e.g. the <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code> folder, <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code>, and <code><a href="https://rdrr.io/r/base/extSoftVersion.html" class="external-link">extSoftVersion()</a></code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
