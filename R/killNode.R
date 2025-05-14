@@ -43,9 +43,15 @@
 #' terminates the underlying R process, possibly without giving the
 #' parallel worker a chance to terminate gracefully.  For example,
 #' it might get terminated in the middle of writing to file.
-#' 
 #' [tools::pskill()] is used to send the signal to the R process hosting
 #' the parallel worker.
+#'
+#' If `signal = tools::SIGTERM` is used and success, this function
+#' will also close any existing socket connection to the node, if they
+#' exist. Moreover, if the node is running on the local host, this
+#' function will also attempt to remove the node's temporary directory,
+#' which is done because the node's R process might not have been exited
+#' gracefully.
 #'
 #' @section Known limitations:
 #' This function works only with cluster nodes of class `RichSOCKnode`,
