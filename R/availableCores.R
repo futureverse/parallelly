@@ -274,10 +274,14 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     } else if (grepl(pattern_connections, method)) {
       ## Number of available connections, which are needed by PSOCK clusters
       n <- freeConnections()
-      delta <- sub(pattern_connections, "\\1", method)
-      if (nzchar(omit)) {
-        delta <- as.integer(delta)
-        n <- max(0L, n + delta)
+      if (!is.na(n)) {
+        delta <- sub(pattern_connections, "\\1", method)
+        if (nzchar(delta) && nzchar(omit)) {
+          delta <- as.integer(delta)
+          n <- max(0L, n + delta)
+        }
+        ## Return at least one
+        if (n <= 0L) n <- 1L
       }
     } else if (method == "BiocParallel") {
       n <- getenv_int("BIOCPARALLEL_WORKER_NUMBER")
