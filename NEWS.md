@@ -16,7 +16,14 @@
 
  * `availableCores()` would not respect `method = "fallback"` if
    `constraints` specified `"connections"` or `"connections-N"`.
-         
+
+ * `availableCores()` would produce an error on `Error in scan(file =
+   file, what = what, ...)` on systems that have a `/proc/self/mounts`
+   file with syntax errors. Such files have been reported on Windows
+   Subsystem for Linux version 2 (WSL 2), where spaces in Windows path
+   have not been properly escaped for some entries. Now such invalid
+   entries are skipped, before parsing the mount table.
+
 
 # Version 1.44.0 [2025-05-07]
 

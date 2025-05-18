@@ -53,14 +53,47 @@ procPath <- local({
 #' @importFrom utils read.table
 readMounts <- function(file) {
   stopifnot(file_test("-f", file))
-  data <- read.table(file, sep = " ", stringsAsFactors = FALSE)
+
+  ## A /proc/self/mounts file has lines following of format:
+  ## 
+  ## <source> <target> <fstype> <options> <dump> <pass>
+  ##
+  ## where the fields are separated by SPACE:s. Now, some files
+  ## may have syntax errors on some lines. For example, one
+  ## Windows WSL2 user reports extraneous SPACE:s due to SPACEs
+  ## in Windows paths (e.g. 'C:\\Program Files\\...') that are
+  ## should have been escaped as '\\040' [1]. Because of this,
+  ## we cannot assume everything is six fields and use:
+  ##   data <- read.table(file, sep = " ")
+  ## The Linux 'findmnt' tool ignores such misconfigured lines
+  ## with a stderr note. We will do the same here.
+  ## [1] https://github.com/futureverse/parallelly/issues/132
+  ## NOTE: Some /proc/self/mounts files may have syntax eros
+
+  ## Drop invalid lines
+  lines <- readLines(file)
+  parts <- strsplit(lines, split = " ", fixed = TRUE)
+  ns <- vapply(parts, FUN.VALUE = NA_integer_, FUN = length)
+  ## Drop misconfigured lines
+  keep <- (ns == 6)
+  invalid <- lines[!keep]
+  names(invalid) <- which(!keep)
+  lines <- lines[keep]
+
+  ## Parse the valid lines
+  data <- read.table(text = lines, sep = " ", stringsAsFactors = FALSE)
+
   names <- c("device", "mountpoint", "type", "options", "dump", "pass")
   if (ncol(data) < length(names)) {
     names <- names[seq_len(ncol(data))]
   } else if (ncol(data) > length(names)) {
     names <- c(names, rep("", ncol(data) - length(names)))
   }
-  names(data) <- names  
+  names(data) <- names
+
+  ## Return invalid entries too
+  if (length(invalid) > 0) attr(data, "invalid") <- invalid
+  
   data
 }
 
