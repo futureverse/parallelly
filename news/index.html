@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9015</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,8 +84,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>
-<code><a href="../reference/availableCores.html">availableCores()</a></code> would not respect <code>method = "fallback"</code> if <code>constraints</code> specified <code>"connections"</code> or <code>"connections-N"</code>.</li>
+<ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would not respect <code>method = "fallback"</code> if <code>constraints</code> specified <code>"connections"</code> or <code>"connections-N"</code>.</p></li>
+<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would produce an error on <code>Error in scan(file =    file, what = what, ...)</code> on systems that have a <code>/proc/self/mounts</code> file with syntax errors. Such files have been reported on Windows Subsystem for Linux version 2 (WSL 2), where spaces in Windows path have not been properly escaped for some entries. Now such invalid entries are skipped, before parsing the mount table.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
