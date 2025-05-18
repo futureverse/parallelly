@@ -279,9 +279,11 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
 
    ## Read the UID
    file <- file.path(tmpdir, "uid")
-   uid <- scan(file.path(tmpdir, "uid"), what = "integer", n = 1L, quiet = TRUE)
-   uid <- as.integer(uid)
-   message(sprintf(" - UID: %d", uid))
+   if (file_test("-f", file)) {
+     uid <- scan(file.path(tmpdir, "uid"), what = "integer", n = 1L, quiet = TRUE)
+     uid <- as.integer(uid)
+     message(sprintf(" - UID: %d", uid))
+   }
 
    ## Clear all memoization caches
    fcns <- list(
@@ -298,9 +300,12 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    }
 
    ## Adjust /proc accordingly
-   old_procPath <- procPath(file.path(tmpdir, "proc"))
-   on.exit(procPath(old_procPath), add = TRUE)
-   message(sprintf(" - procPath(): %s", sQuote(procPath())))
+   file <- file.path(tmpdir, "proc")
+   if (file_test("-d", file)) {
+     old_procPath <- procPath(file)
+     on.exit(procPath(old_procPath), add = TRUE)
+     message(sprintf(" - procPath(): %s", sQuote(procPath())))
+   }
 
    ## Disable max CPU cores validation
    old_maxCores <- maxCores(Inf)
@@ -310,15 +315,17 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    ## Adjust /sys/fs/cgroup root accordingly
    message(" - Adjust /proc/self/mounts accordingly:")
    file <- file.path(tmpdir, "proc", "self", "mounts")
-   mounts <- readMounts(file)
-   idxs <- which(mounts$type %in% c("cgroup", "cgroup2"))
-   for (idx in idxs) {
-     mounts[idx, "mountpoint"] <- normalizePath(file.path(tmpdir, mounts[idx, "mountpoint"]), winslash = "/", mustWork = FALSE)
+   if (file_test("-f", file)) {
+     mounts <- readMounts(file)
+     idxs <- which(mounts$type %in% c("cgroup", "cgroup2"))
+     for (idx in idxs) {
+       mounts[idx, "mountpoint"] <- normalizePath(file.path(tmpdir, mounts[idx, "mountpoint"]), winslash = "/", mustWork = FALSE)
+     }
+     writeMounts(mounts, file = file)
+     bfr <- readLines(file, warn = FALSE)
+     bfr <- sprintf("   %02d: %s", seq_along(bfr), bfr)
+     writeLines(bfr)
    }
-   writeMounts(mounts, file = file)
-   bfr <- readLines(file, warn = FALSE)
-   bfr <- sprintf("   %02d: %s", seq_along(bfr), bfr)
-   writeLines(bfr)
 
    message(" - getCGroupsVersion(): ", getCGroupsVersion())
 
