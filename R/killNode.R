@@ -214,7 +214,10 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
 
   ## Are we calling this from that same host?
   if (identical(hostname, Sys.info()[["nodename"]])) {
-    if (debug) mdebug("The R worker is running on the current host")
+    if (debug) {
+      mdebug("The R worker is running on the current host")
+      mdebugf("pskill(pid = %d, signal = %d)", pid, signal)
+    }
     ## Try to signal the process
     success <- pskill(pid, signal = signal)
     if (getRversion() < "3.5.0") success <- NA
