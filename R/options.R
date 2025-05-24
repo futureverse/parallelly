@@ -7,25 +7,6 @@
 #'  change in future versions of the package.  Please use with care until
 #'  further notice._
 #'
-#' @section Backward compatibility with the \pkg{future} package:
-#'
-#' The functions in the \pkg{parallelly} package originates from the
-#' \pkg{future} package.  Because they are widely used within the future
-#' ecosystem, we need to keep them backward compatible for quite a long time,
-#' in order for all existing packages and R scripts to have time to adjust.
-#' This also goes for the \R options and the environment variables used to
-#' configure these functions.
-#' All options and environment variables used here have prefixes `parallelly.`
-#' and `R_PARALLELLY_`, respectively.  Because of the backward compatibility
-#' with the \pkg{future} package, the same settings can also be controlled
-#' by options and environment variables with prefixes `future.` and
-#' `R_FUTURE_` until further notice, e.g. setting option
-#' `future.availableCores.fallback=1` is the same as setting option
-#' `parallelly.availableCores.fallback=1`, and setting environment
-#' variable \env{R_FUTURE_AVAILABLECORES_FALLBACK=1} is the same as setting
-#' \env{R_PARALLELLY_AVAILABLECORES_FALLBACK=1}.
-#'
-#'
 #' @section Configuring number of parallel workers:
 #'
 #' The below \R options and environment variables control the default results of [availableCores()] and [availableWorkers()].
@@ -118,6 +99,25 @@
 #' `"sequential"` (character).
 #' Similarly, if `R_PARALLELLY_AVAILABLECORES_FALLBACK="1"`, then option
 #' `parallelly.availableCores.fallback` is set to `1` (integer).
+#'
+#'
+#' @section Backward compatibility with the \pkg{future} package:
+#'
+#' The functions in the \pkg{parallelly} package originates from the
+#' \pkg{future} package.  Because they are widely used within the future
+#' ecosystem, we need to keep them backward compatible for quite a long time,
+#' in order for all existing packages and R scripts to have time to adjust.
+#' This also goes for the \R options and the environment variables used to
+#' configure these functions.
+#' All options and environment variables used here have prefixes `parallelly.`
+#' and `R_PARALLELLY_`, respectively.  Because of the backward compatibility
+#' with the \pkg{future} package, the same settings can also be controlled
+#' by options and environment variables with prefixes `future.` and
+#' `R_FUTURE_` until further notice, e.g. setting option
+#' `future.availableCores.fallback=1` is the same as setting option
+#' `parallelly.availableCores.fallback=1`, and setting environment
+#' variable \env{R_FUTURE_AVAILABLECORES_FALLBACK=1} is the same as setting
+#' \env{R_PARALLELLY_AVAILABLECORES_FALLBACK=1}.
 #'
 #'
 #' @examples
