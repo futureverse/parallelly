@@ -24,7 +24,9 @@
 #'
 #'  \item{`parallelly.availableCores.min`:}{(integer) The minimum number of cores [availableCores()] is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (`*`).  (Default: `1L`)}
 #'
-#'  \item{`parallelly.availableCores.omit`:}{(integer) Number of cores to set aside, i.e. not to include.}
+#'  \item{`parallelly.availableCores.omit`:}{(integer; non-negative) Number of cores to set aside, i.e. not to include.}
+#'
+#'  \item{`parallelly.availableCores.max`:}{(integer; positive) Maximum number of cores to return.}
 #'
 #'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")`)}
 #'
@@ -137,6 +139,7 @@
 #' parallelly.availableCores.min
 #' parallelly.availableCores.fallback
 #' parallelly.availableCores.omit
+#' parallelly.availableCores.max
 #' parallelly.availableCores.system
 #' parallelly.availableWorkers.methods
 #' parallelly.availableWorkers.custom
@@ -146,6 +149,7 @@
 #' parallelly.supportsMulticore.unstable
 #' R_PARALLELLY_AVAILABLECORES_FALLBACK
 #' R_PARALLELLY_AVAILABLECORES_OMIT
+#' R_PARALLELLY_AVAILABLECORES_MAX
 #' R_PARALLELLY_AVAILABLECORES_SYSTEM
 #' R_PARALLELLY_AVAILABLECORES_MIN
 #' R_PARALLELLY_FORK_ENABLE
@@ -319,6 +323,7 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("availableCores.system", mode = "integer", disallow = NULL, debug = debug)
   update_package_option("availableCores.logical", mode = "logical", debug = debug)
   update_package_option("availableCores.omit", mode = "integer", debug = debug)
+  update_package_option("availableCores.max", mode = "numeric", disallow = "NA", debug = debug)
 
   update_package_option("availableWorkers.methods", mode = "character", split = ",", debug = debug)
 

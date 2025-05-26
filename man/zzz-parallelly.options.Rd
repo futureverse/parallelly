@@ -9,6 +9,7 @@
 \alias{parallelly.availableCores.min}
 \alias{parallelly.availableCores.fallback}
 \alias{parallelly.availableCores.omit}
+\alias{parallelly.availableCores.max}
 \alias{parallelly.availableCores.system}
 \alias{parallelly.availableWorkers.methods}
 \alias{parallelly.availableWorkers.custom}
@@ -18,6 +19,7 @@
 \alias{parallelly.supportsMulticore.unstable}
 \alias{R_PARALLELLY_AVAILABLECORES_FALLBACK}
 \alias{R_PARALLELLY_AVAILABLECORES_OMIT}
+\alias{R_PARALLELLY_AVAILABLECORES_MAX}
 \alias{R_PARALLELLY_AVAILABLECORES_SYSTEM}
 \alias{R_PARALLELLY_AVAILABLECORES_MIN}
 \alias{R_PARALLELLY_FORK_ENABLE}
@@ -82,7 +84,9 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.availableCores.min}:}{(integer) The minimum number of cores \code{\link[=availableCores]{availableCores()}} is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (\code{*}).  (Default: \code{1L})}
 
-\item{\code{parallelly.availableCores.omit}:}{(integer) Number of cores to set aside, i.e. not to include.}
+\item{\code{parallelly.availableCores.omit}:}{(integer; non-negative) Number of cores to set aside, i.e. not to include.}
+
+\item{\code{parallelly.availableCores.max}:}{(integer; positive) Maximum number of cores to return.}
 
 \item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")})}
 
