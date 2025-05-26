@@ -23,7 +23,7 @@ further notice."><meta property="og:image" content="https://parallelly.futurever
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9022</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9023</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -224,7 +224,17 @@ running R in the RStudio Terminal.
 
 
 <dl><dt><code>parallelly.debug</code>:</dt>
-<dd><p>(logical) If <code>TRUE</code>, extensive debug messages are generated. (Default: <code>FALSE</code>)</p></dd>
+<dd><p>(logical)
+If <code>TRUE</code>, extensive debug messages are generated.
+(Default: <code>FALSE</code>)</p></dd>
+
+
+<dt><code>parallelly.makeNodePSOCK.calls</code>:</dt>
+<dd><p>(logical)
+If TRUE, then the call stack that launched the cluster node is revealed
+as a string part of the system call such that it can be viewed using
+tools such as <code>ps</code>.
+(Default: <code>FALSE</code>)</p></dd>
 
 
 </dl></div>
