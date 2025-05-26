@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9021</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.44.0-9022</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,6 +83,7 @@
 <li><p>The session information collected by <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> now contains more details on each worker, e.g. the <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code> folder, <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code>, and <code><a href="https://rdrr.io/r/base/extSoftVersion.html" class="external-link">extSoftVersion()</a></code>.</p></li>
 <li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> gained argument <code>max</code>, which limits the maximum number of cores returned after everything else is applied, i.e. <code>availableCores(..., max = n)</code> is short for <code>min(n,    availableCores(...), na.rm = TRUE)</code>.</p></li>
 <li><p><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> gained argument <code>...</code>, which passes any additional arguments to <code><a href="../reference/availableCores.html">availableCores()</a></code>, if specified.</p></li>
+<li><p>Cluster nodes created by <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> gained attribute <code>calls</code>, which records the <code><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.calls()</a></code>. This can be useful when troubleshooting from where a cluster was created.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
