@@ -11,7 +11,12 @@
  * The session information collected by `makeClusterPSOCK()` now
    contains more details on each worker, e.g. the `tempdir()` folder,
    `capabilities()`, and `extSoftVersion()`.
-   
+
+ * `availableCores()` gained argument `max`, which limits the maximum
+   number of cores returned after everything else is applied, i.e.
+   `availableCores(..., max = n)` is short for `min(n,
+   availableCores(...), na.rm = TRUE)`.
+
  * `availableWorkers()` gained argument `...`, which passes any
    additional arguments to `availableCores()`, if specified.
 

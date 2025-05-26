@@ -14,7 +14,8 @@ availableCores(
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
   which = c("min", "max", "all"),
-  omit = getOption2("parallelly.availableCores.omit", 0L)
+  omit = getOption2("parallelly.availableCores.omit", 0L),
+  max = getOption2("parallelly.availableCores.max", Inf)
 )
 }
 \arguments{
@@ -49,6 +50,10 @@ If \code{"max"}, the maximum value is returned (be careful!)
 If \code{"all"}, all values are returned.}
 
 \item{omit}{(integer; non-negative) Number of cores to not include.}
+
+\item{max}{(integer; positive) Maximum number of cores returned.
+\code{availableCores(..., max = n)} is short for
+\code{min(n, availableCores(...), na.rm = TRUE)}.}
 }
 \value{
 Return a positive (>= 1) integer.
