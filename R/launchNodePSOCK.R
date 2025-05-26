@@ -221,6 +221,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
   structure(
     list(con = con, host = worker, rank = rank, rshlogfile = rshlogfile),
     options = options,
+    calls = sys.calls(),
     class = c("RichSOCKnode", if (useXDR) "SOCKnode" else "SOCK0node")
   )
 } ## launchNodePSOCK()

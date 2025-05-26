@@ -20,6 +20,10 @@
  * `availableWorkers()` gained argument `...`, which passes any
    additional arguments to `availableCores()`, if specified.
 
+ * Cluster nodes created by `makeClusterPSOCK()` gained attribute
+   `calls`, which records the `sys.calls()`. This can be useful when
+   troubleshooting from where a cluster was created.
+ 
 ## Bug Fixes
 
  * `availableCores()` would not respect `method = "fallback"` if
