@@ -1,5 +1,5 @@
 pandoc: '3.4'
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   parallelly-01-intro: parallelly-01-intro.html
@@ -10,7 +10,7 @@ articles:
   parallelly-20-limit-workers: parallelly-20-limit-workers.html
   parallelly-21-container-workers: parallelly-21-container-workers.html
   parallelly-22-wine-workers: parallelly-22-wine-workers.html
-last_built: 2025-05-24T17:33Z
+last_built: 2025-05-26T19:55Z
 urls:
   reference: https://parallelly.futureverse.org/reference
   article: https://parallelly.futureverse.org/articles
