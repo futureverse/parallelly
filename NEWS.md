@@ -22,7 +22,10 @@
 
  * Cluster nodes created by `makeClusterPSOCK()` gained attribute
    `calls`, which records the `sys.calls()`. This can be useful when
-   troubleshooting from where a cluster was created.
+   troubleshooting from where a cluster was created. Analogously,
+   setting R option `parallelly.makeNodePSOCK.calls` to TRUE will
+   relay the call stack in the system call that launched the cluster
+   node.
  
 ## Bug Fixes
 
