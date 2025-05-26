@@ -11,6 +11,9 @@
  * The session information collected by `makeClusterPSOCK()` now
    contains more details on each worker, e.g. the `tempdir()` folder,
    `capabilities()`, and `extSoftVersion()`.
+   
+ * `availableWorkers()` gained argument `...`, which passes any
+   additional arguments to `availableCores()`, if specified.
 
 ## Bug Fixes
 

@@ -20,6 +20,8 @@
 #' If `"max"`, the maximum value is returned (be careful!)
 #' If `"all"`, all values are returned.
 #'
+#' @param \ldots Additional named arguments pass to [availableCores()].
+#'
 #' @return Return a character vector of workers, which typically consists
 #' of names of machines / compute nodes, but may also be IP numbers.
 #'
@@ -144,7 +146,7 @@
 #'
 #' @importFrom utils file_test
 #' @export
-availableWorkers <- function(constraints = NULL, methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = getOption2("parallelly.localhost.hostname", "localhost"), which = c("auto", "min", "max", "all")) {
+availableWorkers <- function(constraints = NULL, methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = getOption2("parallelly.localhost.hostname", "localhost"), which = c("auto", "min", "max", "all"), ...) {
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
@@ -163,7 +165,7 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
   }
 
   ## Default is to use the current machine
-  ncores <- availableCores(constraints = constraints, methods = methods, na.rm = FALSE, logical = logical, which = "all")
+  ncores <- availableCores(constraints = constraints, methods = methods, na.rm = FALSE, logical = logical, which = "all", ...)
 
   localhost_hostname <- getOption2("parallelly.localhost.hostname", "localhost")
   workers <- lapply(ncores, FUN = function(n) {

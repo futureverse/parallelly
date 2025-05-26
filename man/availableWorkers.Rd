@@ -13,7 +13,8 @@ availableWorkers(
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = getOption2("parallelly.localhost.hostname", "localhost"),
-  which = c("auto", "min", "max", "all")
+  which = c("auto", "min", "max", "all"),
+  ...
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ If \code{"auto"} (default), the first non-empty set found.
 If \code{"min"}, the minimum value is returned.
 If \code{"max"}, the maximum value is returned (be careful!)
 If \code{"all"}, all values are returned.}
+
+\item{\ldots}{Additional named arguments pass to \code{\link[=availableCores]{availableCores()}}.}
 }
 \value{
 Return a character vector of workers, which typically consists
