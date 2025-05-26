@@ -47,6 +47,7 @@
 \alias{parallelly.makeNodePSOCK.rshopts}
 \alias{parallelly.makeNodePSOCK.tries}
 \alias{parallelly.makeNodePSOCK.tries.delay}
+\alias{parallelly.makeNodePSOCK.calls}
 \alias{R_PARALLELLY_MAKENODEPSOCK_SETUP_STRATEGY}
 \alias{R_PARALLELLY_MAKENODEPSOCK_VALIDATE}
 \alias{R_PARALLELLY_MAKENODEPSOCK_CONNECTTIMEOUT}
@@ -57,6 +58,7 @@
 \alias{R_PARALLELLY_MAKENODEPSOCK_RSHOPTS}
 \alias{R_PARALLELLY_MAKENODEPSOCK_TRIES}
 \alias{R_PARALLELLY_MAKENODEPSOCK_TRIES_DELAY}
+\alias{R_PARALLELLY_MAKENODEPSOCK_CALLS}
 \title{Options Used by the 'parallelly' Package}
 \description{
 Below are the \R options and environment variables that are used by the
@@ -150,7 +152,17 @@ The below \R options and environment variables control the default results of \c
 
 
 \describe{
-\item{\code{parallelly.debug}:}{(logical) If \code{TRUE}, extensive debug messages are generated. (Default: \code{FALSE})}
+\item{\code{parallelly.debug}:}{(logical)
+If \code{TRUE}, extensive debug messages are generated.
+(Default: \code{FALSE})
+}
+
+\item{\code{parallelly.makeNodePSOCK.calls}:}{(logical)
+If TRUE, then the call stack that launched the cluster node is revealed
+as a string part of the system call such that it can be viewed using
+tools such as \code{ps}.
+(Default: \code{FALSE})
+}
 }
 }
 

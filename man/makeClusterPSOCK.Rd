@@ -50,6 +50,7 @@ makeNodePSOCK(
   dryrun = FALSE,
   quiet = FALSE,
   setup_strategy = getOption2("parallelly.makeNodePSOCK.setup_strategy", "parallel"),
+  calls = getOption2("parallelly.makeNodePSOCK.calls", FALSE),
   action = c("launch", "options"),
   verbose = FALSE
 )
@@ -226,6 +227,10 @@ using \code{verbose = TRUE}.}
 \item{setup_strategy}{If \code{"parallel"} (default), the workers are set up
 concurrently, one after the other.  If \code{"sequential"}, they are set up
 sequentially.}
+
+\item{calls}{If TRUE, the call stack is recorded and revealed in the
+system call launching the cluster node. This can be useful when trying
+to identify which package and function created a particular cluster node.}
 
 \item{action}{This is an internal argument.}
 

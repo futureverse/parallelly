@@ -84,11 +84,20 @@
 #'  \item{`parallelly.makeNodePSOCK.tries.delay`:}{(numeric) The number of seconds to wait before trying to launch a cluster node that failed to launch previously.  Only used when setting up cluster nodes using the sequential strategy.}
 #' }
 #'
-#'
 #' @section Options for debugging:
 #'
 #' \describe{
-#'  \item{`parallelly.debug`:}{(logical) If `TRUE`, extensive debug messages are generated. (Default: `FALSE`)}
+#'  \item{`parallelly.debug`:}{(logical)
+#'   If `TRUE`, extensive debug messages are generated.
+#'   (Default: `FALSE`)
+#'  }
+#'
+#'  \item{`parallelly.makeNodePSOCK.calls`:}{(logical)
+#'   If TRUE, then the call stack that launched the cluster node is revealed
+#'   as a string part of the system call such that it can be viewed using
+#'   tools such as `ps`.
+#'   (Default: `FALSE`)
+#'  }
 #' }
 #'
 #'
@@ -179,6 +188,7 @@
 #' parallelly.makeNodePSOCK.rshopts
 #' parallelly.makeNodePSOCK.tries
 #' parallelly.makeNodePSOCK.tries.delay
+#' parallelly.makeNodePSOCK.calls
 #' R_PARALLELLY_MAKENODEPSOCK_SETUP_STRATEGY
 #' R_PARALLELLY_MAKENODEPSOCK_VALIDATE
 #' R_PARALLELLY_MAKENODEPSOCK_CONNECTTIMEOUT
@@ -189,6 +199,7 @@
 #' R_PARALLELLY_MAKENODEPSOCK_RSHOPTS
 #' R_PARALLELLY_MAKENODEPSOCK_TRIES
 #' R_PARALLELLY_MAKENODEPSOCK_TRIES_DELAY
+#' R_PARALLELLY_MAKENODEPSOCK_CALLS
 #'
 ## Internal options and environment variables _not_ documented here:
 ## parallelly.localhost.hostname
@@ -350,4 +361,5 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("makeNodePSOCK.autoKill", mode = "logical", debug = debug)
   update_package_option("makeNodePSOCK.master.localhost.hostname", mode = "character", debug = debug)
   update_package_option("makeNodePSOCK.port.increment", mode = "logical", debug = debug)
+  update_package_option("makeNodePSOCK.calls", mode = "logical", debug = debug)
 }
