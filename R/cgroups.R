@@ -54,7 +54,7 @@ procPath <- local({
 readMounts <- function(file) {
   stopifnot(file_test("-f", file))
 
-  ## A /proc/self/mounts file has lines following of format:
+  ## A /proc/self/mounts file has lines of format:
   ## 
   ## <source> <target> <fstype> <options> <dump> <pass>
   ##
