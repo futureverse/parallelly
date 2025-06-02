@@ -1,30 +1,99 @@
-testme_package <- Sys.getenv("R_TESTME_PACKAGE", NA_character_)
-if (is.na(testme_package)) {
-  stop("testme: Environment variable 'R_TESTME_PACKAGE' is not set")
+#!/usr/bin/env Rscript
+
+#' Run a 'testme' Test Script
+#'
+#' R usage:
+#' future::testme("<name>")
+#'
+#' Command-line usage:
+#' Rscript tests/test-<name>.R
+#'
+#' Command-line usage without package re-install:
+#' Rscript inst/testme/run.R --name=<name>
+
+cmd_args <- commandArgs(trailingOnly = TRUE)
+
+pattern <- "--package=([[:alpha:][:alnum:]]+)"
+idx <- grep(pattern, cmd_args)
+if (length(idx) > 0L) {
+  stopifnot(length(idx) == 1L)
+  testme_package <- gsub(pattern, "\\1", cmd_args[idx])
+  cmd_args <- cmd_args[-idx]
+} else {
+  testme_package <- Sys.getenv("R_TESTME_PACKAGE", NA_character_)
+  if (is.na(testme_package)) {
+    desc <- read.dcf("DESCRIPTION")
+    testme_package <- desc[1, "Package"]
+  }
 }
 
-path <- Sys.getenv("R_TESTME_PATH", NA_character_)
-if (is.na(path)) {
-  path <- system.file(package = testme_package, "testme", mustWork = TRUE)
-} else if (!utils::file_test("-d", path)) {
-  stop("There exist no such 'R_TESTME_PATH' folder: ", sQuote(path))
+pattern <- "--path=([[:alpha:][:alnum:]]+)"
+idx <- grep(pattern, cmd_args)
+if (length(idx) > 0L) {
+  stopifnot(length(idx) == 1L)
+  path <- gsub(pattern, "\\1", cmd_args[idx])
+  cmd_args <- cmd_args[-idx]
+} else {
+  path <- Sys.getenv("R_TESTME_PATH", NA_character_)
+  if (is.na(path)) {
+    path <- file.path("inst", "testme")
+  }
+  if (!utils::file_test("-d", path)) {
+    stop("There exist no such 'R_TESTME_PATH' folder: ", sQuote(path))
+  }
 }
 Sys.setenv(R_TESTME_PATH = path)
 
 
-testme_name <- Sys.getenv("R_TESTME_NAME", NA_character_)
-if (is.na(testme_name)) {
-  stop("testme: Environment variable 'R_TESTME_NAME' is not set")
+pattern <- "--name=([[:alpha:][:alnum:]]+)"
+idx <- grep(pattern, cmd_args)
+if (length(idx) > 0L) {
+  stopifnot(length(idx) == 1L)
+  testme_name <- gsub(pattern, "\\1", cmd_args[idx])
+  cmd_args <- cmd_args[-idx]
+} else {
+  testme_name <- NULL
 }
+
+## Fallback for 'testme_name'?
+if (is.null(testme_name)) {
+  if (length(cmd_args) > 0) {
+    stopifnot(length(cmd_args) == 1L)
+    file <- cmd_args[1]
+    if (utils::file_test("-f", file)) {
+      testme_name <- gsub("(^test-|[.]R$)", "", basename(file))
+    } else {
+      stop("No such file: ", file)
+    }
+  } else {
+    testme_name <- Sys.getenv("R_TESTME_NAME", NA_character_)
+    if (is.na(testme_name)) {
+      stop("testme: Environment variable 'R_TESTME_NAME' is not set")
+    }
+  }
+}
+
 
 testme_file <- file.path(path, sprintf("test-%s.R", testme_name))
 if (!utils::file_test("-f", testme_file)) {
   stop("There exist no such 'testme' file: ", sQuote(testme_file))
 }
 
+
 ## -----------------------------------------------------------------
 ## testme environment
 ## -----------------------------------------------------------------
+on_cran <- function() {
+  not_cran <- Sys.getenv("NOT_CRAN", NA_character_)
+  if (is.na(not_cran)) {
+    not_cran <- FALSE
+  } else {
+    not_cran <- isTRUE(as.logical(not_cran))
+  }
+  !interactive() && !not_cran
+} ## on_cran()
+
+
 ## Get test script tags
 tags <- local({
   lines <- readLines(testme_file, warn = FALSE)
@@ -42,22 +111,29 @@ if (length(tags) > 0) {
 }
 
 ## Create 'testme' environment on the search() path
-if ("testme" %in% search()) detach(name = "testme")
-testme <- attach(list(
+testme_config <- list(
   package = testme_package,
      name = testme_name,
      tags = tags,
    status = "created",
     start = proc.time(),
    script = testme_file,
+  on_cran = on_cran(),
     debug = isTRUE(as.logical(Sys.getenv("R_TESTME_DEBUG")))
-), name = "testme", warn.conflicts = FALSE)
+)
+if ("testme" %in% search()) detach(name = "testme")
+testme <- attach(testme_config, name = "testme", warn.conflicts = FALSE)
 rm(list = c("tags", "testme_package", "testme_name", "testme_file"))
 
 
 ## -----------------------------------------------------------------
 ## Filters
-## -----------------------------------------------------------------x
+## -----------------------------------------------------------------
+## Skip on CRAN? To run these tests, set env var NOT_CRAN=true
+if ("skip_on_cran" %in% tags && on_cran()) {
+  testme[["status"]] <- "skipped"
+}
+
 code <- Sys.getenv("R_TESTME_FILTER_NAME", NA_character_)
 if (!is.na(code)) {
   expr <- tryCatch(parse(text = code), error = identity)
@@ -70,7 +146,7 @@ if (!is.na(code)) {
     stop("Evaluation of R_TESTME_FILTER_NAME=%s produced an error: %s",
          sQuote(code), conditionMessage(keep))
   }
-  if (!isTRUE(keep)) envir[["status"]] <- "skipped"
+  if (!isTRUE(keep)) testme[["status"]] <- "skipped"
 }
 
 code <- Sys.getenv("R_TESTME_FILTER_TAGS", NA_character_)
@@ -87,7 +163,13 @@ if (!is.na(code)) {
   if (!isTRUE(keep)) testme[["status"]] <- "skipped"
 }
 
+
 message(sprintf("Test %s ...", sQuote(testme[["name"]])))
+
+if (testme[["debug"]]) {
+  message("testme:")
+  message(paste(utils::capture.output(utils::str(as.list(testme))), collapse = "\n"))
+}
 
 ## Process prologue scripts, if they exist
 if (testme[["status"]] != "skipped" &&
@@ -113,6 +195,11 @@ if (testme[["status"]] != "skipped" &&
     })
     eval(expr, envir = testme)
   })
+
+#  ## In case prologue scripts overwrote some elements in 'testme'
+#  for (name in names(testme_config)) {
+#    testme[[name]] <- testme_config[[name]]
+#  }
 }
 
 
@@ -123,6 +210,11 @@ if (testme[["status"]] != "skipped") {
   testme[["status"]] <- "failed"
   source(testme[["script"]], echo = TRUE)
   testme[["status"]] <- "success"
+  
+#  ## In case test script overwrote some elements in 'testme'
+#  for (name in names(testme_config)) {
+#    testme[[name]] <- testme_config[[name]]
+#  }
 }
 
 

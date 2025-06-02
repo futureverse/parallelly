@@ -36,6 +36,7 @@ PuTTY's
 RStudio
 Renviron
 RichSOCKcluster
+RichSOCKnode
 Rmpi
 Roadmap
 Rprofile
@@ -50,6 +51,7 @@ UGE
 UUID
 Univa
 VPN
+WSL
 XDR
 af
 alice

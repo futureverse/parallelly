@@ -9,7 +9,7 @@ if (on_windows) {
   }
 }
 
-options(parallelly.debug = FALSE)
+options(parallelly.debug = TRUE)
 
 message("*** killNode() and isNodeAlive() ...")
 

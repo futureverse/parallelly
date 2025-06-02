@@ -7,25 +7,6 @@
 #'  change in future versions of the package.  Please use with care until
 #'  further notice._
 #'
-#' @section Backward compatibility with the \pkg{future} package:
-#'
-#' The functions in the \pkg{parallelly} package originates from the
-#' \pkg{future} package.  Because they are widely used within the future
-#' ecosystem, we need to keep them backward compatible for quite a long time,
-#' in order for all existing packages and R scripts to have time to adjust.
-#' This also goes for the \R options and the environment variables used to
-#' configure these functions.
-#' All options and environment variables used here have prefixes `parallelly.`
-#' and `R_PARALLELLY_`, respectively.  Because of the backward compatibility
-#' with the \pkg{future} package, the same settings can also be controlled
-#' by options and environment variables with prefixes `future.` and
-#' `R_FUTURE_` until further notice, e.g. setting option
-#' `future.availableCores.fallback=1` is the same as setting option
-#' `parallelly.availableCores.fallback=1`, and setting environment
-#' variable \env{R_FUTURE_AVAILABLECORES_FALLBACK=1} is the same as setting
-#' \env{R_PARALLELLY_AVAILABLECORES_FALLBACK=1}.
-#'
-#'
 #' @section Configuring number of parallel workers:
 #'
 #' The below \R options and environment variables control the default results of [availableCores()] and [availableWorkers()].
@@ -43,7 +24,9 @@
 #'
 #'  \item{`parallelly.availableCores.min`:}{(integer) The minimum number of cores [availableCores()] is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (`*`).  (Default: `1L`)}
 #'
-#'  \item{`parallelly.availableCores.omit`:}{(integer) Number of cores to set aside, i.e. not to include.}
+#'  \item{`parallelly.availableCores.omit`:}{(integer; non-negative) Number of cores to set aside, i.e. not to include.}
+#'
+#'  \item{`parallelly.availableCores.max`:}{(integer; positive) Maximum number of cores to return.}
 #'
 #'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")`)}
 #'
@@ -101,11 +84,20 @@
 #'  \item{`parallelly.makeNodePSOCK.tries.delay`:}{(numeric) The number of seconds to wait before trying to launch a cluster node that failed to launch previously.  Only used when setting up cluster nodes using the sequential strategy.}
 #' }
 #'
-#'
 #' @section Options for debugging:
 #'
 #' \describe{
-#'  \item{`parallelly.debug`:}{(logical) If `TRUE`, extensive debug messages are generated. (Default: `FALSE`)}
+#'  \item{`parallelly.debug`:}{(logical)
+#'   If `TRUE`, extensive debug messages are generated.
+#'   (Default: `FALSE`)
+#'  }
+#'
+#'  \item{`parallelly.makeNodePSOCK.calls`:}{(logical)
+#'   If TRUE, then the call stack that launched the cluster node is revealed
+#'   as a string part of the system call such that it can be viewed using
+#'   tools such as `ps`.
+#'   (Default: `FALSE`)
+#'  }
 #' }
 #'
 #'
@@ -118,6 +110,25 @@
 #' `"sequential"` (character).
 #' Similarly, if `R_PARALLELLY_AVAILABLECORES_FALLBACK="1"`, then option
 #' `parallelly.availableCores.fallback` is set to `1` (integer).
+#'
+#'
+#' @section Backward compatibility with the \pkg{future} package:
+#'
+#' The functions in the \pkg{parallelly} package originates from the
+#' \pkg{future} package.  Because they are widely used within the future
+#' ecosystem, we need to keep them backward compatible for quite a long time,
+#' in order for all existing packages and R scripts to have time to adjust.
+#' This also goes for the \R options and the environment variables used to
+#' configure these functions.
+#' All options and environment variables used here have prefixes `parallelly.`
+#' and `R_PARALLELLY_`, respectively.  Because of the backward compatibility
+#' with the \pkg{future} package, the same settings can also be controlled
+#' by options and environment variables with prefixes `future.` and
+#' `R_FUTURE_` until further notice, e.g. setting option
+#' `future.availableCores.fallback=1` is the same as setting option
+#' `parallelly.availableCores.fallback=1`, and setting environment
+#' variable \env{R_FUTURE_AVAILABLECORES_FALLBACK=1} is the same as setting
+#' \env{R_PARALLELLY_AVAILABLECORES_FALLBACK=1}.
 #'
 #'
 #' @examples
@@ -137,6 +148,7 @@
 #' parallelly.availableCores.min
 #' parallelly.availableCores.fallback
 #' parallelly.availableCores.omit
+#' parallelly.availableCores.max
 #' parallelly.availableCores.system
 #' parallelly.availableWorkers.methods
 #' parallelly.availableWorkers.custom
@@ -146,6 +158,7 @@
 #' parallelly.supportsMulticore.unstable
 #' R_PARALLELLY_AVAILABLECORES_FALLBACK
 #' R_PARALLELLY_AVAILABLECORES_OMIT
+#' R_PARALLELLY_AVAILABLECORES_MAX
 #' R_PARALLELLY_AVAILABLECORES_SYSTEM
 #' R_PARALLELLY_AVAILABLECORES_MIN
 #' R_PARALLELLY_FORK_ENABLE
@@ -175,6 +188,7 @@
 #' parallelly.makeNodePSOCK.rshopts
 #' parallelly.makeNodePSOCK.tries
 #' parallelly.makeNodePSOCK.tries.delay
+#' parallelly.makeNodePSOCK.calls
 #' R_PARALLELLY_MAKENODEPSOCK_SETUP_STRATEGY
 #' R_PARALLELLY_MAKENODEPSOCK_VALIDATE
 #' R_PARALLELLY_MAKENODEPSOCK_CONNECTTIMEOUT
@@ -185,6 +199,7 @@
 #' R_PARALLELLY_MAKENODEPSOCK_RSHOPTS
 #' R_PARALLELLY_MAKENODEPSOCK_TRIES
 #' R_PARALLELLY_MAKENODEPSOCK_TRIES_DELAY
+#' R_PARALLELLY_MAKENODEPSOCK_CALLS
 #'
 ## Internal options and environment variables _not_ documented here:
 ## parallelly.localhost.hostname
@@ -319,6 +334,7 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("availableCores.system", mode = "integer", disallow = NULL, debug = debug)
   update_package_option("availableCores.logical", mode = "logical", debug = debug)
   update_package_option("availableCores.omit", mode = "integer", debug = debug)
+  update_package_option("availableCores.max", mode = "numeric", disallow = "NA", debug = debug)
 
   update_package_option("availableWorkers.methods", mode = "character", split = ",", debug = debug)
 
@@ -345,4 +361,5 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("makeNodePSOCK.autoKill", mode = "logical", debug = debug)
   update_package_option("makeNodePSOCK.master.localhost.hostname", mode = "character", debug = debug)
   update_package_option("makeNodePSOCK.port.increment", mode = "logical", debug = debug)
+  update_package_option("makeNodePSOCK.calls", mode = "logical", debug = debug)
 }

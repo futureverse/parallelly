@@ -133,6 +133,10 @@
 #' concurrently, one after the other.  If `"sequential"`, they are set up
 #' sequentially.
 #'
+#' @param calls If TRUE, the call stack is recorded and revealed in the
+#' system call launching the cluster node. This can be useful when trying
+#' to identify which package and function created a particular cluster node.
+#'
 #' @param action This is an internal argument.
 #'
 #' @return `makeNodePSOCK()` returns a `"SOCKnode"` or
@@ -377,7 +381,7 @@
 #' @importFrom tools pskill
 #' @importFrom utils flush.console
 #' @export
-makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "localhost"), master = NULL, port, connectTimeout = getOption2("parallelly.makeNodePSOCK.connectTimeout", 2 * 60), timeout = getOption2("parallelly.makeNodePSOCK.timeout", 30 * 24 * 60 * 60), rscript = NULL, homogeneous = NULL, rscript_args = NULL, rscript_envs = NULL, rscript_libs = NULL, rscript_startup = NULL, rscript_sh = c("auto", "cmd", "sh", "none"), default_packages = c("datasets", "utils", "grDevices", "graphics", "stats", if (methods) "methods"), methods = TRUE, socketOptions = getOption2("parallelly.makeNodePSOCK.socketOptions", "no-delay"), useXDR = getOption2("parallelly.makeNodePSOCK.useXDR", FALSE), outfile = "/dev/null", renice = NA_integer_, rshcmd = getOption2("parallelly.makeNodePSOCK.rshcmd", NULL), user = NULL, revtunnel = NA, rshlogfile = NULL, rshopts = getOption2("parallelly.makeNodePSOCK.rshopts", NULL), rank = 1L, manual = FALSE, dryrun = FALSE, quiet = FALSE, setup_strategy = getOption2("parallelly.makeNodePSOCK.setup_strategy", "parallel"), action = c("launch", "options"), verbose = FALSE) {
+makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "localhost"), master = NULL, port, connectTimeout = getOption2("parallelly.makeNodePSOCK.connectTimeout", 2 * 60), timeout = getOption2("parallelly.makeNodePSOCK.timeout", 30 * 24 * 60 * 60), rscript = NULL, homogeneous = NULL, rscript_args = NULL, rscript_envs = NULL, rscript_libs = NULL, rscript_startup = NULL, rscript_sh = c("auto", "cmd", "sh", "none"), default_packages = c("datasets", "utils", "grDevices", "graphics", "stats", if (methods) "methods"), methods = TRUE, socketOptions = getOption2("parallelly.makeNodePSOCK.socketOptions", "no-delay"), useXDR = getOption2("parallelly.makeNodePSOCK.useXDR", FALSE), outfile = "/dev/null", renice = NA_integer_, rshcmd = getOption2("parallelly.makeNodePSOCK.rshcmd", NULL), user = NULL, revtunnel = NA, rshlogfile = NULL, rshopts = getOption2("parallelly.makeNodePSOCK.rshopts", NULL), rank = 1L, manual = FALSE, dryrun = FALSE, quiet = FALSE, setup_strategy = getOption2("parallelly.makeNodePSOCK.setup_strategy", "parallel"), calls = getOption2("parallelly.makeNodePSOCK.calls", FALSE), action = c("launch", "options"), verbose = FALSE) {
   verbose <- as.logical(verbose)
   stop_if_not(length(verbose) == 1L, !is.na(verbose))
   verbose_prefix <- "[local output] "
@@ -418,7 +422,8 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
     manual = manual,
     dryrun = dryrun,
     quiet = quiet,
-    setup_strategy = setup_strategy
+    setup_strategy = setup_strategy,
+    calls = calls
   )
 
   localhostHostname <- getOption2("parallelly.localhost.hostname", "localhost")
@@ -850,7 +855,23 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
     })
     rscript_args_internal <- c(rscript_args_internal, "-e", shQuote(code, type = rscript_sh[1]))
   }
-  
+
+  ## Reveal sys.calls() in system call
+  if (calls) {
+    calls <- sys.calls()
+    ## Drop this function
+    calls <- calls[-length(calls)]
+    ## Drop any arguments
+    calls <- lapply(calls, FUN = function(call) as.character(call)[1])
+    calls <- unlist(calls, use.names = FALSE)
+    calls <- paste(calls, collapse = "->")
+    calls <- gsub("[[:space:]]+", "", calls)
+    calls <- sprintf("calls:%s", calls)
+    calls <- shQuote(calls)
+    calls <- sprintf("invisible(%s)", calls)
+    rscript_args_internal <- c(rscript_args_internal, "-e", shQuote(calls))
+  }
+
   ## .{slave,work}RSOCK() command already specified?
   if (!any(grepl("parallel:::[.](slave|work)RSOCK[(][)]", rscript_args))) {
     ## In R (>= 4.1.0), parallel:::.slaveRSOCK() was renamed to .workRSOCK()

@@ -53,14 +53,47 @@ procPath <- local({
 #' @importFrom utils read.table
 readMounts <- function(file) {
   stopifnot(file_test("-f", file))
-  data <- read.table(file, sep = " ", stringsAsFactors = FALSE)
+
+  ## A /proc/self/mounts file has lines of format:
+  ## 
+  ## <source> <target> <fstype> <options> <dump> <pass>
+  ##
+  ## where the fields are separated by SPACE:s. Now, some files
+  ## may have syntax errors on some lines. For example, one
+  ## Windows WSL2 user reports extraneous SPACE:s due to SPACEs
+  ## in Windows paths (e.g. 'C:\\Program Files\\...') that are
+  ## should have been escaped as '\\040' [1]. Because of this,
+  ## we cannot assume everything is six fields and use:
+  ##   data <- read.table(file, sep = " ")
+  ## The Linux 'findmnt' tool ignores such misconfigured lines
+  ## with a stderr note. We will do the same here.
+  ## [1] https://github.com/futureverse/parallelly/issues/132
+  ## NOTE: Some /proc/self/mounts files may have syntax eros
+
+  ## Drop invalid lines
+  lines <- readLines(file)
+  parts <- strsplit(lines, split = " ", fixed = TRUE)
+  ns <- vapply(parts, FUN.VALUE = NA_integer_, FUN = length)
+  ## Drop misconfigured lines
+  keep <- (ns == 6)
+  invalid <- lines[!keep]
+  names(invalid) <- which(!keep)
+  lines <- lines[keep]
+
+  ## Parse the valid lines
+  data <- read.table(text = lines, sep = " ", stringsAsFactors = FALSE)
+
   names <- c("device", "mountpoint", "type", "options", "dump", "pass")
   if (ncol(data) < length(names)) {
     names <- names[seq_len(ncol(data))]
   } else if (ncol(data) > length(names)) {
     names <- c(names, rep("", ncol(data) - length(names)))
   }
-  names(data) <- names  
+  names(data) <- names
+
+  ## Return invalid entries too
+  if (length(invalid) > 0) attr(data, "invalid") <- invalid
+  
   data
 }
 
@@ -246,9 +279,11 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
 
    ## Read the UID
    file <- file.path(tmpdir, "uid")
-   uid <- scan(file.path(tmpdir, "uid"), what = "integer", n = 1L, quiet = TRUE)
-   uid <- as.integer(uid)
-   message(sprintf(" - UID: %d", uid))
+   if (file_test("-f", file)) {
+     uid <- scan(file.path(tmpdir, "uid"), what = "integer", n = 1L, quiet = TRUE)
+     uid <- as.integer(uid)
+     message(sprintf(" - UID: %d", uid))
+   }
 
    ## Clear all memoization caches
    fcns <- list(
@@ -265,9 +300,12 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    }
 
    ## Adjust /proc accordingly
-   old_procPath <- procPath(file.path(tmpdir, "proc"))
-   on.exit(procPath(old_procPath), add = TRUE)
-   message(sprintf(" - procPath(): %s", sQuote(procPath())))
+   file <- file.path(tmpdir, "proc")
+   if (file_test("-d", file)) {
+     old_procPath <- procPath(file)
+     on.exit(procPath(old_procPath), add = TRUE)
+     message(sprintf(" - procPath(): %s", sQuote(procPath())))
+   }
 
    ## Disable max CPU cores validation
    old_maxCores <- maxCores(Inf)
@@ -277,15 +315,17 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    ## Adjust /sys/fs/cgroup root accordingly
    message(" - Adjust /proc/self/mounts accordingly:")
    file <- file.path(tmpdir, "proc", "self", "mounts")
-   mounts <- readMounts(file)
-   idxs <- which(mounts$type %in% c("cgroup", "cgroup2"))
-   for (idx in idxs) {
-     mounts[idx, "mountpoint"] <- normalizePath(file.path(tmpdir, mounts[idx, "mountpoint"]), winslash = "/", mustWork = FALSE)
+   if (file_test("-f", file)) {
+     mounts <- readMounts(file)
+     idxs <- which(mounts$type %in% c("cgroup", "cgroup2"))
+     for (idx in idxs) {
+       mounts[idx, "mountpoint"] <- normalizePath(file.path(tmpdir, mounts[idx, "mountpoint"]), winslash = "/", mustWork = FALSE)
+     }
+     writeMounts(mounts, file = file)
+     bfr <- readLines(file, warn = FALSE)
+     bfr <- sprintf("   %02d: %s", seq_along(bfr), bfr)
+     writeLines(bfr)
    }
-   writeMounts(mounts, file = file)
-   bfr <- readLines(file, warn = FALSE)
-   bfr <- sprintf("   %02d: %s", seq_along(bfr), bfr)
-   writeLines(bfr)
 
    message(" - getCGroupsVersion(): ", getCGroupsVersion())
 

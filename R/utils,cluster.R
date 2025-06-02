@@ -199,18 +199,37 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
 session_info <- function(pkgs = getOption2("parallelly.makeNodePSOCK.sessionInfo.pkgs", FALSE)) {
   libs <- .libPaths()
   info <- list(
+    ## Process ID
+    process = list(pid = Sys.getpid()),
+
+    ## R version and operating system
     r = c(R.version, os.type = .Platform[["OS.type"]]),
+
+    ## System information
     system = as.list(Sys.info()),
+
+    ## Capabilities, etc
+    capabilities = capabilities(),
+    l10n = l10n_info(),
+
+    ## Build environment
+    extSoftVersion = extSoftVersion(),
+
+    ## Folders
+    pwd = getwd(),
+    tempdir = tempdir(),
+
+    ## R package libraries
     libs = libs,
+    
+    ## Installed packages
     pkgs = if (isTRUE(pkgs)) {
       structure(lapply(libs, FUN = function(lib.loc) {
         pkgs <- installed.packages(lib.loc = lib.loc)
         if (length(pkgs) == 0) return(NULL)
         paste0(pkgs[, "Package"], "_", pkgs[, "Version"])
       }), names = libs)
-    },
-    pwd = getwd(),
-    process = list(pid = Sys.getpid())
+    }
   )
   info
 }

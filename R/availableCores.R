@@ -35,6 +35,10 @@
 #'
 #' @param omit (integer; non-negative) Number of cores to not include.
 #'
+#' @param max (integer; positive) Maximum number of cores returned.
+#' `availableCores(..., max = n)` is short for
+#' `min(n, availableCores(...), na.rm = TRUE)`.
+#'
 #' @return Return a positive (>= 1) integer.
 #' If `which = "all"`, then more than one value may be returned.
 #' Together with `na.rm = FALSE` missing values may also be returned.
@@ -98,6 +102,9 @@
 #'    `"warn"`) used by `R CMD check` and set to true by
 #'    `R CMD check --as-cran`. If set to a non-false value, then a maximum
 #'    of 2 cores is considered.
+#'    Note that `_R_CHECK_LIMIT_CORES_` is _not_ set when `R CMD build`
+#'    builds vignettes or when `R CMD check --as-cran` re-builds then as
+#'    part of the package checks.
 #'
 #'  \item `"Bioconductor"` -
 #'    Query environment variable \env{IS_BIOC_BUILD_MACHINE} (logical)
@@ -228,7 +235,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @export
-availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), omit = getOption2("parallelly.availableCores.omit", 0L)) {
+availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
@@ -245,7 +252,9 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
   stop_if_not(length(omit) == 1L, is.numeric(omit),
               is.finite(omit), omit >= 0L)
   omit <- as.integer(omit)
-  
+
+  stop_if_not(length(max) == 1L, is.numeric(max), !is.na(max), max >= 1L)
+
   ncores <- rep(NA_integer_, times = length(methods))
   names(ncores) <- methods
   for (kk in seq_along(methods)) {
@@ -271,10 +280,14 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     } else if (grepl(pattern_connections, method)) {
       ## Number of available connections, which are needed by PSOCK clusters
       n <- freeConnections()
-      delta <- sub(pattern_connections, "\\1", method)
-      if (nzchar(omit)) {
-        delta <- as.integer(delta)
-        n <- max(0L, n + delta)
+      if (!is.na(n)) {
+        delta <- sub(pattern_connections, "\\1", method)
+        if (nzchar(delta) && nzchar(omit)) {
+          delta <- as.integer(delta)
+          n <- max(0L, n + delta)
+        }
+        ## Return at least one
+        if (n <= 0L) n <- 1L
       }
     } else if (method == "BiocParallel") {
       n <- getenv_int("BIOCPARALLEL_WORKER_NUMBER")
@@ -391,6 +404,8 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     if (length(idx_fallback) == 1) {
       ## Use 'fallback' if and only there are only "special" options specified
       special <- c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc")
+      ## 'connections' and 'connections-N' are also "special" options
+      special <- c(special, grep(pattern_connections, constraints, value = TRUE))
       others <- setdiff(names(ncores), c("fallback", special))
       use_fallback <- (length(others) == 0L)
 
@@ -443,6 +458,12 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
   if (omit > 0L) {
     ncores <- ncores - omit
     ncores[ncores < 1L] <- 1L
+  }
+
+  ## Upper limit?
+  if (is.finite(max)) {
+    ncores <- min(max, ncores, na.rm = TRUE)
+    ncores <- as.integer(ncores)
   }
 
   ## Sanity check

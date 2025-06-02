@@ -14,7 +14,8 @@ availableCores(
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
   which = c("min", "max", "all"),
-  omit = getOption2("parallelly.availableCores.omit", 0L)
+  omit = getOption2("parallelly.availableCores.omit", 0L),
+  max = getOption2("parallelly.availableCores.max", Inf)
 )
 }
 \arguments{
@@ -49,6 +50,10 @@ If \code{"max"}, the maximum value is returned (be careful!)
 If \code{"all"}, all values are returned.}
 
 \item{omit}{(integer; non-negative) Number of cores to not include.}
+
+\item{max}{(integer; positive) Maximum number of cores returned.
+\code{availableCores(..., max = n)} is short for
+\code{min(n, availableCores(...), na.rm = TRUE)}.}
 }
 \value{
 Return a positive (>= 1) integer.
@@ -118,6 +123,9 @@ Query environment variable \env{_R_CHECK_LIMIT_CORES_} (logical or
 \code{"warn"}) used by \verb{R CMD check} and set to true by
 \verb{R CMD check --as-cran}. If set to a non-false value, then a maximum
 of 2 cores is considered.
+Note that \verb{_R_CHECK_LIMIT_CORES_} is \emph{not} set when \verb{R CMD build}
+builds vignettes or when \verb{R CMD check --as-cran} re-builds then as
+part of the package checks.
 
 \item \code{"Bioconductor"} -
 Query environment variable \env{IS_BIOC_BUILD_MACHINE} (logical)

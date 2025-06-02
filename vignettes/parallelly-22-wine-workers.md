@@ -26,16 +26,16 @@ In the GUI, set 'Windows version' to 'Windows 10'. Then, install R for
 Windows in Wine, by:
 
 ```sh
-$ wget https://cran.r-project.org/bin/windows/base/R-4.4.2-win.exe
-$ wine R-4.4.2-win.exe /SILENT
+$ wget https://cran.r-project.org/bin/windows/base/R-4.5.0-win.exe
+$ wine R-4.5.0-win.exe /SILENT
 ```
 
 Finally, verify that R is available in Wine;
 
 ```sh
-$ wine "C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe" --version
+$ wine "C:/Program Files/R/R-4.5.0/bin/x64/Rscript.exe" --version
 ...
-Rscript (R) version 4.4.2 (2024-10-31)
+Rscript (R) version 4.5.0 (2025-04-11)
 ```
 
 
@@ -55,10 +55,11 @@ cl <- makeClusterPSOCK(
     ## Don't pass LC_* and R_LIBS* environments from host to Wine
     sprintf("%s=", grep("^(LC_|R_LIBS)", names(Sys.getenv()), value = TRUE)),
     "wine",
-    "C:/Program Files/R/R-4.4.2/bin/x64/Rscript.exe"
+    "C:/Program Files/R/R-4.5.0/bin/x64/Rscript.exe"
   )
 )
 print(cl)
 #> Socket cluster with 1 nodes where 1 node is on host 'localhost'
-#> (R version 4.4.2 (2024-10-31 ucrt), platform x86_64-w64-mingw32)
+#> (R version 4.5.0 (2025-04-11 ucrt), platform x86_64-w64-mingw32)
 ```
+

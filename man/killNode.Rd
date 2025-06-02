@@ -13,7 +13,26 @@ killNode(x, signal = tools::SIGTERM, ...)
 to the parallel R process.
 It's only \code{tools::SIGINT} (2) and \code{tools::SIGTERM} (15) that are
 supported on all operating systems (i.e. Unix, macOS, and MS Windows).
-All other signals are platform specific, cf. \code{\link[tools:pskill]{tools::pskill()}}.}
+All other signals are platform specific, cf. \code{\link[tools:pskill]{tools::pskill()}}.
+
+With the exception for MS Windows, as explained below, using \code{SIGINT}
+will trigger an R \code{\link[base:conditions]{interrupt}} condition that
+can be caught with \code{\link[=tryCatch]{tryCatch()}} and \code{\link[=withCallingHandlers]{withCallingHandlers()}} using an
+\code{interrupt} calling handler.
+
+When using \code{SIGTERM}, there will be no \code{interrupt} condition signaled,
+meaning your parallel R code does \emph{not} have a chance to exit gracefully.
+Instead, the R process terminates rather abruptly, leaving behind its
+temporary folder.
+
+Importantly, contrary to Linux and macOS, it is not possible to get a
+cluster node running on MS Windows to exit gracefully. For example,
+despite using \code{SIGINT}, there is no \code{interrupt} condition signaled.
+As a matter of fact, on MS Windows, \code{SIGINT} works identically to
+\code{SIGTERM}, where they both terminate the cluster node abruptly without
+giving the R process a chance to exit gracefully. This means that R will
+\emph{not} clean up after itself, e.g. there its temporary directory will
+remain also after R terminates.}
 
 \item{\ldots}{Not used.}
 }
@@ -34,24 +53,25 @@ Using \code{killNode()} is a much more sever approach. It abruptly
 terminates the underlying R process, possibly without giving the
 parallel worker a chance to terminate gracefully.  For example,
 it might get terminated in the middle of writing to file.
-
 \code{\link[tools:pskill]{tools::pskill()}} is used to send the signal to the R process hosting
 the parallel worker.
+
+If \code{signal = tools::SIGTERM} is used and success, this function
+will also close any existing socket connection to the node, if they
+exist. Moreover, if the node is running on the local host, this
+function will also attempt to remove the node's temporary directory,
+which is done because the node's R process might not have been exited
+gracefully.
 }
 \section{Known limitations}{
 
 This function works only with cluster nodes of class \code{RichSOCKnode},
 which were created by \code{\link[=makeClusterPSOCK]{makeClusterPSOCK()}}.  It does not work when
 using \code{\link[parallel:makeCluster]{parallel::makeCluster()}} and friends.
-
-Currently, it's only possible to send signals to parallel workers, that
-is, cluster nodes, that run on the local machine.
-If attempted to use \code{killNode()} on a remote parallel workers, \code{NA}
-is returned and an informative warning is produced.
 }
 
 \examples{
-\dontshow{if (.Platform[["OS.type"]] != "windows" || interactive()) \{}
+\dontshow{if ((interactive() || .Platform[["OS.type"]] != "windows")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 cl <- makeClusterPSOCK(2)
 print(isNodeAlive(cl))  ## [1] TRUE TRUE
 
@@ -63,8 +83,7 @@ print(res)
 Sys.sleep(1.0)
 
 print(isNodeAlive(cl))  ## [1] FALSE FALSE
-\dontshow{\}}
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 Use \code{\link[=isNodeAlive]{isNodeAlive()}} to check whether one or more cluster nodes are alive.

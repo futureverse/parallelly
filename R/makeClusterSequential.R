@@ -2,8 +2,7 @@
 #'
 #' The created cluster has only one node.
 #'
-#' @examples
-#' \dontshow{if (getRversion() >= "4.4.0") \{}
+#' @examplesIf (getRversion() >= "4.4.0")
 #' library(parallel)
 #' 
 #' cl <- makeClusterSequential()
@@ -21,8 +20,6 @@
 #' y <- clusterEvalQ(cl, { abc <- 42; abc })
 #' str(y)
 #' stopifnot(abc == 3.14)
-#' 
-#' \dontshow{\}}
 #'
 #' @details
 #' Expression and function calls are evaluated in a local environment,

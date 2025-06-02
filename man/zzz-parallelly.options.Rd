@@ -9,6 +9,7 @@
 \alias{parallelly.availableCores.min}
 \alias{parallelly.availableCores.fallback}
 \alias{parallelly.availableCores.omit}
+\alias{parallelly.availableCores.max}
 \alias{parallelly.availableCores.system}
 \alias{parallelly.availableWorkers.methods}
 \alias{parallelly.availableWorkers.custom}
@@ -18,6 +19,7 @@
 \alias{parallelly.supportsMulticore.unstable}
 \alias{R_PARALLELLY_AVAILABLECORES_FALLBACK}
 \alias{R_PARALLELLY_AVAILABLECORES_OMIT}
+\alias{R_PARALLELLY_AVAILABLECORES_MAX}
 \alias{R_PARALLELLY_AVAILABLECORES_SYSTEM}
 \alias{R_PARALLELLY_AVAILABLECORES_MIN}
 \alias{R_PARALLELLY_FORK_ENABLE}
@@ -45,6 +47,7 @@
 \alias{parallelly.makeNodePSOCK.rshopts}
 \alias{parallelly.makeNodePSOCK.tries}
 \alias{parallelly.makeNodePSOCK.tries.delay}
+\alias{parallelly.makeNodePSOCK.calls}
 \alias{R_PARALLELLY_MAKENODEPSOCK_SETUP_STRATEGY}
 \alias{R_PARALLELLY_MAKENODEPSOCK_VALIDATE}
 \alias{R_PARALLELLY_MAKENODEPSOCK_CONNECTTIMEOUT}
@@ -55,6 +58,7 @@
 \alias{R_PARALLELLY_MAKENODEPSOCK_RSHOPTS}
 \alias{R_PARALLELLY_MAKENODEPSOCK_TRIES}
 \alias{R_PARALLELLY_MAKENODEPSOCK_TRIES_DELAY}
+\alias{R_PARALLELLY_MAKENODEPSOCK_CALLS}
 \title{Options Used by the 'parallelly' Package}
 \description{
 Below are the \R options and environment variables that are used by the
@@ -64,26 +68,6 @@ Below are the \R options and environment variables that are used by the
 change in future versions of the package.  Please use with care until
 further notice.}
 }
-\section{Backward compatibility with the \pkg{future} package}{
-
-
-The functions in the \pkg{parallelly} package originates from the
-\pkg{future} package.  Because they are widely used within the future
-ecosystem, we need to keep them backward compatible for quite a long time,
-in order for all existing packages and R scripts to have time to adjust.
-This also goes for the \R options and the environment variables used to
-configure these functions.
-All options and environment variables used here have prefixes \code{parallelly.}
-and \code{R_PARALLELLY_}, respectively.  Because of the backward compatibility
-with the \pkg{future} package, the same settings can also be controlled
-by options and environment variables with prefixes \code{future.} and
-\code{R_FUTURE_} until further notice, e.g. setting option
-\code{future.availableCores.fallback=1} is the same as setting option
-\code{parallelly.availableCores.fallback=1}, and setting environment
-variable \env{R_FUTURE_AVAILABLECORES_FALLBACK=1} is the same as setting
-\env{R_PARALLELLY_AVAILABLECORES_FALLBACK=1}.
-}
-
 \section{Configuring number of parallel workers}{
 
 
@@ -102,7 +86,9 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.availableCores.min}:}{(integer) The minimum number of cores \code{\link[=availableCores]{availableCores()}} is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (\code{*}).  (Default: \code{1L})}
 
-\item{\code{parallelly.availableCores.omit}:}{(integer) Number of cores to set aside, i.e. not to include.}
+\item{\code{parallelly.availableCores.omit}:}{(integer; non-negative) Number of cores to set aside, i.e. not to include.}
+
+\item{\code{parallelly.availableCores.max}:}{(integer; positive) Maximum number of cores to return.}
 
 \item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")})}
 
@@ -166,7 +152,17 @@ The below \R options and environment variables control the default results of \c
 
 
 \describe{
-\item{\code{parallelly.debug}:}{(logical) If \code{TRUE}, extensive debug messages are generated. (Default: \code{FALSE})}
+\item{\code{parallelly.debug}:}{(logical)
+If \code{TRUE}, extensive debug messages are generated.
+(Default: \code{FALSE})
+}
+
+\item{\code{parallelly.makeNodePSOCK.calls}:}{(logical)
+If TRUE, then the call stack that launched the cluster node is revealed
+as a string part of the system call such that it can be viewed using
+tools such as \code{ps}.
+(Default: \code{FALSE})
+}
 }
 }
 
@@ -180,6 +176,26 @@ then option \code{parallelly.makeNodePSOCK.setup_strategy} is set to
 \code{"sequential"} (character).
 Similarly, if \code{R_PARALLELLY_AVAILABLECORES_FALLBACK="1"}, then option
 \code{parallelly.availableCores.fallback} is set to \code{1} (integer).
+}
+
+\section{Backward compatibility with the \pkg{future} package}{
+
+
+The functions in the \pkg{parallelly} package originates from the
+\pkg{future} package.  Because they are widely used within the future
+ecosystem, we need to keep them backward compatible for quite a long time,
+in order for all existing packages and R scripts to have time to adjust.
+This also goes for the \R options and the environment variables used to
+configure these functions.
+All options and environment variables used here have prefixes \code{parallelly.}
+and \code{R_PARALLELLY_}, respectively.  Because of the backward compatibility
+with the \pkg{future} package, the same settings can also be controlled
+by options and environment variables with prefixes \code{future.} and
+\code{R_FUTURE_} until further notice, e.g. setting option
+\code{future.availableCores.fallback=1} is the same as setting option
+\code{parallelly.availableCores.fallback=1}, and setting environment
+variable \env{R_FUTURE_AVAILABLECORES_FALLBACK=1} is the same as setting
+\env{R_PARALLELLY_AVAILABLECORES_FALLBACK=1}.
 }
 
 \examples{

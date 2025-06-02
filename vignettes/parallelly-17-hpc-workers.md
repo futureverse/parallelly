@@ -86,13 +86,13 @@ allot the slots across three machines:
 
 ```sh
 Information on R:
-Rscript (R) version 4.4.2 (2024-10-31)
+Rscript (R) version 4.5.0 (2025-04-11)
 Running R script:
 Socket cluster with 8 nodes where 4 nodes are on host ‘localhost’
-(R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), 3
-nodes are on host ‘qb3-id130’ (R version 4.4.2 (2024-10-31), 
+(R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu), 3
+nodes are on host ‘qb3-id130’ (R version 4.5.0 (2025-04-11), 
 platform x86_64-pc-linux-gnu), 1 node is on host ‘qb3-as16’ (R 
-version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)
+version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)
 [1] 671.4629
 ```
 

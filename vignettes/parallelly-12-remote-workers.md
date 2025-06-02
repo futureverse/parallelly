@@ -155,7 +155,7 @@ To verify that R is installed on the other machine, SSH to the machine and call 
 ```sh
 {ally@local}$ ssh alice@n1.remote.org
 {alice@n1}$ Rscript --version
-Rscript (R) version 4.4.2 (2024-10-31)
+Rscript (R) version 4.5.0 (2025-04-11)
 ```
 
 If you get:
@@ -178,7 +178,7 @@ R version in a single call:
 
 ```sh
 {ally@local}$ ssh alice@n1.remote.org Rscript --version
-Rscript (R) version 4.4.2 (2024-10-31)
+Rscript (R) version 4.5.0 (2025-04-11)
 {ally@local}$
 ```
 
@@ -188,11 +188,11 @@ from within R with the **parallelly** package using:
 
 ```sh
 {ally@local}$ R --quiet
-library(parallely)
+library(parallelly)
 cl <- makeClusterPSOCK("n1.remote.org", user = "alice")
 print(cl)
 #> Socket cluster with 1 nodes where 1 node is on host 'n1.remote.org'
-#> (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)
+#> (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)
 parallel::stopCluster(cl)
 ```
 
@@ -307,7 +307,7 @@ workers <- c("n1.remote.org", "n1.remote.org")
 cl <- makeClusterPSOCK(workers, user = "alice")
 print(cl)
 #> Socket cluster with 2 nodes where 2 nodes are on host 'n1.remote.org'
-#> (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu).
+#> (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)
 ```
 
 _Comment_: In the **parallel** package, a parallel worker is referred
@@ -353,8 +353,8 @@ workers <- c("n1.remote.org", "n2.remote.org")
 cl <- makeClusterPSOCK(workers, user = "alice")
 print(cl)
 #> Socket cluster with 2 nodes where 1 node is on host 'n1.remote.org'
-#> (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), 
-#> 1 node is on host 'n2.remote.org' (R version 4.4.2 (2024-10-31),
+#> (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)
+#> 1 node is on host 'n2.remote.org' (R version 4.5.0 (2025-04-11),
 #> platform x86_64-pc-linux-gnu)
 ```
 
@@ -396,8 +396,8 @@ workers <- c("n1.remote.org", "n1.remote.org", "n2.remote.org")
 cl <- makeClusterPSOCK(workers)
 print(cl)
 #> Socket cluster with 3 nodes where 2 nodes are on host 'n1.remote.org'
-#> (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), 
-#> 1 node is on host 'n2.remote.org' (R version 4.4.2 (2024-10-31),
+#> (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)
+#> 1 node is on host 'n2.remote.org' (R version 4.5.0 (2025-04-11),
 #> platform x86_64-pc-linux-gnu)
 ```
 
@@ -426,7 +426,7 @@ workers <- rep("localhost", 4)
 cl_local <- makeClusterPSOCK(workers)
 print(cl_local)
 #> Socket cluster with 4 nodes where 4 nodes are on host 'localhost'
-#> (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu)
+#> (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)
 ```
 
 to launch four local parallel workers. Note how we did not have to
@@ -441,7 +441,7 @@ workers <- rep("n1.remote.org", 4)
 cl_remote <- makeClusterPSOCK(workers, user = "alice")
 print(cl_remote)
 #> Socket cluster with 4 nodes where 4 nodes are on host 'n1.remote.org'
-#> (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu).
+#> (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)
 ```
 
 At this point, we have two independent clusters of parallel workers:
@@ -452,8 +452,8 @@ cluster using:
 cl <- c(cl_local, cl_remote)
 print(cl)
 #> Socket cluster with 8 nodes where 4 nodes are on host 'localhost'
-#> (R version 4.4.2 (2024-10-31), platform x86_64-pc-linux-gnu), 4
-#> nodes are on host 'n1.remote.org' (R version 4.4.2 (2024-10-31),
+#> (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)
+#> nodes are on host 'n1.remote.org' (R version 4.5.0 (2025-04-11),
 #> platform x86_64-pc-linux-gnu)
 ```
 

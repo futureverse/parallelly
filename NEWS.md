@@ -1,4 +1,46 @@
-# Version 1.44.0 [2025-05-06]
+# Version 1.45.0 [2025-06-02]
+
+## New Features
+
+ * `availableCores()` gained argument `max`, which limits the maximum
+   number of cores returned after everything else is applied, i.e.
+   `availableCores(..., max = n)` is short for `min(n,
+   availableCores(...), na.rm = TRUE)`.
+
+ * `availableWorkers()` gained argument `...`, which passes any
+   additional arguments to `availableCores()`, if specified.
+
+ * If `killNode(..., signal = tools::SIGTERM)` successfully signaled
+   the cluster node, it will now close any existing socket connection
+   to the node. If the node is running on the local host, it will also
+   remove its temporary directory, because the the node's R process
+   might not have been exited gracefully.
+   
+ * The session information collected by `makeClusterPSOCK()` now
+   contains more details on each worker, e.g. the `tempdir()` folder,
+   `capabilities()`, and `extSoftVersion()`.
+
+ * Cluster nodes created by `makeClusterPSOCK()` gained attribute
+   `calls`, which records the `sys.calls()`. This can be useful when
+   troubleshooting from where a cluster was created. Analogously,
+   setting R option `parallelly.makeNodePSOCK.calls` to TRUE will
+   relay the call stack in the system call that launched the cluster
+   node.
+ 
+## Bug Fixes
+
+ * `availableCores()` would not respect `method = "fallback"` if
+   `constraints` specified `"connections"` or `"connections-N"`.
+
+ * `availableCores()` would produce an error on `Error in scan(file =
+   file, what = what, ...)` on systems that have a `/proc/self/mounts`
+   file with syntax errors. Such files have been reported on Windows
+   Subsystem for Linux version 2 (WSL 2), where spaces in Windows path
+   have not been properly escaped for some entries. Now such invalid
+   entries are skipped, before parsing the mount table.
+
+
+# Version 1.44.0 [2025-05-07]
 
 ## New Features
 
