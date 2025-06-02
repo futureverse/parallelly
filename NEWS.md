@@ -2,6 +2,14 @@
 
 ## New Features
 
+ * `availableCores()` gained argument `max`, which limits the maximum
+   number of cores returned after everything else is applied, i.e.
+   `availableCores(..., max = n)` is short for `min(n,
+   availableCores(...), na.rm = TRUE)`.
+
+ * `availableWorkers()` gained argument `...`, which passes any
+   additional arguments to `availableCores()`, if specified.
+
  * If `killNode(..., signal = tools::SIGTERM)` successfully signaled
    the cluster node, it will now close any existing socket connection
    to the node. If the node is running on the local host, it will also
@@ -11,14 +19,6 @@
  * The session information collected by `makeClusterPSOCK()` now
    contains more details on each worker, e.g. the `tempdir()` folder,
    `capabilities()`, and `extSoftVersion()`.
-
- * `availableCores()` gained argument `max`, which limits the maximum
-   number of cores returned after everything else is applied, i.e.
-   `availableCores(..., max = n)` is short for `min(n,
-   availableCores(...), na.rm = TRUE)`.
-
- * `availableWorkers()` gained argument `...`, which passes any
-   additional arguments to `availableCores()`, if specified.
 
  * Cluster nodes created by `makeClusterPSOCK()` gained attribute
    `calls`, which records the `sys.calls()`. This can be useful when
