@@ -213,7 +213,7 @@ session_info <- function(pkgs = getOption2("parallelly.makeNodePSOCK.sessionInfo
     l10n = l10n_info(),
 
     ## Build environment
-#    extSoftVersion = extSoftVersion(),
+    extSoftVersion = try(extSoftVersion()),
 
     ## Folders
     pwd = getwd(),
