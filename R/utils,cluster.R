@@ -210,7 +210,7 @@ session_info <- function(pkgs = getOption2("parallelly.makeNodePSOCK.sessionInfo
 
     ## Capabilities, etc
     capabilities = capabilities(),
-#    l10n = l10n_info(),
+    l10n = l10n_info(),
 
     ## Build environment
 #    extSoftVersion = extSoftVersion(),
