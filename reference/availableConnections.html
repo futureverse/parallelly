@@ -27,7 +27,7 @@ standard output via text connections (e.g. utils::capture.output())."><meta prop
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.0-9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.0-9011</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -140,6 +140,7 @@ future releases of <span style="R">R</span>, we do not want to assume that the l
 all <span style="R">R</span> installation.  Unfortunately, it is not possible to query <span style="R">R</span> for what
 the limit is.
 Instead, <code>availableConnections()</code> infers it from trial-and-error.
+Specifically, it attempts to open as many concurrent connections as possible
 until it fails.  For efficiency, the result is memoized throughout the
 current <span style="R">R</span> session.</p>
     </div>
