@@ -52,6 +52,7 @@ future releases of \R, we do not want to assume that the limit is 128 for
 all \R installation.  Unfortunately, it is not possible to query \R for what
 the limit is.
 Instead, \code{availableConnections()} infers it from trial-and-error.
+Specifically, it attempts to open as many concurrent connections as possible
 until it fails.  For efficiency, the result is memoized throughout the
 current \R session.
 }

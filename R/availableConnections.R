@@ -41,7 +41,7 @@
 #' all \R installation.  Unfortunately, it is not possible to query \R for what
 #' the limit is.
 #' Instead, `availableConnections()` infers it from trial-and-error.
-#" Specifically, it attempts to open as many concurrent connections as possible
+#' Specifically, it attempts to open as many concurrent connections as possible
 #' until it fails.  For efficiency, the result is memoized throughout the 
 #' current \R session.
 #'
