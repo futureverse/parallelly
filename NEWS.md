@@ -1,6 +1,15 @@
 # Version (development version)
 
- * ...
+## Deprecated and Defunct
+
+ * In previous version, `makeClusterPSOCK()` started to collect
+   session information on each parallel worker, which included
+   `capabilities()`. However, for unknown reasons, `capabilities()`
+   caused the cluster creation to fail GitHub Actions running
+   macOS. The problem could be reproduced neither locally, on the
+   mac-builder, nor on the CRAN macOS servers. Because this feature is
+   non-critical and only introduced in the previous version, I decided
+   to remove the collection of `capabilities()` again.
  
 
 # Version 1.45.0 [2025-06-02]
