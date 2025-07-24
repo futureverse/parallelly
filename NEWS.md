@@ -1,6 +1,6 @@
 # Version (development version)
 
-## New Features
+## Miscellaneous
 
  * Now `print()` for `RichSOCKcluster` outputs a more concise summary,
    which is also grammatically correct for single-node clusters.
