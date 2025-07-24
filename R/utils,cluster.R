@@ -207,9 +207,18 @@ session_info <- function(pkgs = getOption2("parallelly.makeNodePSOCK.sessionInfo
 
     ## System information
     system = as.list(Sys.info()),
-
+    
     ## Capabilities, etc
-    capabilities = capabilities(),
+
+    ## WARNING: Don't use, because may result in: "Error: Caught an
+    ## unexpected error of class FutureError when trying to launch
+    ## future (‘doFuture2-1’) on backend of class
+    ## MultisessionFutureBackend. The reason was: Failed to find a
+    ## functional cluster worker, after attempting to relaunch the
+    ## parallel worker 3 times" on macOS on GitHub Actions, cf.
+    ## https://github.com/futureverse/doFuture/issues/87
+    ## capabilities = capabilities(),
+    
     l10n = l10n_info(),
 
     ## Build environment

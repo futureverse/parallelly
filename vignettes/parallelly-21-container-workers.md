@@ -43,8 +43,8 @@ cl <- makeClusterPSOCK(
   master = if (.Platform$OS.type == "unix") NULL else "host.docker.internal",
 )
 print(cl)
-#> Socket cluster with 2 nodes where 2 nodes are on host 'localhost'
-#> (R version 4.3.3 (2024-02-29), platform x86_64-pc-linux-gnu)
+#> Socket cluster with 2 nodes on host 'localhost' (R version 4.3.3
+#> (2024-02-29), platform x86_64-pc-linux-gnu)
 ```
 
 
@@ -66,8 +66,8 @@ cl <- makeClusterPSOCK(
   )
 )
 print(cl)
-#> Socket cluster with 2 nodes where 2 nodes are on host 'localhost'
-#> (R version 3.6.1 (2019-07-05), platform x86_64-pc-linux-gnu)
+#> Socket cluster with 2 nodes on host 'localhost' (R version 3.6.1
+#> (2019-07-05), platform x86_64-pc-linux-gnu)
 ```
 
 
@@ -89,6 +89,6 @@ cl <- makeClusterPSOCK(
   )
 )
 print(cl)
-#> Socket cluster with 2 nodes where 2 nodes are on host 'localhost'
-#> (R version 3.6.1 (2019-07-05), platform x86_64-pc-linux-gnu)
+#> Socket cluster with 2 nodes on host 'localhost' (R version 3.6.1
+#> (2019-07-05), platform x86_64-pc-linux-gnu)
 ```
