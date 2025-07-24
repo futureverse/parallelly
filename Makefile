@@ -10,3 +10,13 @@ vignettes/parallelly-01-intro.md: incl/OVERVIEW.md vignettes/incl/clean.css
 	sed -i 's/vignettes\///g' $@
 
 vigns: vignettes/parallelly-01-intro.md
+
+r-versions:
+	@echo "Before:"
+	@grep -F "4.5.0" -r --include="*.R" --include="*.Rd" --include="*.md" --exclude-dir="revdep/"
+	@sed -i 's/R-4.5.0/R-4.5.1/' incl/*.R R/*.R
+	@sed -i 's/4.5.0 (2025-04-11)/4.5.1 (2025-06-13)/' vignettes/*.md
+	@echo
+	@echo "After:"
+	@grep -F "4.5.0" -r --include="*.R" --include="*.Rd" --include="*.md" --exclude-dir="revdep/"
+
