@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.0-9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.0-9016</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -277,8 +277,8 @@ on machine <code>n1.remote.org</code> running under user
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="ex">library</span><span class="er">(</span><span class="ex">parallelly</span><span class="kw">)</span></span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="ex">cl</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> user = <span class="st">"alice"</span><span class="kw">)</span></span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl</span><span class="kw">)</span></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 1 nodes where 1 node is on host 'n1.remote.org'</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.5.1 (2025-06-13), platform x86_64-pc-linux-gnu)</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 1 node on host 'n1.remote.org' (R version 4.5.1</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; (2025-06-13), platform x86_64-pc-linux-gnu)</span></span>
 <span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="ex">parallel::stopCluster</span><span class="er">(</span><span class="ex">cl</span><span class="kw">)</span></span></code></pre></div>
 <p>If you want to run parallel workers on other machines, repeat the
 above for each machine. After this, you will be able to launch parallel
@@ -365,8 +365,8 @@ equal number of times;</p>
 <span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1.remote.org"</span>, <span class="st">"n1.remote.org"</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="va">workers</span>, user <span class="op">=</span> <span class="st">"alice"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Socket cluster with 2 nodes where 2 nodes are on host 'n1.remote.org'</span></span>
-<span><span class="co">#&gt; (R version 4.5.1 (2025-06-13), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
+<span><span class="co">#&gt; Socket cluster with 2 nodes are on host 'n1.remote.org' (R version 4.5.1</span></span>
+<span><span class="co">#&gt; (2025-06-13), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p><em>Comment</em>: In the <strong>parallel</strong> package, a
 parallel worker is referred to a parallel node, or short <em>node</em>,
 which is why we use the same term in the <strong>parallelly</strong>
@@ -465,8 +465,8 @@ can use:</p>
 <span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="ex">workers</span> <span class="op">&lt;</span>- rep<span class="er">(</span><span class="st">"localhost"</span><span class="ex">,</span> 4<span class="kw">)</span></span>
 <span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="ex">cl_local</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers</span><span class="kw">)</span></span>
 <span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl_local</span><span class="kw">)</span></span>
-<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes where 4 nodes are on host 'localhost'</span></span>
-<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.5.1 (2025-06-13), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes on host 'localhost' (R version 4.5.1</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a><span class="co">#&gt; (2025-06-13), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p>to launch four local parallel workers. Note how we did not have to
 specify <code>user = "ally"</code>. This is because the default username
 is always the local username. Next, assume we want to add another four
@@ -476,8 +476,8 @@ we can set these up as:</p>
 <span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="ex">workers</span> <span class="op">&lt;</span>- rep<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> 4<span class="kw">)</span></span>
 <span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="ex">cl_remote</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="ex">workers,</span> user = <span class="st">"alice"</span><span class="kw">)</span></span>
 <span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="ex">print</span><span class="er">(</span><span class="ex">cl_remote</span><span class="kw">)</span></span>
-<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes where 4 nodes are on host 'n1.remote.org'</span></span>
-<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="co">#&gt; (R version 4.5.1 (2025-06-13), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 4 nodes on host 'n1.remote.org' (R version 4.5.1</span></span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="co">#&gt; (2025-06-13), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 <p>At this point, we have two independent clusters of parallel workers:
 <code>cl_local</code> and <code>cl_remote</code>. We can combine them
 into a single cluster using:</p>

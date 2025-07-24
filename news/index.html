@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.0-9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.0-9016</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,6 +77,10 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>Now <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> for <code>RichSOCKcluster</code> outputs a more concise summary, which is also grammatically correct for single-node clusters.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="deprecated-and-defunct-development-version">Deprecated and Defunct<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-development-version"></a></h3>
 <ul><li>In previous version, <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> started to collect session information on each parallel worker, which included <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code>. However, for unknown reasons, <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code> caused the cluster creation to fail GitHub Actions running macOS. The problem could be reproduced neither locally, on the mac-builder, nor on the CRAN macOS servers. Because this feature is non-critical and only introduced in the previous version, I decided to remove the collection of <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code> again.</li>
