@@ -15,7 +15,7 @@ and check whether or not the connection is still valid."><meta property="og:imag
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.0-9016</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -211,7 +211,7 @@ indices. To get a connection by its index, use <code><a href="https://rdrr.io/r/
 <span class="r-in"><span><span class="fu">isConnectionValid</span><span class="op">(</span><span class="va">y</span><span class="op">$</span><span class="va">con</span><span class="op">)</span>     <span class="co">## FALSE with attribute 'reason'</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"reason")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Connection (connection: index=4, description=\"/tmp/henrik/RtmpXuUxb8/filef73a850b31374\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=-1) is no longer valid. It differ from the currently registered R connection with the same index 4 (connection: index=4, description=\"/tmp/henrik/RtmpXuUxb8/filef73a850b31374\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=1427, raw_id=\"&lt;pointer: 0x593&gt;\")"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Connection (connection: index=4, description=\"/tmp/henrik/RtmpB6EgTp/file10c6e057a8174b\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=-1) is no longer valid. It differ from the currently registered R connection with the same index 4 (connection: index=4, description=\"/tmp/henrik/RtmpB6EgTp/file10c6e057a8174b\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=1427, raw_id=\"&lt;pointer: 0x593&gt;\")"</span>
 <span class="r-in"><span><span class="fu">connectionId</span><span class="op">(</span><span class="va">y</span><span class="op">$</span><span class="va">con</span><span class="op">)</span>          <span class="co">## -1L</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] -1</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">close</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
