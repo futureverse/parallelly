@@ -64,7 +64,7 @@ cl <- makeClusterPSOCK(
   )
 )
 print(cl)
-#> Socket cluster with 1 nodes where 1 node is on host 'localhost'
+#> Socket cluster with 1 node on host 'localhost'
 #> (R version 4.5.1 (2025-06-13 ucrt), platform x86_64-w64-mingw32)
 ```
 

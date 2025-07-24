@@ -1,5 +1,10 @@
 # Version (development version)
 
+## New Features
+
+ * Now `print()` for `RichSOCKcluster` outputs a more concise summary,
+   which is also grammatically correct for single-node clusters.
+
 ## Deprecated and Defunct
 
  * In previous version, `makeClusterPSOCK()` started to collect

@@ -65,11 +65,19 @@ print.RichSOCKcluster <- function(x, ...) {
   txt <- paste(txt, specs, sep = " ")
 
   t <- table(txt)
-  t <- t[order(t, decreasing = TRUE)]
-  w <- ifelse(t == 1L, "node is", "nodes are")
-  txt <- sprintf("%d %s on %s", t, w, names(t))
-  txt <- paste(txt, collapse = ", ")
-  txt <- sprintf("Socket cluster with %d nodes where %s", length(x), txt)
+  if (length(t) == 1L) {
+    if (length(x) == 1L) {
+      txt <- sprintf("Socket cluster with 1 node on %s", names(t))
+    } else {
+      txt <- sprintf("Socket cluster with %d nodes on %s", length(x), names(t))
+    }
+  } else {
+    t <- t[order(t, decreasing = TRUE)]
+    w <- ifelse(t == 1L, "node is", "nodes are")
+    txt <- sprintf("%d %s on %s", t, w, names(t))
+    txt <- paste(txt, collapse = ", ")
+    txt <- sprintf("Socket cluster with %d nodes where %s", length(x), txt)
+  }
 
   ## Check for invalid connections
   broken <- grep("ERROR:", info[["connection"]])
