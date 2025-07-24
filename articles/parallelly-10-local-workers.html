@@ -146,15 +146,16 @@ then shut down the cluster.</p>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>cl <span class="ot">&lt;-</span> <span class="fu">makeClusterPSOCK</span>(<span class="dv">2</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">print</span>(cl)</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; Socket cluster with 2 nodes where 2 nodes are on host 'localhost'</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>Socket cluster with <span class="dv">2</span> nodes where <span class="dv">2</span> nodes are on host <span class="st">'localhost'</span><span class="co">#&gt; (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">parLapply</span>(cl, <span class="at">X =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">fun =</span> sqrt)</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">unlist</span>(y)</span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">sum</span>(y)</span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">print</span>(z)</span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; [1] 671.4629</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>parallel<span class="sc">::</span><span class="fu">stopCluster</span>(cl)</span></code></pre></div>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>Socket cluster with <span class="dv">2</span> nodes where <span class="dv">2</span> nodes are on host <span class="st">'localhost'</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; (R version 4.5.1 (2025-06-13), platform x86_64-pc-linux-gnu)</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">parLapply</span>(cl, <span class="at">X =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">fun =</span> sqrt)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">unlist</span>(y)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">sum</span>(y)</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">print</span>(z)</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; [1] 671.4629</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>parallel<span class="sc">::</span><span class="fu">stopCluster</span>(cl)</span></code></pre></div>
 <p><em>Comment</em>: In the <strong>parallel</strong> package, a
 parallel worker is referred to a parallel node, or short <em>node</em>,
 which is why we use the same term in the <strong>parallelly</strong>
@@ -178,7 +179,7 @@ details, see <code><a href="../reference/availableCores.html">help("availableCor
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="fu"><a href="../reference/availableCores.html">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Socket cluster with 8 nodes where 8 nodes are on host 'localhost'</span></span>
-<span><span class="co">#&gt; (R version 4.5.0 (2025-04-11), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
+<span><span class="co">#&gt; (R version 4.5.1 (2025-06-13), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
