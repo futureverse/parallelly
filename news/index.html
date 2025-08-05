@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,7 @@
     <li><a class="dropdown-item" href="../articles/parallelly-20-limit-workers.html">Parallel Workers with CPU and Memory Limited</a></li>
     <li><a class="dropdown-item" href="../articles/parallelly-21-container-workers.html">Parallel Workers Running in Linux Containers</a></li>
     <li><a class="dropdown-item" href="../articles/parallelly-22-wine-workers.html">Parallel Workers Running MS Windows via Wine</a></li>
+    <li><a class="dropdown-item" href="../articles/parallelly-25-sandbox-workers.html">Parallel Workers Running in a Sandbox</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -76,6 +77,10 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<ul><li>…</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.45.1" id="version-1451">Version 1.45.1<a class="anchor" aria-label="anchor" href="#version-1451"></a></h2><p class="text-muted">CRAN release: 2025-07-24</p>
 <div class="section level3">
 <h3 id="miscellaneous-1-45-1">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous-1-45-1"></a></h3>
@@ -90,7 +95,7 @@
 <h2 class="pkg-version" data-toc-text="1.45.0" id="version-1450">Version 1.45.0<a class="anchor" aria-label="anchor" href="#version-1450"></a></h2><p class="text-muted">CRAN release: 2025-06-02</p>
 <div class="section level3">
 <h3 id="new-features-1-45-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-45-0"></a></h3>
-<ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> gained argument <code>max</code>, which limits the maximum number of cores returned after everything else is applied, i.e. <code>availableCores(..., max = n)</code> is short for <code>min(n,    availableCores(...), na.rm = TRUE)</code>.</p></li>
+<ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> gained argument <code>max</code>, which limits the maximum number of cores returned after everything else is applied, i.e. <code>availableCores(..., max = n)</code> is short for <code>min(n, availableCores(...), na.rm = TRUE)</code>.</p></li>
 <li><p><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> gained argument <code>...</code>, which passes any additional arguments to <code><a href="../reference/availableCores.html">availableCores()</a></code>, if specified.</p></li>
 <li><p>If <code>killNode(..., signal = tools::SIGTERM)</code> successfully signaled the cluster node, it will now close any existing socket connection to the node. If the node is running on the local host, it will also remove its temporary directory, because the the node’s R process might not have been exited gracefully.</p></li>
 <li><p>The session information collected by <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> now contains more details on each worker, e.g. the <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code> folder, <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code>, and <code><a href="https://rdrr.io/r/base/extSoftVersion.html" class="external-link">extSoftVersion()</a></code>.</p></li>
@@ -99,7 +104,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-1-45-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-45-0"></a></h3>
 <ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would not respect <code>method = "fallback"</code> if <code>constraints</code> specified <code>"connections"</code> or <code>"connections-N"</code>.</p></li>
-<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would produce an error on <code>Error in scan(file =    file, what = what, ...)</code> on systems that have a <code>/proc/self/mounts</code> file with syntax errors. Such files have been reported on Windows Subsystem for Linux version 2 (WSL 2), where spaces in Windows path have not been properly escaped for some entries. Now such invalid entries are skipped, before parsing the mount table.</p></li>
+<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would produce an error on <code>Error in scan(file = file, what = what, ...)</code> on systems that have a <code>/proc/self/mounts</code> file with syntax errors. Such files have been reported on Windows Subsystem for Linux version 2 (WSL 2), where spaces in Windows path have not been properly escaped for some entries. Now such invalid entries are skipped, before parsing the mount table.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -112,7 +117,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-1-44-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-44-0"></a></h3>
 <ul><li>
-<code><a href="../reference/availableCores.html">availableCores()</a></code> would not respect <code>method = "fallback"</code>, since v1.41.0 (2024-12-18), on system with a value for <code>method =    "/proc/self/status"</code>.</li>
+<code><a href="../reference/availableCores.html">availableCores()</a></code> would not respect <code>method = "fallback"</code>, since v1.41.0 (2024-12-18), on system with a value for <code>method = "/proc/self/status"</code>.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -120,7 +125,7 @@
 <div class="section level3">
 <h3 id="significant-changes-1-43-0">Significant Changes<a class="anchor" aria-label="anchor" href="#significant-changes-1-43-0"></a></h3>
 <ul><li><p>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> memoizes the values of all its components. This means that as soon as it has been called, environment variables such as <code>NSLOTS</code> will no longer be queried.</p></li>
-<li><p>Starting with R 4.5.0, one can use <code>parallel::makeCluster(n, type =    parallelly::RPSOCK)</code> as an alternative to <code>parallelly::makeClusterPSOCK(n)</code>. Similarly, <code>type =    parallelly::RMPI</code> creates a cluster using <code><a href="../reference/makeClusterMPI.html">parallelly::makeClusterMPI()</a></code>, and <code>type = parallelly::SEQ</code> creates a cluster using <code><a href="../reference/makeClusterSequential.html">parallelly::makeClusterSequential()</a></code>. This was first introduced in <strong>parallelly</strong> 1.38.0, but here we rename <code>PSOCK</code> to <code>RPSOCK</code> and <code>MPI</code> to <code>RMPI</code> to minimize the risk for mistaking them from the built-in types in the <strong>parallel</strong> package. The <code>R</code> stands for “Rich”.</p></li>
+<li><p>Starting with R 4.5.0, one can use <code>parallel::makeCluster(n, type = parallelly::RPSOCK)</code> as an alternative to <code>parallelly::makeClusterPSOCK(n)</code>. Similarly, <code>type = parallelly::RMPI</code> creates a cluster using <code><a href="../reference/makeClusterMPI.html">parallelly::makeClusterMPI()</a></code>, and <code>type = parallelly::SEQ</code> creates a cluster using <code><a href="../reference/makeClusterSequential.html">parallelly::makeClusterSequential()</a></code>. This was first introduced in <strong>parallelly</strong> 1.38.0, but here we rename <code>PSOCK</code> to <code>RPSOCK</code> and <code>MPI</code> to <code>RMPI</code> to minimize the risk for mistaking them from the built-in types in the <strong>parallel</strong> package. The <code>R</code> stands for “Rich”.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-1-43-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-1-43-0"></a></h3>
@@ -132,8 +137,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-43-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-43-0"></a></h3>
-<ul><li><p><code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> could produce warnings on <code>doTryCatch(return(expr),    name, parentenv, handler) : NAs introduced by coercion</code> on MS Windows. Improved the internal <code>tasklist</code> parses used to test whether a process is alive.</p></li>
-<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> could produce <code>Error: Error in    cache_controller[[field]] : subscript out of bounds</code> in <code>... getCGroups1CpuQuota -&gt; getCGroups1CpuPeriodMicroseconds</code>.</p></li>
+<ul><li><p><code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> could produce warnings on <code>doTryCatch(return(expr), name, parentenv, handler) : NAs introduced by coercion</code> on MS Windows. Improved the internal <code>tasklist</code> parses used to test whether a process is alive.</p></li>
+<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> could produce <code>Error: Error in cache_controller[[field]] : subscript out of bounds</code> in <code>... getCGroups1CpuQuota -&gt; getCGroups1CpuPeriodMicroseconds</code>.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -144,8 +149,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-42-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-42-0"></a></h3>
-<ul><li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error in match.arg(type, choices =    known_types, several.ok = FALSE) : 'arg' must be of length 1</code>. This bug was introduced in version 1.38.0 (2024-07-27), when adding richer support for the <code>rscript_sh</code> argument.</p></li>
-<li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error: ‘length(rsh_call) == 1L’ is    not TRUE</code> if option <code>rshopts</code> were specified during creation.</p></li>
+<ul><li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error in match.arg(type, choices = known_types, several.ok = FALSE) : 'arg' must be of length 1</code>. This bug was introduced in version 1.38.0 (2024-07-27), when adding richer support for the <code>rscript_sh</code> argument.</p></li>
+<li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error: ‘length(rsh_call) == 1L’ is not TRUE</code> if option <code>rshopts</code> were specified during creation.</p></li>
 <li><p>The value of <code><a href="../reference/availableCores.html">availableCores()</a></code> was numeric rather than integer as documented. This harmless bug was introduced in version 1.31.0 (2022-04-07).</p></li>
 </ul></div>
 </div>
@@ -160,7 +165,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-1-41-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-41-0"></a></h3>
 <ul><li>
-<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> on MS Windows failed to launch remote workers, with warnings on <code>"In system(local_cmd, wait = FALSE, input =    input) : 'C:\WINDOWS\System32\OpenSSH\ssh.exe' not found"</code>. This bug was introduced in version 1.38.0 (2024-07-27), when adding richer support for the <code>rscript_sh</code> argument.</li>
+<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> on MS Windows failed to launch remote workers, with warnings on <code>"In system(local_cmd, wait = FALSE, input = input) : 'C:\WINDOWS\System32\OpenSSH\ssh.exe' not found"</code>. This bug was introduced in version 1.38.0 (2024-07-27), when adding richer support for the <code>rscript_sh</code> argument.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -183,8 +188,8 @@
 <div class="section level3">
 <h3 id="bug-fixes-1-40-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-40-0"></a></h3>
 <ul><li><p>Querying of cgroups v1 ‘cpuquota’ CPU limits broke in the previous release (v1.39.0).</p></li>
-<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> could produce error <code>Failed to identify mount    point for CGroups v1 controller 'cpuset'</code> on some systems.</p></li>
-<li><p><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> would produce invalid warning on <code>Identified 8    workers from the ‘PE_HOSTFILE’ file (...), which is more than    environment variable ‘NSLOTS’ = 8</code> when running via a Grid Engine job scheduler.</p></li>
+<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> could produce error <code>Failed to identify mount point for CGroups v1 controller 'cpuset'</code> on some systems.</p></li>
+<li><p><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> would produce invalid warning on <code>Identified 8 workers from the ‘PE_HOSTFILE’ file (...), which is more than environment variable ‘NSLOTS’ = 8</code> when running via a Grid Engine job scheduler.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -214,7 +219,7 @@
 <li><p>Now <code><a href="../reference/makeClusterPSOCK.html">makeNodePSOCK()</a></code> accepts <code>rscript_sh = "none"</code>, which skips quoting the Rscript call.</p></li>
 <li><p>Now <code><a href="../reference/makeClusterPSOCK.html">makeNodePSOCK()</a></code> accepts <code>rscript_sh</code> of length one or two. If <code>length(rscript_sh) == 2</code>, then <code>rscript_sh[1]</code> is for the inner and <code>rscript_sh[2]</code> is for the outer shell quoting of the Rscript call. More precisely, <code>rscript_sh[1]</code> is for Rscript arguments that need shell quoting (e.g. <code>Rscript -e "&lt;expr&gt;"</code>), and <code>rscript_sh[2]</code> is for the whole <code>Rscript ...</code> call.</p></li>
 <li><p>Add <code><a href="../reference/makeClusterSequential.html">makeClusterSequential()</a></code> available for R (&gt;= 4.4.0).</p></li>
-<li><p>Starting with R 4.5.0 (currently R-devel), one can use <code>parallel::makeCluster(n, type = parallelly::PSOCK)</code> as an alternative to <code>parallelly::makeClusterPSOCK(n)</code>. Similarly, <code>type    = parallelly::MPI</code> creates a cluster using <code><a href="../reference/makeClusterMPI.html">parallelly::makeClusterMPI()</a></code>, and <code>type = parallelly::SEQ</code> creates a cluster using <code><a href="../reference/makeClusterSequential.html">parallelly::makeClusterSequential()</a></code>.</p></li>
+<li><p>Starting with R 4.5.0 (currently R-devel), one can use <code>parallel::makeCluster(n, type = parallelly::PSOCK)</code> as an alternative to <code>parallelly::makeClusterPSOCK(n)</code>. Similarly, <code>type = parallelly::MPI</code> creates a cluster using <code><a href="../reference/makeClusterMPI.html">parallelly::makeClusterMPI()</a></code>, and <code>type = parallelly::SEQ</code> creates a cluster using <code><a href="../reference/makeClusterSequential.html">parallelly::makeClusterSequential()</a></code>.</p></li>
 <li><p>Add <code><a href="../reference/serializedSize.html">serializedSize()</a></code> for calculating the size of an object by counting the number of bytes required to serialize it.</p></li>
 </ul></div>
 <div class="section level3">
@@ -239,7 +244,7 @@
 <div class="section level3">
 <h3 id="miscellaneous-1-37-0">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous-1-37-0"></a></h3>
 <ul><li>
-<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> could produce a confusing error <code>Invalid port:    NA</code> if a non-available port was requested. Now the error message is more informative, e.g. <code>Argument 'port' specifies non-available port(s): 80</code>.</li>
+<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> could produce a confusing error <code>Invalid port: NA</code> if a non-available port was requested. Now the error message is more informative, e.g. <code>Argument 'port' specifies non-available port(s): 80</code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-37-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-37-0"></a></h3>
@@ -290,9 +295,9 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-34-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-34-0"></a></h3>
-<ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would produce a warning <code>In is.na(constraints) :    is.na() applied to non-(list or vector) of type 'NULL'</code> when running with R (&lt; 4.0.0).</p></li>
+<ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would produce a warning <code>In is.na(constraints) : is.na() applied to non-(list or vector) of type 'NULL'</code> when running with R (&lt; 4.0.0).</p></li>
 <li><p><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> did not acknowledge the <code>"cgroups2.cpu.max"</code> and <code>"Bioconductor"</code> methods added to <code><a href="../reference/availableCores.html">availableCores()</a></code> in <strong>parallelly</strong> 1.33.0 (2022-12-13). It also did not acknowledge methods <code>"cgroups.cpuset"</code> and <code>"cgroups.cpuquota"</code> added in <strong>parallelly</strong> 1.31.0 (2022-04-07), and <code>"nproc"</code> added in <strong>parallelly</strong> 1.26.1 (2021-06-29).</p></li>
-<li><p>When <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> failed to connect to all parallel workers within the <code>connectTimeout</code> time limit, could either produce <code>Error    in sprintf(ngettext(failed, "Cluster setup failed    (connectTimeout=%.1f seconds). %d worker of %d failed to    connect.", : invalid format '%d'; use format %f, %e, %g or %a for    numeric objects</code> instead of an informative error message, or an error message with the incorrect information.</p></li>
+<li><p>When <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> failed to connect to all parallel workers within the <code>connectTimeout</code> time limit, could either produce <code>Error in sprintf(ngettext(failed, "Cluster setup failed (connectTimeout=%.1f seconds). %d worker of %d failed to connect.", : invalid format '%d'; use format %f, %e, %g or %a for numeric objects</code> instead of an informative error message, or an error message with the incorrect information.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -301,16 +306,16 @@
 <h3 id="new-features-1-33-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-33-0"></a></h3>
 <ul><li><p>Add <code><a href="../reference/killNode.html">killNode()</a></code> to terminate cluster nodes via process signaling. Currently, this is only supported for parallel workers on the local machine, and only those created by <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code>.</p></li>
 <li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> and likes now assert the running R session has enough permissions on the operating system to do system calls such as <code>system2("Rscript --version")</code>. If not, an informative error message is produced.</p></li>
-<li><p>On Unix, <code><a href="../reference/availableCores.html">availableCores()</a></code> queries also control groups v2 (cgroups v2) field <code>cpu.max</code> for a possible CPU quota allocation. If a CPU quota is set, then the number of CPUs is rounded to the nearest integer, unless its less that 0.5, in case it’s rounded up to a single CPU. An example, where cgroups CPU quotas can be set to limit the total CPU load, is with Linux containers, e.g. <code>docker    run --cpus=3.5 ...</code>.</p></li>
+<li><p>On Unix, <code><a href="../reference/availableCores.html">availableCores()</a></code> queries also control groups v2 (cgroups v2) field <code>cpu.max</code> for a possible CPU quota allocation. If a CPU quota is set, then the number of CPUs is rounded to the nearest integer, unless its less that 0.5, in case it’s rounded up to a single CPU. An example, where cgroups CPU quotas can be set to limit the total CPU load, is with Linux containers, e.g. <code>docker run --cpus=3.5 ...</code>.</p></li>
 <li><p>Add support for <code>availableCores(methods = "connections")</code>, which returns the current number of free R connections per <code><a href="../reference/availableConnections.html">freeConnections()</a></code>. This is the maximum number of PSOCK, SOCK, and MPI <strong>parallel</strong> cluster nodes we can open without running out of available R connections. A convenient way to use this and all other methods is <code>availableCores(constraints = "connections")</code>.</p></li>
 <li><p>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> recognizes environment variable <code>IS_BIOC_BUILD_MACHINE</code>, which is set to true by the Bioconductor (&gt;= 3.16) check servers. If true, then a maximum of four (4) cores is returned. This new environment variable replaces legacy variable <code>BBS_HOME</code> used in Bioconductor (&lt;= 3.15).</p></li>
-<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> splits up method <code>"BiocParallel"</code> into two; <code>"BiocParallel"</code> and <code>"Bioconductor"</code>. The former queries environment variable <code>BIOCPARALLEL_WORKER_NUMBER</code> and the latter <code>IS_BIOC_BUILD_MACHINE</code>. This means <code>availableCores(which =    "all")</code> now reports on both.</p></li>
+<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> splits up method <code>"BiocParallel"</code> into two; <code>"BiocParallel"</code> and <code>"Bioconductor"</code>. The former queries environment variable <code>BIOCPARALLEL_WORKER_NUMBER</code> and the latter <code>IS_BIOC_BUILD_MACHINE</code>. This means <code>availableCores(which = "all")</code> now reports on both.</p></li>
 <li><p><code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> will now produce a once-per-session informative warning when it detects that it is not possible to check whether another process is alive on the current machine.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-1-33-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-1-33-0"></a></h3>
 <ul><li><p>Add section to <code><a href="../reference/makeClusterPSOCK.html">help("makeClusterPSOCK", package = "parallelly")</a></code> explaining why <code>R CMD check</code> may produce “checking for detritus in the temp directory … NOTE” and how to avoid them.</p></li>
-<li><p>Add section ‘For package developers’ to <code><a href="../reference/makeClusterPSOCK.html">help("makeClusterPSOCK",    package = "parallelly")</a></code> reminding us that we need to stop all clusters we created in package examples, tests, and vignettes.</p></li>
+<li><p>Add section ‘For package developers’ to <code><a href="../reference/makeClusterPSOCK.html">help("makeClusterPSOCK", package = "parallelly")</a></code> reminding us that we need to stop all clusters we created in package examples, tests, and vignettes.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-33-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-33-0"></a></h3>
@@ -338,7 +343,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-32-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-32-0"></a></h3>
-<ul><li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> would fail with <code>Error:    node$session_info$process$pid == pid is not TRUE</code> when running R in Simplified Chinese (<code>LANGUAGE=zh_CN</code>), Traditional Chinese (Taiwan) (<code>LANGUAGE=zh_TW</code>), or Korean (<code>LANGUAGE=ko</code>) locales.</p></li>
+<ul><li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> would fail with <code>Error: node$session_info$process$pid == pid is not TRUE</code> when running R in Simplified Chinese (<code>LANGUAGE=zh_CN</code>), Traditional Chinese (Taiwan) (<code>LANGUAGE=zh_TW</code>), or Korean (<code>LANGUAGE=ko</code>) locales.</p></li>
 <li><p>Some warnings and errors showed the wrong call.</p></li>
 </ul></div>
 </div>
@@ -427,7 +432,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-1-28-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-28-0"></a></h3>
 <ul><li><p>Environment variable <code>R_PARALLELLY_SUPPORTSMULTICORE_UNSTABLE</code> was incorrectly parsed as a logical instead of a character string. If the variables was set to, say, <code>"quiet"</code>, this would cause an error when the package was loaded.</p></li>
-<li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> failed to fall back to <code>setup_strategy =    "sequential"</code>, when not supported by the current R version.</p></li>
+<li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> failed to fall back to <code>setup_strategy = "sequential"</code>, when not supported by the current R version.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -440,7 +445,7 @@
 <div class="section level3">
 <h3 id="workaround-1-27-0">Workaround<a class="anchor" aria-label="anchor" href="#workaround-1-27-0"></a></h3>
 <ul><li>
-<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> and <code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">parallel::makeCluster()</a></code> failed with error “Cluster setup failed. <n> of <n> workers failed to connect.” when using the new default <code>setup_strategy = "parallel"</code> and when the <strong>tcltk</strong> package is loaded when running R (&gt;= 4.0.0 &amp;&amp; &lt;= 4.1.0) on macOS. Now <strong>parallelly</strong> forces <code>setup_strategy =    "sequential"</code> when the <strong>tcltk</strong> package is loaded on these R versions.</n></n></li>
+<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> and <code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">parallel::makeCluster()</a></code> failed with error “Cluster setup failed. <n> of <n> workers failed to connect.” when using the new default <code>setup_strategy = "parallel"</code> and when the <strong>tcltk</strong> package is loaded when running R (&gt;= 4.0.0 &amp;&amp; &lt;= 4.1.0) on macOS. Now <strong>parallelly</strong> forces <code>setup_strategy = "sequential"</code> when the <strong>tcltk</strong> package is loaded on these R versions.</n></n></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-27-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-27-0"></a></h3>
@@ -495,7 +500,7 @@
 <div class="section level3">
 <h3 id="new-features-1-25-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-25-0"></a></h3>
 <ul><li>
-<code><a href="../reference/availableCores.html">availableCores()</a></code> gained argument <code>omit</code> to make it easier to put aside zero or more cores from being used in parallel processing. For example, on a system with four cores, <code>availableCores(omit =    1)</code> returns 3. Importantly, since <code><a href="../reference/availableCores.html">availableCores()</a></code> is guaranteed to always return a positive integer, <code>availableCores(omit = 4) ==    1</code>, even on systems with four or fewer cores. Using <code>availableCores() - 4</code> on such systems would return a non-positive value, which would give an error downstream.</li>
+<code><a href="../reference/availableCores.html">availableCores()</a></code> gained argument <code>omit</code> to make it easier to put aside zero or more cores from being used in parallel processing. For example, on a system with four cores, <code>availableCores(omit = 1)</code> returns 3. Importantly, since <code><a href="../reference/availableCores.html">availableCores()</a></code> is guaranteed to always return a positive integer, <code>availableCores(omit = 4) == 1</code>, even on systems with four or fewer cores. Using <code>availableCores() - 4</code> on such systems would return a non-positive value, which would give an error downstream.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-25-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-25-0"></a></h3>
@@ -636,11 +641,11 @@
 <div class="section level3">
 <h3 id="new-features-1-17-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-17-0"></a></h3>
 <ul><li>
-<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> gained argument <code>rscript_envs</code> for setting environment variables in workers on startup, e.g. <code>rscript_envs =    c(FOO = "3.14", "BAR")</code>.</li>
+<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> gained argument <code>rscript_envs</code> for setting environment variables in workers on startup, e.g. <code>rscript_envs = c(FOO = "3.14", "BAR")</code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="miscellaneous-1-17-0">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous-1-17-0"></a></h3>
-<ul><li>Not all CRAN servers have <code>_R_CHECK_LIMIT_CORES_</code> set. To better emulate CRAN submission checks, the <strong>future</strong> package will, when loaded, set this environment variable to TRUE if unset and if <code>R    CMD check</code> is running. Note that <code><a href="https://parallelly.futureverse.org/reference/availableCores.html">future::availableCores()</a></code> respects <code>_R_CHECK_LIMIT_CORES_</code> and returns at most <code>2L</code> (two cores) if detected.</li>
+<ul><li>Not all CRAN servers have <code>_R_CHECK_LIMIT_CORES_</code> set. To better emulate CRAN submission checks, the <strong>future</strong> package will, when loaded, set this environment variable to TRUE if unset and if <code>R CMD check</code> is running. Note that <code><a href="https://parallelly.futureverse.org/reference/availableCores.html">future::availableCores()</a></code> respects <code>_R_CHECK_LIMIT_CORES_</code> and returns at most <code>2L</code> (two cores) if detected.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -668,7 +673,7 @@
 <h3 id="new-features-1-13-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-13-0"></a></h3>
 <ul><li><p>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> also recognizes PBS environment variable <code>NCPUS</code>, because the PBSPro scheduler does not set <code>PBS_NUM_PPN</code>.</p></li>
 <li><p>If, option <code>future.availableCores.custom</code> is set to a function, then <code><a href="../reference/availableCores.html">availableCores()</a></code> will call that function and interpret its value as number of cores. Analogously, option <code>future.availableWorkers.custom</code> can be used to specify a hostnames of a set of workers that <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> sees. These new options provide a mechanism for anyone to customize <code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> in case they do not (yet) recognize, say, environment variables that are specific the user’s compute environment or HPC scheduler.</p></li>
-<li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> gained support for argument <code>rscript_startup</code> for evaluating one or more R expressions in the background R worker prior to the worker event loop launching. This provides a more convenient approach than having to use, say, <code>rscript_args =    c("-e", sQuote(code))</code>.</p></li>
+<li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> gained support for argument <code>rscript_startup</code> for evaluating one or more R expressions in the background R worker prior to the worker event loop launching. This provides a more convenient approach than having to use, say, <code>rscript_args = c("-e", sQuote(code))</code>.</p></li>
 <li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> gained support for argument <code>rscript_libs</code> to control the R package library search path on the workers. For example, to <em>prepend</em> the folder <code>~/R-libs</code> on the workers, use <code>rscript_libs = c("~/R-libs", "*")</code>, where <code>"*"</code> will be resolved to the current <code><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths()</a></code> on the workers.</p></li>
 </ul></div>
 <div class="section level3">
@@ -704,7 +709,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="software-quality-1-11-1">Software Quality<a class="anchor" aria-label="anchor" href="#software-quality-1-11-1"></a></h3>
-<ul><li>TESTS: When the <strong>future</strong> package is loaded, it checks whether <code>R    CMD check</code> is running or not. If it is, then a few future-specific environment variables are adjusted such that the tests play nice with the testing environment. For instance, it sets the socket connection timeout for PSOCK cluster workers to 120 seconds (instead of the default 30 days!). This will lower the risk for more and more zombie worker processes cluttering up the test machine (e.g. CRAN servers) in case a worker process is left behind despite the main R processes is terminated. Note that these adjustments are applied automatically to the checks of any package that depends on, or imports, the <strong>future</strong> package.</li>
+<ul><li>TESTS: When the <strong>future</strong> package is loaded, it checks whether <code>R CMD check</code> is running or not. If it is, then a few future-specific environment variables are adjusted such that the tests play nice with the testing environment. For instance, it sets the socket connection timeout for PSOCK cluster workers to 120 seconds (instead of the default 30 days!). This will lower the risk for more and more zombie worker processes cluttering up the test machine (e.g. CRAN servers) in case a worker process is left behind despite the main R processes is terminated. Note that these adjustments are applied automatically to the checks of any package that depends on, or imports, the <strong>future</strong> package.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-11-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-11-1"></a></h3>
@@ -817,7 +822,7 @@
 <h2 class="pkg-version" data-toc-text="1.1.1" id="version-111">Version 1.1.1<a class="anchor" aria-label="anchor" href="#version-111"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-1-1-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-1"></a></h3>
-<ul><li>For the special case where ‘remote’ futures use <code>workers =    "localhost"</code> they (again) use the exact same R executable as the main / calling R session (in all other cases it uses whatever <code>Rscript</code> is found on the <code>PATH</code>). This was already indeed implemented in 1.0.1, but with the added support for reverse SSH tunnels in 1.1.0 this default behavior was lost.</li>
+<ul><li>For the special case where ‘remote’ futures use <code>workers = "localhost"</code> they (again) use the exact same R executable as the main / calling R session (in all other cases it uses whatever <code>Rscript</code> is found on the <code>PATH</code>). This was already indeed implemented in 1.0.1, but with the added support for reverse SSH tunnels in 1.1.0 this default behavior was lost.</li>
 </ul></div>
 </div>
     <div class="section level2">

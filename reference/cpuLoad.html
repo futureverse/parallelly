@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,7 @@
     <li><a class="dropdown-item" href="../articles/parallelly-20-limit-workers.html">Parallel Workers with CPU and Memory Limited</a></li>
     <li><a class="dropdown-item" href="../articles/parallelly-21-container-workers.html">Parallel Workers Running in Linux Containers</a></li>
     <li><a class="dropdown-item" href="../articles/parallelly-22-wine-workers.html">Parallel Workers Running MS Windows via Wine</a></li>
+    <li><a class="dropdown-item" href="../articles/parallelly-25-sandbox-workers.html">Parallel Workers Running in a Sandbox</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -112,7 +113,7 @@ Brendan Gregg's Blog, 2017-08-08,
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">loadavg</span> <span class="op">&lt;-</span> <span class="fu">cpuLoad</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loadavg</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1min  5min 15min </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.83  0.72  0.62 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3.25  4.25  4.32 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
