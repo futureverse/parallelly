@@ -98,7 +98,7 @@ version 4.5.1 (2025-06-13), platform x86_64-pc-linux-gnu)
 
 
 
-## Example: Launch parallel workers via the'Fujitsu Technical Computing Suite job scheduler
+## Example: Launch parallel workers via the Fujitsu Technical Computing Suite job scheduler
 
 The 'Fujitsu Technical Computing Suite' is a high-performance compute
 (HPC) job scheduler where one can request compute resources on

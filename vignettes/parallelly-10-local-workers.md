@@ -20,7 +20,7 @@ where R is supported, e.g. Linux, macOS, and MS Windows.
 ## Example: Launching two parallel workers
 
 The below illustrates how to launch a cluster of two parallel workers
-on the current machine, run some basic calculations in paralllel, and
+on the current machine, run some basic calculations in parallel, and
 then shut down the cluster.
 
 ```r
@@ -59,7 +59,7 @@ cl <- makeClusterPSOCK(c("localhost", "localhost"))
 
 The `availableCores()` function will return the number of workers that
 the system allows. It respects many common settings that controls the
-number of CPU cores that the current R process is alloted, e.g. R
+number of CPU cores that the current R process is allotted, e.g. R
 options, environment variables, and CGroups settings. For details, see
 `help("availableCores")`. For example,
 
