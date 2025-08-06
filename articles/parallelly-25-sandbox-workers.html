@@ -192,7 +192,6 @@ limited access to the host system.</p>
 <span>  <span class="va">args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">args</span>, <span class="fu">ro_binds</span><span class="op">(</span><span class="va">dirs</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co">## Remap HOME to fresh, private sandboxed HOME</span></span>
-<span>  <span class="va">sandbox_home</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">tmp_home</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"sandbox-home-"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">tmp_home</span><span class="op">)</span></span>
 <span>  <span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
