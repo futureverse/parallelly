@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -139,7 +139,7 @@ where R is supported, e.g. Linux, macOS, and MS Windows.</p>
 <h3 id="example-launching-two-parallel-workers">Example: Launching two parallel workers<a class="anchor" aria-label="anchor" href="#example-launching-two-parallel-workers"></a>
 </h3>
 <p>The below illustrates how to launch a cluster of two parallel workers
-on the current machine, run some basic calculations in paralllel, and
+on the current machine, run some basic calculations in parallel, and
 then shut down the cluster.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
@@ -172,7 +172,7 @@ is to specify a character vector with that number of
 </h3>
 <p>The <code><a href="../reference/availableCores.html">availableCores()</a></code> function will return the number of
 workers that the system allows. It respects many common settings that
-controls the number of CPU cores that the current R process is alloted,
+controls the number of CPU cores that the current R process is allotted,
 e.g. R options, environment variables, and CGroups settings. For
 details, see <code><a href="../reference/availableCores.html">help("availableCores")</a></code>. For example,</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -355,8 +355,8 @@ on average 3.4 CPUs on the host system. In this case
 because it rounds to the nearest integer. In contrast,
 <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> completely ignores such cgroups
 settings and returns the number of CPUs on the host system, which
-results in CPU overuse and degredated performance. Continous Integration
-(CI) services (e.g. GitHub Actions, Travis CI, and Appveyor CI) and
+results in CPU overuse and degraded performance. Continuous Integration
+(CI) services (e.g. GitHub Actions, Travis CI, and AppVeyor CI) and
 cloud services (e.g. RStudio Cloud) use these types of cgroups settings
 under the hood, which means <code><a href="../reference/availableCores.html">availableCores()</a></code> respects their
 CPU allocations.</p>

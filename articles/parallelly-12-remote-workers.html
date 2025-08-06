@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,10 +128,10 @@ Bengtsson</h4>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>Sometimes it is not sufficient to parallize on a single computer - it
-cannot provide all of the compute power we are looking for. When we hit
-this limit, a natural next level is to look at other computers near us,
-e.g. desktops in an office or other computers we have access to
+<p>Sometimes it is not sufficient to parallelize on a single computer -
+it cannot provide all of the compute power we are looking for. When we
+hit this limit, a natural next level is to look at other computers near
+us, e.g. desktops in an office or other computers we have access to
 remotely. In this vignette, we will cover how to run parallel R workers
 on other machines. Sometimes we distinguish between local machines and
 on remote machines, where <em>local</em> machines are machines
@@ -290,8 +290,8 @@ R workers on these machines with little efforts.</p>
 </h4>
 <p>Some machines do not use the default port 22 to answer on SSH
 connection requests. If the machine uses another port, say, port 2201,
-then we canspecify that via option <code>-p port</code>, when we connect
-to it, e.g.</p>
+then we can specify that via option <code>-p port</code>, when we
+connect to it, e.g.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh <span class="at">-p</span> 2201 alice@n1.remote.org</span></code></pre></div>
 <p>In R, we can specify argument <code>port=port</code> as in:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="ex">cl</span> <span class="op">&lt;</span>- makeClusterPSOCK<span class="er">(</span><span class="st">"n1.remote.org"</span><span class="ex">,</span> port = 2201, user = <span class="st">"alice"</span><span class="kw">)</span></span></code></pre></div>
@@ -509,7 +509,7 @@ into <code>login.remote.org</code> as in:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh alice@login.remote.org</span>
 <span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a><span class="ex">{alice@login}$</span> ssh alice@secret1.remote.org</span>
 <span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a><span class="ex">{alice@secret1}$</span> </span></code></pre></div>
-<p>To achive the same in a single SSH call, we can specify the
+<p>To achieve the same in a single SSH call, we can specify the
 “jumphost” <code>-J hostname</code> option for SSH, as in:</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="ex">{ally@local}$</span> ssh <span class="at">-J</span> alice@login.remote.org alice@secret1.remote.org</span>
 <span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="ex">{alice@secret1}$</span> </span></code></pre></div>
