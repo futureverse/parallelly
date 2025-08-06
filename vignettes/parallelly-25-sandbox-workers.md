@@ -74,7 +74,6 @@ bwrap_sandbox <- function(rscript = "Rscript") {
   args <- c(args, ro_binds(dirs))
 
   ## Remap HOME to fresh, private sandboxed HOME
-  sandbox_home <- 
   tmp_home <- tempfile(pattern = "sandbox-home-")
   dir.create(tmp_home)
   opts <- c(
