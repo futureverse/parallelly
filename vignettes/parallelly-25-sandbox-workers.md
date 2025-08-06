@@ -25,81 +25,75 @@ This example sets up two parallel workers on Linux sandboxed using
 ```r
 library(parallelly)
 
-## Helper functions to configure Bubblewrap
-ro_binds <- function(dirs) {
-  dirs <- unique(dirs)
-  dirs <- dirs[file_test("-d", dirs)]
-  opts <- rep(dirs, each = 3L)
-  opts[seq(from = 1, to = length(opts), by = 3)] <- "--ro-bind"
-  opts
-} ## ro_binds()
+bwrap_sandbox <- function(rscript = "Rscript") {
+  ro_binds <- function(dirs) {
+    dirs <- unique(dirs[file_test("-d", dirs)])
+    opts <- rep(dirs, each = 3L)
+    opts[seq(from = 1, to = length(opts), by = 3)] <- "--ro-bind"
+    opts
+  }
 
-ro_rlibs <- function(dirs, home, sandbox_home) {
-  dirs <- unique(dirs)
-  dirs <- dirs[file_test("-d", dirs)]
+  ro_rlibs_remap <- function(dirs = rev(rev(.libPaths())[-1])) {
+    dirs <- unique(dirs[file_test("-d", dirs)])
+    dirs2 <- sub(sprintf("^%s", Sys.getenv("HOME")), "/home/sandbox-user", dirs)
+    opts <- rep(dirs, each = 3L)
+    opts[seq(from = 1, to = length(opts), by = 3)] <- "--ro-bind"
+    opts[seq(from = 3, to = length(opts), by = 3)] <- dirs2
+    opts
+  }
 
-  pattern <- sprintf("^%s", home)
-  to_dirs <- sub(pattern, sandbox_home, dirs) 
-  opts <- rep(dirs, each = 3L)
-  opts[seq(from = 1, to = length(opts), by = 3)] <- "--ro-bind"
-  opts[seq(from = 3, to = length(opts), by = 3)] <- to_dirs
-  opts
-} ## ro_rlibs()
-
-bwrap_args <- function() {
+  args <- c("bwrap")
+  
   ## Unshares
   ## Note, we cannot sandbox the network (--unshare-net), because
   ## PSOCK clusters communicate over socket connections
-  bwrap_unshares <- c(
-    "--unshare-user",
-    "--unshare-pid",
-    "--unshare-ipc"
+  unshares <- c(
+    "--unshare-user",  # isolate user and group ids
+    "--unshare-pid",   # isolate processes
+    "--proc", "/proc",
+    "--unshare-ipc"    # isolate process communication, e.g. shared memory
   )
-  bwrap_opts <- bwrap_unshares
+  args <- c(args, unshares)
   
   ## Misc options
-  opts <- c("--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp")
-  bwrap_opts <- c(bwrap_opts, opts)
+  opts <- c(
+    "--dev", "/dev",   # mount host's /dev
+    "--tmpfs", "/tmp"  # mount fresh, private, empty temporary directory
+  )
+  args <- c(args, opts)
   
   ## Read-only Linux mounts
   dirs <- c("/usr", "/bin", "/usr/bin", "/lib", "/lib64", "/etc/alternatives")
 
-  ## Read-only mount R home folders
+  ## Use host's R and Rscript (by read-only mounting R home folders)
   components <- c("bin", "lib", "doc", "etc", "include", "modules", "share")
   r_dirs <- unname(vapply(components, FUN = R.home, FUN.VALUE = NA_character_))
   r_dirs <- c(r_dirs, dirname(Sys.which("R")), dirname(Sys.which("Rscript")))
   r_dirs <- c(r_dirs, rev(.libPaths())[1])
   dirs <- c(dirs, r_dirs)
+  args <- c(args, ro_binds(dirs))
 
-  bwrap_opts <- c(bwrap_opts, ro_binds(dirs))
-
-  ## Remap HOME
-  home <- Sys.getenv("HOME")
-  sandbox_home <- "/home/sandbox-user"
-  stopifnot(file_test("-d", home))
+  ## Remap HOME to fresh, private sandboxed HOME
+  sandbox_home <- 
   tmp_home <- tempfile(pattern = "sandbox-home-")
   dir.create(tmp_home)
-  stopifnot(file_test("-d", tmp_home))
-  opts <- c("--bind", tmp_home, sandbox_home)
-  opts <- c(opts, "--setenv", "HOME", sandbox_home)
-  opts <- c(opts, "--chdir", sandbox_home)
-  bwrap_opts <- c(bwrap_opts, opts)
+  opts <- c(
+    "--bind", tmp_home, "/home/sandbox-user",
+    "--setenv", "HOME", "/home/sandbox-user",
+    "--chdir", sandbox_home
+  )
+  args <- c(args, opts)
 
-  ## Read-only remapped R library paths
-  libs <- .libPaths()
-  libs <- rev(rev(libs)[-1])
-  bwrap_opts <- c(bwrap_opts, ro_rlibs(libs, home = home, sandbox_home = sandbox_home))
+  ## Read-only remapped non-system R library paths
+  args <- c(args, ro_rlibs_remap())
 
-  bwrap_opts
-} ## bwrap_args()
+  c(args, rscript)
+} ## bwrap_sandbox()
 
-bwrap_sandbox <- function() {
-  c("bwrap", bwrap_args())
-}
 
 cl <- makeClusterPSOCK(2L
   ## Launch Rscript inside a Bubblewrap sandbox
-  rscript = c(bwrap_sandbox(), "Rscript")
+  rscript = bwrap_sandbox("Rscript")
 )
 print(cl)
 #> Socket cluster with 2 nodes on host 'localhost' (R version 4.5.1
