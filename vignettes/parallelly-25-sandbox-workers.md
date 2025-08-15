@@ -91,7 +91,7 @@ bwrap_sandbox <- function(rscript = "*") {
 
 
 ## Launch two parallel workers inside a Bubblewrap sandbox
-cl <- makeClusterPSOCK(2L, rscript = bwrap_sandbox("Rscript"))
+cl <- makeClusterPSOCK(2L, rscript = bwrap_sandbox("*"))
 print(cl)
 #> Socket cluster with 2 nodes on host 'localhost' (R version 4.5.1
 #> (2025-06-13), platform x86_64-pc-linux-gnu)
