@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,7 +143,7 @@ limited access to the host system.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">bwrap_sandbox</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">rscript</span> <span class="op">=</span> <span class="st">"Rscript"</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">bwrap_sandbox</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">rscript</span> <span class="op">=</span> <span class="st">"*"</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">ro_binds</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dirs</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">dirs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dirs</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/utils/filetest.html" class="external-link">file_test</a></span><span class="op">(</span><span class="st">"-d"</span>, <span class="va">dirs</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span>    <span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">dirs</span>, each <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span></span>
