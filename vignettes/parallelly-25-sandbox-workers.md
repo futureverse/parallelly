@@ -25,7 +25,7 @@ This example sets up two parallel workers on Linux sandboxed using
 ```r
 library(parallelly)
 
-bwrap_sandbox <- function(rscript = "Rscript") {
+bwrap_sandbox <- function(rscript = "*") {
   ro_binds <- function(dirs) {
     dirs <- unique(dirs[file_test("-d", dirs)])
     opts <- rep(dirs, each = 3L)
