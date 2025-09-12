@@ -33,7 +33,7 @@
 #' the name and the value will be the value of `Sys.getenv()` for that
 #' variable.  Non-existing environment variables will be dropped.
 #' These variables are set using `Sys.setenv()`.
-#' An named element with value `NA_character_` will cause that variable to be
+#' A named element with value `NA_character_` will cause that variable to be
 #' unset, which is done via `Sys.unsetenv()`.
 #' 
 #' @param rscript_libs A character vector of \R library paths that will be

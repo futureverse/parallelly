@@ -131,7 +131,7 @@ If an element is not named, then the value of that variable will be used as
 the name and the value will be the value of \code{Sys.getenv()} for that
 variable.  Non-existing environment variables will be dropped.
 These variables are set using \code{Sys.setenv()}.
-An named element with value \code{NA_character_} will cause that variable to be
+A named element with value \code{NA_character_} will cause that variable to be
 unset, which is done via \code{Sys.unsetenv()}.}
 
 \item{rscript_libs}{A character vector of \R library paths that will be
