@@ -1,11 +1,11 @@
 Package: parallelly
-Version: 1.45.1-9005
+Version: 1.45.1-9006
 Title: Enhancing the 'parallel' Package
 Imports:
     parallel,
     tools,
     utils
-Suggests:    
+Suggests: 
     commonmark,
     base64enc
 VignetteBuilder: parallelly
@@ -26,5 +26,5 @@ URL: https://parallelly.futureverse.org, https://github.com/futureverse/parallel
 BugReports: https://github.com/futureverse/parallelly/issues
 Language: en-US
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)

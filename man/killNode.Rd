@@ -71,7 +71,7 @@ using \code{\link[parallel:makeCluster]{parallel::makeCluster()}} and friends.
 }
 
 \examples{
-\dontshow{if ((interactive() || .Platform[["OS.type"]] != "windows")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if ((interactive() || .Platform[["OS.type"]] != "windows")) withAutoprint(\{ # examplesIf}
 cl <- makeClusterPSOCK(2)
 print(isNodeAlive(cl))  ## [1] TRUE TRUE
 
