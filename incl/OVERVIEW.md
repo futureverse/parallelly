@@ -7,7 +7,7 @@ The **parallelly** package provides functions that enhance the **parallel** pack
 | ---------------------------------- | :-------------: | :--------: |
 | remote clusters without knowing local public IP      |   ✓  | N/A |
 | remote clusters without firewall configuration       |   ✓  | N/A |
-| remote username in ~/.ssh/config                     |   ✓  | R (>= 4.1.0) with `user = NULL` |
+| remote username in ~/.ssh/config                     |   ✓  | R (>= 4.2.0) |
 | set workers' library package path on startup         |   ✓  | N/A |
 | set workers' environment variables on startup        |   ✓  | N/A |
 | custom workers startup code                          |   ✓  | N/A |
