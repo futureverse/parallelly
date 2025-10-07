@@ -350,7 +350,7 @@ If that is not
 set, then the default is to use \command{ssh} on Unix-like systems,
 including macOS as well as Windows 10.  On older MS Windows versions, which
 does not have a built-in \command{ssh} client, the default is to use
-(i) \command{plink} from the \href{https://www.putty.org/}{\command{PuTTY}}
+(i) \command{plink} from the \href{https://www.chiark.greenend.org.uk/~sgtatham/putty/}{\command{PuTTY}}
 project, and then (ii) the \command{ssh} client that is distributed with
 RStudio.
 
