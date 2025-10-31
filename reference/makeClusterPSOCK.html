@@ -29,7 +29,7 @@ background R workers, and how to connect to external machines."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9009</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -477,7 +477,10 @@ this error
 </code></pre><p></p></div>
 <p>See <a href="zzz-parallelly.options.html">parallelly.options</a> for how to change the default thresholds.
 This built-in protection can be circumvented by specifying argument
-<code>workers</code> as an <code>AsIs</code> object, e.g. <code>workers = I(25)</code> (not recommended).</p>
+<code>workers</code> as an <code>AsIs</code> object, e.g. <code>workers = I(25)</code>. We recommend
+against using this, unless you know the CPU load for each parallel
+worker is very low. This might be safe to do so when the parallel
+tasks are mostly in a waiting state, e.g. polling a webserver.</p>
     </div>
     <div class="section level2">
     <h2 id="definition-of-localhost">Definition of <em>localhost</em><a class="anchor" aria-label="anchor" href="#definition-of-localhost"></a></h2>
