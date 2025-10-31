@@ -322,7 +322,10 @@ this error
 
 See \link{parallelly.options} for how to change the default thresholds.
 This built-in protection can be circumvented by specifying argument
-\code{workers} as an \code{AsIs} object, e.g. \code{workers = I(25)} (not recommended).
+\code{workers} as an \code{AsIs} object, e.g. \code{workers = I(25)}. We recommend
+against using this, unless you know the CPU load for each parallel
+worker is very low. This might be safe to do so when the parallel
+tasks are mostly in a waiting state, e.g. polling a webserver.
 }
 
 \section{Definition of \emph{localhost}}{

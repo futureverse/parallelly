@@ -128,7 +128,10 @@
 #'
 #' See [parallelly.options] for how to change the default thresholds.
 #' This built-in protection can be circumvented by specifying argument
-#' `workers` as an `AsIs` object, e.g. `workers = I(25)` (not recommended).
+#' `workers` as an `AsIs` object, e.g. `workers = I(25)`. We recommend
+#' against using this, unless you know the CPU load for each parallel
+#' worker is very low. This might be safe to do so when the parallel
+#' tasks are mostly in a waiting state, e.g. polling a webserver.
 #'
 #' @example incl/makeClusterPSOCK.R
 #'
