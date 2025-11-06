@@ -1,7 +1,12 @@
 # Version (development version)
 
- * ...
- 
+## New Features
+
+ * Now `availableCores()` returns 2 also when package vignettes are
+   built by `R CMD build` or `R CMD check`. This helps to prevent
+   package vignettes from overusing the CPU cores when building and
+   checking R packages.
+   
 
 # Version 1.45.1 [2025-07-24]
 
