@@ -520,6 +520,21 @@ getNproc <- local({
 })
 
 
+detectCoresHint <- function(workers) {
+  ## Could it be that 'workers' is a function of detectCores(), i.e.
+  ## detectCores(), detectCores() - 1, or detectCores() - 2?
+  delta <- (parallel::detectCores() - workers)
+  if (delta %in% 0:2) {
+    hint <- sprintf("By the way, was parallel::detectCores() used, because the number of workers (%d) equals detectCores()", workers)
+    if (delta > 0) hint <- sprintf("%s - %d", hint, delta)
+    hint <- sprintf("%s? If so, please use parallelly::availableCores() instead", hint)
+  } else {
+    hint <- NULL
+  }
+  hint
+} # detectCoresHint()
+
+
 checkNumberOfLocalWorkers <- function(workers) {
   if (inherits(workers, "AsIs")) return()
   
@@ -549,6 +564,10 @@ checkNumberOfLocalWorkers <- function(workers) {
       msg <- sprintf("%s. The hard limit is set to %.0f%%", msg, 100 * limits[2])
       msg <- sprintf("%s. Overusing the CPUs has negative impact on the current R process, but also on all other processes of yours and others running on the same machine", msg)
       msg <- sprintf("%s. See help(\"parallelly.maxWorkers.localhost\", package = \"parallelly\") for further explanations and how to override the hard limit that triggered this error", msg)
+
+      hint <- detectCoresHint(workers)
+      if (!is.null(hint)) msg <- sprintf("%s. %s", msg, hint)
+      
       stop(msg)
     }
   }
@@ -559,6 +578,10 @@ checkNumberOfLocalWorkers <- function(workers) {
     msg <- sprintf("%s. The soft limit is set to %.0f%%", msg, 100 * limits[1])
     msg <- sprintf("%s. Overusing the CPUs has negative impact on the current R process, but also on all other processes of yours and others running on the same machine", msg)
     msg <- sprintf("%s. See help(\"parallelly.maxWorkers.localhost\", package = \"parallelly\") for further explanations and how to override the soft limit that triggered this warning", msg)
+
+    hint <- detectCoresHint(workers)
+    if (!is.null(hint)) msg <- sprintf("%s. %s", msg, hint)
+      
     warning(msg)
   }
 } ## checkNumberOfLocalWorkers()
