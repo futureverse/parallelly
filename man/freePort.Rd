@@ -72,6 +72,10 @@ Sys.setenv(R_PARALLELLY_RANDOM_PORTS = "30000:50000")
 port <- freePort("random")
 message("A free TCP port: ", port)
 
+# Test if a specific port is free
+isPortFree <- function(port) !is.na(freePort(port, default = NA_integer_))
+message("TCP port 1024 is free: ", isPortFree(1024))
+
 # Undo changes
 Sys.setenv(R_PARALLELLY_RANDOM_PORTS = oenv)
 }
