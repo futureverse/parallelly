@@ -1,0 +1,1048 @@
+# Create a Rich PSOCK Cluster of R Workers for Parallel Processing
+
+The `makeClusterPSOCK()` function creates a cluster of R workers for
+parallel processing. These R workers may be background R sessions on the
+current machine, R sessions on external machines (local or remote), or a
+mix of such. For external workers, the default is to use SSH to connect
+to those external machines. This function works similarly to
+[`makePSOCKcluster()`](https://rdrr.io/r/parallel/makeCluster.html) of
+the parallel package, but provides additional and more flexibility
+options for controlling the setup of the system calls that launch the
+background R workers, and how to connect to external machines.
+
+## Usage
+
+``` r
+makeClusterPSOCK(
+  workers,
+  makeNode = makeNodePSOCK,
+  port = c("auto", "random"),
+  user = NULL,
+  ...,
+  autoStop = FALSE,
+  tries = getOption2("parallelly.makeNodePSOCK.tries", 3L),
+  delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15),
+  validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE),
+  verbose = isTRUE(getOption("parallelly.debug"))
+)
+
+makeNodePSOCK(
+  worker = getOption2("parallelly.localhost.hostname", "localhost"),
+  master = NULL,
+  port,
+  connectTimeout = getOption2("parallelly.makeNodePSOCK.connectTimeout", 2 * 60),
+  timeout = getOption2("parallelly.makeNodePSOCK.timeout", 30 * 24 * 60 * 60),
+  rscript = NULL,
+  homogeneous = NULL,
+  rscript_args = NULL,
+  rscript_envs = NULL,
+  rscript_libs = NULL,
+  rscript_startup = NULL,
+  rscript_sh = c("auto", "cmd", "sh", "none"),
+  default_packages = c("datasets", "utils", "grDevices", "graphics", "stats", if
+    (methods) "methods"),
+  methods = TRUE,
+  socketOptions = getOption2("parallelly.makeNodePSOCK.socketOptions", "no-delay"),
+  useXDR = getOption2("parallelly.makeNodePSOCK.useXDR", FALSE),
+  outfile = "/dev/null",
+  renice = NA_integer_,
+  rshcmd = getOption2("parallelly.makeNodePSOCK.rshcmd", NULL),
+  user = NULL,
+  revtunnel = NA,
+  rshlogfile = NULL,
+  rshopts = getOption2("parallelly.makeNodePSOCK.rshopts", NULL),
+  rank = 1L,
+  manual = FALSE,
+  dryrun = FALSE,
+  quiet = FALSE,
+  setup_strategy = getOption2("parallelly.makeNodePSOCK.setup_strategy", "parallel"),
+  calls = getOption2("parallelly.makeNodePSOCK.calls", FALSE),
+  action = c("launch", "options"),
+  verbose = FALSE
+)
+```
+
+## Arguments
+
+- workers:
+
+  The hostnames of workers (as a character vector) or the number of
+  localhost workers (as a positive integer).
+
+- makeNode:
+
+  A function that creates a `"SOCKnode"` or `"SOCK0node"` object, which
+  represents a connection to a worker.
+
+- port:
+
+  The port number of the master used for communicating with all the
+  workers (via socket connections). If an integer vector of ports, then
+  a random one among those is chosen. If `"random"`, then a random port
+  in is chosen from `11000:11999`, or from the range specified by
+  environment variable `R_PARALLELLY_RANDOM_PORTS`. If `"auto"`
+  (default), then the default (single) port is taken from environment
+  variable `R_PARALLEL_PORT`, otherwise `"random"` is used. *Note, do
+  not use this argument to specify the port number used by `rshcmd`,
+  which typically is an SSH client. Instead, if the SSH daemon runs on a
+  different port than the default 22, specify the SSH port by appending
+  it to the hostname, e.g. `"remote.server.org:2200"` or via SSH options
+  -p, e.g. `rshopts = c("-p", "2200")`.*
+
+- user:
+
+  (optional) The user name to be used when communicating with another
+  host.
+
+- autoStop:
+
+  If TRUE, the cluster will be automatically stopped using
+  [`stopCluster()`](https://rdrr.io/r/parallel/makeCluster.html) when it
+  is garbage collected, unless already stopped. See also
+  [`autoStopCluster()`](https://parallelly.futureverse.org/reference/autoStopCluster.md).
+
+- tries, delay:
+
+  Maximum number of attempts done to launch each node with `makeNode()`
+  and the delay (in seconds) in-between attempts. If argument `port`
+  specifies more than one port, e.g. `port = "random"` then a random
+  port will be drawn and validated at most `tries` times. Arguments
+  `tries` and `delay` are used only when
+  `setup_strategy == "sequential"`.
+
+- validate:
+
+  If TRUE (default), after the nodes have been created, they are all
+  validated that they work by inquiring about their session information,
+  which is saved in attribute `session_info` of each node.
+
+- verbose:
+
+  If TRUE, informative messages are outputted.
+
+- worker:
+
+  The hostname or IP number of the machine where the worker should run.
+  Attribute `localhost` can be set to TRUE or FALSE to manually indicate
+  whether `worker` is the same as the local host.
+
+- master:
+
+  The hostname or IP number of the master / calling machine, as known to
+  the workers. If NULL (default), then the default is
+  `Sys.info()[["nodename"]]` unless `worker` is *localhost* or
+  `revtunnel = TRUE` in case it is `"localhost"`.
+
+- connectTimeout:
+
+  The maximum time (in seconds) allowed for each socket connection
+  between the master and a worker to be established (defaults to 2
+  minutes). *See note below on current lack of support on Linux and
+  macOS systems.*
+
+- timeout:
+
+  The maximum time (in seconds) allowed to pass without the master and a
+  worker communicate with each other (defaults to 30 days).
+
+- rscript, homogeneous:
+
+  The system command for launching `Rscript` on the worker and whether
+  it is installed in the same path as the calling machine or not. For
+  more details, see below.
+
+- rscript_args:
+
+  Additional arguments to `Rscript` (as a character vector). This
+  argument can be used to customize the R environment of the workers
+  before they launches. For instance, use
+  `rscript_args = c("-e", shQuote('setwd("/path/to")'))` to set the
+  working directory to `/path/to` on *all* workers.
+
+- rscript_envs:
+
+  A named character vector environment variables to set or unset on
+  worker at startup, e.g.
+  `rscript_envs = c(FOO = "3.14", "HOME", "UNKNOWN", UNSETME = NA_character_)`.
+  If an element is not named, then the value of that variable will be
+  used as the name and the value will be the value of
+  [`Sys.getenv()`](https://rdrr.io/r/base/Sys.getenv.html) for that
+  variable. Non-existing environment variables will be dropped. These
+  variables are set using
+  [`Sys.setenv()`](https://rdrr.io/r/base/Sys.setenv.html). A named
+  element with value `NA_character_` will cause that variable to be
+  unset, which is done via
+  [`Sys.unsetenv()`](https://rdrr.io/r/base/Sys.setenv.html).
+
+- rscript_libs:
+
+  A character vector of R library paths that will be used for the
+  library search path of the R workers. An asterisk (`"*"`) will be
+  resolved to the default
+  [`.libPaths()`](https://rdrr.io/r/base/libPaths.html) *on the worker*.
+  That is, to `prepend` a folder, instead of replacing the existing
+  ones, use `rscript_libs = c("new_folder", "*")`. To pass down a
+  non-default library path currently set *on the main R session* to the
+  workers, use `rscript_libs = .libPaths()`.
+
+- rscript_startup:
+
+  An R expression or a character vector of R code, or a list with a mix
+  of these, that will be evaluated on the R worker prior to launching
+  the worker's event loop. For instance, use
+  `rscript_startup = 'setwd("/path/to")'` to set the working directory
+  to `/path/to` on *all* workers.
+
+- rscript_sh:
+
+  The type of shell used where `rscript` is launched, which should be
+  `"sh"` is launched via a POSIX shell and `"cmd"` if launched via an MS
+  Windows shell. This controls how shell command-line options are
+  quoted, but also how R string expression are quoted when passed to
+  `Rscript`. If `"none"`, then no quoting is done. If `"auto"`
+  (default), and the cluster node is launched locally, then it is set to
+  `"sh"` or `"cmd"` according to the current platform. *If launched
+  remotely*, then it is set to `"sh"` based on the assumption remote
+  machines typically launch commands via SSH in a POSIX shell. If the
+  remote machines run MS Windows, use `rscript_sh = "cmd"`. If
+  `length(rscript_sh)` is two, then `rscript_sh[1]` is for the inner and
+  `rscript_sh[2]` is for the outer shell quoting of the Rscript call.
+  More precisely, `rscript_sh[1]` is for Rscript arguments that need
+  shell quoting (e.g. `Rscript -e "<expr>"`), and `rscript_sh[2]` is for
+  the whole `Rscript ...` call. If `length(rscript_sh)` is one, then it
+  is used for both the inner and the outer shell quoting.
+
+- default_packages:
+
+  A character vector or NULL that controls which R packages are attached
+  on each cluster node during startup. An asterisk (`"*"`) resolves to
+  `getOption("defaultPackages")` *on the current machine*. If NULL, then
+  the default set of packages R are attached.
+
+- methods:
+
+  If TRUE (default), then the methods package is also loaded. This is
+  argument exists for legacy reasons due to how `Rscript` worked in R
+  (\< 3.5.0).
+
+- socketOptions:
+
+  A character string that sets R option `socketOptions` on the worker.
+
+- useXDR:
+
+  If FALSE (default), the communication between master and workers,
+  which is binary, will use small-endian (faster), otherwise big-endian
+  ("XDR"; slower).
+
+- outfile:
+
+  Where to direct the
+  [stdout](https://rdrr.io/r/base/showConnections.html) and
+  [stderr](https://rdrr.io/r/base/showConnections.html) connection
+  output from the workers. If NULL, then no redirection of output is
+  done, which means that the output is relayed in the terminal on the
+  local computer. On Windows, the output is only relayed when running R
+  from a terminal but not from a GUI.
+
+- renice:
+
+  A numerical 'niceness' (priority) to set for the worker processes.
+
+- rshcmd, rshopts:
+
+  The command (character vector) to be run on the master to launch a
+  process on another host and any additional arguments (character
+  vector). These arguments are only applied if `machine` is not
+  *localhost*. For more details, see below.
+
+- revtunnel:
+
+  If TRUE, a reverse SSH tunnel is set up for each worker such that the
+  worker R process sets up a socket connection to its local port
+  `(port + rank - 1)` which then reaches the master on port `port`. If
+  FALSE, then the worker will try to connect directly to port `port` on
+  `master`. If NA, then TRUE or FALSE is inferred from inspection of
+  `rshcmd[1]`. For more details, see below.
+
+- rshlogfile:
+
+  (optional) If a filename, the output produced by the `rshcmd` call is
+  logged to this file, of if TRUE, then it is logged to a temporary
+  file. The log file name is available as an attribute as part of the
+  return node object. *Warning: This only works with SSH clients that
+  support command-line option -E out.log\`*. For example, PuTTY's
+  `plink` does *not* support this option, and any attempts to specify
+  `rshlogfile` will cause the SSH connection to fail.
+
+- rank:
+
+  A unique one-based index for each worker (automatically set).
+
+- manual:
+
+  If TRUE the workers will need to be run manually. The command to run
+  will be displayed.
+
+- dryrun:
+
+  If TRUE, nothing is set up, but a message suggesting how to launch the
+  worker from the terminal is outputted. This is useful for
+  troubleshooting.
+
+- quiet:
+
+  If TRUE, then no output will be produced other than that from using
+  `verbose = TRUE`.
+
+- setup_strategy:
+
+  If `"parallel"` (default), the workers are set up concurrently, one
+  after the other. If `"sequential"`, they are set up sequentially.
+
+- calls:
+
+  If TRUE, the call stack is recorded and revealed in the system call
+  launching the cluster node. This can be useful when trying to identify
+  which package and function created a particular cluster node.
+
+- action:
+
+  This is an internal argument.
+
+- ...:
+
+  Optional arguments passed to `makeNode(workers[i], ..., rank = i)`
+  where `i = seq_along(workers)`.
+
+## Value
+
+An object of class `c("RichSOCKcluster", "SOCKcluster", "cluster")`
+consisting of a list of `"SOCKnode"` or `"SOCK0node"` workers (that also
+inherit from `RichSOCKnode`).
+
+`makeNodePSOCK()` returns a `"SOCKnode"` or `"SOCK0node"` object
+representing an established connection to a worker.
+
+## Alternative usage
+
+In R (\>= 4.5.0), an alternatively to using
+`cl <- parallelly::makeClusterPSOCK(workers)` is:
+
+    cl <- parallel::makeCluster(workers, type = parallelly::RPSOCK)
+
+where the 'R' in RPSOCK stands for "Rich", which reflects that the
+cluster returned is of class `RichSOCKcluster`, whereas the default is
+of class `SOCKcluster`.
+
+## Protection against CPU overuse
+
+Using too many parallel workers on the same machine may result in
+overusing the CPU. For example, if an R script hard codes the number of
+parallel workers to 32, as in
+
+    cl <- makeClusterPSOCK(32)
+
+it will use more than 100% of the CPU cores when running on machine with
+fewer than 32 CPU cores. For example, on a eight-core machine, this may
+run the CPU at 400% of its capacity, which has a significant negative
+effect on the current R process, but also on all other processes running
+on the same machine. This also a problem on systems where R gets
+allotted a specific number of CPU cores, which is the case on
+high-performance compute (HPC) clusters, but also on other shared
+systems that limits user processes via Linux Control Groups (cgroups).
+For example, a free account on Posit Cloud is limited to a single CPU
+core. Parallelizing with 32 workers when only having access to a single
+core, will result in 3200% overuse and 32 concurrent R processes
+competing for this single CPU core.
+
+To protect against CPU overuse by mistake, `makeClusterPSOCK()` will
+warn when parallelizing above 100%;
+
+    cl <- parallelly::makeClusterPSOCK(12, dryrun = TRUE)
+    Warning message:
+    In checkNumberOfLocalWorkers(workers) :
+      Careful, you are setting up 12 localhost parallel workers with only
+    8 CPU cores available for this R process (per 'system'), which could
+    result in a 150% load. The soft limit is set to 100%. Overusing the
+    CPUs has negative impact on the current R process, but also on all
+    other processes of yours and others running on the same machine. See
+    help("parallelly.maxWorkers.localhost", package = "parallelly") for
+    further explanations and how to override the soft limit that triggered
+
+Any attempts resulting in more than 300% overuse will be refused;
+
+    > cl <- parallelly::makeClusterPSOCK(25, dryrun = TRUE)
+    Error in checkNumberOfLocalWorkers(workers) :
+      Attempting to set up 25 localhost parallel workers with only 8 CPU
+    cores available for this R process (per 'system'), which could result
+    in a 312% load. The hard limit is set to 300%. Overusing the CPUs has
+    negative impact on the current R process, but also on all other
+    processes of yours and others running on the same machine. See
+    help("parallelly.maxWorkers.localhost", package = "parallelly") for
+    further explanations and how to override the hard limit that triggered
+    this error
+
+See
+[parallelly.options](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+for how to change the default thresholds. This built-in protection can
+be circumvented by specifying argument `workers` as an `AsIs` object,
+e.g. `workers = I(25)`. We recommend against using this, unless you know
+the CPU load for each parallel worker is very low. This might be safe to
+do so when the parallel tasks are mostly in a waiting state, e.g.
+polling a webserver.
+
+## Definition of *localhost*
+
+A hostname is considered to be *localhost* if it equals:
+
+- `"localhost"`,
+
+- `"127.0.0.1"`, or
+
+- `Sys.info()[["nodename"]]`.
+
+It is also considered *localhost* if it appears on the same line as the
+value of `Sys.info()[["nodename"]]` in file `/etc/hosts`.
+
+## Default SSH client and options (arguments `rshcmd` and `rshopts`)
+
+Arguments `rshcmd` and `rshopts` are only used when connecting to an
+external host.
+
+The default method for connecting to an external host is via SSH and the
+system executable for this is given by argument `rshcmd`. The default is
+given by option
+[`parallelly.makeNodePSOCK.rshcmd`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md).
+If that is not set, then the default is to use `ssh` on Unix-like
+systems, including macOS as well as Windows 10. On older MS Windows
+versions, which does not have a built-in `ssh` client, the default is to
+use (i) `plink` from the
+[`PuTTY`](https://www.chiark.greenend.org.uk/~sgtatham/putty/) project,
+and then (ii) the `ssh` client that is distributed with RStudio.
+
+PuTTY puts itself on Windows' system `PATH` when installed, meaning this
+function will find PuTTY automatically if installed. If not, to manually
+set specify PuTTY as the SSH client, specify the absolute pathname of
+`plink.exe` in the first element and option `-ssh` in the second as in
+`rshcmd = c("C:/Path/PuTTY/plink.exe", "-ssh")`. This is because all
+elements of `rshcmd` are individually "shell" quoted and element
+`rshcmd[1]` must be on the system `PATH`.
+
+Furthermore, when running R from RStudio on Windows, the `ssh` client
+that is distributed with RStudio will also be considered. This client,
+which is from [MinGW](https://en.wikipedia.org/wiki/MinGW) MSYS, is
+searched for in the folder given by the `RSTUDIO_MSYS_SSH` environment
+variable—a variable that is (only) set when running RStudio. To use this
+SSH client outside of RStudio, set `RSTUDIO_MSYS_SSH` accordingly.
+
+You can override the default set of SSH clients that are searched for by
+specifying them in argument `rshcmd` or via option
+[`parallelly.makeNodePSOCK.rshcmd`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+using the format `<...>`, e.g.
+`rshcmd = c("<rstudio-ssh>", "<putty-plink>", "<ssh>")`. See below for
+examples.
+
+If no SSH-client is found, an informative error message is produced.
+
+Additional SSH command-line options may be specified via argument
+`rshopts`, which defaults to option `parallelly.makeNodePSOCK.rshopts`.
+For instance, a private SSH key can be provided as
+`rshopts = c("-i", "~/.ssh/my_private_key")`. PuTTY users should specify
+a PuTTY PPK file, e.g.
+`rshopts = c("-i", "C:/Users/joe/.ssh/my_keys.ppk")`. Contrary to
+`rshcmd`, elements of `rshopts` are not quoted.
+
+## Accessing external machines that prompts for a password
+
+*IMPORTANT: With one exception, it is not possible to for these
+functions to log in and launch R workers on external machines that
+requires a password to be entered manually for authentication.* The only
+known exception is the PuTTY client on Windows for which one can pass
+the password via command-line option -pw, e.g.
+`rshopts = c("-pw", "MySecretPassword")`.
+
+Note, depending on whether you run R in a terminal or via a GUI, you
+might not even see the password prompt. It is also likely that you
+cannot enter a password, because the connection is set up via a
+background system call.
+
+The poor man's workaround for setup that requires a password is to
+manually log into the each of the external machines and launch the R
+workers by hand. For this approach, use `manual = TRUE` and follow the
+instructions which include cut'n'pasteable commands on how to launch the
+worker from the external machine.
+
+However, a much more convenient and less tedious method is to set up
+key-based SSH authentication between your local machine and the external
+machine(s), as explain below.
+
+## Accessing external machines via key-based SSH authentication
+
+The best approach to automatically launch R workers on external machines
+over SSH is to set up key-based SSH authentication. This will allow you
+to log into the external machine without have to enter a password.
+
+Key-based SSH authentication is taken care of by the SSH client and not
+R. To configure this, see the manuals of your SSH client or search the
+web for "ssh key authentication".
+
+## Reverse SSH tunneling
+
+If SSH is used, which is inferred from `rshcmd[1]`, then the default is
+to use reverse SSH tunneling (`revtunnel = TRUE`), otherwise not
+(`revtunnel = FALSE`). Using reverse SSH tunneling, avoids complications
+from otherwise having to configure port forwarding in firewalls, which
+often requires static IP address as well as privileges to edit the
+firewall on your outgoing router, something most users don't have. It
+also has the advantage of not having to know the internal and / or the
+public IP address / hostname of the master. Yet another advantage is
+that there will be no need for a DNS lookup by the worker machines to
+the master, which may not be configured or is disabled on some systems,
+e.g. compute clusters.
+
+## Argument `rscript`
+
+If `homogeneous` is FALSE, the `rscript` defaults to `"Rscript"`, i.e.
+it is assumed that the `Rscript` executable is available on the `PATH`
+of the worker. If `homogeneous` is TRUE, the `rscript` defaults to
+`file.path(R.home("bin"), "Rscript")`, i.e. it is basically assumed that
+the worker and the caller share the same file system and R installation.
+
+When specified, argument `rscript` should be a character vector with one
+or more elements. Any asterisk (`"*"`) will be resolved to the above
+default `homogeneous`-dependent `Rscript` path. All elements are
+automatically shell quoted using
+[`base::shQuote()`](https://rdrr.io/r/base/shQuote.html), except those
+that are of format `<ENVVAR>=<VALUE>`, that is, the ones matching the
+regular expression '`^[[:alpha:]_][[:alnum:]_]*=.*`'. Another exception
+is when `rscript` inherits from 'AsIs'.
+
+## Default value of argument `homogeneous`
+
+The default value of `homogeneous` is TRUE if and only if either of the
+following is fulfilled:
+
+- `worker` is *localhost*
+
+- `revtunnel` is FALSE and `master` is *localhost*
+
+- `worker` is neither an IP number nor a fully qualified domain name
+  (FQDN). A hostname is considered to be a FQDN if it contains one or
+  more periods
+
+In all other cases, `homogeneous` defaults to FALSE.
+
+## Connection timeout
+
+Argument `connectTimeout` does *not* work properly on Unix and macOS due
+to limitation in R itself. For more details on this, please see R-devel
+thread 'BUG?: On Linux setTimeLimit() fails to propagate timeout error
+when it occurs (works on Windows)' on 2016-10-26
+(<https://stat.ethz.ch/pipermail/r-devel/2016-October/073309.html>).
+When used, the timeout will eventually trigger an error, but it won't
+happen until the socket connection timeout `timeout` itself happens.
+
+## Communication timeout
+
+If there is no communication between the master and a worker within the
+`timeout` limit, then the corresponding socket connection will be closed
+automatically. This will eventually result in an error in code trying to
+access the connection. This timeout is also what terminates a
+stray-running parallel cluster-node process.
+
+## Failing to set up local workers
+
+When setting up a cluster of localhost workers, that is, workers running
+on the same machine as the master R process, occasionally a connection
+to a worker ("cluster node") may fail to be set up. When this occurs, an
+informative error message with troubleshooting suggestions will be
+produced. The most common reason for such localhost failures is due to
+port clashes. Retrying will often resolve the problem.
+
+If R stalls when setting up a cluster of local workers, then it might be
+that you have a virtual private network (VPN) enabled that is configured
+to prevent you from connecting to `localhost`. To verify that this is
+the case, call the following from the terminal:
+
+    {local}$ ssh localhost "date"
+
+This also freezed if the VPN intercepts connections to `localhost`. If
+this happens, try also:
+
+    {local}$ ssh 127.0.0.1 "date"
+
+In rare cases, `127.0.0.1` might work when `localhost` does not. If the
+latter works, setting R option:
+
+    options(parallelly.localhost.hostname = "127.0.0.1")
+
+should solve it (the default is `"localhost"`). You can set this
+automatically when R starts by adding it to your `~/.Rprofile` startup
+file. Alternatively, set environment variable
+`R_PARALLELLY_LOCALHOST_HOSTNAME=127.0.0.1` in your `~/.Renviron` file.
+
+If using `127.0.0.1` did not work around the problem, check your VPN
+settings and make sure it allows connections to `localhost` or
+`127.0.0.1`.
+
+## Failing to set up remote workers
+
+A cluster of remote workers runs R processes on external machines. These
+external R processes are launched over, typically, SSH to the remote
+machine. For this to work, each of the remote machines needs to have R
+installed, which preferably is of the same version as what is on the
+main machine. For this to work, it is required that one can SSH to the
+remote machines. Ideally, the SSH connections use authentication based
+on public-private SSH keys such that the set up of the remote workers
+can be fully automated (see above). If `makeClusterPSOCK()` fails to set
+up one or more remote R workers, then an informative error message is
+produced. There are a few reasons for failing to set up remote workers.
+If this happens, start by asserting that you can SSH to the remote
+machine and launch `Rscript` by calling something like:
+
+
+    {local}$ ssh -l alice remote.server.org
+    {remote}$ Rscript --version
+    R scripting front-end version 4.2.2 (2022-10-31)
+    {remote}$ logout
+    {local}$
+
+When you have confirmed the above to work, then confirm that you can
+achieve the same in a single command-line call;
+
+
+    {local}$ ssh -l alice remote.server.org Rscript --version
+    R scripting front-end version 4.2.2 (2022-10-31)
+    {local}$
+
+The latter will assert that you have proper startup configuration also
+for *non-interactive* shell sessions on the remote machine.
+
+If the remote machines are running on MS Windows, make sure to add
+argument `rscript_sh = "cmd"` when calling `makeClusterPSOCK()`, because
+the default is `rscript_sh = "sh"`, which assumes that that the remote
+machines are Unix-like machines.
+
+Another reason for failing to setup remote workers could be that they
+are running an R version that is not compatible with the version that
+your main R session is running. For instance, if we run R (\>= 3.6.0)
+locally and the workers run R (\< 3.5.0), we will get:
+`Error in unserialize(node$con) : error reading from connection`. This
+is because R (\>= 3.6.0) uses serialization format version 3 by default
+whereas R (\< 3.5.0) only supports version 2. We can see the version of
+the R workers by adding
+`rscript_args = c("-e", shQuote("getRversion()"))` when calling
+`makeClusterPSOCK()`.
+
+## For package developers
+
+When creating a `cluster` object, for instance via
+[`parallel::makeCluster()`](https://rdrr.io/r/parallel/makeCluster.html)
+or `parallelly::makeClusterPSOCK()`, in a package help example, in a
+package vignette, or in a package test, we must *remember to stop the
+cluster at the end of all examples(\*), vignettes, and unit tests*. This
+is required in order to not leave behind stray parallel `cluster`
+workers after our main R session terminates. On Linux and macOS, the
+operating system often takes care of terminating the worker processes if
+we forget, but on MS Windows such processes will keep running in the
+background until they time out themselves, which takes 30 days (sic!).
+
+`R CMD check --as-cran` will indirectly detect these stray worker
+processes on MS Windows when running R (\>= 4.3.0). They are detected,
+because they result in placeholder `Rscript<hexcode>` files being left
+behind in the temporary directory. The check NOTE to look out for (only
+in R (\>= 4.3.0)) is:
+
+    * checking for detritus in the temp directory ... NOTE
+    Found the following files/directories:
+      'Rscript1058267d0c10' 'Rscriptbd4267d0c10'
+
+Those `Rscript<hexcode>` files are from background R worker processes,
+which almost always are parallel `cluster`:s that we forgot to stop at
+the end. To stop all `cluster` workers, use
+[`parallel::stopCluster()`](https://rdrr.io/r/parallel/makeCluster.html)
+at the end of your examples(\*), vignettes, and package tests for every
+`cluster` object that is created.
+
+(\*) Currently, examples are excluded from the detritus checks. This was
+validated with R-devel revision 82991 (2022-10-02).
+
+## Examples
+
+``` r
+## NOTE: Drop 'dryrun = TRUE' below in order to actually connect.  Add
+## 'verbose = TRUE' if you run into problems and need to troubleshoot.
+
+## ---------------------------------------------------------------
+## Section 1. Setting up parallel workers on the local machine
+## ---------------------------------------------------------------
+## EXAMPLE: Two workers on the local machine
+workers <- c("localhost", "localhost")
+cl <- makeClusterPSOCK(workers, dryrun = TRUE, quiet = TRUE)
+
+
+## EXAMPLE: Launch 124 workers on MS Windows 10, where half are
+## running on CPU Group #0 and half on CPU Group #1.  
+## (https://lovickconsulting.com/2021/11/18/
+##  running-r-clusters-on-an-amd-threadripper-3990x-in-windows-10-2/)
+## The parallel workers are launched as:
+## "%COMSPEC%" /c start /B /NODE 1 /AFFINITY 0xFFFFFFFFFFFFFFFE ...
+## ...
+## "%COMSPEC%" /c start /B /NODE 1 /AFFINITY 0xFFFFFFFFFFFFFFFE ...
+
+## Temporarily disable CPU load protection for this example
+oopts <- options(parallelly.maxWorkers.localhost = Inf)
+
+ncores <- 124
+cpu_groups <- c(0, 1)
+cl <- lapply(cpu_groups, FUN = function(cpu_group) {
+    parallelly::makeClusterPSOCK(ncores %/% length(cpu_groups),
+      rscript = I(c(
+        Sys.getenv("COMSPEC"), "/c", "start", "/B",
+        "/NODE", cpu_group, "/AFFINITY", "0xFFFFFFFFFFFFFFFE",
+        "*"
+      )),
+      dryrun = TRUE, quiet = TRUE
+    )
+})
+## merge the two 62-node clusters into one with 124 nodes
+cl <- do.call(c, cl)
+#> Warning: The combined cluster contains 123 duplicated nodes
+
+## Re-enable CPU load protection
+options(oopts)
+
+
+## ---------------------------------------------------------------
+## Section 2. Setting up parallel workers on remote machines
+## ---------------------------------------------------------------
+## EXAMPLE: Three remote workers
+## Setup of three R workers on two remote machines are set up
+## The parallel workers are launched as:
+## '/usr/bin/ssh' -R 11058:localhost:11058 n1.remote.org ...
+## '/usr/bin/ssh' -R 11059:localhost:11058 n2.remote.org ...
+## '/usr/bin/ssh' -R 11060:localhost:11058 n1.remote.org ...
+workers <- c("n1.remote.org", "n2.remote.org", "n1.remote.org")
+cl <- makeClusterPSOCK(workers, dryrun = TRUE, quiet = TRUE)
+
+
+## EXAMPLE: Two remote workers running on MS Windows.  Because the
+## remote workers are MS Windows machines, we need to use
+## rscript_sh = "cmd".
+## The parallel workers are launched as:
+## '/usr/bin/ssh' -R 11912:localhost:11912 mswin1.remote.org ...
+## '/usr/bin/ssh' -R 11913:localhost:11912 mswin2.remote.org ...
+workers <- c("mswin1.remote.org", "mswin2.remote.org")
+cl <- makeClusterPSOCK(workers, rscript_sh = "cmd", dryrun = TRUE, quiet = TRUE)
+
+
+## EXAMPLE: Local and remote workers
+## Same setup when the two machines are on the local network and
+## have identical software setups
+cl <- makeClusterPSOCK(
+  workers,
+  revtunnel = FALSE, homogeneous = TRUE,
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+## EXAMPLE: Three remote workers 'n1', 'n2', and 'n3' that can only be
+## accessed via jumphost 'login.remote.org'
+## The parallel workers are launched as:
+## '/usr/bin/ssh' -R 11226:localhost:11226 -J login.remote.org n1 ...
+## '/usr/bin/ssh' -R 11227:localhost:11226 -J login.remote.org n2 ...
+## '/usr/bin/ssh' -R 11228:localhost:11226 -J login.remote.org n1 ...
+workers <- c("n1", "n2", "n1")
+cl <- makeClusterPSOCK(
+  workers,
+  rshopts = c("-J", "login.remote.org"),
+  homogeneous = FALSE,
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+## EXAMPLE: Remote worker running on Linux from MS Windows machine
+## Connect to remote Unix machine 'remote.server.org' on port 2200
+## as user 'bob' from a MS Windows machine with PuTTY installed.
+## Using the explicit special rshcmd = "<putty-plink>", will force
+## makeClusterPSOCK() to search for and use the PuTTY plink software,
+## preventing it from using other SSH clients on the system search PATH.
+## The parallel worker is launched as:
+## 'plink' -l bob -P 2200 -i C:/Users/bobby/.ssh/putty.ppk remote.server.org ...
+cl <- makeClusterPSOCK(
+  "remote.server.org", user = "bob",
+  rshcmd = "<putty-plink>",
+  rshopts = c("-P", 2200, "-i", "C:/Users/bobby/.ssh/putty.ppk"),
+  dryrun = TRUE, quiet = TRUE
+)
+#> Warning: Failed to locate a default SSH client (checked: ‘putty-plink’). Please specify one via argument 'rshcmd'. Will still try with ‘ssh’.
+
+
+## EXAMPLE: Remote workers with specific setup
+## Setup of remote worker with more detailed control on
+## authentication and reverse SSH tunneling
+## The parallel worker is launched as:
+## '/usr/bin/ssh' -l johnny -v -R 11000:gateway:11942 remote.server.org ...
+## "R_DEFAULT_PACKAGES=... 'nice' '/path/to/Rscript' --no-init-file ...
+cl <- makeClusterPSOCK(
+  "remote.server.org", user = "johnny",
+  ## Manual configuration of reverse SSH tunneling
+  revtunnel = FALSE,
+  rshopts = c("-v", "-R 11000:gateway:11942"),
+  master = "gateway", port = 11942,
+  ## Run Rscript nicely and skip any startup scripts
+  rscript = c("nice", "/path/to/Rscript"),
+  rscript_args = c("--no-init-file"),
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+## EXAMPLE: Remote worker running on Linux from RStudio on MS Windows
+## Connect to remote Unix machine 'remote.server.org' on port 2200
+## as user 'bob' from a MS Windows machine via RStudio's SSH client.
+## Using the explicit special rshcmd = "<rstudio-ssh>", will force
+## makeClusterPSOCK() to use the SSH client that comes with RStudio,
+## preventing it from using other SSH clients on the system search PATH.
+## The parallel worker is launched as:
+## 'ssh' -l bob remote.server.org:2200 ...
+cl <- makeClusterPSOCK(
+  "remote.server.org:2200", user = "bob", rshcmd = "<rstudio-ssh>",
+  dryrun = TRUE, quiet = TRUE
+)
+#> Warning: Failed to locate a default SSH client (checked: ‘rstudio-ssh’). Please specify one via argument 'rshcmd'. Will still try with ‘ssh’.
+
+
+## ---------------------------------------------------------------
+## Section 3. Setting up parallel workers on HPC cluster
+## ---------------------------------------------------------------
+## EXAMPLE: 'Grid Engine' is a high-performance compute (HPC) job
+## scheduler where one can request compute resources on multiple nodes,
+## each running multiple cores. Examples of Grid Engine schedulers are
+## Oracle Grid Engine (formerly Sun Grid Engine), Univa Grid Engine,
+## and Son of Grid Engine - all commonly referred to as SGE schedulers.
+## Each SGE cluster may have its own configuration with their own way
+## of requesting parallel slots. Here are a few examples:
+##
+##   ## Request 18 slots on a single host
+##   qsub -pe smp 18 script.sh
+##
+##   ## Request 18 slots on one or more hosts
+##   qsub -pe mpi 18 script.sh
+##
+## This will launch the job script 'script.sh' on one host, while have
+## reserved in total 18 slots (CPU cores) on this host and possible
+## other hosts.
+##
+## This example shows how to use the SGE command 'qrsh' to launch
+## 18 parallel workers from R, which is assumed to have been launched
+## by 'script.sh'.
+##
+## The parallel workers are launched as:
+## 'qrsh' -inherit -nostdin -V comphost01 ...
+## 'qrsh' -inherit -nostdin -V comphost01 ...
+## ...
+## 'qrsh' -inherit -nostdin -V comphost06 ...
+cl <- makeClusterPSOCK(
+  availableWorkers(),
+  rshcmd = "qrsh", rshopts = c("-inherit", "-nostdin", "-V"),
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+## EXAMPLE: The 'Fujitsu Technical Computing Suite' is a high-performance
+## compute (HPC) job scheduler where one can request compute resources on
+## multiple nodes, each running multiple cores.  For example,
+##
+##   pjsub -L vnode=3 -L vnode-core=18 script.sh
+##
+## reserves 18 cores on three nodes. The job script runs on the first
+## with enviroment variables set to infer the other nodes, resulting in
+## availableWorkers() to return 3 * 18 workers. When the HPC environment
+## does not support SSH between compute nodes, one can use the 'pjrsh'
+## command to launch the parallel workers.
+##
+## The parallel workers are launched as:
+## 'pjrsh' comphost01 ...
+## 'pjrsh' comphost01 ...
+## ...
+## 'pjrsh' comphost06 ...
+cl <- makeClusterPSOCK(
+  availableWorkers(),
+  rshcmd = "pjrsh",
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+
+## ---------------------------------------------------------------
+## Section 4. Setting up remote parallel workers in the cloud
+## ---------------------------------------------------------------
+## EXAMPLE: Remote worker running on AWS
+## Launching worker on Amazon AWS EC2 running one of the
+## Amazon Machine Images (AMI) provided by RStudio
+## (https://www.louisaslett.com/RStudio_AMI/)
+##
+## The parallel worker is launched as:
+## '/usr/bin/ssh' -R 11153:localhost:11153 -l ubuntu ...
+## -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ...
+## -i ~/.ssh/my-private-aws-key.pem 1.2.3.4 ...
+public_ip <- "1.2.3.4"
+ssh_private_key_file <- "~/.ssh/my-private-aws-key.pem"
+cl <- makeClusterPSOCK(
+  ## Public IP number of EC2 instance
+  public_ip,
+  ## User name (always 'ubuntu')
+  user = "ubuntu",
+  ## Use private SSH key registered with AWS
+  rshopts = c(
+    "-o", "StrictHostKeyChecking=no",
+    "-o", "IdentitiesOnly=yes",
+    "-i", ssh_private_key_file
+  ),
+  ## Set up .libPaths() for the 'ubuntu' user
+  ## and then install the future package
+  rscript_startup = quote(local({
+    p <- Sys.getenv("R_LIBS_USER")
+    dir.create(p, recursive = TRUE, showWarnings = FALSE)
+    .libPaths(p)
+    install.packages("future")
+  })),
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+## EXAMPLE: Remote worker running on GCE
+## Launching worker on Google Cloud Engine (GCE) running a
+## container based VM (with a #cloud-config specification)
+public_ip <- "1.2.3.4"
+user <- "johnny"
+ssh_private_key_file <- "~/.ssh/google_compute_engine"
+cl <- makeClusterPSOCK(
+  ## Public IP number of GCE instance
+  public_ip,
+  ## User name (== SSH key label (sic!))
+  user = user,
+  ## Use private SSH key registered with GCE
+  rshopts = c(
+    "-o", "StrictHostKeyChecking=no",
+    "-o", "IdentitiesOnly=yes",
+    "-i", ssh_private_key_file
+  ),
+  ## Launch Rscript inside Docker container
+  rscript = c(
+    "docker", "run", "--net=host", "rocker/r-parallel",
+    "Rscript"
+  ),
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+
+## ---------------------------------------------------------------
+## Section 5. Parallel workers running locally inside virtual
+## machines, Linux containers, etc.
+## ---------------------------------------------------------------
+## EXAMPLE: Two workers limited to 100% CPU process and 50 MiB of
+## memory using Linux CGroups management. The 100% CPU quota limit
+## constrain each worker to use at most one CPU worth of
+## processing preventing them from overusing the machine, e.g.
+## through unintended nested parallelization. The 50 MiB memory
+## limit is strict - if a worker use more than this, the operating
+## system will terminate the worker instantly.
+## See 'man systemd.resource-control' for more details.
+cl <- makeClusterPSOCK(2L,
+  rscript = c("systemd-run", "--user", "--scope",
+    "-p", "CPUQuota=100%",
+    "-p", "MemoryMax=50M", "-p", "MemorySwapMax=50M",
+    "*"
+  ),
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+## EXAMPLE: Two workers running in Docker on the local machine
+## Setup of 2 Docker workers running rocker/r-parallel
+##
+## The parallel workers are launched as:
+## R_DEFAULT_PACKAGES=... '/usr/bin/docker' 'run' '--net=host' 'rocker/r-parallel' ...
+## R_DEFAULT_PACKAGES=... '/usr/bin/docker' 'run' '--net=host' 'rocker/r-parallel' ...
+cl <- makeClusterPSOCK(
+  rep("localhost", times = 2L),
+  ## Launch Rscript inside Docker container
+  rscript = c(
+    "docker", "run", "--net=host", "rocker/r-parallel",
+    "Rscript"
+  ),
+  ## IMPORTANT: Because Docker runs inside a virtual machine (VM) on macOS
+  ## and MS Windows (not Linux), when the R worker tries to connect back to
+  ## the default 'localhost' it will fail, because the main R session is
+  ## not running in the VM, but outside on the host.  To reach the host on
+  ## macOS and MS Windows, make sure to use master = "host.docker.internal"
+  master = if (.Platform$OS.type == "unix") NULL else "host.docker.internal",
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+## EXAMPLE: Two workers running via Linux container 'rocker/r-parallel' from
+## DockerHub on the local machine using Apptainer (formerly Singularity)
+##
+## The parallel workers are launched as:
+## R_DEFAULT_PACKAGES=... '/usr/bin/apptainer' 'exec' 'docker://rocker/r-parallel' ...
+## R_DEFAULT_PACKAGES=... '/usr/bin/apptainer' 'exec' 'docker://rocker/r-parallel' ...
+cl <- makeClusterPSOCK(
+  rep("localhost", times = 2L),
+  ## Launch Rscript inside Linux container
+  rscript = c(
+    "apptainer", "exec", "docker://rocker/r-parallel",
+    "Rscript"
+  ),
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+## EXAMPLE: One worker running in udocker on the local machine
+## Setup of a single udocker.py worker running rocker/r-parallel
+##
+## The parallel worker is launched as:
+## R_DEFAULT_PACKAGES=... 'udocker.py' 'run' 'rocker/r-parallel' ...
+cl <- makeClusterPSOCK(
+  "localhost",
+  ## Launch Rscript inside Docker container (using udocker)
+  rscript = c(
+    "udocker.py", "run", "rocker/r-parallel",
+    "Rscript"
+  ), 
+  ## Manually launch parallel workers
+  ## (need double shQuote():s because udocker.py drops one level)
+  rscript_args = c(
+    "-e", shQuote(shQuote("parallel:::.workRSOCK()"))
+  ),
+  dryrun = TRUE, quiet = TRUE
+)
+
+
+## EXAMPLE: One worker running in Wine for Linux on the local machine
+## To install R for MS Windows in Wine, do something like:
+##   winecfg  # In GUI, set 'Windows version' to 'Windows 10'
+##   wget https://cran.r-project.org/bin/windows/base/R-4.5.1-win.exe
+##   wine R-4.5.1-win.exe /SILENT
+## Prevent packages from being installed to R's system library:
+##   chmod ugo-w "$HOME/.wine/drive_c/Program Files/R/R-4.5.1/library/"
+## Verify it works:
+##   wine "C:/Program Files/R/R-4.5.1/bin/x64/Rscript.exe" --version
+##
+## The parallel worker is launched as:
+## R_DEFAULT_PACKAGES=... WINEDEBUG=fixme-all R_LIBS_SITE= R_LIBS_USER= 'wine' ...
+cl <- makeClusterPSOCK(1L,
+  rscript = c(
+    ## Silence Wine warnings
+    "WINEDEBUG=fixme-all",
+    ## Don't pass LC_* and R_LIBS* environments from host to Wine
+    sprintf("%s=", grep("^(LC_|R_LIBS)", names(Sys.getenv()), value = TRUE)),
+    "wine",
+    "C:/Program Files/R/R-4.5.1/bin/x64/Rscript.exe"
+  ),
+  dryrun = TRUE, quiet = TRUE
+)
+```

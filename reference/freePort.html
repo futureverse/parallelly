@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9012</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,7 +95,10 @@
 Zero or more TCP ports in [0, 65535] to scan.
 If <code>"random"</code>, then a random set of ports is considered.
 If <code>"auto"</code>, then the port given by environment variable
-<code class="env">R_PARALLEL_PORT</code> is used, which may also specify <code>random</code>.</p></dd>
+<code class="env">R_PARALLEL_PORT</code> is used, which may also specify
+<code>"random"</code>. If <code class="env">R_PARALLEL_PORT</code> is not set, the default
+is <code>"random"</code>. The <code>"auto"</code> alternative is used for full
+backward compatibility with the <strong>parallelly</strong> package.</p></dd>
 
 
 <dt id="arg-default">default<a class="anchor" aria-label="anchor" href="#arg-default"></a></dt>
@@ -112,10 +115,56 @@ before searched.  This shuffle does <em>not</em> forward the RNG seed.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns an integer representing the first port among <code>ports</code> that
-can be opened.  If none can be opened, then <code>default</code> is returned.</p>
+    <p>Returns an integer representing the first port among <code>ports</code> <em>that
+can be opened</em>. If none can be opened, then <code>default</code> is returned.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="validation-of-tcp-port-returned">Validation of TCP port returned<a class="anchor" aria-label="anchor" href="#validation-of-tcp-port-returned"></a></h2>
+
+
+<p>This function attempts to validate that the TCP port returned is
+available and can be be opened. Thus, it is likely that this port
+is available momentarily after <code>freePort()</code> returns. However, due
+to race conditions, there is always a risk that the port is taken
+by another process on the same system after <code>freePort() returns but before, say, </code>makeClusterPSOCK()`, opens it.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="controlling-the-random-set-of-tcp-ports">Controlling the random set of TCP ports<a class="anchor" aria-label="anchor" href="#controlling-the-random-set-of-tcp-ports"></a></h2>
+
+
+<p>For backward compatibility with the <strong>parallel</strong> package, the default
+set of of ports <code>freePort("random")</code>, or <code>freePort("auto")</code> with
+environment variable <code>R_PARALLEL_PORT=random</code> samples from is
+<code>11000:11999</code>.
+The set can be overriden by setting environment variable
+<code>R_PARALLELLY_RANDOM_PORTS</code>,  e.g.
+<code>R_PARALLELLY_RANDOM_PORTS="10001:10010,11000:54000"</code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Get a random, free TCP port in 1024:65535</span></span></span>
+<span class="r-in"><span><span class="va">port</span> <span class="op">&lt;-</span> <span class="fu">freePort</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"A free TCP port: "</span>, <span class="va">port</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> A free TCP port: 43431</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Get a random, free TCP port in 11000:11999, which is what</span></span></span>
+<span class="r-in"><span><span class="co"># parallelly::makeClusterPSOCK() and parallel::makePSOCKcluster()</span></span></span>
+<span class="r-in"><span><span class="co"># default to (but the latter does not make sure it is available)</span></span></span>
+<span class="r-in"><span><span class="va">port</span> <span class="op">&lt;-</span> <span class="fu">freePort</span><span class="op">(</span><span class="st">"random"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"A free TCP port: "</span>, <span class="va">port</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> A free TCP port: 31270</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Customize the range of ports to sample from to 30000:50000</span></span></span>
+<span class="r-in"><span><span class="va">oenv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"R_PARALLELLY_RANDOM_PORTS"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>R_PARALLELLY_RANDOM_PORTS <span class="op">=</span> <span class="st">"30000:50000"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">port</span> <span class="op">&lt;-</span> <span class="fu">freePort</span><span class="op">(</span><span class="st">"random"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>R_PARALLELLY_RANDOM_PORTS <span class="op">=</span> <span class="va">oenv</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"A free TCP port: "</span>, <span class="va">port</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> A free TCP port: 30933</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -125,7 +174,7 @@ can be opened.  If none can be opened, then <code>default</code> is returned.</p
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3</p> and <a href="https://github.com/HenrikBengtsson/pkgdown.extras/">pkgdown.extras</a> 0.0.0.9007.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0</p> and <a href="https://github.com/HenrikBengtsson/pkgdown.extras/">pkgdown.extras</a> 0.0.0.9007.</p>
 </div>
 
     </footer></div>

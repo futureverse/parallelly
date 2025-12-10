@@ -29,7 +29,7 @@ background R workers, and how to connect to external machines."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9012</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,7 +99,7 @@ for parallel processing.  These <span style="R">R</span> workers may be backgrou
 on the current machine, <span style="R">R</span> sessions on external machines (local or remote),
 or a mix of such. For external workers, the default is to use SSH to
 connect to those external machines.  This function works similarly to
-<code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makePSOCKcluster</a>()</code> of the
+<code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makePSOCKcluster()</a></code> of the
 <span class="pkg">parallel</span> package, but provides additional and more flexibility
 options for controlling the setup of the system calls that launch the
 background <span style="R">R</span> workers, and how to connect to external machines.</p>
@@ -193,7 +193,7 @@ another host.</p></dd>
 
 <dt id="arg-autostop">autoStop<a class="anchor" aria-label="anchor" href="#arg-autostop"></a></dt>
 <dd><p>If TRUE, the cluster will be automatically stopped
-using <code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">stopCluster</a>()</code> when it is
+using <code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">stopCluster()</a></code> when it is
 garbage collected, unless already stopped.  See also <code><a href="autoStopCluster.html">autoStopCluster()</a></code>.</p></dd>
 
 
@@ -1129,7 +1129,7 @@ This was validated with R-devel revision 82991 (2022-10-02).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3</p> and <a href="https://github.com/HenrikBengtsson/pkgdown.extras/">pkgdown.extras</a> 0.0.0.9007.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0</p> and <a href="https://github.com/HenrikBengtsson/pkgdown.extras/">pkgdown.extras</a> 0.0.0.9007.</p>
 </div>
 
     </footer></div>

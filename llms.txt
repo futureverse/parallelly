@@ -1,0 +1,399 @@
+# parallelly: Enhancing the ‘parallel’ Package
+
+The **parallelly** package provides functions that enhance the
+**parallel** packages. For example,
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+gives the number of CPU cores available to your R process as given by R
+options and environment variables, including those set by job schedulers
+on high-performance compute (HPC) clusters. If R runs under ‘cgroups’ or
+in a Linux container, then their settings are acknowledges too. If
+nothing else is set, then it will fall back to
+[`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html).
+Another example is
+[`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md),
+which is backward compatible with
+[`parallel::makePSOCKcluster()`](https://rdrr.io/r/parallel/makeCluster.html)
+while doing a better job in setting up remote cluster workers without
+having to know your local public IP address and configuring the firewall
+to do port-forwarding to your local computer. The functions and features
+added to this package are written to be backward compatible with the
+**parallel** package, such that they may be incorporated there later.
+The **parallelly** package comes with an open invitation for the R Core
+Team to adopt all or parts of its code into the **parallel** package.
+
+## Feature Comparison ‘parallelly’ vs ‘parallel’
+
+|  | parallelly | parallel |
+|----|:--:|:--:|
+| remote clusters without knowing local public IP | ✓ | N/A |
+| remote clusters without firewall configuration | ✓ | N/A |
+| remote username in ~/.ssh/config | ✓ | R (\>= 4.2.0) |
+| set workers’ library package path on startup | ✓ | N/A |
+| set workers’ environment variables on startup | ✓ | N/A |
+| custom workers startup code | ✓ | N/A |
+| fallback to RStudio’s SSH and PuTTY’s plink | ✓ | N/A |
+| faster, parallel setup of local workers (R \>= 4.0.0) | ✓ | ✓ |
+| faster, little-endian protocol by default | ✓ | N/A |
+| faster, low-latency socket connections by default | ✓ | N/A |
+| validation of cluster at setup | ✓ | ✓ |
+| attempt to launch failed workers multiple times | ✓ | N/A |
+| collect worker details at cluster setup | ✓ | N/A |
+| termination of workers if cluster setup fails | ✓ | R (\>= 4.0.0) |
+| shutdown of cluster by garbage collector | ✓ | N/A |
+| combining multiple, existing clusters | ✓ | N/A |
+| more informative printing of cluster objects | ✓ | N/A |
+| check if local and remote workers are alive | ✓ | N/A |
+| restart local and remote workers | ✓ | N/A |
+| defaults via options & environment variables | ✓ | N/A |
+| respecting CPU resources allocated by cgroups, Linux containers, and HPC schedulers | ✓ | N/A |
+| early error if requesting more workers than possible | ✓ | N/A |
+| informative error messages | ✓ | N/A |
+
+## Compatibility with the parallel package
+
+Any cluster created by the **parallelly** package is fully compatible
+with the clusters created by the **parallel** package and can be used by
+all of **parallel**’s functions for cluster processing,
+e.g. [`parallel::clusterEvalQ()`](https://rdrr.io/r/parallel/clusterApply.html)
+and
+[`parallel::parLapply()`](https://rdrr.io/r/parallel/clusterApply.html).
+The
+[`parallelly::makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
+function can be used as a stand-in replacement of the
+[`parallel::makePSOCKcluster()`](https://rdrr.io/r/parallel/makeCluster.html),
+or equivalently, `parallel::makeCluster(..., type = "PSOCK")`.
+
+Most of **parallelly** functions apply also to clusters created by the
+**parallel** package. For example,
+
+``` r
+
+cl <- parallel::makeCluster(2)
+cl <- parallelly::autoStopCluster(cl)
+```
+
+makes the cluster created by **parallel** to shut down automatically
+when R’s garbage collector removes the cluster object. This lowers the
+risk for leaving stray R worker processes running in the background by
+mistake. Another way to achieve the above in a single call is to use:
+
+``` r
+
+cl <- parallelly::makeClusterPSOCK(2, autoStop = TRUE)
+```
+
+### availableCores() vs parallel::detectCores()
+
+The
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+function is designed as a better, safer alternative to `detectCores()`
+of the **parallel** package. It is designed to be a worry-free solution
+for developers and end-users to query the number of available cores - a
+solution that plays nice on multi-tenant systems, in Linux containers,
+on high-performance compute (HPC) cluster, on CRAN and Bioconductor
+check servers, and elsewhere.
+
+Did you know that
+[`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html)
+might return NA on some systems, or that `parallel::detectCores() - 1`
+might return 0 on some systems, e.g. old hardware and virtual machines?
+Because of this, you have to use
+`max(1, parallel::detectCores() - 1, na.rm = TRUE)` to get it correct.
+In contrast,
+[`parallelly::availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+is guaranteed to return a positive integer, and you can use
+`parallelly::availableCores(omit = 1)` to return all but one core and
+always at least one.
+
+Just like other software tools that “hijacks” all cores by default, R
+scripts, and packages that defaults to `detectCores()` number of
+parallel workers cause lots of suffering for fellow end-users and system
+administrators. For instance, a shared server with 48 cores will come to
+a halt already after a few users run parallel processing using
+`detectCores()` number of parallel workers. This problem gets worse on
+machines with many cores because they can host even more concurrent
+users. If these R users would have used
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+instead, then the system administrator can limit the number of cores
+each user get to, say, two (2), by setting the environment variable
+`R_PARALLELLY_AVAILABLECORES_FALLBACK=2`. In contrast, it is *not*
+possible to override what
+[`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html)
+returns, cf. [PR#17641 - WISH: Make parallel::detectCores() agile to new
+env var
+R_DEFAULT_CORES](https://bugs.r-project.org/show_bug.cgi?id=17641).
+
+Similarly,
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+is also agile to CPU limitations set by Unix control groups (cgroups),
+which is often used by Linux containers (e.g. Docker, Apptainer /
+Singularity, and Podman) and Kubernetes (K8s) environments. For example,
+`docker run --cpuset-cpus=0-2,8 ...` sets the CPU affinity so that the
+processes can only run on CPUs 0, 1, 2, and 8 on the host system. In
+this case
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+detects this and returns four (4). Another example is
+`docker run --cpu=3.4 ...`, which throttles the CPU quota to on average
+3.4 CPUs on the host system. In this case
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+detects this and returns three (3), because it rounds to the nearest
+integer. In contrast,
+[`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html)
+completely ignores such cgroups settings and returns the number of CPUs
+on the host system, which results in CPU overuse and degraded
+performance. Continuous Integration (CI) services (e.g. GitHub Actions,
+Travis CI, and AppVeyor CI) and cloud services (e.g. RStudio Cloud) use
+these types of cgroups settings under the hood, which means
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+respects their CPU allocations.
+
+If running on an HPC cluster with a job scheduler, a script that uses
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+will run the number of parallel workers that the job scheduler has
+assigned to the job. For example, if we submit a Slurm job as
+`sbatch --cpus-per-task=16 ...`, then
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+returns 16, because it respects the `SLURM_*` environment variables set
+by the scheduler. On Son of Grid Engine (SGE), the scheduler sets
+`NSLOTS` when submitting using `qsub -pe smp 8 ...` and
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+returns eight (8). See
+[`help("availableCores", package = "parallelly")`](https://parallelly.futureverse.org/reference/availableCores.md)
+for currently supported job schedulers, which includes ‘Fujitsu
+Technical Computing Suite’, ‘Load Sharing Facility’ (LSF), Simple Linux
+Utility for Resource Management (Slurm), Sun Grid Engine/Oracle Grid
+Engine/Son of Grid Engine (SGE), Univa Grid Engine (UGE), and
+TORQUE/PBS.
+
+Of course,
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+respects also R options and environment variables commonly used to
+specify the number of parallel workers, e.g. R option `mc.cores` and
+Bioconductor environment variable `BIOCPARALLEL_WORKER_NUMBER`. It will
+also detect when running `R CMD check` and limit the number of workers
+to two (2), which is the maximum number of parallel workers allowed by
+the [CRAN
+Policies](https://cran.r-project.org/web/packages/policies.html). This
+way you, as a package developer, know that your package will always play
+by the rules on CRAN and Bioconductor.
+
+If nothing is set that limits the number of cores, then
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+falls back to
+[`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html)
+and if that returns `NA_integer_` then one (1) is returned.
+
+The below table summarize the benefits:
+
+|  | availableCores() | parallel::detectCores() |
+|----|:--:|:--:|
+| Guaranteed to return a positive integer | ✓ | no (may return `NA_integer_`) |
+| Safely use all but some cores | ✓ | no (may return zero or less) |
+| Can be overridden, e.g. by a sysadm | ✓ | no |
+| Respects cgroups and Linux containers | ✓ | no |
+| Respects job scheduler allocations | ✓ | no |
+| Respects CRAN policies | ✓ | no |
+| Respects Bioconductor policies | ✓ | no |
+
+## Backward compatibility with the future package
+
+The functions in this package originate from the
+**[future](https://cran.r-project.org/package=future)** package where we
+have used and validated them for several years. I moved these functions
+to this separate package in 2020, because they are also useful outside
+of the future framework. For backward-compatibility reasons of the
+future framework, the R options and environment variables that are
+prefixed with `parallelly.*` and `R_PARALLELLY_*` can for the time being
+also be set with `future.*` and `R_FUTURE_*` prefixes.
+
+## Roadmap
+
+Submit **parallelly** to CRAN, with minimal changes compared to the
+corresponding functions in the **future** package (on CRAN as of
+2020-10-20)
+
+Update the **future** package to import and re-export the functions from
+the **parallelly** to maximize backward compatibility in the future
+framework (**future** 1.20.1 on CRAN as of 2020-11-03)
+
+Switch to use 10-15% faster `useXDR=FALSE`
+
+Implement same fast parallel setup of parallel PSOCK workers as in
+**parallel** (\>= 4.0.0)
+
+After having validated that there is no negative impact on the future
+framework, allow for changes in the **parallelly** package,
+e.g. renaming the R options and environment variable to be
+`parallelly.*` and `R_PARALLELLY_*` while falling back to `future.*` and
+`R_FUTURE_*`
+
+Add vignettes on how to set up cluster running on local or remote
+machines, including in Linux containers and on popular cloud services,
+and vignettes on common problems and how to troubleshoot them
+
+Migrate, currently internal, UUID functions and export them,
+e.g. `uuid()`, `connectionUuid()`, and `sessionUuid()`
+(<https://github.com/HenrikBengtsson/Wishlist-for-R/issues/96>). Because
+[R does not have a built-in md5 checksum function that operates on
+object](https://github.com/HenrikBengtsson/Wishlist-for-R/issues/21),
+these functions require us adding a dependency on the
+**[digest](https://cran.r-project.org/package=digest)** package.
+
+Initially, backward compatibility for the **future** package is of top
+priority.
+
+## Installation
+
+R package parallelly is available on
+[CRAN](https://cran.r-project.org/package=parallelly) and can be
+installed in R as:
+
+``` r
+
+install.packages("parallelly")
+```
+
+### Pre-release version
+
+To install the pre-release version that is available in Git branch
+`develop` on GitHub, use:
+
+``` r
+
+remotes::install_github("futureverse/parallelly", ref="develop")
+```
+
+This will install the package from source. Because of this and because
+this package also compiles native code, Windows users need to have
+[Rtools](https://cran.r-project.org/bin/windows/Rtools/) installed and
+macOS users need to have [Xcode](https://developer.apple.com/xcode/)
+installed.
+
+# Package index
+
+## All functions
+
+- [`as.cluster()`](https://parallelly.futureverse.org/reference/as.cluster.md)
+  [`c(`*`<cluster>`*`)`](https://parallelly.futureverse.org/reference/as.cluster.md)
+  : Coerce an Object to a Cluster Object
+- [`autoStopCluster()`](https://parallelly.futureverse.org/reference/autoStopCluster.md)
+  : Automatically Stop a Cluster when Garbage Collected
+- [`availableConnections()`](https://parallelly.futureverse.org/reference/availableConnections.md)
+  [`freeConnections()`](https://parallelly.futureverse.org/reference/availableConnections.md)
+  : Number of Available and Free Connections
+- [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+  : Get Number of Available Cores on The Current Machine
+- [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+  : Get Set of Available Workers
+- [`cloneNode()`](https://parallelly.futureverse.org/reference/cloneNode.md)
+  : Clone one or more nodes
+- [`freePort()`](https://parallelly.futureverse.org/reference/freePort.md)
+  : Find a TCP port that can be opened
+- [`isConnectionValid()`](https://parallelly.futureverse.org/reference/isConnectionValid.md)
+  [`connectionId()`](https://parallelly.futureverse.org/reference/isConnectionValid.md)
+  : Checks if a Connection is Valid
+- [`isForkedChild()`](https://parallelly.futureverse.org/reference/isForkedChild.md)
+  : Checks whether or not we are running in a forked child process
+- [`isForkedNode()`](https://parallelly.futureverse.org/reference/isForkedNode.md)
+  : Checks whether or not a Cluster Node Runs in a Forked Process
+- [`isLocalhostNode()`](https://parallelly.futureverse.org/reference/isLocalhostNode.md)
+  : Checks whether or not a Cluster Node Runs on Localhost
+- [`isNodeAlive()`](https://parallelly.futureverse.org/reference/isNodeAlive.md)
+  : Check whether or not the cluster nodes are alive
+- [`killNode()`](https://parallelly.futureverse.org/reference/killNode.md)
+  : Terminate one or more cluster nodes using process signaling
+- [`makeClusterMPI()`](https://parallelly.futureverse.org/reference/makeClusterMPI.md)
+  : Create a Rich Message Passing Interface (MPI) Cluster of R Workers
+  for Parallel Processing
+- [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
+  [`makeNodePSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
+  : Create a Rich PSOCK Cluster of R Workers for Parallel Processing
+- [`makeClusterSequential()`](https://parallelly.futureverse.org/reference/makeClusterSequential.md)
+  : Create a "parallel" cluster running sequentially in the current
+  session
+- [`serializedSize()`](https://parallelly.futureverse.org/reference/serializedSize.md)
+  : Calculate the size of an R object when it is serialized
+- [`supportsMulticore()`](https://parallelly.futureverse.org/reference/supportsMulticore.md)
+  : Check If Forked Processing ("multicore") is Supported
+- [`zzz-parallelly.options`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.options`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.debug`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableCores.custom`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableCores.methods`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableCores.min`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableCores.fallback`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableCores.omit`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableCores.max`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableCores.system`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableWorkers.methods`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableWorkers.custom`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.fork.enable`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.maxWorkers.localhost`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.supportsMulticore.disableOn`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.supportsMulticore.unstable`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_AVAILABLECORES_FALLBACK`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_AVAILABLECORES_OMIT`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_AVAILABLECORES_MAX`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_AVAILABLECORES_SYSTEM`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_AVAILABLECORES_MIN`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_FORK_ENABLE`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_SUPPORTSMULTICORE_DISABLEON`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_SUPPORTSMULTICORE_UNSTABLE`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`future.availableCores.custom`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`future.availableCores.methods`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`future.availableCores.fallback`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`future.availableCores.system`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`future.availableWorkers.methods`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`future.availableWorkers.custom`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`future.fork.enable`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`future.supportsMulticore.unstable`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_FUTURE_AVAILABLECORES_FALLBACK`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_FUTURE_AVAILABLECORES_SYSTEM`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_FUTURE_FORK_ENABLE`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_FUTURE_SUPPORTSMULTICORE_UNSTABLE`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.setup_strategy`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.validate`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.connectTimeout`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.timeout`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.useXDR`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.socketOptions`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.rshcmd`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.rshopts`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.tries`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.tries.delay`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.makeNodePSOCK.calls`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_SETUP_STRATEGY`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_VALIDATE`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_CONNECTTIMEOUT`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_TIMEOUT`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_USEXDR`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_SOCKETOPTIONS`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_RSHCMD`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_RSHOPTS`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_TRIES`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_TRIES_DELAY`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`R_PARALLELLY_MAKENODEPSOCK_CALLS`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  : Options Used by the 'parallelly' Package
+
+# Articles
+
+### All vignettes
+
+- [An Introduction to
+  'parallelly'](https://parallelly.futureverse.org/articles/parallelly-01-intro.md):
+- [Parallel Workers on the Local
+  Machine](https://parallelly.futureverse.org/articles/parallelly-10-local-workers.md):
+- [Parallel Workers on Other
+  Machines](https://parallelly.futureverse.org/articles/parallelly-12-remote-workers.md):
+- [Parallel Workers in the
+  Cloud](https://parallelly.futureverse.org/articles/parallelly-15-cloud-workers.md):
+- [Parallel Workers on High-Performance Compute
+  Environments](https://parallelly.futureverse.org/articles/parallelly-17-hpc-workers.md):
+- [Parallel Workers with CPU and Memory
+  Limited](https://parallelly.futureverse.org/articles/parallelly-20-limit-workers.md):
+- [Parallel Workers Running in Linux
+  Containers](https://parallelly.futureverse.org/articles/parallelly-21-container-workers.md):
+- [Parallel Workers Running MS Windows via
+  Wine](https://parallelly.futureverse.org/articles/parallelly-22-wine-workers.md):
+- [Parallel Workers Running in a
+  Sandbox](https://parallelly.futureverse.org/articles/parallelly-25-sandbox-workers.md):
