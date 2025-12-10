@@ -22,7 +22,7 @@
 #' available and can be be opened. Thus, it is likely that this port
 #' is available momentarily after `freePort()` returns. However, due
 #' to race conditions, there is always a risk that the port is taken
-#' by another process on the same system after `freePort() returns
+#' by another process on the same system after `freePort()` returns
 #' but before, say, `makeClusterPSOCK()`, opens it.
 #'
 #' @section Controlling the random set of TCP ports:
@@ -39,6 +39,9 @@
 #' can be opened_. If none can be opened, then `default` is returned.
 #' 
 #' @examples
+#' # Make sure to undo any changes at the end
+#' oenv <- Sys.getenv("R_PARALLELLY_RANDOM_PORTS")
+#'
 #' # Get a random, free TCP port in 1024:65535
 #' port <- freePort()
 #' message("A free TCP port: ", port)
@@ -46,16 +49,17 @@
 #' # Get a random, free TCP port in 11000:11999, which is what
 #' # parallelly::makeClusterPSOCK() and parallel::makePSOCKcluster()
 #' # default to (but the latter does not make sure it is available)
+#' Sys.unsetenv("R_PARALLELLY_RANDOM_PORTS")
 #' port <- freePort("random")
 #' message("A free TCP port: ", port)
 #'
 #' # Customize the range of ports to sample from to 30000:50000
-#' oenv <- Sys.getenv("R_PARALLELLY_RANDOM_PORTS")
 #' Sys.setenv(R_PARALLELLY_RANDOM_PORTS = "30000:50000")
 #' port <- freePort("random")
-#' Sys.setenv(R_PARALLELLY_RANDOM_PORTS = oenv)
 #' message("A free TCP port: ", port)
 #'
+#' # Undo changes
+#' Sys.setenv(R_PARALLELLY_RANDOM_PORTS = oenv)
 #' @export
 freePort <- function(ports = 1024:65535, default = "random", randomize = TRUE) {
   if (is.character(default)) {
