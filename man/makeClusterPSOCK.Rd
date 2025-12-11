@@ -64,8 +64,8 @@ number of localhost workers (as a positive integer).}
 
 \item{port}{The port number of the master used for communicating with all
 the workers (via socket connections).  If an integer vector of ports, then
-a random one among those is chosen.  If \code{"random"}, then a random port in
-is chosen from \code{11000:11999}, or from the range specified by
+a random one among those is chosen.  If \code{"random"}, then a random,
+\emph{available} port is chosen in the range \code{11000:11999} or as specified by
 environment variable \env{R_PARALLELLY_RANDOM_PORTS}.
 If \code{"auto"} (default), then the default (single) port is taken from
 environment variable \env{R_PARALLEL_PORT}, otherwise \code{"random"} is
