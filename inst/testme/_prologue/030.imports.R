@@ -7,3 +7,8 @@ mdebugf <- parallelly:::mdebugf
 pid_exists <- parallelly:::pid_exists
 isFALSE <- parallelly:::isFALSE
 isNA <- parallelly:::isNA
+
+stopf <- parallelly:::stopf
+warnf <- parallelly:::warnf
+msgf <- parallelly:::msgf
+
