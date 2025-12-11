@@ -19,17 +19,23 @@
 #' --name=<name>    The name of the test to run, used to locate the test
 #'                  script `test-<name>.R`
 #'                  (Environment variable: `R_TESTME_NAME`)
+#' --covr           Estimate test code coverage
 #'
 #' Examples:
-#' NOT_CRAN=true inst/testme/run.R inst/testme/test-abc.R
+#' testme/test-abc.R
+#' tests/test-cpuLoad.R --covr
+#'
+#' inst/testme/run.R inst/testme/test-abc.R
+#' inst/testme/run.R inst/testme/test-abc.R --covr
 #'
 #' Environment variables:
 #' * R_TESTME_PACKAGE
 #' * R_TESTME_NAME
 #' * R_TESTME_PATH
-#' * R_TESTME_DEBUG
 #' * R_TESTME_FILTER_NAME
 #' * R_TESTME_FILTER_TAGS
+#' * R_TESTME_COVR
+#' * R_TESTME_DEBUG
 main <- function() {
   cmd_args <- commandArgs(trailingOnly = TRUE)
   
@@ -72,6 +78,23 @@ main <- function() {
   } else {
     testme_name <- NULL
   }
+
+  pattern <- "^--covr$"
+  idx <- grep(pattern, cmd_args)
+  if (length(idx) > 0L) {
+    covr <- TRUE
+    cmd_args <- cmd_args[-idx]
+  } else {
+    value <- Sys.getenv("R_TESTME_COVR", "FALSE")
+    value <- as.logical(value)
+    if (is.na(value)) stop("Non-logical value of 'R_TESTME_COVR'")
+    covr <- value
+  }
+  if (covr) {
+    if (!utils::file_test("-f", "DESCRIPTION")) {
+      stop("Current folder does not look like a package folder")
+    }
+  }
   
   ## Fallback for 'testme_name'?
   if (is.null(testme_name)) {
@@ -89,14 +112,13 @@ main <- function() {
         stop("testme: Environment variable 'R_TESTME_NAME' is not set")
       }
     }
-  }
-  
+  } 
   
   testme_file <- file.path(path, sprintf("test-%s.R", testme_name))
   if (!utils::file_test("-f", testme_file)) {
     stop("There exist no such 'testme' file: ", sQuote(testme_file))
   }
-  
+
   
   ## -----------------------------------------------------------------
   ## testme environment
@@ -139,6 +161,7 @@ main <- function() {
      script = testme_file,
        path = path,
     on_cran = on_cran(),
+       covr = covr,
       debug = isTRUE(as.logical(Sys.getenv("R_TESTME_DEBUG")))
   )
   if ("testme" %in% search()) detach(name = "testme")
@@ -153,7 +176,7 @@ main <- function() {
   if ("skip_on_cran" %in% tags && on_cran()) {
     testme[["status"]] <- "skipped"
   }
-  
+
   code <- Sys.getenv("R_TESTME_FILTER_NAME", NA_character_)
   if (!is.na(code)) {
     expr <- tryCatch(parse(text = code), error = identity)
@@ -236,7 +259,21 @@ testme_run_test <- function(testme) {
   if (testme[["status"]] != "skipped") {
     message("Running test script: ", sQuote(testme[["script"]]))
     testme[["status"]] <- "failed"
-    source(testme[["script"]], echo = TRUE)
+    if (isTRUE(testme[["covr"]])) {
+      source_dirs <- c("R", "src")
+      source_dirs <- source_dirs[utils::file_test("-d", source_dirs)]
+      source_files <- dir(source_dirs, pattern = "[.]R$", full.names = TRUE)
+      stopifnot(length(source_files) > 0)
+      assign(".packageName", testme[["package"]], envir = globalenv())
+      cov <- covr::file_coverage(source_files, test_files = testme[["script"]])
+
+      ## Drop entries with zero coverage
+      zero <- vapply(cov, FUN = function(x) (x$value == 0), FUN.VALUE = FALSE)
+      cov <- cov[!zero]
+      print(cov)
+    } else {
+      source(testme[["script"]], echo = TRUE)
+    }
     testme[["status"]] <- "success"
     
   #  ## In case test script overwrote some elements in 'testme'
