@@ -10,6 +10,16 @@
   `R CMD check`. This helps to prevent package vignettes from overusing
   the CPU cores when building and checking R packages.
 
+- Functions
+  [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md),
+  [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md),
+  [`cpuLoad()`](https://parallelly.futureverse.org/reference/cpuLoad.md),
+  and
+  [`freePort()`](https://parallelly.futureverse.org/reference/freePort.md)
+  can now be called directly from the command line,
+  e.g. `Rscript -e parallelly::availableCores --omit=1` and
+  `Rscript -e parallelly::freePort`.
+
 ### Documentation
 
 - Option `parallelly.supportsMulticore.disableOn` was documented to

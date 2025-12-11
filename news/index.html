@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9017</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,8 @@
 <h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> returns 2 also when package vignettes are built by <code>R CMD build</code> or <code>R CMD check</code>. This helps to prevent package vignettes from overusing the CPU cores when building and checking R packages.</li>
+<ul><li><p>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> returns 2 also when package vignettes are built by <code>R CMD build</code> or <code>R CMD check</code>. This helps to prevent package vignettes from overusing the CPU cores when building and checking R packages.</p></li>
+<li><p>Functions <code><a href="../reference/availableCores.html">availableCores()</a></code>, <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code>, <code><a href="../reference/cpuLoad.html">cpuLoad()</a></code>, and <code><a href="../reference/freePort.html">freePort()</a></code> can now be called directly from the command line, e.g. <code>Rscript -e parallelly::availableCores --omit=1</code> and <code>Rscript -e parallelly::freePort</code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>

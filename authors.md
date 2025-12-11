@@ -13,12 +13,12 @@ Source:
 [`DESCRIPTION`](https://github.com/futureverse/parallelly/blob/HEAD/DESCRIPTION)
 
 Bengtsson H (2025). *parallelly: Enhancing the 'parallel' Package*. R
-package version 1.45.1-9015, <https://parallelly.futureverse.org>.
+package version 1.45.1-9017, <https://parallelly.futureverse.org>.
 
     @Manual{,
       title = {parallelly: Enhancing the 'parallel' Package},
       author = {Henrik Bengtsson},
       year = {2025},
-      note = {R package version 1.45.1-9015},
+      note = {R package version 1.45.1-9017},
       url = {https://parallelly.futureverse.org},
     }
