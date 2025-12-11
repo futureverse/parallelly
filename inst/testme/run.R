@@ -20,14 +20,15 @@
 #'                  script `test-<name>.R`
 #'                  (Environment variable: `R_TESTME_NAME`)
 #' --not-cran       Set environment variable `NOT_CRAN=true`
-#' --covr           Estimate test code coverage
+#' --covr=summary   Estimate test code coverage with basic summary
+#' --covr=report    Estimate test code coverage with full HTML report
 #' --debug          Output debug messages
 #'                  (Environment variable: `R_TESTME_DEBUG`)
 #'
 #' Examples:
 #' testme/test-abc.R
 #' testme/test-abc.R --not-cran
-#' tests/test-cpuLoad.R --covr
+#' tests/test-cpuLoad.R --covr=report
 #'
 #' inst/testme/run.R inst/testme/test-abc.R
 #' inst/testme/run.R inst/testme/test-abc.R --covr
@@ -97,18 +98,26 @@ main <- function() {
     Sys.setenv(R_TESTME_DEBUG = "TRUE")
   }
 
-  pattern <- "^--covr$"
+  pattern <- "^--covr(|=([[:alpha:][:alnum:]]+))$"
   idx <- grep(pattern, cmd_args)
   if (length(idx) > 0L) {
-    covr <- TRUE
+    value <- gsub(pattern, "\\2", cmd_args[idx])
+    if (!nzchar(value)) {
+      covr <- "summary"
+    } else {
+      covr <- match.arg(value, choices = c("summary", "report"))
+    }
     cmd_args <- cmd_args[-idx]
   } else {
     value <- Sys.getenv("R_TESTME_COVR", "FALSE")
-    value <- as.logical(value)
-    if (is.na(value)) stop("Non-logical value of 'R_TESTME_COVR'")
-    covr <- value
+    if (toupper(value) %in% c("FALSE", "TRUE")) {
+      value <- as.logical(value)
+      covr <- if (value) "summary" else "none"
+    } else {
+      covr <- match.arg(value, choices = "report")
+    }
   }
-  if (covr) {
+  if (covr != "none") {
     if (!utils::file_test("-f", "DESCRIPTION")) {
       stop("Current folder does not look like a package folder")
     }
@@ -279,7 +288,7 @@ testme_run_test <- function(testme) {
   if (testme[["status"]] != "skipped") {
     if (testme[["debug"]]) message("Running test script: ", sQuote(testme[["script"]]))
     testme[["status"]] <- "failed"
-    if (isTRUE(testme[["covr"]])) {
+    if (testme[["covr"]] != "none") {
       source_dirs <- c("R", "src")
       source_dirs <- source_dirs[utils::file_test("-d", source_dirs)]
       source_files <- dir(source_dirs, pattern = "[.]R$", full.names = TRUE)
@@ -287,7 +296,6 @@ testme_run_test <- function(testme) {
       assign(".packageName", testme[["package"]], envir = globalenv())
       cov <- covr::file_coverage(source_files, test_files = testme[["script"]])
       ## Keep source files with non-zero coverage
-      message("Source files covered by the test script:")
       tally <- covr::tally_coverage(cov)
       tally <- subset(tally, value > 0)
       cov <- cov[covr::display_name(cov) %in% unique(tally$filename)]
@@ -341,7 +349,19 @@ testme_run_test <- function(testme) {
   if ("testme" %in% search()) detach(name = "testme")
 
   cov <- testme[["test_coverage"]]
-  if (!is.null(cov)) print(cov)
+  if (!is.null(cov)) {
+    message("Source files covered by the test script:")
+    if (length(cov) > 0) {
+      print(cov)
+      if (testme[["covr"]] == "report") {
+        html <- covr::report(cov, browse = FALSE)
+        browseURL(html)
+        Sys.sleep(5.0)
+      }
+    } else {
+      message("* No source files were covered by this test!")
+    }
+  }
 
   message(sprintf("Test %s ... %s", sQuote(testme[["name"]]), testme[["status"]]))
 } ## testme_run_test()
