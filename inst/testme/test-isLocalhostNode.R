@@ -45,7 +45,7 @@ if (supportsMulticore()) {
 
 ## Test isLocalhostNode.SOCKnode
 message("- isLocalhostNode.SOCKnode ...")
-cl <- parallel::makeCluster(1L, type = "SOCK")
+cl <- parallel::makeCluster(1L)
 node <- cl[[1]]
 print(node)
 res <- isLocalhostNode(node)
