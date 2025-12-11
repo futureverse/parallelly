@@ -167,6 +167,8 @@ main <- function() {
   } else {
     tags <- character(0L)
   }
+
+  debug <- isTRUE(as.logical(Sys.getenv("R_TESTME_DEBUG")))
   
   ## Create 'testme' environment on the search() path
   testme_config <- list(
@@ -180,7 +182,7 @@ main <- function() {
        path = path,
     on_cran = on_cran(),
        covr = covr,
-      debug = isTRUE(as.logical(Sys.getenv("R_TESTME_DEBUG")))
+      debug = debug
   )
   if ("testme" %in% search()) detach(name = "testme")
   testme <- attach(testme_config, name = "testme", warn.conflicts = FALSE)
@@ -233,13 +235,13 @@ main <- function() {
 #'
 testme_run_test <- function(testme) {
   message(sprintf("Test %s ...", sQuote(testme[["name"]])))
-
-  path <- testme[["path"]]
   if (testme[["debug"]]) {
     message("testme:")
     message(paste(utils::capture.output(utils::str(as.list(testme))), collapse = "\n"))
   }
-  
+
+  path <- testme[["path"]]
+
   ## Process prologue scripts, if they exist
   if (testme[["status"]] != "skipped" &&
       utils::file_test("-d", file.path(path, "_prologue"))) {
@@ -249,17 +251,17 @@ testme_run_test <- function(testme) {
       files <- dir(file.path(path, "_prologue"), pattern = "*[.]R$", full.names = TRUE)
       files <- sort(files)
       testme[["prologue_scripts"]] <- files
-    
+
       ## Source all prologue scripts inside the 'testme' environment
-      expr <- quote({
+      expr <- bquote({
         files <- prologue_scripts
-        message(sprintf("Sourcing %d prologue scripts ...", length(files)))
+        if (.(testme[["debug"]])) message(sprintf("Sourcing %d prologue scripts ...", length(files)))
         for (kk in seq_along(files)) {
           file <- files[kk]
-          message(sprintf("%02d/%02d prologue script %s", kk, length(files), sQuote(file)))
+          if (.(testme[["debug"]])) message(sprintf("%02d/%02d prologue script %s", kk, length(files), sQuote(file)))
           source(file, local = TRUE)
         }
-        message(sprintf("Sourcing %d prologue scripts ... done", length(files)))
+        if (.(testme[["debug"]])) message(sprintf("Sourcing %d prologue scripts ... done", length(files)))
         rm(list = c("kk", "file", "files"))
       })
       eval(expr, envir = testme)
@@ -275,7 +277,7 @@ testme_run_test <- function(testme) {
   ## Run test script
   ## Note, prologue scripts may trigger test to be skipped
   if (testme[["status"]] != "skipped") {
-    message("Running test script: ", sQuote(testme[["script"]]))
+    if (testme[["debug"]]) message("Running test script: ", sQuote(testme[["script"]]))
     testme[["status"]] <- "failed"
     if (isTRUE(testme[["covr"]])) {
       source_dirs <- c("R", "src")
@@ -289,8 +291,9 @@ testme_run_test <- function(testme) {
       tally <- covr::tally_coverage(cov)
       tally <- subset(tally, value > 0)
       cov <- cov[covr::display_name(cov) %in% unique(tally$filename)]
-      print(cov)
+      testme[["test_coverage"]] <- cov
     } else {
+      testme[["test_coverage"]] <- NULL
       source(testme[["script"]], echo = TRUE)
     }
     testme[["status"]] <- "success"
@@ -314,15 +317,15 @@ testme_run_test <- function(testme) {
       testme[["epilogue_scripts"]] <- files
     
       ## Source all epilogue scripts inside the 'testme' environment
-      expr <- quote({
+      expr <- bquote({
         files <- epilogue_scripts
-        message(sprintf("Sourcing %d epilogue scripts ...", length(files)))
+        if (.(testme[["debug"]])) message(sprintf("Sourcing %d epilogue scripts ...", length(files)))
         for (kk in seq_along(files)) {
           file <- files[kk]
-          message(sprintf("%02d/%02d epilogue script %s", kk, length(files), sQuote(file)))
+          if (.(testme[["debug"]])) message(sprintf("%02d/%02d epilogue script %s", kk, length(files), sQuote(file)))
           source(file, local = TRUE)
         }
-        message(sprintf("Sourcing %d epilogue scripts ... done", length(files)))
+        if (.(testme[["debug"]])) message(sprintf("Sourcing %d epilogue scripts ... done", length(files)))
         rm(list = c("kk", "file", "files"))
       })
       eval(expr, envir = testme)
@@ -335,9 +338,12 @@ testme_run_test <- function(testme) {
   dt_str <- sprintf("%s=%.1gs", names(dt), dt)
   message("Test time: ", paste(dt_str, collapse = ", "))
   
-  message(sprintf("Test %s ... %s", sQuote(testme[["name"]]), testme[["status"]]))
-  
   if ("testme" %in% search()) detach(name = "testme")
+
+  cov <- testme[["test_coverage"]]
+  if (!is.null(cov)) print(cov)
+
+  message(sprintf("Test %s ... %s", sQuote(testme[["name"]]), testme[["status"]]))
 } ## testme_run_test()
 
 
