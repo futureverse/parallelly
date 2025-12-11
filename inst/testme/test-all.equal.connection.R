@@ -10,5 +10,9 @@ close(con1)
 con2 <- rawConnection(raw())
 close(con2)
 
+con3 <- rawConnection(raw())
+stopifnot(isTRUE(all.equal(con3, con3)))
+close(con3)
+
 stopifnot(!isTRUE(all.equal(con1, con2)))
 message("all.equal() for connection ... done")

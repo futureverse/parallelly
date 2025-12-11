@@ -33,6 +33,23 @@ stopifnot(grepl("Hello world", res$message))
 
 
 res <- tryCatch({
+  stopf("Hello %s", "world", call. = TRUE)
+}, error = identity)
+print(res)
+stopifnot(inherits(res, "simpleError"))
+stopifnot(grepl("Hello world", res$message))
+
+
+f <- function() {
+  stopf("Hello %s", "world", call. = sys.call())
+}
+res <- tryCatch(f(), error = identity)
+print(res)
+stopifnot(inherits(res, "simpleError"))
+stopifnot(grepl("Hello world", res$message))
+
+
+res <- tryCatch({
   stopf("Hello %s", "world", domain = "R-futile.options")
 }, error = identity)
 print(res)
@@ -84,6 +101,23 @@ stopifnot(grepl("Hello world", res$message))
 
 
 res <- tryCatch({
+  warnf("Hello %s", "world", call. = TRUE)
+}, warning = identity)
+print(res)
+stopifnot(inherits(res, "simpleWarning"))
+stopifnot(grepl("Hello world", res$message))
+
+
+f <- function() {
+  warnf("Hello %s", "world", call. = sys.call())
+}
+res <- tryCatch(f(), warning = identity)
+print(res)
+stopifnot(inherits(res, "simpleWarning"))
+stopifnot(grepl("Hello world", res$message))
+
+
+res <- tryCatch({
   warnf("Hello %s", "world", domain = "R-futile.options")
 }, warning = identity)
 print(res)
@@ -116,6 +150,15 @@ res <- capture.output({
 }, type = "message")
 print(res)
 stopifnot(identical(res, msg))
+
+
+msg <- "Hello world"
+res <- capture.output({
+  msgf("Hello %s", "world", appendLF = TRUE, domain = "R-futile.options")
+}, type = "message")
+print(res)
+stopifnot(identical(res, msg))
+
 
 message("*** msgf() ... DONE")
 
