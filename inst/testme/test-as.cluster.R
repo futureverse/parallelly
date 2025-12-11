@@ -1,6 +1,7 @@
 library(parallelly)
 
 stopCluster <- parallel::stopCluster
+useXDR <- isTRUE(parallelly:::getOption2("parallelly.makeNodePSOCK.useXDR"))
 
 message("*** cluster operations ...")
 
@@ -69,3 +70,25 @@ if (length(remotes) > 0) {
 message("*** cluster operations - makeClusterPSOCK(remotes) ... DONE")
 
 message("*** cluster operations ... DONE")
+
+message("*** cluster operations - as.cluster(<non-cluster>) ...")
+res <- tryCatch({
+  as.cluster(1)
+}, error = function(ex) ex)
+stopifnot(inherits(res, "error"))
+message("*** cluster operations - as.cluster(<non-cluster>) ... DONE")
+
+message("*** cluster operations - c(...) with duplicated nodes ...")
+cl_dup1 <- makeClusterPSOCK(1L)
+on.exit(stopCluster(cl_dup1), add = TRUE)
+cl_combined <- c(cl_dup1, cl_dup1)
+stopifnot(inherits(cl_combined, "cluster"), length(cl_combined) == 2L)
+message("*** cluster operations - c(...) with duplicated nodes ... DONE")
+
+message("*** cluster operations - as.cluster(SOCKnode) ...")
+cl_base <- parallel::makeCluster(1L, type = "PSOCK")
+node_base <- cl_base[[1]]
+res_base <- as.cluster(node_base)
+stopifnot(inherits(res_base, "cluster"), inherits(res_base[[1]], "SOCKnode"))
+parallel::stopCluster(cl_base)
+message("*** cluster operations - as.cluster(SOCKnode) ... DONE")

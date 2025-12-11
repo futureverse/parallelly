@@ -73,7 +73,6 @@ sendData.sequential_node <- function(node, data) {
     data <- data[["data"]]  ## sic!
     fun <- data[["fun"]]
     args <- data[["args"]]
-    ret <- data[["return"]]
 
     ## Don't evaluate in the global environment, which is the default
     if (identical(args[["envir"]], globalenv())) {
