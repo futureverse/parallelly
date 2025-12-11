@@ -11,7 +11,9 @@ stopifnot(is.logical(res))
 options(parallelly.fork.enable = TRUE)
 res <- supportsMulticore()
 print(res)
-stopifnot(isTRUE(res))
+stopifnot(
+  if (.Platform[["OS.type"]] == "windows") isFALSE(res) else isTRUE(res)
+)
 options(parallelly.fork.enable = NULL)
 
 options(parallelly.fork.enable = FALSE)
@@ -23,7 +25,10 @@ options(parallelly.fork.enable = NULL)
 Sys.setenv(R_PARALLELLY_FORK_ENABLE = "true")
 res <- supportsMulticore()
 print(res)
-stopifnot(isTRUE(res))
+stopifnot(
+  if (.Platform[["OS.type"]] == "windows") isFALSE(res) else isTRUE(res)
+)
+
 Sys.unsetenv("R_PARALLELLY_FORK_ENABLE")
 message("- supportsMulticore() ... DONE")
 
@@ -34,7 +39,9 @@ message("- supportsMulticoreAndRStudio() ...")
 ## When not in RStudio
 res <- supportsMulticoreAndRStudio()
 print(res)
-stopifnot(isTRUE(res))
+stopifnot(
+  if (.Platform[["OS.type"]] == "windows") isFALSE(res) else isTRUE(res)
+)
 
 ## When in RStudio Console (not supported)
 Sys.setenv(RSTUDIO = "1")
@@ -48,7 +55,9 @@ Sys.setenv(RSTUDIO = "1")
 Sys.setenv(RSTUDIO_TERM = "1")
 res <- supportsMulticoreAndRStudio()
 print(res)
-stopifnot(isTRUE(res))
+stopifnot(
+  if (.Platform[["OS.type"]] == "windows") isFALSE(res) else isTRUE(res)
+)
 
 opts <- options(parallelly.supportsMulticore.disableOn = "rstudio_terminal")
 res <- supportsMulticoreAndRStudio()
