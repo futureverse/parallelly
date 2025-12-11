@@ -4,6 +4,7 @@ message("*** freePort() ...")
 
 # Make sure to undo any changes at the end
 oenv <- Sys.getenv("R_PARALLELLY_RANDOM_PORTS")
+Sys.setenv(R_PARALLELLY_DEBUG = "TRUE")
 
 set.seed(42)
 rng <- .Random.seed
