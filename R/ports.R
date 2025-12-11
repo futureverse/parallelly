@@ -283,3 +283,6 @@ isTcpPortAvailable <- function(port, test = c("bind", "listen")) {
   
   (res == 0L)
 }
+
+
+cli_fcn(freePort) <- list(cli_arg_expr("ports"), cli_arg_character("default"), cli_arg_logical("randomize"))

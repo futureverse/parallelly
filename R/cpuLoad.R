@@ -31,3 +31,5 @@ cpuLoad <- function() {
   names(res) <- c("1min", "5min", "15min")
   res
 }
+
+cli_fcn(cpuLoad) <- list()

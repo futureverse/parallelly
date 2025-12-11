@@ -473,7 +473,6 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
   ncores
 } # availableCores()
 
-
 getNproc <- local({
   res <- NULL
   
@@ -726,3 +725,6 @@ availableCoresSlurm <- local({
     n
   }
 }) ## availableCoresSlurm()
+
+
+cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_character("default"), cli_arg_character("which"), cli_arg_integer("omit"), cli_arg_numeric("max"))

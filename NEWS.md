@@ -7,6 +7,11 @@
    package vignettes from overusing the CPU cores when building and
    checking R packages.
 
+ * Functions `availableCores()`, `availableWorkers()`, `cpuLoad()`,
+   and `freePort()` can now be called directly from the command line,
+   e.g. `Rscript -e parallelly::availableCores --omit=1` and
+   `Rscript -e parallelly::freePort`.
+
 ## Documentation
 
  * Option `parallelly.supportsMulticore.disableOn` was documented to
