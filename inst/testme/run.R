@@ -284,10 +284,11 @@ testme_run_test <- function(testme) {
       stopifnot(length(source_files) > 0)
       assign(".packageName", testme[["package"]], envir = globalenv())
       cov <- covr::file_coverage(source_files, test_files = testme[["script"]])
-
-      ## Drop entries with zero coverage
-      zero <- vapply(cov, FUN = function(x) (x$value == 0), FUN.VALUE = FALSE)
-      cov <- cov[!zero]
+      ## Keep source files with non-zero coverage
+      message("Source files covered by the test script:")
+      tally <- covr::tally_coverage(cov)
+      tally <- subset(tally, value > 0)
+      cov <- cov[covr::display_name(cov) %in% unique(tally$filename)]
       print(cov)
     } else {
       source(testme[["script"]], echo = TRUE)
