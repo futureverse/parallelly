@@ -25,3 +25,6 @@ revdep/checks
 revdep/library
 docs/
 .Rdump/
+covr/
+*.gcda
+*.gcno
