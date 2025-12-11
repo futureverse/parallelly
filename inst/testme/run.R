@@ -19,10 +19,14 @@
 #' --name=<name>    The name of the test to run, used to locate the test
 #'                  script `test-<name>.R`
 #'                  (Environment variable: `R_TESTME_NAME`)
+#' --not-cran       Set environment variable `NOT_CRAN=true`
 #' --covr           Estimate test code coverage
+#' --debug          Output debug messages
+#'                  (Environment variable: `R_TESTME_DEBUG`)
 #'
 #' Examples:
 #' testme/test-abc.R
+#' testme/test-abc.R --not-cran
 #' tests/test-cpuLoad.R --covr
 #'
 #' inst/testme/run.R inst/testme/test-abc.R
@@ -77,6 +81,20 @@ main <- function() {
     cmd_args <- cmd_args[-idx]
   } else {
     testme_name <- NULL
+  }
+
+  pattern <- "^--not-cran"
+  idx <- grep(pattern, cmd_args)
+  if (length(idx) > 0L) {
+    cmd_args <- cmd_args[-idx]
+    Sys.setenv(NOT_CRAN = "TRUE")
+  }
+
+  pattern <- "^--debug"
+  idx <- grep(pattern, cmd_args)
+  if (length(idx) > 0L) {
+    cmd_args <- cmd_args[-idx]
+    Sys.setenv(R_TESTME_DEBUG = "TRUE")
   }
 
   pattern <- "^--covr$"
