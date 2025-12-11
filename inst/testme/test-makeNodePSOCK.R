@@ -31,10 +31,12 @@ print(options)
 stopifnot(inherits(options, "makeNodePSOCKOptions"))
 
 ## Test with rscript_sh = c("sh", "cmd")
-message("- rscript_sh = c('sh', 'cmd') ...")
-options <- makeNodePSOCK(port = 12345L, rscript_sh = c("sh", "cmd"), action = "options")
-print(options)
-stopifnot(inherits(options, "makeNodePSOCKOptions"))
+if (.Platform[["OS.type"]] != "windows") {
+  message("- rscript_sh = c('sh', 'cmd') ...")
+  options <- makeNodePSOCK(port = 12345L, rscript_sh = c("sh", "cmd"), action = "options")
+  print(options)
+  stopifnot(inherits(options, "makeNodePSOCKOptions"))
+}
 
 ## Test with rscript_args
 message("- rscript_args ...")
