@@ -293,7 +293,46 @@ testme_run_test <- function(testme) {
       source_dirs <- source_dirs[utils::file_test("-d", source_dirs)]
       source_files <- dir(source_dirs, pattern = "[.]R$", full.names = TRUE)
       stopifnot(length(source_files) > 0)
+
       assign(".packageName", testme[["package"]], envir = globalenv())
+  
+      ## Attach imported packages
+#      library(testme[["package"]], character.only = TRUE)
+#      desc <- utils::packageDescription(testme[["package"]])
+#      pkgs <- desc[["Imports"]]
+#      pkgs <- strsplit(pkgs, split = ",", fixed = TRUE)[[1]]
+#      pkgs <- gsub("[[:space:]]", "", pkgs)
+#      lapply(pkgs, FUN = library, character.only = TRUE)
+
+      ## Copy imports
+      ns <- getNamespace(testme[["package"]])
+      ns <- parent.env(ns)
+      for (name in names(ns)) {
+        obj <- get(name, envir = ns, inherits = FALSE)
+        assign(name, obj, envir = globalenv(), inherits = FALSE)
+      }
+
+      ## Copy non-exported 'NativeSymbolInfo':s
+      ns <- getNamespace(testme[["package"]])
+      for (name in names(ns)) {
+        if (!exists(name, mode = "list", envir = ns, inherits = FALSE)) next
+        obj <- get(name, mode = "list", envir = ns, inherits = FALSE)
+        if (!inherits(obj, "NativeSymbolInfo")) next
+        assign(name, obj, envir = globalenv(), inherits = FALSE)
+      }
+
+      ## Register S3 methods
+      library(testme[["package"]], character.only = TRUE)
+      ns <- getNamespace(testme[["package"]])
+      ns2 <- ns[[".__S3MethodsTable__."]]
+      for (name in names(ns2)) {
+        pattern <- "(.*)[.]([^.]+)$"
+        genname <- gsub(pattern, "\\1", name)
+        class <- gsub(pattern, "\\2", name)
+        method <- ns2[[name]]
+        registerS3method(genname, class, method, envir = ns)
+      }
+      
       cov <- covr::file_coverage(source_files, test_files = testme[["script"]])
       ## Keep source files with non-zero coverage
       tally <- covr::tally_coverage(cov)

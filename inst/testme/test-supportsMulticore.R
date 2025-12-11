@@ -30,7 +30,6 @@ message("- supportsMulticore() ... DONE")
 
 ## Test supportsMulticoreAndRStudio()
 message("- supportsMulticoreAndRStudio() ...")
-supportsMulticoreAndRStudio <- parallelly:::supportsMulticoreAndRStudio
 
 ## When not in RStudio
 res <- supportsMulticoreAndRStudio()

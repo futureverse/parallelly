@@ -3,7 +3,6 @@ library(parallelly)
 message("registerClusterTypes() ...")
 
 ## Local functions
-registerClusterTypes <- parallelly:::registerClusterTypes
 ns <- getNamespace("parallel")
 
 ## Skip if parallel::registerClusterType() is not supported

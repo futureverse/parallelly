@@ -1,5 +1,3 @@
-isForkedNode <- parallelly:::isForkedNode
-
 message("isForkedNode() ...")
 
 # 1. Test with a default object
