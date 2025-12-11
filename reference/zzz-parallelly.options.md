@@ -114,7 +114,7 @@ of
   `"rstudio_console"`, it is disabled when running R in the RStudio
   Console. If this vector contains `"rstudio_terminal"`, it is disabled
   when running R in the RStudio Terminal. (Default:
-  `c("rstudio_console", "rstudio_terminal")`)
+  `c("rstudio_console")`)
 
 - `parallelly.supportsMulticore.unstable`::
 

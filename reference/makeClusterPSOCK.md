@@ -78,9 +78,9 @@ makeNodePSOCK(
 
   The port number of the master used for communicating with all the
   workers (via socket connections). If an integer vector of ports, then
-  a random one among those is chosen. If `"random"`, then a random port
-  in is chosen from `11000:11999`, or from the range specified by
-  environment variable `R_PARALLELLY_RANDOM_PORTS`. If `"auto"`
+  a random one among those is chosen. If `"random"`, then a random,
+  *available* port is chosen in the range `11000:11999` or as specified
+  by environment variable `R_PARALLELLY_RANDOM_PORTS`. If `"auto"`
   (default), then the default (single) port is taken from environment
   variable `R_PARALLEL_PORT`, otherwise `"random"` is used. *Note, do
   not use this argument to specify the port number used by `rshcmd`,

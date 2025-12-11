@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.45.1-9015</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,6 +81,14 @@
 <div class="section level3">
 <h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> returns 2 also when package vignettes are built by <code>R CMD build</code> or <code>R CMD check</code>. This helps to prevent package vignettes from overusing the CPU cores when building and checking R packages.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<ul><li>Option <code>parallelly.supportsMulticore.disableOn</code> was documented to disable forked (“multicore”) processing in the RStudio Terminal, but that was not the case due to a thinko. Default options and the documentation has now been updated to reflect that it is only disabled in the RStudio Console.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fix-development-version">BUG FIX:<a class="anchor" aria-label="anchor" href="#bug-fix-development-version"></a></h3>
+<ul><li>Setting option <code>parallelly.supportsMulticore.disableOn</code> to hold <code>"rstudio_terminal"</code> had no effect.</li>
 </ul></div>
 </div>
     <div class="section level2">
