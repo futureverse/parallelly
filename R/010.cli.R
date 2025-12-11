@@ -12,18 +12,21 @@ parse_cmd_args <- function(patterns = list(), cmdargs = getOption("future.p2p.te
       name <- gsub(pattern, "\\1", cmdarg)
       value <- gsub(pattern, "\\2", cmdarg)
       if (!is.null(type)) {
-        if (type == "character") {
-          value <- as.character(value)
-        } else if (type == "logical") {
-          value <- as.logical(value)
-        } else if (type == "integer") {
-          value <- as.integer(value)
-        } else if (type == "numeric") {
-          value <- as.numeric(value)
-        } else if (type == "expr") {
+        if (type == "expr") {
           value <- local(eval(parse(text = value)))
         } else {
-          stop("Unknown cli_arg type: ", sQuote(type))
+          value <- strsplit(value, split = ",", fixed = TRUE)[[1]]
+          if (type == "character") {
+            value <- as.character(value)
+          } else if (type == "logical") {
+            value <- as.logical(value)
+          } else if (type == "integer") {
+            value <- as.integer(value)
+          } else if (type == "numeric") {
+            value <- as.numeric(value)
+          } else {
+            stop("Unknown cli_arg type: ", sQuote(type))
+          }
         }
       }
       class(value) <- "cmd_arg"

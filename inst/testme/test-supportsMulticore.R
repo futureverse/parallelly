@@ -55,9 +55,7 @@ Sys.setenv(RSTUDIO = "1")
 Sys.setenv(RSTUDIO_TERM = "1")
 res <- supportsMulticoreAndRStudio()
 print(res)
-stopifnot(
-  if (.Platform[["OS.type"]] == "windows") isFALSE(res) else isTRUE(res)
-)
+stopifnot(isTRUE(res))
 
 opts <- options(parallelly.supportsMulticore.disableOn = "rstudio_terminal")
 res <- supportsMulticoreAndRStudio()
