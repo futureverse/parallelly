@@ -49,7 +49,7 @@
 #'    running R in the RStudio Console.
 #'    If this vector contains `"rstudio_terminal"`, it is disabled when
 #'    running R in the RStudio Terminal.
-#'    (Default: `c("rstudio_console", "rstudio_terminal")`)
+#'    (Default: `c("rstudio_console")`)
 #'  }
 #'
 #'  \item{`parallelly.supportsMulticore.unstable`:}{(character) Controls whether a warning should be produced or not whenever multicore processing is automatically disabled per settings in option `parallelly.supportsMulticore.disableOn`.  If `"warn"` (default), then an informative warning is produces the first time 'multicore' futures are used.  If `"quiet"`, no warning is produced.}

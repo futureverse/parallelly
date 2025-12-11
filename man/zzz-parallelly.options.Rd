@@ -111,7 +111,7 @@ If this vector contains \code{"rstudio_console"}, it is disabled when
 running R in the RStudio Console.
 If this vector contains \code{"rstudio_terminal"}, it is disabled when
 running R in the RStudio Terminal.
-(Default: \code{c("rstudio_console", "rstudio_terminal")})
+(Default: \code{c("rstudio_console")})
 }
 
 \item{\code{parallelly.supportsMulticore.unstable}:}{(character) Controls whether a warning should be produced or not whenever multicore processing is automatically disabled per settings in option \code{parallelly.supportsMulticore.disableOn}.  If \code{"warn"} (default), then an informative warning is produces the first time 'multicore' futures are used.  If \code{"quiet"}, no warning is produced.}
