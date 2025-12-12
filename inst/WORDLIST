@@ -1,12 +1,16 @@
-AppVeyor
+AMI
 Apptainer
+AppVeyor
 AsIs
 BiocParallel
+Bubblewrap
 CGroups
 CMD
+DDNS
 DJOB
 DNS
 FQDN
+GCE
 GetConnection
 HOSTFILE
 HenrikBengtsson
@@ -15,6 +19,7 @@ LSB
 LSF
 LibreSSL
 MSYS
+MiB
 MinGW
 NCPUS
 NSLOTS
@@ -30,10 +35,12 @@ PJM
 PPK
 PPN
 PSOCK
+Podman
 Pre
 PuTTY
 PuTTY's
 RStudio
+RStudio's
 Renviron
 RichSOCKcluster
 RichSOCKnode
@@ -90,6 +97,7 @@ freezed
 getOption
 getOptionOrEnvVar
 github
+globbing
 grepl
 hardcoded
 hostname
@@ -101,6 +109,7 @@ isForkedChild
 isForkedNode
 isLocalhostNode
 isNodeAlive
+jumphost
 libPaths
 libs
 linux
@@ -134,6 +143,7 @@ rshcmd
 rshlogfile
 rstudio
 sQuote
+sandboxed
 scontrol
 setTimeLimit
 sig
@@ -150,7 +160,9 @@ tasklist
 tcltk
 tmp
 todo
+udocker
 useFancyQuotes
 useXDR
 workRSOCK
 yYF
+VM

@@ -18,8 +18,8 @@
 #' 
 #' @param port The port number of the master used for communicating with all
 #' the workers (via socket connections).  If an integer vector of ports, then
-#' a random one among those is chosen.  If `"random"`, then a random port in
-#' is chosen from `11000:11999`, or from the range specified by
+#' a random one among those is chosen.  If `"random"`, then a random,
+#' _available_ port is chosen in the range `11000:11999` or as specified by
 #' environment variable \env{R_PARALLELLY_RANDOM_PORTS}.
 #' If `"auto"` (default), then the default (single) port is taken from
 #' environment variable \env{R_PARALLEL_PORT}, otherwise `"random"` is
@@ -128,7 +128,10 @@
 #'
 #' See [parallelly.options] for how to change the default thresholds.
 #' This built-in protection can be circumvented by specifying argument
-#' `workers` as an `AsIs` object, e.g. `workers = I(25)` (not recommended).
+#' `workers` as an `AsIs` object, e.g. `workers = I(25)`. We recommend
+#' against using this, unless you know the CPU load for each parallel
+#' worker is very low. This might be safe to do so when the parallel
+#' tasks are mostly in a waiting state, e.g. polling a webserver.
 #'
 #' @example incl/makeClusterPSOCK.R
 #'
@@ -188,6 +191,13 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
       if (getRversion() >= "4.4.0") {
         msg <- sprintf("%s. To increase this limit in R (>= 4.4.0), use command-line option '--max-connections=N' when launching R.", msg)
       }
+
+      ## Could it be that 'workers' is a function of detectCores(), i.e.
+      ## detectCores(), detectCores() - 1, or detectCores() - 2? If so,
+      ## add a troubleshooting hint about this.
+      hint <- detectCoresHint(length(workers))
+      if (!is.null(hint)) msg <- sprintf("%s. %s", msg, hint)
+
       stopf(msg)
     }
   }

@@ -76,10 +76,10 @@ that runs the R script `script.R` when launched. If we submit
 $ qsub script.sh
 ```
 
-it will by default request eight slots - on one more more machines,
-which then R and **parallelly** will set up a parallel cluster on. On
-how many, and on which machines, the parallel workers will run on
-depends on where the job scheduler finds these requested slots on. 
+it will by default request eight slots - on one or more machines,
+which then R and **parallelly** will set up a parallel cluster
+on. Exactly on which machines depends on where the job scheduler finds
+these requested slots.
 
 Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:
@@ -98,7 +98,7 @@ version 4.5.1 (2025-06-13), platform x86_64-pc-linux-gnu)
 
 
 
-## Example: Launch parallel workers via the'Fujitsu Technical Computing Suite job scheduler
+## Example: Launch parallel workers via the Fujitsu Technical Computing Suite job scheduler
 
 The 'Fujitsu Technical Computing Suite' is a high-performance compute
 (HPC) job scheduler where one can request compute resources on
@@ -141,7 +141,7 @@ stopCluster(cl)
 ```
 
 The `script.sh` file is a job script that we submit to the scheduler
-that runs the R script `script.R` when launched. Wee can submit
+that runs the R script `script.R` when launched. We can submit
 `script.sh` as:
 
 ```sh

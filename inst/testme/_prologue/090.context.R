@@ -8,5 +8,3 @@ on_solaris <- grepl("^solaris", R.version[["os"]])
 
 covr_testing <- ("covr" %in% loadedNamespaces())
 on_githubactions <- isTRUE(as.logical(Sys.getenv("GITHUB_ACTIONS")))
-
-useXDR <- isTRUE(parallelly:::getOption2("parallelly.makeNodePSOCK.useXDR"))

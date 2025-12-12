@@ -132,6 +132,15 @@ queryRCmdCheck <- function(...) {
 
 inRCmdCheck <- function() { queryRCmdCheck() != "notRunning" }
 
+inRCmdVignette <- function() {
+  r_cmd <- Sys.getenv("R_CMD", NA_character_)
+  if (is.null(r_cmd)) return(FALSE)
+  args <- commandArgs()
+  if (length(args) != 6) return(FALSE)
+  truth <- c(r_cmd, "--no-echo", "--no-restore", "--vanilla", "-e", "tools::buildVignettes(dir~+~=~+~'.',~+~tangle~+~=~+~TRUE)")
+  any(args != truth)
+}
+
 comma <- function(x, sep = ", ") paste(x, collapse = sep)
 
 commaq <- function(x, sep = ", ") paste(sQuote(x), collapse = sep)

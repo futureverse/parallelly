@@ -10,8 +10,8 @@
 
 # Introduction
 
-Sometimes it is not sufficient to parallize on a single computer - it
-cannot provide all of the compute power we are looking for. When we
+Sometimes it is not sufficient to parallelize on a single computer -
+it cannot provide all of the compute power we are looking for. When we
 hit this limit, a natural next level is to look at other computers
 near us, e.g. desktops in an office or other computers we have access
 to remotely. In this vignette, we will cover how to run parallel R
@@ -205,7 +205,7 @@ parallel R workers on these machines with little efforts.
 
 Some machines do not use the default port 22 to answer on SSH
 connection requests. If the machine uses another port, say, port 2201,
-then we canspecify that via option `-p port`, when we connect to it,
+then we can specify that via option `-p port`, when we connect to it,
 e.g.
 
 ```sh
@@ -483,8 +483,8 @@ referred to as a "jumphost".  For example, assume machine
 {alice@secret1}$ 
 ```
 
-To achive the same in a single SSH call, we can specify the "jumphost"
-`-J hostname` option for SSH, as in:
+To achieve the same in a single SSH call, we can specify the
+"jumphost" `-J hostname` option for SSH, as in:
 
 ```sh
 {ally@local}$ ssh -J alice@login.remote.org alice@secret1.remote.org

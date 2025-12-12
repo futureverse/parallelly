@@ -64,8 +64,8 @@ number of localhost workers (as a positive integer).}
 
 \item{port}{The port number of the master used for communicating with all
 the workers (via socket connections).  If an integer vector of ports, then
-a random one among those is chosen.  If \code{"random"}, then a random port in
-is chosen from \code{11000:11999}, or from the range specified by
+a random one among those is chosen.  If \code{"random"}, then a random,
+\emph{available} port is chosen in the range \code{11000:11999} or as specified by
 environment variable \env{R_PARALLELLY_RANDOM_PORTS}.
 If \code{"auto"} (default), then the default (single) port is taken from
 environment variable \env{R_PARALLEL_PORT}, otherwise \code{"random"} is
@@ -131,7 +131,7 @@ If an element is not named, then the value of that variable will be used as
 the name and the value will be the value of \code{Sys.getenv()} for that
 variable.  Non-existing environment variables will be dropped.
 These variables are set using \code{Sys.setenv()}.
-An named element with value \code{NA_character_} will cause that variable to be
+A named element with value \code{NA_character_} will cause that variable to be
 unset, which is done via \code{Sys.unsetenv()}.}
 
 \item{rscript_libs}{A character vector of \R library paths that will be
@@ -322,7 +322,10 @@ this error
 
 See \link{parallelly.options} for how to change the default thresholds.
 This built-in protection can be circumvented by specifying argument
-\code{workers} as an \code{AsIs} object, e.g. \code{workers = I(25)} (not recommended).
+\code{workers} as an \code{AsIs} object, e.g. \code{workers = I(25)}. We recommend
+against using this, unless you know the CPU load for each parallel
+worker is very low. This might be safe to do so when the parallel
+tasks are mostly in a waiting state, e.g. polling a webserver.
 }
 
 \section{Definition of \emph{localhost}}{
@@ -350,7 +353,7 @@ If that is not
 set, then the default is to use \command{ssh} on Unix-like systems,
 including macOS as well as Windows 10.  On older MS Windows versions, which
 does not have a built-in \command{ssh} client, the default is to use
-(i) \command{plink} from the \href{https://www.putty.org/}{\command{PuTTY}}
+(i) \command{plink} from the \href{https://www.chiark.greenend.org.uk/~sgtatham/putty/}{\command{PuTTY}}
 project, and then (ii) the \command{ssh} client that is distributed with
 RStudio.
 

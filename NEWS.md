@@ -1,3 +1,31 @@
+# Version 1.46.0 [2025-12-11]
+
+## New Features
+
+ * Now `availableCores()` returns 2 also when package vignettes are
+   built by `R CMD build` or `R CMD check`. This helps to prevent
+   package vignettes from overusing the CPU cores when building and
+   checking R packages.
+
+ * Functions `availableCores()`, `availableWorkers()`, `cpuLoad()`,
+   and `freePort()` can now be called directly from the command line,
+   e.g. `Rscript -e parallelly::availableCores --omit=1` and
+   `Rscript -e parallelly::freePort`.
+
+## Documentation
+
+ * Option `parallelly.supportsMulticore.disableOn` was documented to
+   disable forked ("multicore") processing in the RStudio Terminal,
+   but that was not the case due to a thinko. Default options and the
+   documentation has now been updated to reflect that it is only
+   disabled in the RStudio Console.
+
+## BUG FIX:
+
+ * Setting option `parallelly.supportsMulticore.disableOn` to hold
+   `"rstudio_terminal"` had no effect.
+
+
 # Version 1.45.1 [2025-07-24]
 
 ## Miscellaneous

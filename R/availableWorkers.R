@@ -759,3 +759,5 @@ availableWorkersSlurm <- function() {
   
   w
 } ## availableWorkersSlurm()
+
+cli_fcn(availableWorkers) <- cli_fcn_args(availableCores)

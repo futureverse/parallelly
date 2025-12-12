@@ -6,9 +6,16 @@
   if (debug) options(parallelly.debug = TRUE)
   debug <- getOption("parallelly.debug", debug)
 
+  ## Drop CLI arguments
+  if (interactive()) cli_prune()
+
   ## Automatically play nice when 'R CMD check' runs?
-  if (isTRUE(as.logical(getEnvVar2("R_PARALLELLY_R_CMD_CHECK_NICE", "TRUE"))) && inRCmdCheck()) {
-    if (debug) mdebug("Detected 'R CMD check':\n - adjusting defaults to be a good citizen")
+  if (isTRUE(as.logical(getEnvVar2("R_PARALLELLY_R_CMD_CHECK_NICE", "TRUE"))) &&
+      (inRCmdCheck() || inRCmdVignette())) {
+    if (inRCmdVignette() || inRCmdCheck()) {
+      if (debug) mdebug("Detected 'R CMD check' or 'R CMD tools::buildVignettes()':\n - adjusting defaults to be a good citizen")
+    }
+    
     ## To be nicer to test environments (e.g. CRAN, Travis CI and AppVeyor CI),
     ## timeout much earlier than the default 30 days. This will also give a more
     ## informative error message produced by R itself, rather than whatever the

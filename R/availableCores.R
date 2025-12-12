@@ -100,11 +100,12 @@
 #'  \item `"_R_CHECK_LIMIT_CORES_"` -
 #'    Query environment variable \env{_R_CHECK_LIMIT_CORES_} (logical or
 #'    `"warn"`) used by `R CMD check` and set to true by
-#'    `R CMD check --as-cran`. If set to a non-false value, then a maximum
+#'    `R CMD check --as-cran`. In addition, package \pkg{parallelly} sets
+#'    `_R_CHECK_LIMIT_CORES_=true` when _loaded_ if it detects that `R CMD`
+#'    is running and _builds_ package vignettes via `R CMD build` and
+#'    `R CMD check`, which is something `R CMD check` does not do itself.
+#'    If `_R_CHECK_LIMIT_CORES_` is set to a non-false value, then a maximum
 #'    of 2 cores is considered.
-#'    Note that `_R_CHECK_LIMIT_CORES_` is _not_ set when `R CMD build`
-#'    builds vignettes or when `R CMD check --as-cran` re-builds then as
-#'    part of the package checks.
 #'
 #'  \item `"Bioconductor"` -
 #'    Query environment variable \env{IS_BIOC_BUILD_MACHINE} (logical)
@@ -472,7 +473,6 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
   ncores
 } # availableCores()
 
-
 getNproc <- local({
   res <- NULL
   
@@ -519,6 +519,21 @@ getNproc <- local({
 })
 
 
+detectCoresHint <- function(workers) {
+  ## Could it be that 'workers' is a function of detectCores(), i.e.
+  ## detectCores(), detectCores() - 1, or detectCores() - 2?
+  delta <- (parallel::detectCores() - workers)
+  if (delta %in% 0:2) {
+    hint <- sprintf("By the way, was parallel::detectCores() used, because the number of workers (%d) equals detectCores()", workers)
+    if (delta > 0) hint <- sprintf("%s - %d", hint, delta)
+    hint <- sprintf("%s? If so, please use parallelly::availableCores() instead", hint)
+  } else {
+    hint <- NULL
+  }
+  hint
+} # detectCoresHint()
+
+
 checkNumberOfLocalWorkers <- function(workers) {
   if (inherits(workers, "AsIs")) return()
   
@@ -548,6 +563,10 @@ checkNumberOfLocalWorkers <- function(workers) {
       msg <- sprintf("%s. The hard limit is set to %.0f%%", msg, 100 * limits[2])
       msg <- sprintf("%s. Overusing the CPUs has negative impact on the current R process, but also on all other processes of yours and others running on the same machine", msg)
       msg <- sprintf("%s. See help(\"parallelly.maxWorkers.localhost\", package = \"parallelly\") for further explanations and how to override the hard limit that triggered this error", msg)
+
+      hint <- detectCoresHint(workers)
+      if (!is.null(hint)) msg <- sprintf("%s. %s", msg, hint)
+      
       stop(msg)
     }
   }
@@ -558,6 +577,10 @@ checkNumberOfLocalWorkers <- function(workers) {
     msg <- sprintf("%s. The soft limit is set to %.0f%%", msg, 100 * limits[1])
     msg <- sprintf("%s. Overusing the CPUs has negative impact on the current R process, but also on all other processes of yours and others running on the same machine", msg)
     msg <- sprintf("%s. See help(\"parallelly.maxWorkers.localhost\", package = \"parallelly\") for further explanations and how to override the soft limit that triggered this warning", msg)
+
+    hint <- detectCoresHint(workers)
+    if (!is.null(hint)) msg <- sprintf("%s. %s", msg, hint)
+      
     warning(msg)
   }
 } ## checkNumberOfLocalWorkers()
@@ -702,3 +725,6 @@ availableCoresSlurm <- local({
     n
   }
 }) ## availableCoresSlurm()
+
+
+cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_character("default"), cli_arg_character("which"), cli_arg_integer("omit"), cli_arg_numeric("max"))

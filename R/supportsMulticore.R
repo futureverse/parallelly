@@ -80,7 +80,7 @@ supportsMulticoreAndRStudio <- local({
   alreadyWarned <- FALSE
 
   function(warn = FALSE) {
-    disableOn <- getOption2("parallelly.supportsMulticore.disableOn", c("rstudio_console", "rstudio_terminal"))
+    disableOn <- getOption2("parallelly.supportsMulticore.disableOn", "rstudio_console")
 
     disable <- FALSE
     
@@ -91,7 +91,7 @@ supportsMulticoreAndRStudio <- local({
     if (is_rstudio) {
       if (nzchar(Sys.getenv("RSTUDIO_TERM", ""))) {
         ## Running R via the RStudio Terminal
-        disable <- ("rstudio_term" %in% disableOn)
+        disable <- ("rstudio_terminal" %in% disableOn)
       } else {
         ## Running R via the RStudio Console
         disable <- ("rstudio_console" %in% disableOn)

@@ -20,7 +20,7 @@ This function is only defined for R (>= 4.4.0).
 }
 
 \examples{
-\dontshow{if ((getRversion() >= "4.4.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if ((getRversion() >= "4.4.0")) withAutoprint(\{ # examplesIf}
 library(parallel)
 
 cl <- makeClusterSequential()

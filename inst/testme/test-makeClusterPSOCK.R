@@ -5,6 +5,8 @@ is_ip_number <- parallelly:::is_ip_number
 is_localhost <- parallelly:::is_localhost
 find_rshcmd <- parallelly:::find_rshcmd
 
+useXDR <- isTRUE(parallelly:::getOption2("parallelly.makeNodePSOCK.useXDR"))
+
 message("*** makeClusterPSOCK() ...")
 
 message("- makeClusterPSOCK() - internal utility functions")
