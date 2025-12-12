@@ -39,9 +39,8 @@ message("- supportsMulticoreAndRStudio() ...")
 ## When not in RStudio
 res <- supportsMulticoreAndRStudio()
 print(res)
-stopifnot(
-  if (.Platform[["OS.type"]] == "windows") isFALSE(res) else isTRUE(res)
-)
+stopifnot(isTRUE(res))
+
 
 ## When in RStudio Console (not supported)
 Sys.setenv(RSTUDIO = "1")
