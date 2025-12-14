@@ -1,6 +1,5 @@
 library(parallelly)
 library(parallel)
-options(parallelly.debug = FALSE)
 
 message("*** isForkedChild() ...")
 

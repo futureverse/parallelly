@@ -136,12 +136,11 @@ if (.Platform[["OS.type"]] != "windows") {
   options$rscript_sh <- c("sh", "sh")
   attr(node, "options") <- options
   ## Enable debug mode to cover debug lines
-  old_debug <- getOption("parallelly.debug")
-  options(parallelly.debug = TRUE)
+  opts <- options(parallelly.debug = TRUE)
   res <- tryCatch({
     suppressWarnings(isNodeAlive(node, timeout = 1.0))
   }, warning = function(w) NA, error = function(e) NA)
-  options(parallelly.debug = old_debug)
+  options(opts)
   print(res)
   stopifnot(is.na(res))
   parallel::stopCluster(cl)
