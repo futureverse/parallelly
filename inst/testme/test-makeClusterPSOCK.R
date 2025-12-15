@@ -1,5 +1,7 @@
 library(parallelly)
 
+options(parallelly.debug = TRUE)
+
 is_fqdn <- parallelly:::is_fqdn
 is_ip_number <- parallelly:::is_ip_number
 is_localhost <- parallelly:::is_localhost
@@ -282,12 +284,22 @@ print(res)
 stopifnot(inherits(res, "error"))
 
 ## Broken connection
-cl <- makeClusterPSOCK(2L)
+cl <- makeClusterPSOCK(2L, user = "*")
 node <- cl[[1]]
 close(node[["con"]])
 out <- utils::capture.output(print(cl))
 parallel::stopCluster(cl[2])
 stopifnot(any(grepl("broken connection", out)))
+
+## More workers than connections available
+ncons <- freeConnections()
+if (ncons < 200) local({
+  opts <- options(parallelly.maxWorkers.localhost = c(Inf, Inf))
+  res <- tryCatch(cl <- makeClusterPSOCK(ncons + 1L), error = identity)
+  print(res)
+  stopifnot(inherits(res, "error"))
+  options(opts)
+})
 
 ## Don't test on CRAN
 if (fullTest || covr_testing) {
