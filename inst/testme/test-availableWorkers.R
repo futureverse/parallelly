@@ -21,6 +21,20 @@ w <- availableWorkers(methods = "system")
 print(w)
 stopifnot(is.character(w), length(w) >= 1)
 
+## Contrain by number of available connections
+opts <- options(mc.cores = availableConnections())
+w <- availableWorkers(constraints = "connections", method = "mc.cores")
+print(w)
+stopifnot(is.character(w), length(w) >= 1)
+w0 <- w
+w <- availableWorkers(constraints = "connections-1", method = "mc.cores")
+print(w)
+stopifnot(is.character(w), length(w) >= 1, length(w) == length(w0) - 1L)
+w <- availableWorkers(constraints = "connections-2", method = "mc.cores")
+print(w)
+stopifnot(is.character(w), length(w) >= 1, length(w) == length(w0) - 2L)
+options(opts)
+
 ## Predefined ones for known cluster schedulers
 print(availableWorkers(methods = "PBS"))
 print(availableWorkers(methods = "SGE"))

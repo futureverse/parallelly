@@ -6,7 +6,6 @@ mdebug <- parallelly:::mdebug
 mdebugf <- parallelly:::mdebugf
 pid_exists <- parallelly:::pid_exists
 isFALSE <- parallelly:::isFALSE
-isNA <- parallelly:::isNA
 
 stopf <- parallelly:::stopf
 warnf <- parallelly:::warnf
@@ -15,3 +14,4 @@ stealth_sample <- parallelly:::stealth_sample
 supportsMulticoreAndRStudio <- parallelly:::supportsMulticoreAndRStudio
 registerClusterTypes <- parallelly:::registerClusterTypes
 isForkedNode <- parallelly:::isForkedNode
+update_package_options <- parallelly:::update_package_options

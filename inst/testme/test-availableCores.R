@@ -11,6 +11,13 @@ stopifnot(length(n) == 1, is.numeric(n))
 n <- availableCores()
 message(sprintf("availableCores() = %d", n))
 stopifnot(length(n) == 1, is.integer(n), n >= 1)
+n0 <- n
+
+n <- availableCores(omit = 1L)
+stopifnot(length(n) == 1, is.integer(n), n >= 1, n == max(1L, n0 - 1L))
+
+n <- availableCores(max = 1L)
+stopifnot(length(n) == 1, is.integer(n), n == 1L)
 
 ## Minimium of all known settings (default)
 print(availableCores(which = "min"))
@@ -26,6 +33,44 @@ stopifnot(length(ns) >= 1, is.integer(ns), all(is.na(ns) | ns >= 0L))
 n <- availableCores(methods = "system")
 print(n)
 stopifnot(length(n) == 1, is.integer(n), n >= 1)
+
+## Contrain by number of available connections
+opts <- options(mc.cores = availableConnections())
+n <- availableCores(constraints = "connections", method = "mc.cores")
+print(n)
+stopifnot(length(n) == 1, is.integer(n), n >= 1)
+n0 <- n
+n <- availableCores(constraints = "connections-1", method = "mc.cores")
+print(n)
+stopifnot(length(n) == 1, is.integer(n), n >= 1, n == n0 - 1L)
+n <- availableCores(constraints = "connections-2", method = "mc.cores")
+print(n)
+stopifnot(length(n) == 1, is.integer(n), n >= 1, n == n0 - 2L)
+n <- availableCores(method = "connections")
+print(n)
+stopifnot(length(n) == 1, is.integer(n), n >= 1, n == n0)
+n <- availableCores(method = "connections-1")
+print(n)
+stopifnot(length(n) == 1, is.integer(n), n >= 1, n == n0 - 1L)
+n <- availableCores(method = "connections-2")
+print(n)
+stopifnot(length(n) == 1, is.integer(n), n >= 1, n == n0 - 2L)
+options(opts)
+
+## Contrain by support for multicore
+n <- availableCores(constraints = "multicore")
+print(n)
+stopifnot(length(n) == 1, is.integer(n), n >= 1)
+
+## Special case: mc.cores = 0L
+opts <- options(mc.cores = 0L)
+n <- availableCores(method = "mc.cores")
+print(n)
+stopifnot(length(n) == 1, is.integer(n), n == 1L)
+n <- availableCores(method = "mc.cores+1")
+print(n)
+stopifnot(length(n) == 1, is.integer(n), n == 1L)
+options(opts)
 
 ## Predefined ones for known cluster schedulers
 print(availableCores(methods = "PBS"))

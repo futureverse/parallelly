@@ -104,6 +104,31 @@ for (value in list(NULL, "options(abc = 42L)", quote(options(abc = 42L)))) {
 }
 
 
+message("- makeClusterPSOCK() - argument 'user'")
+
+## Test user = "*" (wildcard for system default username) with localhost
+## The "*" wildcard means "use system default", which should work for localhost
+cl <- makeClusterPSOCK(1L, user = "*")
+print(cl)
+y <- parallel::clusterEvalQ(cl, Sys.info()[["user"]])[[1]]
+stopifnot(is.character(y), length(y) == 1L)
+parallel::stopCluster(cl)
+
+## Test user = "*" with multiple workers (single user for all)
+cl <- makeClusterPSOCK(2L, user = "*")
+print(cl)
+y <- parallel::clusterEvalQ(cl, Sys.info()[["user"]])
+stopifnot(length(y) == 2L)
+parallel::stopCluster(cl)
+
+## Test user = "*" per worker (vector form with 2 workers)
+cl <- makeClusterPSOCK(2L, user = c("*", "*"))
+print(cl)
+y <- parallel::clusterEvalQ(cl, Sys.info()[["user"]])
+stopifnot(length(y) == 2L)
+parallel::stopCluster(cl)
+
+
 message("- makeClusterPSOCK() - setup_strategy = TRUE/FALSE")
 
 for (setup_strategy in c("sequential", "parallel")) {

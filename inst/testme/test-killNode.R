@@ -105,4 +105,13 @@ if (on_windows) {
 
 cl <- NULL
 
+message("- Exceptions")
+res <- killNode(NULL)
+print(res)
+stopifnot(is.logical(res), length(res) == 1L, is.na(res))
+
+res <- tryCatch(killNode(NULL), warning = identity)
+print(res)
+stopifnot(inherits(res, "warning"))
+
 message("*** killNode() and isNodeAlive() ... done")
