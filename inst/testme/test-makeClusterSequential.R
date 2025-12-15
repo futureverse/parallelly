@@ -51,6 +51,10 @@ if (getRversion() < "4.4.0") {
   y <- clusterEvalQ(cl, { abc <- 42; abc })
   stopifnot(identical(y, list(42)), abc == 3.14)
 
+  ## Test with run-time errors
+  y <- tryCatch(parLapply(cl, X = 1, fun = stop), error = identity)
+  stopifnot(inherits(y, "error"))
+
   ## Test stopping the cluster
   stopCluster(cl)
 

@@ -16,9 +16,11 @@ cl <- makeClusterPSOCK(1L)
 node <- cl[[1]]
 
 ## method = "as-is"
+opts <- options(parallelly.debug = TRUE)
 node_asis <- cloneNode(node, method = "as-is")
 print(node_asis)
 stopifnot(inherits(node_asis, "RichSOCKnode"))
+options(opts)
 
 ## method = "vanilla"
 node_vanilla <- cloneNode(node, method = "vanilla", setup_strategy = "sequential")

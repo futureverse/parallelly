@@ -24,6 +24,8 @@ f <- tempfile()
 con <- file(f, open = "w")
 sink(con, type = "message")
 cl <- makeClusterPSOCK(1L)
+
+opts <- options(parallelly.debug = TRUE)
 cl <- autoStopCluster(cl, debug = TRUE)
 rm(list = "cl")
 gc()
@@ -31,8 +33,9 @@ sink(type = "message")
 close(con)
 output <- readLines(f, warn = FALSE)
 unlink(f)
-
 print(output)
+options(opts)
+
 stopifnot(any(grepl("Finalizing cluster", output)))
 
 

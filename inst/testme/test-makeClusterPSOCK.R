@@ -51,10 +51,20 @@ print(cl)
 cl <- makeClusterPSOCK(1L)
 print(cl)
 node <- cl[[1]]
+print(node)
 utils::str(node)
 stopifnot(isTRUE(attr(node[["host"]], "localhost")))
+print(cl)
 parallel::stopCluster(cl)
 
+cl <- makeClusterPSOCK(2L, autoStop = TRUE)
+print(cl)
+## Mockup different hostnames for print()
+node <- cl[[1]]
+node[["host"]] <- "localhost2"
+cl[[1]] <- node
+print(cl)
+parallel::stopCluster(cl)
 
 message("- makeClusterPSOCK() - useXDR = TRUE/FALSE")
 
@@ -270,6 +280,14 @@ res <- tryCatch({
 }, error = identity)
 print(res)
 stopifnot(inherits(res, "error"))
+
+## Broken connection
+cl <- makeClusterPSOCK(2L)
+node <- cl[[1]]
+close(node[["con"]])
+out <- utils::capture.output(print(cl))
+parallel::stopCluster(cl[2])
+stopifnot(any(grepl("broken connection", out)))
 
 ## Don't test on CRAN
 if (fullTest || covr_testing) {
