@@ -1,6 +1,9 @@
 # Version (development version)
 
- * ...
+## Bug Fixes
+
+ * Argument `user` of `makeClusterPSOCK()` did not recycle across
+   workers when `length(user) == 1`.
 
 
 # Version 1.46.0 [2025-12-11]
@@ -25,7 +28,7 @@
    documentation has now been updated to reflect that it is only
    disabled in the RStudio Console.
 
-## BUG FIX:
+## Bug Fixes
 
  * Setting option `parallelly.supportsMulticore.disableOn` to hold
    `"rstudio_terminal"` had no effect.
