@@ -15,7 +15,7 @@ number of cores available is always at least one."><meta property="og:image" con
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.0-9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -276,7 +276,9 @@ variable is queried.  If neither is set, a missing value is returned.</p>
 
 <p>Note that some machines might have a limited number of cores, or the R
 process runs in a container or a cgroup that only provides a small number
-of cores.  In such cases:</p>
+of cores. A real-world example is when you run R in webR – webR is
+single-core by design. Another example are free Posit Cloud accounts,
+which are limited to a single core. In such cases</p>
 <p></p><div class="sourceCode r"><pre><code><span><span class="va">ncores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/availableCores.html">availableCores</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span></code></pre><p></p></div>
 <p>may return zero, which is often not intended and is likely to give an
 error downstream.  Instead, use:</p>
