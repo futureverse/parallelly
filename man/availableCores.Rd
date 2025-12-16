@@ -193,7 +193,9 @@ variable is queried.  If neither is set, a missing value is returned.
 
 Note that some machines might have a limited number of cores, or the R
 process runs in a container or a cgroup that only provides a small number
-of cores.  In such cases:
+of cores. A real-world example is when you run R in webR -- webR is
+single-core by design. Another example are free Posit Cloud accounts,
+which are limited to a single core. In such cases
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{ncores <- availableCores() - 1
 }\if{html}{\out{</div>}}
