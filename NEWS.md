@@ -2,6 +2,10 @@
 
 ## Bug Fixes
 
+ * `parallel::clusterExport()` on a `makeClusterSequential()` cluster
+   would export to the global environment rather than the local
+   environment of the cluster nodes.
+   
  * Argument `user` of `makeClusterPSOCK()` did not recycle across
    workers when `length(user) == 1`.
 

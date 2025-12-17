@@ -38,5 +38,11 @@ abc <- 3.14
 y <- clusterEvalQ(cl, { abc <- 42; abc })
 str(y)
 stopifnot(abc == 3.14)
+
+clusterExport(cl, "abc", envir = environment())
+rm(abc)
+y <- clusterEvalQ(cl, { abc })
+str(y)
+stopifnot(y[[1]] == 3.14)
 \dontshow{\}) # examplesIf}
 }
