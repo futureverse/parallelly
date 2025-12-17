@@ -35,11 +35,11 @@ str(y)
 
 pid <- Sys.getpid()
 print(pid)
-#> [1] 633757
+#> [1] 1080469
 y <- clusterEvalQ(cl, Sys.getpid())
 str(y)
 #> List of 1
-#>  $ : int 633757
+#>  $ : int 1080469
 
 abc <- 3.14
 y <- clusterEvalQ(cl, { abc <- 42; abc })
@@ -47,4 +47,12 @@ str(y)
 #> List of 1
 #>  $ : num 42
 stopifnot(abc == 3.14)
+
+clusterExport(cl, "abc", envir = environment())
+rm(abc)
+y <- clusterEvalQ(cl, { abc })
+str(y)
+#> List of 1
+#>  $ : num 3.14
+stopifnot(y[[1]] == 3.14)
 ```

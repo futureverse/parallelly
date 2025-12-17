@@ -4,6 +4,12 @@
 
 ### Bug Fixes
 
+- [`parallel::clusterExport()`](https://rdrr.io/r/parallel/clusterApply.html)
+  on a
+  [`makeClusterSequential()`](https://parallelly.futureverse.org/reference/makeClusterSequential.md)
+  cluster would export to the global environment rather than the local
+  environment of the cluster nodes.
+
 - Argument `user` of
   [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
   did not recycle across workers when `length(user) == 1`.
