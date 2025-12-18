@@ -34,6 +34,11 @@
 #' @section Requirements:
 #' This function is only defined for R (>= 4.4.0).
 #'
+#' @section Works in webR:
+#' Contrary to other cluster types, a `makeClusterSequential()` cluster
+#' works in webR, meaning you can use it for code that rely on the
+#' **parallel** package, e.g. `y <- parLapply(cl, ...)`.
+#'
 #' @rawNamespace if (getRversion() >= "4.4") export(makeClusterSequential)
 #' @aliases SEQ
 makeClusterSequential <- function() {
