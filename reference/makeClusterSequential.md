@@ -17,6 +17,12 @@ inheriting the global environment.
 
 This function is only defined for R (\>= 4.4.0).
 
+## Works in webR
+
+Contrary to other cluster types, a `makeClusterSequential()` cluster
+works in webR, meaning you can use it for code that rely on the
+**parallel** package, e.g. `y <- parLapply(cl, ...)`.
+
 ## Examples
 
 ``` r
@@ -35,11 +41,11 @@ str(y)
 
 pid <- Sys.getpid()
 print(pid)
-#> [1] 1100874
+#> [1] 1111460
 y <- clusterEvalQ(cl, Sys.getpid())
 str(y)
 #> List of 1
-#>  $ : int 1100874
+#>  $ : int 1111460
 
 abc <- 3.14
 y <- clusterEvalQ(cl, { abc <- 42; abc })
