@@ -118,7 +118,7 @@ inRCmdVignette <- function() {
   args <- commandArgs()
   if (length(args) != 6) return(FALSE)
   truth <- c(r_cmd, "--no-echo", "--no-restore", "--vanilla", "-e", "tools::buildVignettes(dir~+~=~+~'.',~+~tangle~+~=~+~TRUE)")
-  any(args == truth)
+  all(args == truth)
 }
 
 commaq <- function(x, sep = ", ") paste(sQuote(x), collapse = sep)
