@@ -4,6 +4,12 @@
 
 ### Bug Fixes
 
+- Loading the package in the Positron Console would incorrectly set
+  environment variable `_R_CHECK_LIMIT_CORES_` to TRUE, which in turn
+  would result in
+  [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+  being limited to a maximum of two (2) CPU cores.
+
 - [`parallel::clusterExport()`](https://rdrr.io/r/parallel/clusterApply.html)
   on a
   [`makeClusterSequential()`](https://parallelly.futureverse.org/reference/makeClusterSequential.md)

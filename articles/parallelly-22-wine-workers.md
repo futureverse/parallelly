@@ -42,7 +42,6 @@ This example shows how to launch one worker running in Wine for Linux on
 the local machine.
 
 ``` r
-
 cl <- makeClusterPSOCK(
   1L,
   rscript = c(

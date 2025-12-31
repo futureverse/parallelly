@@ -35,7 +35,7 @@
 
     <a class="navbar-brand me-2" href="index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.0-9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.0-9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,123 +120,123 @@
 <col width="25%">
 <col width="16%">
 </colgroup>
-<thead><tr>
+<thead><tr class="header">
 <th></th>
 <th align="center">parallelly</th>
 <th align="center">parallel</th>
 </tr></thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>remote clusters without knowing local public IP</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="even">
 <td>remote clusters without firewall configuration</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>remote username in ~/.ssh/config</td>
 <td align="center">✓</td>
 <td align="center">R (&gt;= 4.2.0)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>set workers’ library package path on startup</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>set workers’ environment variables on startup</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="even">
 <td>custom workers startup code</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>fallback to RStudio’s SSH and PuTTY’s plink</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="even">
 <td>faster, parallel setup of local workers (R &gt;= 4.0.0)</td>
 <td align="center">✓</td>
 <td align="center">✓</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>faster, little-endian protocol by default</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="even">
 <td>faster, low-latency socket connections by default</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>validation of cluster at setup</td>
 <td align="center">✓</td>
 <td align="center">✓</td>
 </tr>
-<tr>
+<tr class="even">
 <td>attempt to launch failed workers multiple times</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>collect worker details at cluster setup</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="even">
 <td>termination of workers if cluster setup fails</td>
 <td align="center">✓</td>
 <td align="center">R (&gt;= 4.0.0)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>shutdown of cluster by garbage collector</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="even">
 <td>combining multiple, existing clusters</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>more informative printing of cluster objects</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="even">
 <td>check if local and remote workers are alive</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>restart local and remote workers</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="even">
 <td>defaults via options &amp; environment variables</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>respecting CPU resources allocated by cgroups, Linux containers, and HPC schedulers</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="even">
 <td>early error if requesting more workers than possible</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>informative error messages</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
@@ -272,43 +272,43 @@
 <col width="19%">
 <col width="34%">
 </colgroup>
-<thead><tr>
+<thead><tr class="header">
 <th></th>
 <th align="center">availableCores()</th>
 <th align="center">parallel::detectCores()</th>
 </tr></thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>Guaranteed to return a positive integer</td>
 <td align="center">✓</td>
 <td align="center">no (may return <code>NA_integer_</code>)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Safely use all but some cores</td>
 <td align="center">✓</td>
 <td align="center">no (may return zero or less)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Can be overridden, e.g. by a sysadm</td>
 <td align="center">✓</td>
 <td align="center">no</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Respects cgroups and Linux containers</td>
 <td align="center">✓</td>
 <td align="center">no</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Respects job scheduler allocations</td>
 <td align="center">✓</td>
 <td align="center">no</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Respects CRAN policies</td>
 <td align="center">✓</td>
 <td align="center">no</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Respects Bioconductor policies</td>
 <td align="center">✓</td>
 <td align="center">no</td>

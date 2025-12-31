@@ -13,7 +13,6 @@ This example sets up two parallel workers on Linux sandboxed using
 [Bubblewrap](https://github.com/containers/bubblewrap).
 
 ``` r
-
 library(parallelly)
 
 bwrap_sandbox <- function(rscript = "*") {

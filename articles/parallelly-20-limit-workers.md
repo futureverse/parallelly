@@ -19,13 +19,11 @@ this, we can prepend `nice` to the `Rscript` call via the `rscript`
 argument using. This works both on local and remote Linux machines, e.g.
 
 ``` r
-
 library(parallelly)
 cl <- makeClusterPSOCK(2, rscript = c("nice", "*"))
 ```
 
 ``` r
-
 library(parallelly)
 workers <- rep("n1.remote.org", 2)
 cl <- makeClusterPSOCK(2, rscript = c("nice", "*"))
@@ -44,7 +42,6 @@ unintended nested parallelization. For more details, see
 `man systemd.resource-control`.
 
 ``` r
-
 library(parallelly)
 cl <- makeClusterPSOCK(
   2L,
@@ -69,7 +66,6 @@ mean, the memory consumption is within 50-MiB memory limit that each
 parallel worker has available;
 
 ``` r
-
 library(parallel)
 mu <- clusterEvalQ(cl, { x <- rnorm(n = 1e6); mean(x) })
 mu <- unlist(mu)
@@ -82,7 +78,6 @@ will grow to at least 80 MB, which is over then 50-MiB memory limit, and
 we will get an error:
 
 ``` r
-
 mu <- clusterEvalQ(cl, { x <- rnorm(n = 10e6); mean(x) })
 #> Error in unserialize(node$con) : error reading from connection
 ```
@@ -93,7 +88,6 @@ process no longer can communicate with the parallel workers. We can see
 that both workers are down, by calling:
 
 ``` r
-
 isNodeAlive(cl)
 #> [1] FALSE FALSE
 ```
@@ -103,7 +97,6 @@ We can use
 to relaunch workers that are no longer alive, e.g.
 
 ``` r
-
 is_down <- !isNodeAlive(cl)
 cl[is_down] <- cloneNode(cl[is_down])
 isNodeAlive(cl)
@@ -117,7 +110,6 @@ workers, where two are running on CPU Group \#0 and two on CPU Group
 \#1.
 
 ``` r
-
 library(parallelly)
 rscript <- I(c(
   Sys.getenv("COMSPEC"), "/c", 

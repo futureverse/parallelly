@@ -15,7 +15,6 @@ This example sets up two parallel workers running Docker image
 ‘rocker/r-parallel’ (<https://hub.docker.com/r/rocker/r-parallel>).
 
 ``` r
-
 library(parallelly)
 cl <- makeClusterPSOCK(
   rep("localhost", times = 2L),
@@ -43,7 +42,6 @@ image ‘rocker/r-parallel’ (<https://hub.docker.com/r/rocker/r-parallel>)
 via Apptainer (\<<https://apptainer.org/>).
 
 ``` r
-
 library(parallelly)
 cl <- makeClusterPSOCK(
   rep("localhost", times = 2L),
@@ -65,7 +63,6 @@ image ‘rocker/r-parallel’ (<https://hub.docker.com/r/rocker/r-parallel>)
 via udocker (<https://indigo-dc.github.io/udocker/>).
 
 ``` r
-
 library(parallelly)
 cl <- makeClusterPSOCK(
   rep("localhost", times = 2L),

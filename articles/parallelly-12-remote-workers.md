@@ -287,7 +287,6 @@ remote machines is specified by repeating the machine name an equal
 number of times;
 
 ``` r
-
 library(parallelly)
 workers <- c("n1.remote.org", "n1.remote.org")
 cl <- makeClusterPSOCK(workers, user = "alice")
@@ -332,7 +331,6 @@ previous example, but now the two SSH connections go to two different
 machines rather than the same.
 
 ``` r
-
 library(parallelly)
 workers <- c("n1.remote.org", "n2.remote.org")
 cl <- makeClusterPSOCK(workers, user = "alice")
@@ -354,7 +352,6 @@ Recall, if we have configured SSH to pick up the username `alice` from
 we could have skipped the `user` argument, and just used:
 
 ``` r
-
 workers <- c("n1.remote.org", "n2.remote.org")
 cl <- makeClusterPSOCK(workers)
 ```
@@ -374,7 +371,6 @@ specified, because it has already been configured via the
 `n1.remote.org` and one on `n2.remote.org`, by:
 
 ``` r
-
 library(parallelly)
 workers <- c("n1.remote.org", "n1.remote.org", "n2.remote.org")
 cl <- makeClusterPSOCK(workers)
@@ -392,7 +388,6 @@ To generalize to many workers, we can use the
 [`rep()`](https://rdrr.io/r/base/rep.html) function. For example,
 
 ``` r
-
 workers <- c(rep("n1.remote.org", 3), rep("n2.remote.org", 4))
 ```
 
@@ -435,7 +430,6 @@ At this point, we have two independent clusters of parallel workers:
 using:
 
 ``` r
-
 cl <- c(cl_local, cl_remote)
 print(cl)
 #> Socket cluster with 8 nodes where 4 nodes are on host 'localhost'
@@ -483,7 +477,6 @@ to achieve the same when setting up parallel workers. To launch three
 parallel workers on `secret1.remote.org`, use:
 
 ``` r
-
 workers <- rep("secret1.remote.org", 3)
 cl <- makeClusterPSOCK(
   workers,
@@ -523,7 +516,6 @@ and then:
 If the above work, then the following will work from within R:
 
 ``` r
-
 library(parallelly)
 workers <- rep("secret1.remote.org", 3)
 cl <- makeClusterPSOCK(workers)
@@ -543,7 +535,6 @@ remote machines, we can pass option `--no-init-file` to `Rscript` via
 argument `rscript_args`. For example,
 
 ``` r
-
 workers <- rep("n1.remote.org", 2)
 cl <- makeClusterPSOCK(workers, rscript_args = "--no-init-file")
 ```
@@ -564,7 +555,6 @@ running under user `alice` connecting via SSH port 2201 using PuTTY and
 public-private SSH keys in file `C:/Users/ally/.ssh/putty.ppk`:
 
 ``` r
-
 workers <- "n1.remote.org"
 cl <- makeClusterPSOCK(
   workers, 
@@ -591,7 +581,6 @@ as before, except that we need to specify also argument
 `rscript_sh = "cmd"`;
 
 ``` r
-
 workers <- c("mswin1.remote.org", "mswin2.remote.org")
 cl <- makeClusterPSOCK(workers, rscript_sh = "cmd")
 ```

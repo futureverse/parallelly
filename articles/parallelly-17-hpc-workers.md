@@ -39,7 +39,6 @@ Rscript script.R
 script.R:
 
 ``` r
-
 library(parallelly)
 library(parallel)
 
@@ -110,7 +109,6 @@ Rscript script.R
 script.R:
 
 ``` r
-
 library(parallelly)
 library(parallel)
 

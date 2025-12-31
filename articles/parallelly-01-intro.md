@@ -23,31 +23,31 @@ Team to adopt all or parts of its code into the **parallel** package.
 
 ## Feature Comparison ‘parallelly’ vs ‘parallel’
 
-|  | parallelly | parallel |
-|----|:--:|:--:|
-| remote clusters without knowing local public IP | ✓ | N/A |
-| remote clusters without firewall configuration | ✓ | N/A |
-| remote username in ~/.ssh/config | ✓ | R (\>= 4.2.0) |
-| set workers’ library package path on startup | ✓ | N/A |
-| set workers’ environment variables on startup | ✓ | N/A |
-| custom workers startup code | ✓ | N/A |
-| fallback to RStudio’s SSH and PuTTY’s plink | ✓ | N/A |
-| faster, parallel setup of local workers (R \>= 4.0.0) | ✓ | ✓ |
-| faster, little-endian protocol by default | ✓ | N/A |
-| faster, low-latency socket connections by default | ✓ | N/A |
-| validation of cluster at setup | ✓ | ✓ |
-| attempt to launch failed workers multiple times | ✓ | N/A |
-| collect worker details at cluster setup | ✓ | N/A |
-| termination of workers if cluster setup fails | ✓ | R (\>= 4.0.0) |
-| shutdown of cluster by garbage collector | ✓ | N/A |
-| combining multiple, existing clusters | ✓ | N/A |
-| more informative printing of cluster objects | ✓ | N/A |
-| check if local and remote workers are alive | ✓ | N/A |
-| restart local and remote workers | ✓ | N/A |
-| defaults via options & environment variables | ✓ | N/A |
-| respecting CPU resources allocated by cgroups, Linux containers, and HPC schedulers | ✓ | N/A |
-| early error if requesting more workers than possible | ✓ | N/A |
-| informative error messages | ✓ | N/A |
+|                                                                                     | parallelly |   parallel    |
+|-------------------------------------------------------------------------------------|:----------:|:-------------:|
+| remote clusters without knowing local public IP                                     |     ✓      |      N/A      |
+| remote clusters without firewall configuration                                      |     ✓      |      N/A      |
+| remote username in ~/.ssh/config                                                    |     ✓      | R (\>= 4.2.0) |
+| set workers’ library package path on startup                                        |     ✓      |      N/A      |
+| set workers’ environment variables on startup                                       |     ✓      |      N/A      |
+| custom workers startup code                                                         |     ✓      |      N/A      |
+| fallback to RStudio’s SSH and PuTTY’s plink                                         |     ✓      |      N/A      |
+| faster, parallel setup of local workers (R \>= 4.0.0)                               |     ✓      |       ✓       |
+| faster, little-endian protocol by default                                           |     ✓      |      N/A      |
+| faster, low-latency socket connections by default                                   |     ✓      |      N/A      |
+| validation of cluster at setup                                                      |     ✓      |       ✓       |
+| attempt to launch failed workers multiple times                                     |     ✓      |      N/A      |
+| collect worker details at cluster setup                                             |     ✓      |      N/A      |
+| termination of workers if cluster setup fails                                       |     ✓      | R (\>= 4.0.0) |
+| shutdown of cluster by garbage collector                                            |     ✓      |      N/A      |
+| combining multiple, existing clusters                                               |     ✓      |      N/A      |
+| more informative printing of cluster objects                                        |     ✓      |      N/A      |
+| check if local and remote workers are alive                                         |     ✓      |      N/A      |
+| restart local and remote workers                                                    |     ✓      |      N/A      |
+| defaults via options & environment variables                                        |     ✓      |      N/A      |
+| respecting CPU resources allocated by cgroups, Linux containers, and HPC schedulers |     ✓      |      N/A      |
+| early error if requesting more workers than possible                                |     ✓      |      N/A      |
+| informative error messages                                                          |     ✓      |      N/A      |
 
 ## Compatibility with the parallel package
 
@@ -67,7 +67,6 @@ Most of **parallelly** functions apply also to clusters created by the
 **parallel** package. For example,
 
 ``` r
-
 cl <- parallel::makeCluster(2)
 cl <- parallelly::autoStopCluster(cl)
 ```
@@ -78,7 +77,6 @@ risk for leaving stray R worker processes running in the background by
 mistake. Another way to achieve the above in a single call is to use:
 
 ``` r
-
 cl <- parallelly::makeClusterPSOCK(2, autoStop = TRUE)
 ```
 
@@ -188,15 +186,15 @@ and if that returns `NA_integer_` then one (1) is returned.
 
 The below table summarize the benefits:
 
-|  | availableCores() | parallel::detectCores() |
-|----|:--:|:--:|
-| Guaranteed to return a positive integer | ✓ | no (may return `NA_integer_`) |
-| Safely use all but some cores | ✓ | no (may return zero or less) |
-| Can be overridden, e.g. by a sysadm | ✓ | no |
-| Respects cgroups and Linux containers | ✓ | no |
-| Respects job scheduler allocations | ✓ | no |
-| Respects CRAN policies | ✓ | no |
-| Respects Bioconductor policies | ✓ | no |
+|                                         | availableCores() |    parallel::detectCores()    |
+|-----------------------------------------|:----------------:|:-----------------------------:|
+| Guaranteed to return a positive integer |        ✓         | no (may return `NA_integer_`) |
+| Safely use all but some cores           |        ✓         | no (may return zero or less)  |
+| Can be overridden, e.g. by a sysadm     |        ✓         |              no               |
+| Respects cgroups and Linux containers   |        ✓         |              no               |
+| Respects job scheduler allocations      |        ✓         |              no               |
+| Respects CRAN policies                  |        ✓         |              no               |
+| Respects Bioconductor policies          |        ✓         |              no               |
 
 ## Backward compatibility with the future package
 
@@ -211,36 +209,37 @@ also be set with `future.*` and `R_FUTURE_*` prefixes.
 
 ## Roadmap
 
-Submit **parallelly** to CRAN, with minimal changes compared to the
-corresponding functions in the **future** package (on CRAN as of
-2020-10-20)
+- Submit **parallelly** to CRAN, with minimal changes compared to the
+  corresponding functions in the **future** package (on CRAN as of
+  2020-10-20)
 
-Update the **future** package to import and re-export the functions from
-the **parallelly** to maximize backward compatibility in the future
-framework (**future** 1.20.1 on CRAN as of 2020-11-03)
+- Update the **future** package to import and re-export the functions
+  from the **parallelly** to maximize backward compatibility in the
+  future framework (**future** 1.20.1 on CRAN as of 2020-11-03)
 
-Switch to use 10-15% faster `useXDR=FALSE`
+- Switch to use 10-15% faster `useXDR=FALSE`
 
-Implement same fast parallel setup of parallel PSOCK workers as in
-**parallel** (\>= 4.0.0)
+- Implement same fast parallel setup of parallel PSOCK workers as in
+  **parallel** (\>= 4.0.0)
 
-After having validated that there is no negative impact on the future
-framework, allow for changes in the **parallelly** package,
-e.g. renaming the R options and environment variable to be
-`parallelly.*` and `R_PARALLELLY_*` while falling back to `future.*` and
-`R_FUTURE_*`
+- After having validated that there is no negative impact on the future
+  framework, allow for changes in the **parallelly** package,
+  e.g. renaming the R options and environment variable to be
+  `parallelly.*` and `R_PARALLELLY_*` while falling back to `future.*`
+  and `R_FUTURE_*`
 
-Add vignettes on how to set up cluster running on local or remote
-machines, including in Linux containers and on popular cloud services,
-and vignettes on common problems and how to troubleshoot them
+- Add vignettes on how to set up cluster running on local or remote
+  machines, including in Linux containers and on popular cloud services,
+  and vignettes on common problems and how to troubleshoot them
 
-Migrate, currently internal, UUID functions and export them,
-e.g. `uuid()`, `connectionUuid()`, and `sessionUuid()`
-(<https://github.com/HenrikBengtsson/Wishlist-for-R/issues/96>). Because
-[R does not have a built-in md5 checksum function that operates on
-object](https://github.com/HenrikBengtsson/Wishlist-for-R/issues/21),
-these functions require us adding a dependency on the
-**[digest](https://cran.r-project.org/package=digest)** package.
+- Migrate, currently internal, UUID functions and export them,
+  e.g. `uuid()`, `connectionUuid()`, and `sessionUuid()`
+  (<https://github.com/HenrikBengtsson/Wishlist-for-R/issues/96>).
+  Because [R does not have a built-in md5 checksum function that
+  operates on
+  object](https://github.com/HenrikBengtsson/Wishlist-for-R/issues/21),
+  these functions require us adding a dependency on the
+  **[digest](https://cran.r-project.org/package=digest)** package.
 
 Initially, backward compatibility for the **future** package is of top
 priority.
