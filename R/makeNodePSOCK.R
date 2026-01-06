@@ -602,7 +602,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
     if (any(is_asterisk)) {
       pkgs <- getOption("defaultPackages")
       if (length(pkgs) == 0) {
-        default_packages[!is_asterisk]
+        default_packages <- default_packages[!is_asterisk]
       } else {
         pkgs <- paste(pkgs, collapse=",")
         default_packages[is_asterisk] <- pkgs

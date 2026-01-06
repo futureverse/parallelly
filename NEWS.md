@@ -14,6 +14,9 @@
  * Argument `user` of `makeClusterPSOCK()` did not recycle across
    workers when `length(user) == 1`.
 
+ * `makeClusterPSOCK(default_packages = "*")` with an empty R option
+   `defaultPackages` gave an error.
+
 
 # Version 1.46.0 [2025-12-11]
 
