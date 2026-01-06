@@ -20,6 +20,9 @@
   [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
   did not recycle across workers when `length(user) == 1`.
 
+- `makeClusterPSOCK(default_packages = "*")` with an empty R option
+  `defaultPackages` gave an error.
+
 ## Version 1.46.0
 
 CRAN release: 2025-12-12

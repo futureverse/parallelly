@@ -151,7 +151,7 @@ To get the number of available workers on the current machine, see
 ``` r
 message(paste("Available workers:",
         paste(sQuote(availableWorkers()), collapse = ", ")))
-#> Available workers: ‘localhost’, ‘localhost’
+#> Available workers: ‘localhost’, ‘localhost’, ‘localhost’, ‘localhost’, ‘localhost’, ‘localhost’, ‘localhost’, ‘localhost’
 
 if (FALSE) { # \dontrun{
 options(mc.cores = 2L)
