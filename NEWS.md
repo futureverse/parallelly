@@ -5,7 +5,8 @@
  * Loading the package in the Positron Console would incorrectly set
    environment variable `_R_CHECK_LIMIT_CORES_` to TRUE, which in turn
    would result in `availableCores()` being limited to a maximum of
-   two (2) CPU cores.
+   two (2) CPU cores. This bug was introduced in **parallelly** 1.46.0
+   (2025-12-12).
 
  * `parallel::clusterExport()` on a `makeClusterSequential()` cluster
    would export to the global environment rather than the local
@@ -18,7 +19,7 @@
    `defaultPackages` gave an error.
 
 
-# Version 1.46.0 [2025-12-11]
+# Version 1.46.0 [2025-12-12]
 
 ## New Features
 
