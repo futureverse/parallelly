@@ -151,6 +151,47 @@ Run `revdepcheck::revdep_details(, "COTAN")` for more info
     manual.
     ```
 
+# crmPack
+
+<details>
+
+* Version: 2.0.1
+* GitHub: https://github.com/openpharma/crmPack
+* Source code: https://github.com/cran/crmPack
+* Date/Publication: 2025-12-04 14:40:20 UTC
+* Number of recursive dependencies: 120
+
+Run `revdepcheck::revdep_details(, "crmPack")` for more info
+
+</details>
+
+## In both
+
+*   checking tests ...
+    ```
+      Running ‘test-package-load.R’
+      Running ‘testthat.R’
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 50 lines of output:
+        'test-Model-class.R:1593:1', 'test-Model-class.R:1602:1',
+        'test-Model-methods.R:2493:1', 'test-Model-methods.R:2501:1',
+        'test-Model-validity.R:126:1', 'test-Model-validity.R:223:1',
+        'test-Model-validity.R:314:1', 'test-Model-validity.R:425:1',
+        'test-Model-validity.R:433:1', 'test-Model-validity.R:442:1',
+    ...
+      Expected `h_test_logging_enabled()` to be TRUE.
+      Differences:
+      `actual`:   <NA>
+      `expected`: TRUE
+      
+      
+      [ FAIL 3 | WARN 0 | SKIP 121 | PASS 3444 ]
+      Error:
+      ! Test failures.
+      Execution halted
+    ```
+
 # ctsem
 
 <details>
@@ -231,7 +272,7 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
     > ### ** Examples
     > 
     > collectri <- get_collectri(organism='human', split_complexes=FALSE)
-    [2025-12-14 13:14:00] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+    [2026-01-06 16:39:26] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
     Error in if (.keep) . else select(., -!!evs_col) : 
       argument is of length zero
     Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
@@ -270,8 +311,8 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
     --- finished re-building ‘decoupleR.Rmd’
     
     --- re-building ‘pw_bk.Rmd’ using rmarkdown
-    [2025-12-14 13:17:46] [WARN]    [OmnipathR] Accessing `PROGENy` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
-    [2025-12-14 13:17:48] [SUCCESS] [OmnipathR] Loaded 700239 annotation records from cache.
+    [2026-01-06 16:42:48] [WARN]    [OmnipathR] Accessing `PROGENy` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+    [2026-01-06 16:42:51] [SUCCESS] [OmnipathR] Loaded 700239 annotation records from cache.
     Warning: ggrepel: 445 unlabeled data points (too many overlaps). Consider increasing max.overlaps
     [WARNING] Could not fetch resource https://decoupler-py.readthedocs.io/en/1.4.0/_images/mlm.png: HttpExceptionRequest Request {
         host                 = "decoupler-py.readthedocs.io"
@@ -294,6 +335,47 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
       ‘GSVA::gsva’ ‘GeneSetCollection’
     
     See section 'Cross-references' in the 'Writing R Extensions' manual.
+    ```
+
+# fmeffects
+
+<details>
+
+* Version: 0.1.4
+* GitHub: https://github.com/holgstr/fmeffects
+* Source code: https://github.com/cran/fmeffects
+* Date/Publication: 2024-11-05 18:50:02 UTC
+* Number of recursive dependencies: 182
+
+Run `revdepcheck::revdep_details(, "fmeffects")` for more info
+
+</details>
+
+## In both
+
+*   checking re-building of vignette outputs ... ERROR
+    ```
+    Error(s) in re-building vignettes:
+    --- re-building ‘fme_theory.Rmd’ using rmarkdown
+    [WARNING] Deprecated: --highlight-style. Use --syntax-highlighting instead.
+    --- finished re-building ‘fme_theory.Rmd’
+    
+    --- re-building ‘fmeffects.Rmd’ using rmarkdown
+    
+    Quitting from fmeffects.Rmd:121-127 [unnamed-chunk-11]
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    <error/purrr_error_indexed>
+    ...
+    ℹ In index: 1.
+    Caused by error in `.__Task__col_roles()`:
+    ! Assertion on 'names(rhs)' failed: Names must be a permutation of set {'feature','target','name','order','stratum','group','offset','weights_learner','weights_measure'}, but has extra elements {'always_included'}.
+    --- failed re-building ‘fmeffects.Rmd’
+    
+    SUMMARY: processing the following file failed:
+      ‘fmeffects.Rmd’
+    
+    Error: Vignette re-building failed.
+    Execution halted
     ```
 
 # InPAS
@@ -401,72 +483,6 @@ Run `revdepcheck::revdep_details(, "mappp")` for more info
     ```
     Namespace in Imports field not imported from: ‘pbmcapply’
       All declared Imports should be used.
-    ```
-
-# modeltime
-
-<details>
-
-* Version: 1.3.2
-* GitHub: https://github.com/business-science/modeltime
-* Source code: https://github.com/cran/modeltime
-* Date/Publication: 2025-08-28 23:40:09 UTC
-* Number of recursive dependencies: 237
-
-Run `revdepcheck::revdep_details(, "modeltime")` for more info
-
-</details>
-
-## In both
-
-*   checking tests ...
-    ```
-      Running ‘testthat.R’
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 50 lines of output:
-        'test-algo-seasonal_decomp_ets.R:10:5',
-        'test-algo-seasonal_reg_tbats.R:20:5', 'test-algo-seasonal_reg_tbats.R:35:5',
-        'test-algo-seasonal_reg_tbats.R:93:5', 'test-algo-temporal_hierarchy.R:8:5',
-        'test-algo-window_reg.R:24:5', 'test-algo-window_reg.R:69:5',
-        'test-algo-window_reg.R:100:5', 'test-algo-window_reg.R:153:5',
-        'test-algo-window_reg.R:206:5', 'test-algo-window_reg.R:241:5',
-    ...
-       5. │   └─parsnip:::xy_xy(...)
-       6. │     └─parsnip:::eval_mod(...)
-       7. │       └─rlang::eval_tidy(e, env = envir, ...)
-       8. └─modeltime::prophet_xgboost_fit_impl(...)
-       9.   └─modeltime::xgboost_predict(fit_xgboost, newdata = xreg_tbl)
-      
-      [ FAIL 1 | WARN 0 | SKIP 80 | PASS 0 ]
-      Error:
-      ! Test failures.
-      Execution halted
-    ```
-
-*   checking re-building of vignette outputs ... ERROR
-    ```
-    Error(s) in re-building vignettes:
-    --- re-building ‘getting-started-with-modeltime.Rmd’ using rmarkdown
-    
-    Quitting from getting-started-with-modeltime.Rmd:162-171 [unnamed-chunk-9]
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    <error/rlang_error>
-    Error in `switch()`:
-    ! EXPR must be a length 1 vector
-    ---
-    Backtrace:
-    ...
-    
-    Error: processing vignette 'getting-started-with-modeltime.Rmd' failed with diagnostics:
-    EXPR must be a length 1 vector
-    --- failed re-building ‘getting-started-with-modeltime.Rmd’
-    
-    SUMMARY: processing the following file failed:
-      ‘getting-started-with-modeltime.Rmd’
-    
-    Error: Vignette re-building failed.
-    Execution halted
     ```
 
 # NCC
