@@ -1,6 +1,8 @@
 # Changelog
 
-## Version (development version)
+## Version 1.46.1
+
+CRAN release: 2026-01-08
 
 ### Bug Fixes
 

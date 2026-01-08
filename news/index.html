@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.0-9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,9 +77,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.46.1" id="version-1461">Version 1.46.1<a class="anchor" aria-label="anchor" href="#version-1461"></a></h2><p class="text-muted">CRAN release: 2026-01-08</p>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-1-46-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-46-1"></a></h3>
 <ul><li><p>Loading the package in the Positron Console would incorrectly set environment variable <code>_R_CHECK_LIMIT_CORES_</code> to TRUE, which in turn would result in <code><a href="../reference/availableCores.html">availableCores()</a></code> being limited to a maximum of two (2) CPU cores. This bug was introduced in <strong>parallelly</strong> 1.46.0 (2025-12-12).</p></li>
 <li><p><code><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">parallel::clusterExport()</a></code> on a <code><a href="../reference/makeClusterSequential.html">makeClusterSequential()</a></code> cluster would export to the global environment rather than the local environment of the cluster nodes.</p></li>
 <li><p>Argument <code>user</code> of <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> did not recycle across workers when <code>length(user) == 1</code>.</p></li>
