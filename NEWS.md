@@ -1,4 +1,25 @@
-# Version 1.46.0 [2025-12-11]
+# Version 1.46.1 [2026-01-07]
+
+## Bug Fixes
+
+ * Loading the package in the Positron Console would incorrectly set
+   environment variable `_R_CHECK_LIMIT_CORES_` to TRUE, which in turn
+   would result in `availableCores()` being limited to a maximum of
+   two (2) CPU cores. This bug was introduced in **parallelly** 1.46.0
+   (2025-12-12).
+
+ * `parallel::clusterExport()` on a `makeClusterSequential()` cluster
+   would export to the global environment rather than the local
+   environment of the cluster nodes.
+   
+ * Argument `user` of `makeClusterPSOCK()` did not recycle across
+   workers when `length(user) == 1`.
+
+ * `makeClusterPSOCK(default_packages = "*")` with an empty R option
+   `defaultPackages` gave an error.
+
+
+# Version 1.46.0 [2025-12-12]
 
 ## New Features
 
@@ -20,7 +41,7 @@
    documentation has now been updated to reflect that it is only
    disabled in the RStudio Console.
 
-## BUG FIX:
+## Bug Fixes
 
  * Setting option `parallelly.supportsMulticore.disableOn` to hold
    `"rstudio_terminal"` had no effect.

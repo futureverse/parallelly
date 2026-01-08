@@ -21,12 +21,23 @@
 #' str(y)
 #' stopifnot(abc == 3.14)
 #'
+#' clusterExport(cl, "abc", envir = environment())
+#' rm(abc)
+#' y <- clusterEvalQ(cl, { abc })
+#' str(y)
+#' stopifnot(y[[1]] == 3.14)
+#'
 #' @details
 #' Expression and function calls are evaluated in a local environment,
 #' inheriting the global environment.
 #'
 #' @section Requirements:
 #' This function is only defined for R (>= 4.4.0).
+#'
+#' @section Works in webR:
+#' Contrary to other cluster types, a `makeClusterSequential()` cluster
+#' works in webR, meaning you can use it for code that rely on the
+#' **parallel** package, e.g. `y <- parLapply(cl, ...)`.
 #'
 #' @rawNamespace if (getRversion() >= "4.4") export(makeClusterSequential)
 #' @aliases SEQ
@@ -77,6 +88,15 @@ sendData.sequential_node <- function(node, data) {
     ## Don't evaluate in the global environment, which is the default
     if (identical(args[["envir"]], globalenv())) {
       args[["envir"]] <- envir
+    }
+
+    ## WORKAROUND: parallel::clusterExport() assigns to global environment
+    ## of the worker, but we want it to be our local environment
+    if (identical(fun, environment(parallel::clusterExport)[["gets"]])) {
+      fun <- function(n, v) {
+        assign(n, v, envir = envir)
+        NULL
+      }
     }
     
     success <- TRUE

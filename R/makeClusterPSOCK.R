@@ -169,7 +169,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
 
   if (!is.null(user)) {
     stop_if_not(is.character(user), length(user) == 1L || length(user) == length(workers))
-    user <- rep(user, length.out = length(user))
+    user <- rep(user, length.out = length(workers))
   }
 
   tries <- as.integer(tries)

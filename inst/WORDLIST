@@ -1,6 +1,6 @@
 AMI
-Apptainer
 AppVeyor
+Apptainer
 AsIs
 BiocParallel
 Bubblewrap
@@ -57,6 +57,7 @@ Slurm
 UGE
 UUID
 Univa
+VM
 VPN
 WSL
 XDR
@@ -158,6 +159,7 @@ supportsMulticore
 sysadm
 tasklist
 tcltk
+thinko
 tmp
 todo
 udocker
@@ -165,4 +167,3 @@ useFancyQuotes
 useXDR
 workRSOCK
 yYF
-VM

@@ -14,12 +14,93 @@ Run `revdepcheck::revdep_details(, "adea")` for more info
 
 ## In both
 
-*   checking package dependencies ... ERROR
+*   checking whether package ‘adea’ can be installed ... ERROR
     ```
-    Package required but not available: ‘ROI.plugin.symphony’
+    Installation failed.
+    See ‘/scratch/henrik/revdep/parallelly/checks/adea/new/adea.Rcheck/00install.out’ for details.
+    ```
+
+## Installation
+
+### Devel
+
+```
+* installing *source* package ‘adea’ ...
+** this is package ‘adea’ version ‘1.5.2’
+** package ‘adea’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** data
+** demo
+** inst
+** byte-compile and prepare package for lazy loading
+Error: package or namespace load failed for ‘ROI.plugin.symphony’ in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]):
+ there is no package called ‘Rsymphony’
+Execution halted
+ERROR: lazy loading failed for package ‘adea’
+* removing ‘/scratch/henrik/revdep/parallelly/checks/adea/new/adea.Rcheck/adea’
+
+
+```
+### CRAN
+
+```
+* installing *source* package ‘adea’ ...
+** this is package ‘adea’ version ‘1.5.2’
+** package ‘adea’ successfully unpacked and MD5 sums checked
+** using staged installation
+** R
+** data
+** demo
+** inst
+** byte-compile and prepare package for lazy loading
+Error: package or namespace load failed for ‘ROI.plugin.symphony’ in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]):
+ there is no package called ‘Rsymphony’
+Execution halted
+ERROR: lazy loading failed for package ‘adea’
+* removing ‘/scratch/henrik/revdep/parallelly/checks/adea/old/adea.Rcheck/adea’
+
+
+```
+# alookr
+
+<details>
+
+* Version: 0.4.0
+* GitHub: https://github.com/choonghyunryu/alookr
+* Source code: https://github.com/cran/alookr
+* Date/Publication: 2025-09-16 02:50:02 UTC
+* Number of recursive dependencies: 149
+
+Run `revdepcheck::revdep_details(, "alookr")` for more info
+
+</details>
+
+## In both
+
+*   checking examples ... ERROR
+    ```
+    Running examples in ‘alookr-Ex.R’ failed
+    The error most likely occurred in:
     
-    See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-    manual.
+    > ### Name: run_models
+    > ### Title: Fit binary classification model
+    > ### Aliases: run_models
+    > 
+    > ### ** Examples
+    > 
+    > library(dplyr)
+    ...
+     10. │   ├─purrr:::call_with_cleanup(...)
+     11. │   └─alookr (local) .f(.x[[i]], ...)
+     12. │     ├─future::value(.x)
+     13. │     └─future:::value.Future(.x)
+     14. │       └─future:::signalConditions(...)
+     15. │         └─base::stop(condition)
+     16. └─purrr (local) `<fn>`(`<smplErrr>`)
+     17.   └─cli::cli_abort(...)
+     18.     └─rlang::abort(...)
+    Execution halted
     ```
 
 # bbw
@@ -30,7 +111,7 @@ Run `revdepcheck::revdep_details(, "adea")` for more info
 * GitHub: https://github.com/rapidsurveys/bbw
 * Source code: https://github.com/cran/bbw
 * Date/Publication: 2025-01-16 09:00:06 UTC
-* Number of recursive dependencies: 112
+* Number of recursive dependencies: 125
 
 Run `revdepcheck::revdep_details(, "bbw")` for more info
 
@@ -50,11 +131,11 @@ Run `revdepcheck::revdep_details(, "bbw")` for more info
 
 <details>
 
-* Version: 2.8.1
+* Version: 2.10.0
 * GitHub: https://github.com/seriph78/COTAN
 * Source code: https://github.com/cran/COTAN
-* Date/Publication: 2025-04-30
-* Number of recursive dependencies: 269
+* Date/Publication: 2025-10-29
+* Number of recursive dependencies: 266
 
 Run `revdepcheck::revdep_details(, "COTAN")` for more info
 
@@ -62,51 +143,25 @@ Run `revdepcheck::revdep_details(, "COTAN")` for more info
 
 ## In both
 
-*   checking dependencies in R code ... NOTE
+*   checking package dependencies ... ERROR
     ```
-    'library' or 'require' call to ‘torch’ in package code.
-      Please use :: or requireNamespace() instead.
-      See section 'Suggested packages' in the 'Writing R Extensions' manual.
-    Unexported object imported by a ':::' call: ‘ggplot2:::ggname’
-      See the note in ?`:::` about the use of this operator.
-    ```
-
-*   checking R code for possible problems ... NOTE
-    ```
-    mergeUniformCellsClusters : fromMergedName: warning in
-      vapply(currentClNames, function(clName, mergedName) {: partial
-      argument match of 'FUN.VAL' to 'FUN.VALUE'
-    mergeUniformCellsClusters : fromMergedName: warning in
-      return(str_detect(mergedName, clName)): partial argument match of
-      'FUN.VAL' to 'FUN.VALUE'
-    mergeUniformCellsClusters : fromMergedName: warning in }, FUN.VAL =
-      logical(1L), mergedClName): partial argument match of 'FUN.VAL' to
-      'FUN.VALUE'
-    GDIPlot: no visible binding for global variable ‘sum.raw.norm’
-    ...
-    heatmapPlot: no visible binding for global variable ‘coex’
-    mitochondrialPercentagePlot: no visible binding for global variable
-      ‘mit.percentage’
-    scatterPlot: no visible binding for global variable ‘.x’
-    screePlot: no visible binding for global variable ‘PC’
-    screePlot: no visible binding for global variable ‘Variance’
-    Undefined global functions or variables:
-      .x CellNumber Cluster Condition ExpGenes GDI PC PC1 PC2 Variance coex
-      g2 group keys means mit.percentage n nu obj sum.raw.norm type types
-      values violinwidth width x xmax xmaxv xminv y
+    Package required but not available: ‘gghalves’
+    
+    See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
+    manual.
     ```
 
-# decoupleR
+# crmPack
 
 <details>
 
-* Version: 2.14.0
-* GitHub: https://github.com/saezlab/decoupleR
-* Source code: https://github.com/cran/decoupleR
-* Date/Publication: 2025-04-15
-* Number of recursive dependencies: 266
+* Version: 2.0.1
+* GitHub: https://github.com/openpharma/crmPack
+* Source code: https://github.com/cran/crmPack
+* Date/Publication: 2025-12-04 14:40:20 UTC
+* Number of recursive dependencies: 120
 
-Run `revdepcheck::revdep_details(, "decoupleR")` for more info
+Run `revdepcheck::revdep_details(, "crmPack")` for more info
 
 </details>
 
@@ -114,27 +169,164 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 
 *   checking tests ...
     ```
+      Running ‘test-package-load.R’
       Running ‘testthat.R’
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 50 lines of output:
-       17. ├─... %>% ...
-       18. ├─OmnipathR::translate_ids(., uniprot, genesymbol, organism = organism)
-       19. ├─OmnipathR::orthology_translate_column(...)
-       20. │ ├─... %>% ...
-       21. │ └─OmnipathR::get_db(db_name, param = orthology_param)
-       22. │   └─OmnipathR::load_db(key, param = param)
+        'test-Model-class.R:1593:1', 'test-Model-class.R:1602:1',
+        'test-Model-methods.R:2493:1', 'test-Model-methods.R:2501:1',
+        'test-Model-validity.R:126:1', 'test-Model-validity.R:223:1',
+        'test-Model-validity.R:314:1', 'test-Model-validity.R:425:1',
+        'test-Model-validity.R:433:1', 'test-Model-validity.R:442:1',
     ...
-       59. │ └─from_cache %<>% if_null(data %>% is_from_cache)
-       60. ├─OmnipathR:::if_null(., data %>% is_from_cache)
-       61. │ └─value1 %>% is.null %>% if (value2) value1
-       62. ├─data %>% is_from_cache
-       63. └─OmnipathR:::is_from_cache(.)
-       64.   └─obj %>% attr("origin") %>% ...
+      Expected `h_test_logging_enabled()` to be TRUE.
+      Differences:
+      `actual`:   <NA>
+      `expected`: TRUE
       
-      [ FAIL 1 | WARN 18 | SKIP 0 | PASS 34 ]
-      Error: Test failures
+      
+      [ FAIL 3 | WARN 0 | SKIP 121 | PASS 3444 ]
+      Error:
+      ! Test failures.
       Execution halted
+    ```
+
+# ctsem
+
+<details>
+
+* Version: 3.10.4
+* GitHub: https://github.com/cdriveraus/ctsem
+* Source code: https://github.com/cran/ctsem
+* Date/Publication: 2025-06-30 16:40:11 UTC
+* Number of recursive dependencies: 166
+
+Run `revdepcheck::revdep_details(, "ctsem")` for more info
+
+</details>
+
+## In both
+
+*   checking whether package ‘ctsem’ can be installed ... WARNING
+    ```
+    Found the following significant warnings:
+      Warning: namespace ‘colorspace’ is not available and has been replaced
+    See ‘/scratch/henrik/revdep/parallelly/checks/ctsem/new/ctsem.Rcheck/00install.out’ for details.
+    ```
+
+*   checking re-building of vignette outputs ... WARNING
+    ```
+    Error(s) in re-building vignettes:
+      ...
+    --- re-building ‘hierarchicalmanual.rnw’ using knitr_notangle
+    Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
+      texi2dvi script/program not available, using emulation
+    Error: processing vignette 'hierarchicalmanual.rnw' failed with diagnostics:
+    unable to run pdflatex on 'hierarchicalmanual.tex'
+    LaTeX errors:
+    ! LaTeX Error: File `apacite.sty' not found.
+    
+    ...
+    l.62 \bibliographystyle
+                           {apacite}     % Set bibliography style^^M
+    !  ==> Fatal error occurred, no output PDF file produced!
+    --- failed re-building ‘hierarchicalmanual.rnw’
+    
+    SUMMARY: processing the following file failed:
+      ‘hierarchicalmanual.rnw’
+    
+    Error: Vignette re-building failed.
+    Execution halted
+    ```
+
+# decoupleR
+
+<details>
+
+* Version: 2.16.0
+* GitHub: https://github.com/saezlab/decoupleR
+* Source code: https://github.com/cran/decoupleR
+* Date/Publication: 2025-10-29
+* Number of recursive dependencies: 265
+
+Run `revdepcheck::revdep_details(, "decoupleR")` for more info
+
+</details>
+
+## In both
+
+*   checking examples ... ERROR
+    ```
+    Running examples in ‘decoupleR-Ex.R’ failed
+    The error most likely occurred in:
+    
+    > ### Name: get_collectri
+    > ### Title: CollecTRI gene regulatory network. Wrapper to access CollecTRI
+    > ###   gene regulatory network. CollecTRI is a comprehensive resource
+    > ###   containing a curated collection of transcription factors (TFs) and
+    > ###   their target genes. It is an expansion of DoRothEA. Each interaction
+    > ###   is weighted by its mode of regulation (either positive or negative).
+    > ### Aliases: get_collectri
+    > 
+    > ### ** Examples
+    > 
+    > collectri <- get_collectri(organism='human', split_complexes=FALSE)
+    [2026-01-06 16:39:26] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+    Error in if (.keep) . else select(., -!!evs_col) : 
+      argument is of length zero
+    Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
+    Execution halted
+    ```
+
+*   checking tests ...
+    ```
+      Running ‘testthat.R’
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 50 lines of output:
+       26. │ ├─col %in% colnames(data)
+       27. │ └─base::colnames(data)
+       28. │   └─base::is.data.frame(x)
+       29. ├─OmnipathR::filter_evidences(...)
+       30. │ └─expr(...) %>% eval_select(data) %>% names %>% ...
+       31. ├─OmnipathR:::if_null_len0(...)
+    ...
+       26. │ └─value %>% ...
+       27. ├─tidyselect::eval_select(., data)
+       28. │ └─tidyselect::tidyselect_data_has_predicates(data)
+       29. └─OmnipathR::unnest_evidences(., .keep = .keep)
+       30.   └─... %>% ...
+      
+      [ FAIL 5 | WARN 11 | SKIP 0 | PASS 29 ]
+      Error:
+      ! Test failures.
+      Execution halted
+    ```
+
+*   checking re-building of vignette outputs ... ERROR
+    ```
+    Error(s) in re-building vignettes:
+    --- re-building ‘decoupleR.Rmd’ using rmarkdown
+    --- finished re-building ‘decoupleR.Rmd’
+    
+    --- re-building ‘pw_bk.Rmd’ using rmarkdown
+    [2026-01-06 16:42:48] [WARN]    [OmnipathR] Accessing `PROGENy` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+    [2026-01-06 16:42:51] [SUCCESS] [OmnipathR] Loaded 700239 annotation records from cache.
+    Warning: ggrepel: 445 unlabeled data points (too many overlaps). Consider increasing max.overlaps
+    [WARNING] Could not fetch resource https://decoupler-py.readthedocs.io/en/1.4.0/_images/mlm.png: HttpExceptionRequest Request {
+        host                 = "decoupler-py.readthedocs.io"
+    ...
+    
+    Error: processing vignette 'tf_sc.Rmd' failed with diagnostics:
+    argument is of length zero
+    --- failed re-building ‘tf_sc.Rmd’
+    
+    SUMMARY: processing the following files failed:
+      ‘tf_bk.Rmd’ ‘tf_sc.Rmd’
+    
+    Error: Vignette re-building failed.
+    Execution halted
     ```
 
 *   checking Rd cross-references ... WARNING
@@ -145,32 +337,62 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
     See section 'Cross-references' in the 'Writing R Extensions' manual.
     ```
 
+# fmeffects
+
+<details>
+
+* Version: 0.1.4
+* GitHub: https://github.com/holgstr/fmeffects
+* Source code: https://github.com/cran/fmeffects
+* Date/Publication: 2024-11-05 18:50:02 UTC
+* Number of recursive dependencies: 182
+
+Run `revdepcheck::revdep_details(, "fmeffects")` for more info
+
+</details>
+
+## In both
+
+*   checking re-building of vignette outputs ... ERROR
+    ```
+    Error(s) in re-building vignettes:
+    --- re-building ‘fme_theory.Rmd’ using rmarkdown
+    [WARNING] Deprecated: --highlight-style. Use --syntax-highlighting instead.
+    --- finished re-building ‘fme_theory.Rmd’
+    
+    --- re-building ‘fmeffects.Rmd’ using rmarkdown
+    
+    Quitting from fmeffects.Rmd:121-127 [unnamed-chunk-11]
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    <error/purrr_error_indexed>
+    ...
+    ℹ In index: 1.
+    Caused by error in `.__Task__col_roles()`:
+    ! Assertion on 'names(rhs)' failed: Names must be a permutation of set {'feature','target','name','order','stratum','group','offset','weights_learner','weights_measure'}, but has extra elements {'always_included'}.
+    --- failed re-building ‘fmeffects.Rmd’
+    
+    SUMMARY: processing the following file failed:
+      ‘fmeffects.Rmd’
+    
+    Error: Vignette re-building failed.
+    Execution halted
+    ```
+
 # InPAS
 
 <details>
 
-* Version: 2.16.0
+* Version: 2.18.1
 * GitHub: NA
 * Source code: https://github.com/cran/InPAS
-* Date/Publication: 2025-04-15
-* Number of recursive dependencies: 163
+* Date/Publication: 2025-11-25
+* Number of recursive dependencies: 164
 
 Run `revdepcheck::revdep_details(, "InPAS")` for more info
 
 </details>
 
 ## In both
-
-*   checking Rd cross-references ... WARNING
-    ```
-    Missing link(s) in Rd file 'get_ssRleCov.Rd':
-      ‘[BSgenome:BSgenomeForge]{BSgenome::forgeBSgenomeDataPkg()}’
-    
-    Missing link(s) in Rd file 'set_globals.Rd':
-      ‘[BSgenome:BSgenomeForge]{BSgenome::forgeBSgenomeDataPkg()}’
-    
-    See section 'Cross-references' in the 'Writing R Extensions' manual.
-    ```
 
 *   checking dependencies in R code ... NOTE
     ```
@@ -180,6 +402,12 @@ Run `revdepcheck::revdep_details(, "InPAS")` for more info
       ‘adjust_proximalCPsByPWM’ ‘calculate_mse’ ‘find_valleyBySpline’
       ‘get_PAscore’ ‘get_PAscore2’ ‘remove_convergentUTR3s’
       ‘search_distalCPs’ ‘search_proximalCPs’
+    ```
+
+*   checking Rd metadata ... NOTE
+    ```
+    Invalid package aliases in Rd file 'InPAS.Rd':
+      ‘-package’
     ```
 
 *   checking Rd \usage sections ... NOTE
@@ -194,6 +422,47 @@ Run `revdepcheck::revdep_details(, "InPAS")` for more info
     Extensions’ manual.
     ```
 
+# iscream
+
+<details>
+
+* Version: 1.0.0
+* GitHub: https://github.com/huishenlab/iscream
+* Source code: https://github.com/cran/iscream
+* Date/Publication: 2025-10-29
+* Number of recursive dependencies: 147
+
+Run `revdepcheck::revdep_details(, "iscream")` for more info
+
+</details>
+
+## In both
+
+*   checking tests ...
+    ```
+      Running ‘testthat.R’
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 50 lines of output:
+      0%   10   20   30   40   50   60   70   80   90   100%
+      [----|----|----|----|----|----|----|----|----|----|
+      **************************************************|
+      0%   10   20   30   40   50   60   70   80   90   100%
+      [----|----|----|----|----|----|----|----|----|----|
+      **************************************************|
+    ...
+       12. │       └─parallelly:::call_slurm_show_hostname(nodelist)
+       13. │         └─parallelly:::stop_if_not(file_test("-x", bin))
+       14. │           └─parallelly:::stopf(...)
+       15. │             └─base::stop(cond)
+       16. └─base (local) `<fn>`(`<smplErrr>`)
+      
+      [ FAIL 1 | WARN 0 | SKIP 2 | PASS 352 ]
+      Error:
+      ! Test failures.
+      Execution halted
+    ```
+
 # mappp
 
 <details>
@@ -202,7 +471,7 @@ Run `revdepcheck::revdep_details(, "InPAS")` for more info
 * GitHub: https://github.com/cole-brokamp/mappp
 * Source code: https://github.com/cran/mappp
 * Date/Publication: 2022-01-25 09:22:42 UTC
-* Number of recursive dependencies: 35
+* Number of recursive dependencies: 34
 
 Run `revdepcheck::revdep_details(, "mappp")` for more info
 
@@ -216,30 +485,6 @@ Run `revdepcheck::revdep_details(, "mappp")` for more info
       All declared Imports should be used.
     ```
 
-# mmrm
-
-<details>
-
-* Version: 0.3.14
-* GitHub: https://github.com/openpharma/mmrm
-* Source code: https://github.com/cran/mmrm
-* Date/Publication: 2024-09-27 23:30:01 UTC
-* Number of recursive dependencies: 175
-
-Run `revdepcheck::revdep_details(, "mmrm")` for more info
-
-</details>
-
-## In both
-
-*   checking DESCRIPTION meta-information ... NOTE
-    ```
-      Missing dependency on R >= 4.1.0 because package code uses the pipe
-      |> or function shorthand \(...) syntax added in R 4.1.0.
-      File(s) using such syntax:
-        ‘interop-car.R’ ‘mmrm_tidiers.Rd’
-    ```
-
 # NCC
 
 <details>
@@ -248,7 +493,7 @@ Run `revdepcheck::revdep_details(, "mmrm")` for more info
 * GitHub: https://github.com/pavlakrotka/NCC
 * Source code: https://github.com/cran/NCC
 * Date/Publication: 2023-03-03 09:10:10 UTC
-* Number of recursive dependencies: 117
+* Number of recursive dependencies: 116
 
 Run `revdepcheck::revdep_details(, "NCC")` for more info
 
@@ -266,11 +511,11 @@ Run `revdepcheck::revdep_details(, "NCC")` for more info
 
 <details>
 
-* Version: 1.0.1
+* Version: 1.1.1
 * GitHub: NA
 * Source code: https://github.com/cran/outliers.ts.oga
-* Date/Publication: 2025-02-27 09:50:02 UTC
-* Number of recursive dependencies: 156
+* Date/Publication: 2025-09-03 14:50:02 UTC
+* Number of recursive dependencies: 155
 
 Run `revdepcheck::revdep_details(, "outliers.ts.oga")` for more info
 
@@ -289,11 +534,11 @@ Run `revdepcheck::revdep_details(, "outliers.ts.oga")` for more info
 
 <details>
 
-* Version: 1.44.0
+* Version: 1.46.0
 * GitHub: https://github.com/ccagc/QDNAseq
 * Source code: https://github.com/cran/QDNAseq
-* Date/Publication: 2025-04-15
-* Number of recursive dependencies: 94
+* Date/Publication: 2025-10-29
+* Number of recursive dependencies: 95
 
 Run `revdepcheck::revdep_details(, "QDNAseq")` for more info
 
@@ -330,11 +575,11 @@ Run `revdepcheck::revdep_details(, "QDNAseq")` for more info
 
 <details>
 
-* Version: 1.26.0
+* Version: 1.28.0
 * GitHub: https://github.com/campbio/scruff
 * Source code: https://github.com/cran/scruff
-* Date/Publication: 2025-04-15
-* Number of recursive dependencies: 178
+* Date/Publication: 2025-10-29
+* Number of recursive dependencies: 173
 
 Run `revdepcheck::revdep_details(, "scruff")` for more info
 
@@ -349,6 +594,8 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 
 *   checking dependencies in R code ... NOTE
     ```
+    Namespace in Imports field not imported from: 'patchwork'
+      All declared Imports should be used.
     Unexported object imported by a ':::' call: 'ShortRead:::.set_omp_threads'
       See the note in ?`:::` about the use of this operator.
     ```
@@ -380,7 +627,7 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 * GitHub: NA
 * Source code: https://github.com/cran/streetscape
 * Date/Publication: 2025-01-21 14:50:03 UTC
-* Number of recursive dependencies: 138
+* Number of recursive dependencies: 131
 
 Run `revdepcheck::revdep_details(, "streetscape")` for more info
 

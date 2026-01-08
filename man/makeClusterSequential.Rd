@@ -19,6 +19,13 @@ inheriting the global environment.
 This function is only defined for R (>= 4.4.0).
 }
 
+\section{Works in webR}{
+
+Contrary to other cluster types, a \code{makeClusterSequential()} cluster
+works in webR, meaning you can use it for code that rely on the
+\strong{parallel} package, e.g. \code{y <- parLapply(cl, ...)}.
+}
+
 \examples{
 \dontshow{if ((getRversion() >= "4.4.0")) withAutoprint(\{ # examplesIf}
 library(parallel)
@@ -38,5 +45,11 @@ abc <- 3.14
 y <- clusterEvalQ(cl, { abc <- 42; abc })
 str(y)
 stopifnot(abc == 3.14)
+
+clusterExport(cl, "abc", envir = environment())
+rm(abc)
+y <- clusterEvalQ(cl, { abc })
+str(y)
+stopifnot(y[[1]] == 3.14)
 \dontshow{\}) # examplesIf}
 }

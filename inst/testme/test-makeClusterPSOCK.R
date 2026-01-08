@@ -1,5 +1,7 @@
 library(parallelly)
 
+options(parallelly.debug = TRUE)
+
 is_fqdn <- parallelly:::is_fqdn
 is_ip_number <- parallelly:::is_ip_number
 is_localhost <- parallelly:::is_localhost
@@ -51,10 +53,20 @@ print(cl)
 cl <- makeClusterPSOCK(1L)
 print(cl)
 node <- cl[[1]]
+print(node)
 utils::str(node)
 stopifnot(isTRUE(attr(node[["host"]], "localhost")))
+print(cl)
 parallel::stopCluster(cl)
 
+cl <- makeClusterPSOCK(2L, autoStop = TRUE)
+print(cl)
+## Mockup different hostnames for print()
+node <- cl[[1]]
+node[["host"]] <- "localhost2"
+cl[[1]] <- node
+print(cl)
+parallel::stopCluster(cl)
 
 message("- makeClusterPSOCK() - useXDR = TRUE/FALSE")
 
@@ -90,6 +102,31 @@ for (value in list(NULL, "options(abc = 42L)", quote(options(abc = 42L)))) {
   if (!is.null(value)) stopifnot(identical(y, 42L))
   parallel::stopCluster(cl)
 }
+
+
+message("- makeClusterPSOCK() - argument 'user'")
+
+## Test user = "*" (wildcard for system default username) with localhost
+## The "*" wildcard means "use system default", which should work for localhost
+cl <- makeClusterPSOCK(1L, user = "*")
+print(cl)
+y <- parallel::clusterEvalQ(cl, Sys.info()[["user"]])[[1]]
+stopifnot(is.character(y), length(y) == 1L)
+parallel::stopCluster(cl)
+
+## Test user = "*" with multiple workers (single user for all)
+cl <- makeClusterPSOCK(2L, user = "*")
+print(cl)
+y <- parallel::clusterEvalQ(cl, Sys.info()[["user"]])
+stopifnot(length(y) == 2L)
+parallel::stopCluster(cl)
+
+## Test user = "*" per worker (vector form with 2 workers)
+cl <- makeClusterPSOCK(2L, user = c("*", "*"))
+print(cl)
+y <- parallel::clusterEvalQ(cl, Sys.info()[["user"]])
+stopifnot(length(y) == 2L)
+parallel::stopCluster(cl)
 
 
 message("- makeClusterPSOCK() - setup_strategy = TRUE/FALSE")
@@ -270,6 +307,24 @@ res <- tryCatch({
 }, error = identity)
 print(res)
 stopifnot(inherits(res, "error"))
+
+## Broken connection
+cl <- makeClusterPSOCK(2L, user = "*")
+node <- cl[[1]]
+close(node[["con"]])
+out <- utils::capture.output(print(cl))
+parallel::stopCluster(cl[2])
+stopifnot(any(grepl("broken connection", out)))
+
+## More workers than connections available
+ncons <- freeConnections()
+if (ncons < 200) local({
+  opts <- options(parallelly.maxWorkers.localhost = c(Inf, Inf))
+  res <- tryCatch(cl <- makeClusterPSOCK(ncons + 1L), error = identity)
+  print(res)
+  stopifnot(inherits(res, "error"))
+  options(opts)
+})
 
 ## Don't test on CRAN
 if (fullTest || covr_testing) {

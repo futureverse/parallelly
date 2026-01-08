@@ -4,8 +4,12 @@ library(parallelly)
 
 if (on_windows) {
   killNode <- function(cl) {
-    parallel::stopCluster(cl)
-    rep(TRUE, times = length(cl))
+    if (is.null(cl)) {
+      parallelly::killNode(NULL)
+    } else {
+      parallel::stopCluster(cl)
+      rep(TRUE, times = length(cl))
+    }
   }
 }
 
@@ -104,5 +108,14 @@ if (on_windows) {
 }
 
 cl <- NULL
+
+message("- Exceptions")
+res <- killNode(NULL)
+print(res)
+stopifnot(is.logical(res), length(res) == 1L, is.na(res))
+
+res <- tryCatch(killNode(NULL), warning = identity)
+print(res)
+stopifnot(inherits(res, "warning"))
 
 message("*** killNode() and isNodeAlive() ... done")

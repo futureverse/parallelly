@@ -2,19 +2,6 @@ isFALSE <- function(x) {
   is.logical(x) && length(x) == 1L && !is.na(x) && !x
 }
 
-isNA <- function(x) {
-  is.logical(x) && length(x) == 1L && is.na(x)
-}
-
-assert_no_positional_args_but_first <- function(call = sys.call(sys.parent())) {
-  ast <- as.list(call)
-  if (length(ast) <= 2L) return()
-  names <- names(ast[-(1:2)])
-  if (is.null(names) || any(names == "")) {
-    stopf("Function %s() requires that all arguments beyond the first one are passed by name and not by position: %s", as.character(call[[1L]]), deparse(call, width.cutoff = 100L))
-  }
-}
-
 stop_if_not <- function(...) {
   res <- list(...)
   for (ii in 1L:length(res)) {
@@ -66,13 +53,6 @@ hpaste <- function(..., sep = "", collapse = ", ", lastCollapse = NULL, maxHead 
 trim <- function(s) {
   sub("[\t\n\f\r ]+$", "", sub("^[\t\n\f\r ]+", "", s))
 } # trim()
-
-
-hexpr <- function(expr, trim = TRUE, collapse = "; ", maxHead = 6L, maxTail = 3L, ...) {
-  code <- deparse(expr)
-  if (trim) code <- trim(code)
-  hpaste(code, collapse = collapse, maxHead = maxHead, maxTail = maxTail, ...)
-} # hexpr()
 
 
 ## From R.utils 2.7.0 (2018-08-26)
@@ -134,14 +114,12 @@ inRCmdCheck <- function() { queryRCmdCheck() != "notRunning" }
 
 inRCmdVignette <- function() {
   r_cmd <- Sys.getenv("R_CMD", NA_character_)
-  if (is.null(r_cmd)) return(FALSE)
+  if (is.na(r_cmd)) return(FALSE)
   args <- commandArgs()
   if (length(args) != 6) return(FALSE)
   truth <- c(r_cmd, "--no-echo", "--no-restore", "--vanilla", "-e", "tools::buildVignettes(dir~+~=~+~'.',~+~tangle~+~=~+~TRUE)")
-  any(args != truth)
+  all(args == truth)
 }
-
-comma <- function(x, sep = ", ") paste(x, collapse = sep)
 
 commaq <- function(x, sep = ", ") paste(sQuote(x), collapse = sep)
 

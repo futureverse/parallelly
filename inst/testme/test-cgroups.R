@@ -1,5 +1,47 @@
 library(parallelly)
 
+message("*** Internal functions ...")
+
+## Reset memoization
+parallelly:::maxCores(NA_integer_)
+parallelly:::procPath(NA_character_)
+getUID <- parallelly:::getUID
+environment(getUID)$.uid <- NULL
+
+message("getUID(): ", getUID())
+message("getUID(): ", getUID())
+
+message("getCGroupsVersion(): ", parallelly:::getCGroupsVersion())
+message("getCGroupsVersion(): ", parallelly:::getCGroupsVersion())
+
+message("getCGroupsRoot(): ", parallelly:::getCGroupsRoot())
+message("getCGroupsRoot(): ", parallelly:::getCGroupsRoot())
+
+options(parallelly.cgroups.cpuset = 0:3)
+message("getCGroups1CpuSet(): ", parallelly:::getCGroups1CpuSet())
+options(parallelly.cgroups.cpuset = NULL)
+
+options(parallelly.cgroups.cpuquota = 0:3)
+message("getCGroups1CpuQuota(): ", parallelly:::getCGroups1CpuQuota())
+options(parallelly.cgroups.cpuquota = NULL)
+
+options(parallelly.cgroups2.cpu.max = 100000L)
+message("getCGroups2CpuMax(): ", parallelly:::getCGroups2CpuMax())
+options(parallelly.cgroups2.cpu.max = NULL)
+
+local({
+  opwd <- setwd(tempdir())
+  on.exit(setwd(opwd))
+  tarfile <- parallelly:::cloneCGroups()
+  print(file.info(tarfile))
+  stopifnot(utils::file_test("-f", tarfile))
+  file.remove(tarfile)
+})
+
+message("*** Internal functions ... DONE")
+
+
+
 message("*** cgroups ...")
 
 message("- getCGroups()")

@@ -13,25 +13,26 @@
 #' inst/testme/run.R <test-name.R>
 #'
 #' Options:
-#' --package=<pkg>  The name of the package being tested
-#'                  (Environment variable: `R_TESTME_PACKAGE`)
-#'                  (Default: The `Package` field of the DESCRIPTION file)
-#' --name=<name>    The name of the test to run, used to locate the test
-#'                  script `test-<name>.R`
-#'                  (Environment variable: `R_TESTME_NAME`)
-#' --not-cran       Set environment variable `NOT_CRAN=true`
-#' --covr=summary   Estimate test code coverage with basic summary
-#' --covr=report    Estimate test code coverage with full HTML report
-#' --debug          Output debug messages
-#'                  (Environment variable: `R_TESTME_DEBUG`)
+#' --package=<pkg>     The name of the package being tested
+#'                     (Environment variable: `R_TESTME_PACKAGE`)
+#'                     (Default: The `Package` field of the DESCRIPTION file)
+#' --name=<name>       The name of the test to run, used to locate the test
+#'                     script `test-<name>.R`
+#'                     (Environment variable: `R_TESTME_NAME`)
+#' --not-cran          Set environment variable `NOT_CRAN=true`
+#' --coverage=summary  Estimate test code coverage with basic summary
+#' --coverage=tally    Estimate test code coverage with full tally summary
+#' --coverage=report   Estimate test code coverage with full HTML report
+#' --debug             Output debug messages
+#'                     (Environment variable: `R_TESTME_DEBUG`)
 #'
 #' Examples:
 #' testme/test-abc.R
 #' testme/test-abc.R --not-cran
-#' tests/test-cpuLoad.R --covr=report
+#' tests/test-cpuLoad.R --coverage=report
 #'
 #' inst/testme/run.R inst/testme/test-abc.R
-#' inst/testme/run.R inst/testme/test-abc.R --covr
+#' inst/testme/run.R inst/testme/test-abc.R --coverage
 #'
 #' Environment variables:
 #' * R_TESTME_PACKAGE
@@ -39,7 +40,7 @@
 #' * R_TESTME_PATH
 #' * R_TESTME_FILTER_NAME
 #' * R_TESTME_FILTER_TAGS
-#' * R_TESTME_COVR
+#' * R_TESTME_COVERAGE
 #' * R_TESTME_DEBUG
 main <- function() {
   cmd_args <- commandArgs(trailingOnly = TRUE)
@@ -98,26 +99,21 @@ main <- function() {
     Sys.setenv(R_TESTME_DEBUG = "TRUE")
   }
 
-  pattern <- "^--covr(|=([[:alpha:][:alnum:]]+))$"
+  pattern <- "^--coverage(|=([[:alpha:][:alnum:]]+))$"
   idx <- grep(pattern, cmd_args)
   if (length(idx) > 0L) {
     value <- gsub(pattern, "\\2", cmd_args[idx])
     if (!nzchar(value)) {
-      covr <- "summary"
+      coverage <- "summary"
     } else {
-      covr <- match.arg(value, choices = c("summary", "report"))
+      coverage <- match.arg(value, choices = c("none", "summary", "tally", "report"))
     }
     cmd_args <- cmd_args[-idx]
   } else {
-    value <- Sys.getenv("R_TESTME_COVR", "FALSE")
-    if (toupper(value) %in% c("FALSE", "TRUE")) {
-      value <- as.logical(value)
-      covr <- if (value) "summary" else "none"
-    } else {
-      covr <- match.arg(value, choices = "report")
-    }
+    value <- Sys.getenv("R_TESTME_COVERAGE", "none")
+    coverage <- match.arg(value, choices = c("none", "summary", "tally", "report"))
   }
-  if (covr != "none") {
+  if (coverage != "none") {
     if (!utils::file_test("-f", "DESCRIPTION")) {
       stop("Current folder does not look like a package folder")
     }
@@ -178,7 +174,9 @@ main <- function() {
   }
 
   debug <- isTRUE(as.logical(Sys.getenv("R_TESTME_DEBUG")))
-  
+
+  coverage <- match.arg(coverage, choices = c("none", "summary", "tally", "report"))
+
   ## Create 'testme' environment on the search() path
   testme_config <- list(
      testme = TRUE,
@@ -190,14 +188,14 @@ main <- function() {
      script = testme_file,
        path = path,
     on_cran = on_cran(),
-       covr = covr,
+       coverage = coverage,
       debug = debug
   )
   if ("testme" %in% search()) detach(name = "testme")
   testme <- attach(testme_config, name = "testme", warn.conflicts = FALSE)
   rm(list = c("tags", "testme_package", "testme_name", "testme_file"))
   
-  
+
   ## -----------------------------------------------------------------
   ## Filters
   ## -----------------------------------------------------------------
@@ -288,52 +286,9 @@ testme_run_test <- function(testme) {
   if (testme[["status"]] != "skipped") {
     if (testme[["debug"]]) message("Running test script: ", sQuote(testme[["script"]]))
     testme[["status"]] <- "failed"
-    if (testme[["covr"]] != "none") {
-      source_dirs <- c("R", "src")
-      source_dirs <- source_dirs[utils::file_test("-d", source_dirs)]
-      source_files <- dir(source_dirs, pattern = "[.]R$", full.names = TRUE)
-      stopifnot(length(source_files) > 0)
-
-      assign(".packageName", testme[["package"]], envir = globalenv())
-  
-      ## Attach imported packages
-#      library(testme[["package"]], character.only = TRUE)
-#      desc <- utils::packageDescription(testme[["package"]])
-#      pkgs <- desc[["Imports"]]
-#      pkgs <- strsplit(pkgs, split = ",", fixed = TRUE)[[1]]
-#      pkgs <- gsub("[[:space:]]", "", pkgs)
-#      lapply(pkgs, FUN = library, character.only = TRUE)
-
-      ## Copy imports
-      ns <- getNamespace(testme[["package"]])
-      ns <- parent.env(ns)
-      for (name in names(ns)) {
-        obj <- get(name, envir = ns, inherits = FALSE)
-        assign(name, obj, envir = globalenv(), inherits = FALSE)
-      }
-
-      ## Copy non-exported 'NativeSymbolInfo':s
-      ns <- getNamespace(testme[["package"]])
-      for (name in names(ns)) {
-        if (!exists(name, mode = "list", envir = ns, inherits = FALSE)) next
-        obj <- get(name, mode = "list", envir = ns, inherits = FALSE)
-        if (!inherits(obj, "NativeSymbolInfo")) next
-        assign(name, obj, envir = globalenv(), inherits = FALSE)
-      }
-
-      ## Register S3 methods
-      library(testme[["package"]], character.only = TRUE)
-      ns <- getNamespace(testme[["package"]])
-      ns2 <- ns[[".__S3MethodsTable__."]]
-      for (name in names(ns2)) {
-        pattern <- "(.*)[.]([^.]+)$"
-        genname <- gsub(pattern, "\\1", name)
-        class <- gsub(pattern, "\\2", name)
-        method <- ns2[[name]]
-        registerS3method(genname, class, method, envir = ns)
-      }
-      
-      cov <- covr::file_coverage(source_files, test_files = testme[["script"]])
+    if (testme[["coverage"]] != "none") {
+      pkg_env <- pkgload::load_all()
+      cov <- covr::environment_coverage(pkg_env[["env"]], test_files = testme[["script"]])
       ## Keep source files with non-zero coverage
       tally <- covr::tally_coverage(cov)
       tally <- subset(tally, value > 0)
@@ -344,11 +299,6 @@ testme_run_test <- function(testme) {
       source(testme[["script"]], echo = TRUE)
     }
     testme[["status"]] <- "success"
-    
-  #  ## In case test script overwrote some elements in 'testme'
-  #  for (name in names(testme_config)) {
-  #    testme[[name]] <- testme_config[[name]]
-  #  }
   }
   
   
@@ -391,8 +341,11 @@ testme_run_test <- function(testme) {
   if (!is.null(cov)) {
     message("Source files covered by the test script:")
     if (length(cov) > 0) {
-      print(cov)
-      if (testme[["covr"]] == "report") {
+      if ("tally" %in% testme[["coverage"]]) {
+        tally <- covr::tally_coverage(cov)
+        print(tally)
+      }
+      if ("report" %in% testme[["coverage"]]) {
         html <- covr::report(cov, browse = FALSE)
         browseURL(html)
         Sys.sleep(5.0)

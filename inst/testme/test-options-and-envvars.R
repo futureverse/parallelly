@@ -92,5 +92,7 @@ for (what in c("option", "envvar")) {
   } ## for (name ...)
 } ## for (what ...)
 
+update_package_options(debug = TRUE)
+
 
 message("*** Options and environment variables ... DONE")

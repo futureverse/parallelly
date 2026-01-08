@@ -73,7 +73,7 @@ cli_fcn_args <- function(fcn) {
 }
 
 `cli_fcn_output<-` <- function(x, value = cat) {
-  stopifnot(is.function(cat))
+  stopifnot(is.function(value))
   attr(x, "cli_fcn_output") <- value
   invisible(x)
 }

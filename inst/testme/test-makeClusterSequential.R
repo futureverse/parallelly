@@ -6,31 +6,6 @@ if (getRversion() < "4.4.0") {
   message("makeClusterSequential() ... skipped")
 } else {
   library(parallelly)
-
-  ## Temporarily override parallel::makeCluster and parallel::stopCluster
-  ## to use the sequential versions
-  old_makeCluster <- parallel::makeCluster
-  old_stopCluster <- parallel::stopCluster
-  on.exit({
-    unlockBinding("makeCluster", getNamespace("parallel"))
-    assign("makeCluster", old_makeCluster, envir = getNamespace("parallel"))
-    unlockBinding("stopCluster", getNamespace("parallel"))
-    assign("stopCluster", old_stopCluster, envir = getNamespace("parallel"))
-  }, add = TRUE)
-
-  unlockBinding("makeCluster", getNamespace("parallel"))
-  assign("makeCluster", makeClusterSequential, envir = getNamespace("parallel"))
-  unlockBinding("stopCluster", getNamespace("parallel"))
-  assign("stopCluster", function(cl) {
-    ## Do nothing for sequential_cluster, as it's not a real parallel cluster
-    ## Except for invalidating the node state
-    for (node in cl) {
-      if (inherits(node, "sequential_node")) {
-        node$envir[["...parallelly.valid..."]] <- FALSE
-      }
-    }
-  }, envir = getNamespace("parallel"))
-
   library(parallel)
 
   cl <- makeClusterSequential()
@@ -50,6 +25,18 @@ if (getRversion() < "4.4.0") {
   abc <- 3.14
   y <- clusterEvalQ(cl, { abc <- 42; abc })
   stopifnot(identical(y, list(42)), abc == 3.14)
+
+  ## Export a variable to the cluster nodes
+  def <- 42
+  y <- clusterExport(cl, "def")
+  rm(def)
+  stopifnot(!exists("def"))
+  y <- clusterEvalQ(cl, { def })
+  stopifnot(identical(y, list(42)))
+
+  ## Test with run-time errors
+  y <- tryCatch(parLapply(cl, X = 1, fun = stop), error = identity)
+  stopifnot(inherits(y, "error"))
 
   ## Test stopping the cluster
   stopCluster(cl)
