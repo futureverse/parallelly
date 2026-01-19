@@ -10,7 +10,7 @@
 
 # Introduction
 
-This vignettes illustrates how to launch parallel workers on cloud
+This vignette illustrates how to launch parallel workers on cloud
 services such as Amazon AWS (<https://aws.amazon.com/>) and Google
 Compute Engine (<https://cloud.google.com/products/compute>).
 

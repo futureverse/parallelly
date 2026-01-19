@@ -43,7 +43,7 @@
  * Option `parallelly.supportsMulticore.disableOn` was documented to
    disable forked ("multicore") processing in the RStudio Terminal,
    but that was not the case due to a thinko. Default options and the
-   documentation has now been updated to reflect that it is only
+   documentation have now been updated to reflect that it is only
    disabled in the RStudio Console.
 
 ## Bug Fixes
@@ -61,13 +61,13 @@
 
 ## Deprecated and Defunct
 
- * In previous version, `makeClusterPSOCK()` started to collect
+ * In the previous version, `makeClusterPSOCK()` started to collect
    session information on each parallel worker, which included
    `capabilities()`. However, for unknown reasons, `capabilities()`
-   caused the cluster creation to fail GitHub Actions running
+   caused the cluster creation to fail on GitHub Actions running
    macOS. The problem could be reproduced neither locally, on the
    mac-builder, nor on the CRAN macOS servers. Because this feature is
-   non-critical and only introduced in the previous version, I decided
+   non-critical and was only introduced in the previous version, I decided
    to remove the collection of `capabilities()` again.
  
 
@@ -86,15 +86,15 @@
  * If `killNode(..., signal = tools::SIGTERM)` successfully signaled
    the cluster node, it will now close any existing socket connection
    to the node. If the node is running on the local host, it will also
-   remove its temporary directory, because the the node's R process
-   might not have been exited gracefully.
+   remove its temporary directory, because the node's R process
+   might not have exited gracefully.
    
  * The session information collected by `makeClusterPSOCK()` now
    contains more details on each worker, e.g. the `tempdir()` folder,
    `capabilities()`, and `extSoftVersion()`.
 
  * Cluster nodes created by `makeClusterPSOCK()` gained attribute
-   `calls`, which records the `sys.calls()`. This can be useful when
+   `calls`, which record the `sys.calls()`. This can be useful when
    troubleshooting from where a cluster was created. Analogously,
    setting R option `parallelly.makeNodePSOCK.calls` to TRUE will
    relay the call stack in the system call that launched the cluster
@@ -108,7 +108,7 @@
  * `availableCores()` would produce an error on `Error in scan(file =
    file, what = what, ...)` on systems that have a `/proc/self/mounts`
    file with syntax errors. Such files have been reported on Windows
-   Subsystem for Linux version 2 (WSL 2), where spaces in Windows path
+   Subsystem for Linux version 2 (WSL 2), where spaces in Windows paths
    have not been properly escaped for some entries. Now such invalid
    entries are skipped, before parsing the mount table.
 
@@ -130,7 +130,7 @@
 ## Bug Fixes
 
  * `availableCores()` would not respect `method = "fallback"`, since
-   v1.41.0 (2024-12-18), on system with a value for `method =
+   v1.41.0 (2024-12-18), on a system with a value for `method =
    "/proc/self/status"`.
 
 
@@ -168,7 +168,7 @@
 
  * `isNodeAlive()` could produce warnings on `doTryCatch(return(expr),
    name, parentenv, handler) : NAs introduced by coercion` on MS
-   Windows. Improved the internal `tasklist` parses used to test
+   Windows. Improved the internal `tasklist` parsers used to test
    whether a process is alive.
  
  * `availableCores()` could produce `Error: Error in
@@ -186,13 +186,13 @@
 
 ## Bug Fixes
 
- * Call `isNodeAlive()` and `killNode()` on cluster nodes running on
+ * Calling `isNodeAlive()` and `killNode()` on cluster nodes running on
    external machines would produce `Error in match.arg(type, choices =
    known_types, several.ok = FALSE) : 'arg' must be of length 1`. This
    bug was introduced in version 1.38.0 (2024-07-27), when adding
    richer support for the `rscript_sh` argument.
 
- * Call `isNodeAlive()` and `killNode()` on cluster nodes running on
+ * Calling `isNodeAlive()` and `killNode()` on cluster nodes running on
    external machines would produce `Error: ‘length(rsh_call) == 1L’ is
    not TRUE` if option `rshopts` were specified during creation.
 

@@ -1,4 +1,4 @@
-The **parallelly** package provides functions that enhance the **parallel** packages.  For example, `availableCores()` gives the number of CPU cores available to your R process as given by R options and environment variables, including those set by job schedulers on high-performance compute (HPC) clusters.  If R runs under 'cgroups' or in a Linux container, then their settings are acknowledges too.  If nothing else is set, then it will fall back to `parallel::detectCores()`.  Another example is `makeClusterPSOCK()`, which is backward compatible with `parallel::makePSOCKcluster()` while doing a better job in setting up remote cluster workers without having to know your local public IP address and configuring the firewall to do port-forwarding to your local computer.  The functions and features added to this package are written to be backward compatible with the **parallel** package, such that they may be incorporated there later.  The **parallelly** package comes with an open invitation for the R Core Team to adopt all or parts of its code into the **parallel** package.
+The **parallelly** package provides functions that enhance the **parallel** packages.  For example, `availableCores()` gives the number of CPU cores available to your R process as given by R options and environment variables, including those set by job schedulers on high-performance compute (HPC) clusters.  If R runs under 'cgroups' or in a Linux container, then their settings are acknowledged too.  If nothing else is set, then it will fall back to `parallel::detectCores()`.  Another example is `makeClusterPSOCK()`, which is backward compatible with `parallel::makePSOCKcluster()` while doing a better job in setting up remote cluster workers without having to know your local public IP address and configuring the firewall to do port-forwarding to your local computer.  The functions and features added to this package are written to be backward compatible with the **parallel** package, such that they may be incorporated there later.  The **parallelly** package comes with an open invitation for the R Core Team to adopt all or parts of its code into the **parallel** package.
 
 
 ## Feature Comparison 'parallelly' vs 'parallel' 
@@ -65,7 +65,7 @@ Of course, `availableCores()` respects also R options and environment variables 
 
 If nothing is set that limits the number of cores, then `availableCores()` falls back to `parallel::detectCores()` and if that returns `NA_integer_` then one (1) is returned.
 
-The below table summarize the benefits:
+The below table summarizes the benefits:
 
 |                                         | availableCores() |    parallel::detectCores()    |
 | --------------------------------------- | :--------------: | :---------------------------: |
@@ -88,7 +88,7 @@ The functions in this package originate from the **[future](https://cran.r-proje
 
 * [x] Submit **parallelly** to CRAN, with minimal changes compared to the corresponding functions in the **future** package (on CRAN as of 2020-10-20)
 
-* [x] Update the **future** package to import and re-export the functions from the **parallelly** to maximize backward compatibility in the future framework (**future** 1.20.1 on CRAN as of 2020-11-03)
+* [x] Update the **future** package to import and re-export the functions from **parallelly** to maximize backward compatibility in the future framework (**future** 1.20.1 on CRAN as of 2020-11-03)
 
 * [x] Switch to use 10-15% faster `useXDR=FALSE`
 

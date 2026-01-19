@@ -121,7 +121,7 @@ isNodeAlive.RichSOCKnode <- function(x, timeout = 0.0, ...) {
 
   ## system() does not support argument 'timeout' in R (<= 3.4.0)
   if (getRversion() < "3.5.0") {
-    if (timeout > 0) warning("isNodeAlive() does not support argument 'timeout' in R (< 3.5.0) for cluster nodes running on a remote maching")
+    if (timeout > 0) warning("isNodeAlive() does not support argument 'timeout' in R (< 3.5.0) for cluster nodes running on a remote machine")
     system <- function(..., timeout) base::system(...)
   }
 

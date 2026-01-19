@@ -62,7 +62,7 @@
 #'    Query the "Grid Engine" scheduler environment variable \env{PE_HOSTFILE}.
 #'    An example of a job submission that results in this is
 #'    `qsub -pe mpi 8` (or `qsub -pe ompi 8`), which
-#'    requests eight cores on a any number of machines.
+#'    requests eight cores on any number of machines.
 #'    Known Grid Engine schedulers are
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
@@ -76,7 +76,7 @@
 #'    to legacy \env{SLURM_NODELIST}) and parse set of nodes.
 #'    Then query Slurm environment variable \env{SLURM_JOB_CPUS_PER_NODE}
 #'    (fallback \env{SLURM_TASKS_PER_NODE}) to infer how many CPU cores
-#'    Slurm have allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
+#'    Slurm has allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
 #'    is set, which is always a scalar, then that is respected too, i.e.
 #'    if it is smaller, then that is used for all nodes.
 #'    For example, if `SLURM_NODELIST="n1,n[03-05]"` (expands to
@@ -562,7 +562,7 @@ supports_scontrol_show_hostname <- local({
 
     ## Sanity check
     if (!isTRUE(all.equal(sort(hosts), sort(truth)))) {
-      warnf("Internal availableWorkers() validation failed: 'scontrol show hostnames %s' did not return the expected results.  Expected c(%s) but got c(%s).  Will still use it this methods but please report this to the maintainer of the 'parallelly' package", shQuote(nodelist), commaq(truth), commaq(hosts), immediate. = TRUE)
+      warnf("Internal availableWorkers() validation failed: 'scontrol show hostnames %s' did not return the expected results.  Expected c(%s) but got c(%s).  Will still use this method but please report this to the maintainer of the 'parallelly' package", shQuote(nodelist), commaq(truth), commaq(hosts), immediate. = TRUE)
     }
     
     value <- TRUE

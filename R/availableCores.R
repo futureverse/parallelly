@@ -22,8 +22,8 @@
 #' \code{\link[parallel]{detectCores}(logical = logical)}, which,
 #' _if supported_, returns the number of logical CPUs (TRUE) or physical
 #' CPUs/cores (FALSE).
-#' At least as of R 4.2.2, `detectCores()` this argument on Linux.
-#' This argument is only if argument `methods` includes `"system"`.
+#' At least as of R 4.2.2, `detectCores()` ignores this argument on Linux.
+#' This argument is only used if argument `methods` includes `"system"`.
 #'
 #' @param default The default number of cores to return if no non-missing
 #' settings are available.
@@ -83,7 +83,7 @@
 #'  \item `"connections"` or `"connections-N"` -
 #'    Query the current number of available R connections per
 #'    [freeConnections()].  This is the maximum number of socket-based
-#'    **parallel** cluster nodes that are possible launch, because each
+#'    **parallel** cluster nodes that are possible to launch, because each
 #'    one needs its own R connection.
 #'    The `"connections-N"` form (e.g. `connections-16`) works like
 #'    `"connections"` but uses `freeConnections() - N` as the upper limit,
@@ -153,7 +153,7 @@
 #'    If \env{SLURM_CPUS_PER_TASK} is not set, then it will fall back to
 #'    use \env{SLURM_CPUS_ON_NODE} if the job is a single-node job
 #'    (\env{SLURM_JOB_NUM_NODES} is 1), e.g. `sbatch --ntasks=2 hello.sh`.
-#'    To make sure all tasks are assign to a single node, specify
+#'    To make sure all tasks are assigned to a single node, specify
 #'    `--nodes=1`, e.g. `sbatch --nodes=1 --ntasks=16 hello.sh`.
 #'
 #'  \item `"custom"` -
@@ -369,7 +369,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
         fcn()
       })
       if (length(n) != 1L) {
-        stop("Function specified by option 'parallelly.availableCores.custom' does not a single value")
+        stop("Function specified by option 'parallelly.availableCores.custom' does not return a single value")
       }
       n <- as.integer(n)
     } else {
