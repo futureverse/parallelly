@@ -6,7 +6,7 @@ The **parallelly** package provides functions that enhance the
 gives the number of CPU cores available to your R process as given by R
 options and environment variables, including those set by job schedulers
 on high-performance compute (HPC) clusters. If R runs under ‘cgroups’ or
-in a Linux container, then their settings are acknowledges too. If
+in a Linux container, then their settings are acknowledged too. If
 nothing else is set, then it will fall back to
 [`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html).
 Another example is
@@ -181,7 +181,7 @@ falls back to
 [`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html)
 and if that returns `NA_integer_` then one (1) is returned.
 
-The below table summarize the benefits:
+The below table summarizes the benefits:
 
 |                                         | availableCores() |    parallel::detectCores()    |
 |-----------------------------------------|:----------------:|:-----------------------------:|
@@ -211,8 +211,8 @@ also be set with `future.*` and `R_FUTURE_*` prefixes.
   2020-10-20)
 
 - Update the **future** package to import and re-export the functions
-  from the **parallelly** to maximize backward compatibility in the
-  future framework (**future** 1.20.1 on CRAN as of 2020-11-03)
+  from **parallelly** to maximize backward compatibility in the future
+  framework (**future** 1.20.1 on CRAN as of 2020-11-03)
 
 - Switch to use 10-15% faster `useXDR=FALSE`
 

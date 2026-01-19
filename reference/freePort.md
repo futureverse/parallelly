@@ -65,7 +65,7 @@ oenv <- Sys.getenv("R_PARALLELLY_RANDOM_PORTS")
 # Get a random, free TCP port in 1024:65535
 port <- freePort()
 message("A free TCP port: ", port)
-#> A free TCP port: 47999
+#> A free TCP port: 45529
 
 # Get a random, free TCP port in 11000:11999, which is what
 # parallelly::makeClusterPSOCK() and parallel::makePSOCKcluster()
@@ -73,13 +73,13 @@ message("A free TCP port: ", port)
 Sys.unsetenv("R_PARALLELLY_RANDOM_PORTS")
 port <- freePort("random")
 message("A free TCP port: ", port)
-#> A free TCP port: 11282
+#> A free TCP port: 11569
 
 # Customize the range of ports to sample from to 30000:50000
 Sys.setenv(R_PARALLELLY_RANDOM_PORTS = "30000:50000")
 port <- freePort("random")
 message("A free TCP port: ", port)
-#> A free TCP port: 42577
+#> A free TCP port: 47154
 
 # Test if a specific port is free
 isPortFree <- function(port) !is.na(freePort(port, default = NA_integer_))
