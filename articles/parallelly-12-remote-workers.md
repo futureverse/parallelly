@@ -13,7 +13,7 @@ on the same local area network (LAN) and that might share a common file
 system. *Remote* machines are machines that are on a different network
 and that do not share a common file system with the main R computer. In
 most cases the distinction between local and remote machines does not
-matter, but in some cases we can take advantages of workers being local.
+matter, but in some cases we can take advantage of workers being local.
 
 Regardless of running parallel workers on local or remote machines, we
 need a way to connect to the machines and launch R on them.
@@ -62,16 +62,17 @@ machine.
 #### Configure password-less SSH access
 
 Launching parallel R workers is typically done automatically in the
-background, which means it cumbersome, or even impossible, to enter the
-SSH password for each machine we wish to connect to. The solution is to
-configure SSH to connect with *public-private keys*, which pre-establish
-SSH authentication between the main machine and the machine to connect
-to. As this is common practice when working with SSH, there are numerous
-online tutorials explaining how to configure private-public SSH key
-pairs. Please consult one of them for the details, but the gist is to
-use (i) `ssh-keygen` to generate the public-private SSH keys on your
-local machine, and then (ii) `ssh-copy-id` to deploy the public key on
-the machine you want to connect to.
+background, which means it is cumbersome, or even impossible, to enter
+the SSH password for each machine we wish to connect to. The solution is
+to configure SSH to connect with *public-private keys*, which
+pre-establish SSH authentication between the main machine and the
+machine to connect to. As this is common practice when working with SSH,
+there are numerous online tutorials explaining how to configure
+private-public SSH key pairs. Please consult one of them for the
+details, but the gist is to use (i) `ssh-keygen` to generate the
+public-private SSH keys on your local machine, and then (ii)
+`ssh-copy-id` to deploy the public key on the machine you want to
+connect to.
 
 Step 1: Generate public-private SSH keys locally
 
@@ -127,7 +128,7 @@ Type `exit` to return to your local machine.
 
 Note, if you later want to connect to other machines,
 e.g. `n2.remote.org` or `hpc.my-university.edu`, you may re-use the
-above generated keys for those systems to. In other words, you do not
+above generated keys for those systems too. In other words, you do not
 have to use `ssh-keygen` to generate new keys for those machines.
 
 #### Verifying R exists on the other machine
@@ -156,7 +157,7 @@ Rscript: command not found
 
 then R is either not installed on that machine, or it cannot be found.
 If it is installed, but cannot be found, make sure that environment
-variable `PATH` his configured properly on that machine.
+variable `PATH` is configured properly on that machine.
 
 #### Final checks
 
@@ -186,7 +187,7 @@ parallel::stopCluster(cl)
 
 If you want to run parallel workers on other machines, repeat the above
 for each machine. After this, you will be able to launch parallel R
-workers on these machines with little efforts.
+workers on these machines with little effort.
 
 #### Machine-specific SSH customization (recommended)
 
@@ -571,9 +572,9 @@ operating system, e.g. Linux or macOS. If your remote machines run MS
 Windows, you can use similar techniques to launch parallel workers there
 as well. For this to work, the remote MS Windows machines must accept
 incoming SSH connections, which is something most Windows machines are
-not configured to do by default. If you do not know set that up, or if
-you do not have the system permissions to do so, please reach out to you
-system administrator of those machines.
+not configured to do by default. If you do not know how to set that up,
+or if you do not have the system permissions to do so, please reach out
+to your system administrator of those machines.
 
 Assuming we have SSH access to two MS Windows machines,
 `mswin1.remote.org` and `mswin2.remote.org`, everything works the same

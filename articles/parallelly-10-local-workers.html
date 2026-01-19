@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,7 +128,7 @@ Bengtsson</h4>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This vignettes illustrates how to launch parallel workers on the
+<p>This vignette illustrates how to launch parallel workers on the
 current, local machine. This works the same on all operating systems
 where R is supported, e.g. Linux, macOS, and MS Windows.</p>
 </div>
@@ -172,7 +172,7 @@ is to specify a character vector with that number of
 </h3>
 <p>The <code><a href="../reference/availableCores.html">availableCores()</a></code> function will return the number of
 workers that the system allows. It respects many common settings that
-controls the number of CPU cores that the current R process is allotted,
+control the number of CPU cores that the current R process is allotted,
 e.g. R options, environment variables, and CGroups settings. For
 details, see <code><a href="../reference/availableCores.html">help("availableCores")</a></code>. For example,</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">

@@ -2,9 +2,9 @@
 
 ## Introduction
 
-This vignettes illustrates how to launch parallel workers on the
-current, local machine. This works the same on all operating systems
-where R is supported, e.g. Linux, macOS, and MS Windows.
+This vignette illustrates how to launch parallel workers on the current,
+local machine. This works the same on all operating systems where R is
+supported, e.g. Linux, macOS, and MS Windows.
 
 ## Examples
 
@@ -49,7 +49,7 @@ cl <- makeClusterPSOCK(c("localhost", "localhost"))
 The
 [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
 function will return the number of workers that the system allows. It
-respects many common settings that controls the number of CPU cores that
+respects many common settings that control the number of CPU cores that
 the current R process is allotted, e.g. R options, environment
 variables, and CGroups settings. For details, see
 [`help("availableCores")`](https://parallelly.futureverse.org/reference/availableCores.md).

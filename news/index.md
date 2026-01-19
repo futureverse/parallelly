@@ -1,5 +1,9 @@
 # Changelog
 
+## Version (development version)
+
+- …
+
 ## Version 1.46.1
 
 CRAN release: 2026-01-08
@@ -53,8 +57,8 @@ CRAN release: 2025-12-12
 - Option `parallelly.supportsMulticore.disableOn` was documented to
   disable forked (“multicore”) processing in the RStudio Terminal, but
   that was not the case due to a thinko. Default options and the
-  documentation has now been updated to reflect that it is only disabled
-  in the RStudio Console.
+  documentation have now been updated to reflect that it is only
+  disabled in the RStudio Console.
 
 ### Bug Fixes
 
@@ -73,17 +77,18 @@ CRAN release: 2025-07-24
 
 ### Deprecated and Defunct
 
-- In previous version,
+- In the previous version,
   [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
   started to collect session information on each parallel worker, which
   included [`capabilities()`](https://rdrr.io/r/base/capabilities.html).
   However, for unknown reasons,
   [`capabilities()`](https://rdrr.io/r/base/capabilities.html) caused
-  the cluster creation to fail GitHub Actions running macOS. The problem
-  could be reproduced neither locally, on the mac-builder, nor on the
-  CRAN macOS servers. Because this feature is non-critical and only
-  introduced in the previous version, I decided to remove the collection
-  of [`capabilities()`](https://rdrr.io/r/base/capabilities.html) again.
+  the cluster creation to fail on GitHub Actions running macOS. The
+  problem could be reproduced neither locally, on the mac-builder, nor
+  on the CRAN macOS servers. Because this feature is non-critical and
+  was only introduced in the previous version, I decided to remove the
+  collection of
+  [`capabilities()`](https://rdrr.io/r/base/capabilities.html) again.
 
 ## Version 1.45.0
 
@@ -105,8 +110,8 @@ CRAN release: 2025-06-02
 - If `killNode(..., signal = tools::SIGTERM)` successfully signaled the
   cluster node, it will now close any existing socket connection to the
   node. If the node is running on the local host, it will also remove
-  its temporary directory, because the the node’s R process might not
-  have been exited gracefully.
+  its temporary directory, because the node’s R process might not have
+  exited gracefully.
 
 - The session information collected by
   [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
@@ -117,7 +122,7 @@ CRAN release: 2025-06-02
 
 - Cluster nodes created by
   [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
-  gained attribute `calls`, which records the
+  gained attribute `calls`, which record the
   [`sys.calls()`](https://rdrr.io/r/base/sys.parent.html). This can be
   useful when troubleshooting from where a cluster was created.
   Analogously, setting R option `parallelly.makeNodePSOCK.calls` to TRUE
@@ -135,7 +140,7 @@ CRAN release: 2025-06-02
   `Error in scan(file = file, what = what, ...)` on systems that have a
   `/proc/self/mounts` file with syntax errors. Such files have been
   reported on Windows Subsystem for Linux version 2 (WSL 2), where
-  spaces in Windows path have not been properly escaped for some
+  spaces in Windows paths have not been properly escaped for some
   entries. Now such invalid entries are skipped, before parsing the
   mount table.
 
@@ -163,7 +168,7 @@ CRAN release: 2025-05-07
 
 - [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   would not respect `method = "fallback"`, since v1.41.0 (2024-12-18),
-  on system with a value for `method = "/proc/self/status"`.
+  on a system with a value for `method = "/proc/self/status"`.
 
 ## Version 1.43.0
 
@@ -205,7 +210,7 @@ CRAN release: 2025-03-24
 - [`isNodeAlive()`](https://parallelly.futureverse.org/reference/isNodeAlive.md)
   could produce warnings on
   `doTryCatch(return(expr), name, parentenv, handler) : NAs introduced by coercion`
-  on MS Windows. Improved the internal `tasklist` parses used to test
+  on MS Windows. Improved the internal `tasklist` parsers used to test
   whether a process is alive.
 
 - [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
@@ -228,7 +233,7 @@ CRAN release: 2025-01-30
 
 ### Bug Fixes
 
-- Call
+- Calling
   [`isNodeAlive()`](https://parallelly.futureverse.org/reference/isNodeAlive.md)
   and
   [`killNode()`](https://parallelly.futureverse.org/reference/killNode.md)
@@ -237,7 +242,7 @@ CRAN release: 2025-01-30
   This bug was introduced in version 1.38.0 (2024-07-27), when adding
   richer support for the `rscript_sh` argument.
 
-- Call
+- Calling
   [`isNodeAlive()`](https://parallelly.futureverse.org/reference/isNodeAlive.md)
   and
   [`killNode()`](https://parallelly.futureverse.org/reference/killNode.md)

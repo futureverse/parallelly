@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,10 +128,10 @@ Bengtsson</h4>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This vignette gives examples how to restrict CPU and memory usage of
-parallel workers. This can useful for optimizing the performance of the
-parallel workers, but also lower the risk that they overuse the CPU and
-memory on the machines they are running on.</p>
+<p>This vignette gives examples of how to restrict CPU and memory usage
+of parallel workers. This can be useful for optimizing the performance
+of the parallel workers, but also lower the risk that they overuse the
+CPU and memory on the machines they are running on.</p>
 </div>
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
@@ -143,10 +143,10 @@ memory on the machines they are running on.</p>
 <p>On Unix, we can run any process with a lower CPU priority using the
 <code>nice</code> command. This can be used when we want to lower the
 risk of negatively affecting other users and processes that run on the
-same machine from our R workers overusing the CPUs by mistake. To
+same machine due to our R workers overusing the CPUs by mistake. To
 achieve this, we can prepend <code>nice</code> to the
-<code>Rscript</code> call via the <code>rscript</code> argument using.
-This works both on local and remote Linux machines, e.g.</p>
+<code>Rscript</code> call via the <code>rscript</code> argument. This
+works both on local and remote Linux machines, e.g.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="fl">2</span>, rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nice"</span>, <span class="st">"*"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -164,7 +164,7 @@ CGroups<a class="anchor" aria-label="anchor" href="#example-linux-parallel-worke
 </h3>
 <p>This example launches two parallel workers each limited to 100% CPU
 quota and 50 MiB of memory using Linux CGroups management. The 100% CPU
-quota limit constrain each worker to use at most one CPU worth of
+quota limit constrains each worker to use at most one CPU worth of
 processing preventing them from overusing the machine, e.g. through
 unintended nested parallelization. For more details, see
 <code>man systemd.resource-control</code>.</p>
@@ -182,7 +182,7 @@ unintended nested parallelization. For more details, see
 <p>Note, depending on your CGroups configuration, a non-privileged user
 may or may not be able to set the CPU quota. If not, the
 <code>-p CPUQuota=100%</code> will be silently ignored.</p>
-<p>The 50 MiB memory limit is strict - if a worker use more than this,
+<p>The 50 MiB memory limit is strict - if a worker uses more than this,
 the operating system will terminate the worker instantly. To illustrate
 what happens, we first start by generating 1 million numeric values each
 consuming 8 bytes, which in total consumes ~8 MB, and then calculate the
@@ -195,7 +195,7 @@ parallel worker has available;</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1]  0.0008072657 -0.0019693992</span></span></code></pre></div>
 <p>However, if we generate 10 times more values, the memory consumption
-will grow to at least 80 MB, which is over then 50-MiB memory limit, and
+will grow to at least 80 MB, which is over the 50-MiB memory limit, and
 we will get an error:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">clusterEvalQ</a></span><span class="op">(</span><span class="va">cl</span>, <span class="op">{</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10e6</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span></span>
@@ -219,7 +219,7 @@ longer alive, e.g.</p>
 <h3 id="example-ms-windows-parallel-workers-with-specific-cpu-affinities">Example: MS Windows parallel workers with specific CPU
 affinities<a class="anchor" aria-label="anchor" href="#example-ms-windows-parallel-workers-with-specific-cpu-affinities"></a>
 </h3>
-<p>This example, works only on MS Windows machines. It launches four
+<p>This example works only on MS Windows machines. It launches four
 local workers, where two are running on CPU Group #0 and two on CPU
 Group #1.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">

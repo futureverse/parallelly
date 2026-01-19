@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -134,7 +134,7 @@ enhance the <strong>parallel</strong> packages. For example,
 your R process as given by R options and environment variables,
 including those set by job schedulers on high-performance compute (HPC)
 clusters. If R runs under ‘cgroups’ or in a Linux container, then their
-settings are acknowledges too. If nothing else is set, then it will fall
+settings are acknowledged too. If nothing else is set, then it will fall
 back to <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code>. Another example is
 <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code>, which is backward compatible with
 <code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">parallel::makePSOCKcluster()</a></code> while doing a better job in
@@ -386,7 +386,7 @@ package will always play by the rules on CRAN and Bioconductor.</p>
 <code><a href="../reference/availableCores.html">availableCores()</a></code> falls back to
 <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> and if that returns
 <code>NA_integer_</code> then one (1) is returned.</p>
-<p>The below table summarize the benefits:</p>
+<p>The below table summarizes the benefits:</p>
 <table class="table">
 <colgroup>
 <col width="46%">
@@ -460,8 +460,8 @@ the corresponding functions in the <strong>future</strong> package (on
 CRAN as of 2020-10-20)</label></p></li>
 <li><p><label><input type="checkbox" checked>Update the
 <strong>future</strong> package to import and re-export the functions
-from the <strong>parallelly</strong> to maximize backward compatibility
-in the future framework (<strong>future</strong> 1.20.1 on CRAN as of
+from <strong>parallelly</strong> to maximize backward compatibility in
+the future framework (<strong>future</strong> 1.20.1 on CRAN as of
 2020-11-03)</label></p></li>
 <li><p><label><input type="checkbox" checked>Switch to use 10-15%
 faster <code>useXDR=FALSE</code></label></p></li>

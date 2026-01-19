@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,6 +77,10 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<ul><li>…</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.46.1" id="version-1461">Version 1.46.1<a class="anchor" aria-label="anchor" href="#version-1461"></a></h2><p class="text-muted">CRAN release: 2026-01-08</p>
 <div class="section level3">
 <h3 id="bug-fixes-1-46-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-46-1"></a></h3>
@@ -95,7 +99,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-1-46-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-1-46-0"></a></h3>
-<ul><li>Option <code>parallelly.supportsMulticore.disableOn</code> was documented to disable forked (“multicore”) processing in the RStudio Terminal, but that was not the case due to a thinko. Default options and the documentation has now been updated to reflect that it is only disabled in the RStudio Console.</li>
+<ul><li>Option <code>parallelly.supportsMulticore.disableOn</code> was documented to disable forked (“multicore”) processing in the RStudio Terminal, but that was not the case due to a thinko. Default options and the documentation have now been updated to reflect that it is only disabled in the RStudio Console.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-46-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-46-0"></a></h3>
@@ -110,7 +114,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="deprecated-and-defunct-1-45-1">Deprecated and Defunct<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-1-45-1"></a></h3>
-<ul><li>In previous version, <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> started to collect session information on each parallel worker, which included <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code>. However, for unknown reasons, <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code> caused the cluster creation to fail GitHub Actions running macOS. The problem could be reproduced neither locally, on the mac-builder, nor on the CRAN macOS servers. Because this feature is non-critical and only introduced in the previous version, I decided to remove the collection of <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code> again.</li>
+<ul><li>In the previous version, <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> started to collect session information on each parallel worker, which included <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code>. However, for unknown reasons, <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code> caused the cluster creation to fail on GitHub Actions running macOS. The problem could be reproduced neither locally, on the mac-builder, nor on the CRAN macOS servers. Because this feature is non-critical and was only introduced in the previous version, I decided to remove the collection of <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code> again.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -119,14 +123,14 @@
 <h3 id="new-features-1-45-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-45-0"></a></h3>
 <ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> gained argument <code>max</code>, which limits the maximum number of cores returned after everything else is applied, i.e. <code>availableCores(..., max = n)</code> is short for <code>min(n,    availableCores(...), na.rm = TRUE)</code>.</p></li>
 <li><p><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> gained argument <code>...</code>, which passes any additional arguments to <code><a href="../reference/availableCores.html">availableCores()</a></code>, if specified.</p></li>
-<li><p>If <code>killNode(..., signal = tools::SIGTERM)</code> successfully signaled the cluster node, it will now close any existing socket connection to the node. If the node is running on the local host, it will also remove its temporary directory, because the the node’s R process might not have been exited gracefully.</p></li>
+<li><p>If <code>killNode(..., signal = tools::SIGTERM)</code> successfully signaled the cluster node, it will now close any existing socket connection to the node. If the node is running on the local host, it will also remove its temporary directory, because the node’s R process might not have exited gracefully.</p></li>
 <li><p>The session information collected by <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> now contains more details on each worker, e.g. the <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code> folder, <code><a href="https://rdrr.io/r/base/capabilities.html" class="external-link">capabilities()</a></code>, and <code><a href="https://rdrr.io/r/base/extSoftVersion.html" class="external-link">extSoftVersion()</a></code>.</p></li>
-<li><p>Cluster nodes created by <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> gained attribute <code>calls</code>, which records the <code><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.calls()</a></code>. This can be useful when troubleshooting from where a cluster was created. Analogously, setting R option <code>parallelly.makeNodePSOCK.calls</code> to TRUE will relay the call stack in the system call that launched the cluster node.</p></li>
+<li><p>Cluster nodes created by <code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> gained attribute <code>calls</code>, which record the <code><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.calls()</a></code>. This can be useful when troubleshooting from where a cluster was created. Analogously, setting R option <code>parallelly.makeNodePSOCK.calls</code> to TRUE will relay the call stack in the system call that launched the cluster node.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-45-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-45-0"></a></h3>
 <ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would not respect <code>method = "fallback"</code> if <code>constraints</code> specified <code>"connections"</code> or <code>"connections-N"</code>.</p></li>
-<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would produce an error on <code>Error in scan(file =    file, what = what, ...)</code> on systems that have a <code>/proc/self/mounts</code> file with syntax errors. Such files have been reported on Windows Subsystem for Linux version 2 (WSL 2), where spaces in Windows path have not been properly escaped for some entries. Now such invalid entries are skipped, before parsing the mount table.</p></li>
+<li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> would produce an error on <code>Error in scan(file =    file, what = what, ...)</code> on systems that have a <code>/proc/self/mounts</code> file with syntax errors. Such files have been reported on Windows Subsystem for Linux version 2 (WSL 2), where spaces in Windows paths have not been properly escaped for some entries. Now such invalid entries are skipped, before parsing the mount table.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -139,7 +143,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-1-44-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-44-0"></a></h3>
 <ul><li>
-<code><a href="../reference/availableCores.html">availableCores()</a></code> would not respect <code>method = "fallback"</code>, since v1.41.0 (2024-12-18), on system with a value for <code>method =    "/proc/self/status"</code>.</li>
+<code><a href="../reference/availableCores.html">availableCores()</a></code> would not respect <code>method = "fallback"</code>, since v1.41.0 (2024-12-18), on a system with a value for <code>method =    "/proc/self/status"</code>.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -159,7 +163,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-43-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-43-0"></a></h3>
-<ul><li><p><code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> could produce warnings on <code>doTryCatch(return(expr),    name, parentenv, handler) : NAs introduced by coercion</code> on MS Windows. Improved the internal <code>tasklist</code> parses used to test whether a process is alive.</p></li>
+<ul><li><p><code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> could produce warnings on <code>doTryCatch(return(expr),    name, parentenv, handler) : NAs introduced by coercion</code> on MS Windows. Improved the internal <code>tasklist</code> parsers used to test whether a process is alive.</p></li>
 <li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> could produce <code>Error: Error in    cache_controller[[field]] : subscript out of bounds</code> in <code>... getCGroups1CpuQuota -&gt; getCGroups1CpuPeriodMicroseconds</code>.</p></li>
 </ul></div>
 </div>
@@ -171,8 +175,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-42-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-42-0"></a></h3>
-<ul><li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error in match.arg(type, choices =    known_types, several.ok = FALSE) : 'arg' must be of length 1</code>. This bug was introduced in version 1.38.0 (2024-07-27), when adding richer support for the <code>rscript_sh</code> argument.</p></li>
-<li><p>Call <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error: ‘length(rsh_call) == 1L’ is    not TRUE</code> if option <code>rshopts</code> were specified during creation.</p></li>
+<ul><li><p>Calling <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error in match.arg(type, choices =    known_types, several.ok = FALSE) : 'arg' must be of length 1</code>. This bug was introduced in version 1.38.0 (2024-07-27), when adding richer support for the <code>rscript_sh</code> argument.</p></li>
+<li><p>Calling <code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> on cluster nodes running on external machines would produce <code>Error: ‘length(rsh_call) == 1L’ is    not TRUE</code> if option <code>rshopts</code> were specified during creation.</p></li>
 <li><p>The value of <code><a href="../reference/availableCores.html">availableCores()</a></code> was numeric rather than integer as documented. This harmless bug was introduced in version 1.31.0 (2022-04-07).</p></li>
 </ul></div>
 </div>

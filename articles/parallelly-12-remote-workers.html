@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -140,7 +140,7 @@ share a common file system. <em>Remote</em> machines are machines that
 are on a different network and that do not share a common file system
 with the main R computer. In most cases the distinction between local
 and remote machines does not matter, but in some cases we can take
-advantages of workers being local.</p>
+advantage of workers being local.</p>
 <p>Regardless of running parallel workers on local or remote machines,
 we need a way to connect to the machines and launch R on them.</p>
 <div class="section level3">
@@ -183,9 +183,9 @@ machine.</p>
 <h4 id="configure-password-less-ssh-access">Configure password-less SSH access<a class="anchor" aria-label="anchor" href="#configure-password-less-ssh-access"></a>
 </h4>
 <p>Launching parallel R workers is typically done automatically in the
-background, which means it cumbersome, or even impossible, to enter the
-SSH password for each machine we wish to connect to. The solution is to
-configure SSH to connect with <em>public-private keys</em>, which
+background, which means it is cumbersome, or even impossible, to enter
+the SSH password for each machine we wish to connect to. The solution is
+to configure SSH to connect with <em>public-private keys</em>, which
 pre-establish SSH authentication between the main machine and the
 machine to connect to. As this is common practice when working with SSH,
 there are numerous online tutorials explaining how to configure
@@ -235,7 +235,7 @@ having to enter a password;</p>
 <p>Type <code>exit</code> to return to your local machine.</p>
 <p>Note, if you later want to connect to other machines,
 e.g. <code>n2.remote.org</code> or <code>hpc.my-university.edu</code>,
-you may re-use the above generated keys for those systems to. In other
+you may re-use the above generated keys for those systems too. In other
 words, you do not have to use <code>ssh-keygen</code> to generate new
 keys for those machines.</p>
 </div>
@@ -258,7 +258,7 @@ machine and call <code>Rscript --version</code>;</p>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="ex">Rscript:</span> command not found</span></code></pre></div>
 <p>then R is either not installed on that machine, or it cannot be
 found. If it is installed, but cannot be found, make sure that
-environment variable <code>PATH</code> his configured properly on that
+environment variable <code>PATH</code> is configured properly on that
 machine.</p>
 </div>
 <div class="section level4">
@@ -283,7 +283,7 @@ on machine <code>n1.remote.org</code> running under user
 <span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="ex">parallel::stopCluster</span><span class="er">(</span><span class="ex">cl</span><span class="kw">)</span></span></code></pre></div>
 <p>If you want to run parallel workers on other machines, repeat the
 above for each machine. After this, you will be able to launch parallel
-R workers on these machines with little efforts.</p>
+R workers on these machines with little effort.</p>
 </div>
 <div class="section level4">
 <h4 id="machine-specific-ssh-customization-recommended">Machine-specific SSH customization (recommended)<a class="anchor" aria-label="anchor" href="#machine-specific-ssh-customization-recommended"></a>
@@ -598,9 +598,9 @@ operating system, e.g. Linux or macOS. If your remote machines run MS
 Windows, you can use similar techniques to launch parallel workers there
 as well. For this to work, the remote MS Windows machines must accept
 incoming SSH connections, which is something most Windows machines are
-not configured to do by default. If you do not know set that up, or if
-you do not have the system permissions to do so, please reach out to you
-system administrator of those machines.</p>
+not configured to do by default. If you do not know how to set that up,
+or if you do not have the system permissions to do so, please reach out
+to your system administrator of those machines.</p>
 <p>Assuming we have SSH access to two MS Windows machines,
 <code>mswin1.remote.org</code> and <code>mswin2.remote.org</code>,
 everything works the same as before, except that we need to specify also

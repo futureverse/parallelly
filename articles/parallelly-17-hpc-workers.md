@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This vignettes illustrates how to launch parallel workers via job
+This vignette illustrates how to launch parallel workers via job
 schedulers running in high-performance compute (HPC) environments.
 
 ## Examples
@@ -14,7 +14,7 @@ one can request compute resources on multiple nodes, each running
 multiple cores. Examples of Grid Engine schedulers are Oracle Grid
 Engine (formerly Sun Grid Engine), Univa Grid Engine, and Son of Grid
 Engine - all commonly referred to as SGE schedulers. Each SGE cluster
-may have its own configuration with their own way of requesting parallel
+may have its own configuration with its own way of requesting parallel
 slots.
 
 Consider the following two files: `script.sh` and `script.R`.

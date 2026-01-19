@@ -7,7 +7,7 @@ Windows via Wine (<https://www.winehq.org/>) on Linux and macOS. This
 can be useful when we need to run R code or call R packages that work
 only on MS Windows.
 
-The below instructions assumes that you already have Wine installed.
+The below instructions assume that you already have Wine installed.
 
 ### Install R for MS Windows 10
 

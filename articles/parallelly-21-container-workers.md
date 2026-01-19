@@ -39,7 +39,7 @@ print(cl)
 
 This example shows how to set up two parallel workers running Docker
 image ‘rocker/r-parallel’ (<https://hub.docker.com/r/rocker/r-parallel>)
-via Apptainer (\<<https://apptainer.org/>).
+via Apptainer (<https://apptainer.org/>).
 
 ``` r
 library(parallelly)
