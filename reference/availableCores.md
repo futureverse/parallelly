@@ -48,8 +48,8 @@ availableCores(
   [`detectCores`](https://rdrr.io/r/parallel/detectCores.html)`(logical = logical)`,
   which, *if supported*, returns the number of logical CPUs (TRUE) or
   physical CPUs/cores (FALSE). At least as of R 4.2.2, `detectCores()`
-  this argument on Linux. This argument is only if argument `methods`
-  includes `"system"`.
+  ignores this argument on Linux. This argument is only used if argument
+  `methods` includes `"system"`.
 
 - default:
 
@@ -114,12 +114,12 @@ supported:
   available R connections per
   [`freeConnections()`](https://parallelly.futureverse.org/reference/availableConnections.md).
   This is the maximum number of socket-based **parallel** cluster nodes
-  that are possible launch, because each one needs its own R connection.
-  The `"connections-N"` form (e.g. `connections-16`) works like
-  `"connections"` but uses `freeConnections() - N` as the upper limit,
-  leaving `N` connections free for other purposes. The exception is when
-  the result is zero or less, then `1L` is still returned, because
-  `availableCores()` should always return a positive integer.
+  that are possible to launch, because each one needs its own R
+  connection. The `"connections-N"` form (e.g. `connections-16`) works
+  like `"connections"` but uses `freeConnections() - N` as the upper
+  limit, leaving `N` connections free for other purposes. The exception
+  is when the result is zero or less, then `1L` is still returned,
+  because `availableCores()` should always return a positive integer.
 
 - `"BiocParallel"` - Query environment variable
   `BIOCPARALLEL_WORKER_NUMBER` (integer), which is defined and used by
@@ -172,8 +172,8 @@ supported:
   `SLURM_CPUS_PER_TASK` is not set, then it will fall back to use
   `SLURM_CPUS_ON_NODE` if the job is a single-node job
   (`SLURM_JOB_NUM_NODES` is 1), e.g. `sbatch --ntasks=2 hello.sh`. To
-  make sure all tasks are assign to a single node, specify `--nodes=1`,
-  e.g. `sbatch --nodes=1 --ntasks=16 hello.sh`.
+  make sure all tasks are assigned to a single node, specify
+  `--nodes=1`, e.g. `sbatch --nodes=1 --ntasks=16 hello.sh`.
 
 - `"custom"` - If option
   [`parallelly.availableCores.custom`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)

@@ -24,7 +24,7 @@ killNode(x, signal = tools::SIGTERM, ...)
   All other signals are platform specific, cf.
   [`tools::pskill()`](https://rdrr.io/r/tools/pskill.html).
 
-  With the exception for MS Windows, as explained below, using `SIGINT`
+  With the exception of MS Windows, as explained below, using `SIGINT`
   will trigger an R
   [`interrupt`](https://rdrr.io/r/base/conditions.html) condition that
   can be caught with
@@ -43,8 +43,8 @@ killNode(x, signal = tools::SIGTERM, ...)
   a matter of fact, on MS Windows, `SIGINT` works identically to
   `SIGTERM`, where they both terminate the cluster node abruptly without
   giving the R process a chance to exit gracefully. This means that R
-  will *not* clean up after itself, e.g. there its temporary directory
-  will remain also after R terminates.
+  will *not* clean up after itself, e.g. its temporary directory will
+  remain even after R terminates.
 
 - ...:
 
@@ -62,7 +62,7 @@ With R (\< 3.5.0), NA is always returned. This is due to a bug in R (\<
 Note that the preferred way to terminate a cluster is via
 [`parallel::stopCluster()`](https://rdrr.io/r/parallel/makeCluster.html),
 because it terminates the cluster nodes by kindly asking each of them to
-nicely shut themselves down. Using `killNode()` is a much more sever
+nicely shut themselves down. Using `killNode()` is a much more severe
 approach. It abruptly terminates the underlying R process, possibly
 without giving the parallel worker a chance to terminate gracefully. For
 example, it might get terminated in the middle of writing to file.

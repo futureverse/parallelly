@@ -6,9 +6,9 @@ current machine, R sessions on external machines (local or remote), or a
 mix of such. For external workers, the default is to use SSH to connect
 to those external machines. This function works similarly to
 [`makePSOCKcluster()`](https://rdrr.io/r/parallel/makeCluster.html) of
-the parallel package, but provides additional and more flexibility
-options for controlling the setup of the system calls that launch the
-background R workers, and how to connect to external machines.
+the parallel package, but provides additional and more flexible options
+for controlling the setup of the system calls that launch the background
+R workers, and how to connect to external machines.
 
 ## Usage
 
@@ -347,10 +347,10 @@ it will use more than 100% of the CPU cores when running on machine with
 fewer than 32 CPU cores. For example, on a eight-core machine, this may
 run the CPU at 400% of its capacity, which has a significant negative
 effect on the current R process, but also on all other processes running
-on the same machine. This also a problem on systems where R gets
+on the same machine. This is also a problem on systems where R gets
 allotted a specific number of CPU cores, which is the case on
 high-performance compute (HPC) clusters, but also on other shared
-systems that limits user processes via Linux Control Groups (cgroups).
+systems that limit user processes via Linux Control Groups (cgroups).
 For example, a free account on Posit Cloud is limited to a single CPU
 core. Parallelizing with 32 workers when only having access to a single
 core, will result in 3200% overuse and 32 concurrent R processes

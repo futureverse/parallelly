@@ -131,8 +131,8 @@ of available cores.</p></dd>
 <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a>(logical = logical)</code>, which,
 <em>if supported</em>, returns the number of logical CPUs (TRUE) or physical
 CPUs/cores (FALSE).
-At least as of R 4.2.2, <code>detectCores()</code> this argument on Linux.
-This argument is only if argument <code>methods</code> includes <code>"system"</code>.</p></dd>
+At least as of R 4.2.2, <code>detectCores()</code> ignores this argument on Linux.
+This argument is only used if argument <code>methods</code> includes <code>"system"</code>.</p></dd>
 
 
 <dt id="arg-default">default<a class="anchor" aria-label="anchor" href="#arg-default"></a></dt>
@@ -195,7 +195,7 @@ package.</p></li>
 <li><p><code>"connections"</code> or <code>"connections-N"</code> -
 Query the current number of available R connections per
 <code><a href="availableConnections.html">freeConnections()</a></code>.  This is the maximum number of socket-based
-<strong>parallel</strong> cluster nodes that are possible launch, because each
+<strong>parallel</strong> cluster nodes that are possible to launch, because each
 one needs its own R connection.
 The <code>"connections-N"</code> form (e.g. <code>connections-16</code>) works like
 <code>"connections"</code> but uses <code>freeConnections() - N</code> as the upper limit,
@@ -255,7 +255,7 @@ e.g. <code>sbatch --cpus-per-task=2 hello.sh</code> or by adding
 If <code class="env">SLURM_CPUS_PER_TASK</code> is not set, then it will fall back to
 use <code class="env">SLURM_CPUS_ON_NODE</code> if the job is a single-node job
 (<code class="env">SLURM_JOB_NUM_NODES</code> is 1), e.g. <code>sbatch --ntasks=2 hello.sh</code>.
-To make sure all tasks are assign to a single node, specify
+To make sure all tasks are assigned to a single node, specify
 <code>--nodes=1</code>, e.g. <code>sbatch --nodes=1 --ntasks=16 hello.sh</code>.</p></li>
 <li><p><code>"custom"</code> -
 If option
