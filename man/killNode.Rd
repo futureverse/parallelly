@@ -15,7 +15,7 @@ It's only \code{tools::SIGINT} (2) and \code{tools::SIGTERM} (15) that are
 supported on all operating systems (i.e. Unix, macOS, and MS Windows).
 All other signals are platform specific, cf. \code{\link[tools:pskill]{tools::pskill()}}.
 
-With the exception for MS Windows, as explained below, using \code{SIGINT}
+With the exception of MS Windows, as explained below, using \code{SIGINT}
 will trigger an R \code{\link[base:conditions]{interrupt}} condition that
 can be caught with \code{\link[=tryCatch]{tryCatch()}} and \code{\link[=withCallingHandlers]{withCallingHandlers()}} using an
 \code{interrupt} calling handler.
@@ -31,8 +31,8 @@ despite using \code{SIGINT}, there is no \code{interrupt} condition signaled.
 As a matter of fact, on MS Windows, \code{SIGINT} works identically to
 \code{SIGTERM}, where they both terminate the cluster node abruptly without
 giving the R process a chance to exit gracefully. This means that R will
-\emph{not} clean up after itself, e.g. there its temporary directory will
-remain also after R terminates.}
+\emph{not} clean up after itself, e.g. its temporary directory will
+remain even after R terminates.}
 
 \item{\ldots}{Not used.}
 }
@@ -49,7 +49,7 @@ Terminate one or more cluster nodes using process signaling
 Note that the preferred way to terminate a cluster is via
 \code{\link[parallel:makeCluster]{parallel::stopCluster()}}, because it terminates the cluster nodes
 by kindly asking each of them to nicely shut themselves down.
-Using \code{killNode()} is a much more sever approach. It abruptly
+Using \code{killNode()} is a much more severe approach. It abruptly
 terminates the underlying R process, possibly without giving the
 parallel worker a chance to terminate gracefully.  For example,
 it might get terminated in the middle of writing to file.
