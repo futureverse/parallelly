@@ -18,7 +18,7 @@ only on MS Windows.
 The below instructions assume that you already have Wine installed.
 
 
-## Install R for MS Windows 10
+## Install R for MS Windows 11
 
 To install R for MS Windows in Wine, first configure Wine to use
 Windows 11;
@@ -73,6 +73,8 @@ print(cl)
 
 # Appendix
 
+## Wine and R warnings
+
 It might be that Wine produces warnings like:
 
 ```plain
@@ -90,6 +92,27 @@ These are typically harmless. Environment variable setting
 `WINEDEBUG=fixme-all` should take care of the first one, and
 `LC_ALL=en_US.UTF-8` the second one.
 
+
+## Windows-only CRAN packages 
+
+A small number of the CRAN packages install only on MS Windows. Here
+is how to see which are:
+
+```r
+db <- read.dcf(url("https://cran.r-project.org/src/contrib/PACKAGES"))
+db <- as.data.frame(db)
+win_only <- subset(db, OS_type == "windows")
+print(win_only$Package)
+```
+
+As of 2026-01-21, this outputs:
+
+```r
+ [1] "BiplotGUI"         "blatr"             "excel.link"
+ [4] "KeyboardSimulator" "MDSGUI"            "MediaNews"
+ [7] "R2PPT"             "R2wd"              "rFUSION"
+[10] "RWinEdt"           "spectrino"         "taskscheduleR"
+```
 
 [R for Windows]: https://cran.r-project.org/bin/windows/base/
 [Winetricks]: https://github.com/Winetricks/winetricks
