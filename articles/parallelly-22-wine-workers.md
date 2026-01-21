@@ -9,7 +9,7 @@ only on MS Windows.
 
 The below instructions assume that you already have Wine installed.
 
-### Install R for MS Windows 10
+### Install R for MS Windows 11
 
 To install R for MS Windows in Wine, first configure Wine to use Windows
 11;
