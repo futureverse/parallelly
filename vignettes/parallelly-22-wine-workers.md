@@ -21,14 +21,15 @@ The below instructions assume that you already have Wine installed.
 ## Install R for MS Windows 10
 
 To install R for MS Windows in Wine, first configure Wine to use
-Windows 10;
+Windows 11;
 
 ```sh
-$ winecfg
+$ winecfg /v win11
+$ winecfg /v
+win11
 ```
 
-In the GUI, set 'Windows version' to 'Windows 10'. Then, install [R for
-Windows] in Wine, by:
+Then, install [R for Windows] in Wine, by:
 
 ```sh
 $ wget https://cran.r-project.org/bin/windows/base/R-4.5.2-win.exe
@@ -57,6 +58,7 @@ cl <- makeClusterPSOCK(
   rscript = c(
     ## Silence Wine warnings
     "WINEDEBUG=fixme-all",
+    "LC_ALL=en_US.UTF-8",
     ## Don't pass LC_* and R_LIBS* environments from host to Wine
     sprintf("%s=", grep("^(LC_|R_LIBS)", names(Sys.getenv()), value = TRUE)),
     "wine",
@@ -69,4 +71,25 @@ print(cl)
 ```
 
 
+# Appendix
+
+It might be that Wine produces warnings like:
+
+```plain
+0128:fixme:font:find_matching_face Untranslated charset 255
+```
+
+and R for Windows produces a warning on:
+
+```plain
+During startup - Warning message:
+Using locale code page other than 65001 ("UTF-8") may cause problems.
+```
+
+These are typically harmless. Environment variable setting
+`WINEDEBUG=fixme-all` should take care of the first one, and
+`LC_ALL=en_US.UTF-8` the second one.
+
+
 [R for Windows]: https://cran.r-project.org/bin/windows/base/
+[Winetricks]: https://github.com/Winetricks/winetricks
