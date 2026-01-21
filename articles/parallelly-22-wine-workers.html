@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -138,9 +138,11 @@ installed.</p>
 <h3 id="install-r-for-ms-windows-10">Install R for MS Windows 10<a class="anchor" aria-label="anchor" href="#install-r-for-ms-windows-10"></a>
 </h3>
 <p>To install R for MS Windows in Wine, first configure Wine to use
-Windows 10;</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">$</span> winecfg</span></code></pre></div>
-<p>In the GUI, set ‘Windows version’ to ‘Windows 10’. Then, install <a href="https://cran.r-project.org/bin/windows/base/" class="external-link">R for Windows</a> in
+Windows 11;</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">$</span> winecfg /v win11</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="ex">$</span> winecfg /v</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="ex">win11</span></span></code></pre></div>
+<p>Then, install <a href="https://cran.r-project.org/bin/windows/base/" class="external-link">R for Windows</a> in
 Wine, by:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">$</span> wget https://cran.r-project.org/bin/windows/base/R-4.5.2-win.exe</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">$</span> wine R-4.5.2-win.exe /SILENT</span></code></pre></div>
@@ -164,6 +166,7 @@ on the local machine.</p>
 <span>  rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="co">## Silence Wine warnings</span></span>
 <span>    <span class="st">"WINEDEBUG=fixme-all"</span>,</span>
+<span>    <span class="st">"LC_ALL=en_US.UTF-8"</span>,</span>
 <span>    <span class="co">## Don't pass LC_* and R_LIBS* environments from host to Wine</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s="</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^(LC_|R_LIBS)"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="st">"wine"</span>,</span>
@@ -173,6 +176,38 @@ on the local machine.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Socket cluster with 1 node on host 'localhost'</span></span>
 <span><span class="co">#&gt; (R version 4.5.2 (2025-10-31 ucrt), platform x86_64-w64-mingw32)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="appendix">Appendix<a class="anchor" aria-label="anchor" href="#appendix"></a>
+</h2>
+<div class="section level3">
+<h3 id="wine-and-r-warnings">Wine and R warnings<a class="anchor" aria-label="anchor" href="#wine-and-r-warnings"></a>
+</h3>
+<p>It might be that Wine produces warnings like:</p>
+<pre class="plain"><code>0128:fixme:font:find_matching_face Untranslated charset 255</code></pre>
+<p>and R for Windows produces a warning on:</p>
+<pre class="plain"><code>During startup - Warning message:
+Using locale code page other than 65001 ("UTF-8") may cause problems.</code></pre>
+<p>These are typically harmless. Environment variable setting
+<code>WINEDEBUG=fixme-all</code> should take care of the first one, and
+<code>LC_ALL=en_US.UTF-8</code> the second one.</p>
+</div>
+<div class="section level3">
+<h3 id="windows-only-cran-packages">Windows-only CRAN packages<a class="anchor" aria-label="anchor" href="#windows-only-cran-packages"></a>
+</h3>
+<p>A small number of the CRAN packages install only on MS Windows. Here
+is how to see which are:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dcf.html" class="external-link">read.dcf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">url</a></span><span class="op">(</span><span class="st">"https://cran.r-project.org/src/contrib/PACKAGES"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
+<span><span class="va">win_only</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">db</span>, <span class="va">OS_type</span> <span class="op">==</span> <span class="st">"windows"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">win_only</span><span class="op">$</span><span class="va">Package</span><span class="op">)</span></span></code></pre></div>
+<p>As of 2026-01-21, this outputs:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a> [<span class="dv">1</span>] <span class="st">"BiplotGUI"</span>         <span class="st">"blatr"</span>             <span class="st">"excel.link"</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a> [<span class="dv">4</span>] <span class="st">"KeyboardSimulator"</span> <span class="st">"MDSGUI"</span>            <span class="st">"MediaNews"</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a> [<span class="dv">7</span>] <span class="st">"R2PPT"</span>             <span class="st">"R2wd"</span>              <span class="st">"rFUSION"</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>[<span class="dv">10</span>] <span class="st">"RWinEdt"</span>           <span class="st">"spectrino"</span>         <span class="st">"taskscheduleR"</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
