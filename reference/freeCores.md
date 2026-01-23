@@ -46,10 +46,10 @@ An positive integer with attributes `loadavg` (named numeric),
 ``` r
 free <- freeCores()
 print(free)
-#> [1] 4
+#> [1] 5
 #> attr(,"loadavg")
 #>  1min  5min 15min 
-#>  2.33  2.51  2.44 
+#>  1.28  1.36  0.84 
 #> attr(,"maxCores")
 #> system 
 #>      8 
