@@ -40,10 +40,10 @@ stopifnot(inherits(args, "error"))
 
 print(parallelly::availableCores, call = FALSE)
 
-options(future.p2p.tests.cmdargs = character(0L))
+options(parallelly.tests.cmdargs = character(0L))
 print(parallelly::availableCores, call = TRUE)
 
-options(future.p2p.tests.cmdargs = c("--max=4"))
+options(parallelly.tests.cmdargs = c("--max=4"))
 print(parallelly::availableCores, call = TRUE)
 
 
@@ -68,20 +68,20 @@ output(list(abc = 42))
 output(c(abc = 42))
 
 
-options(future.p2p.tests.cmdargs = character(0L))
+options(parallelly.tests.cmdargs = character(0L))
 void <- print(fcn)
 
-options(future.p2p.tests.cmdargs = c("--abc=0", "--def=3.14"))
+options(parallelly.tests.cmdargs = c("--abc=0", "--def=3.14"))
 void <- print(fcn)
 
-options(future.p2p.tests.cmdargs = c("--abc=-1", "--def=3.14"))
+options(parallelly.tests.cmdargs = c("--abc=-1", "--def=3.14"))
 void <- print(fcn)
 
-options(future.p2p.tests.cmdargs = c("--abc=+1", "--def=3.14"))
+options(parallelly.tests.cmdargs = c("--abc=+1", "--def=3.14"))
 void <- print(fcn)
 
 parallelly:::cli_fcn_output(fcn) <- utils::str
-options(future.p2p.tests.cmdargs = c("--abc=+1", "--def=3.14"))
+options(parallelly.tests.cmdargs = c("--abc=+1", "--def=3.14"))
 void <- print(fcn)
 
 parallelly:::cli_fcn(fcn) <- list(structure(parallelly:::cli_arg_integer("abc"), type = "unknown"))
@@ -89,7 +89,7 @@ void <- tryCatch(print(fcn), error = identity)
 print(void)
 stopifnot(inherits(void, "error"))
 
-options(future.p2p.tests.cmdargs = NULL)
+options(parallelly.tests.cmdargs = NULL)
 
 
 res <- tryCatch(parallelly:::cli_prune(), error = identity)
