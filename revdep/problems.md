@@ -17,7 +17,7 @@ Run `revdepcheck::revdep_details(, "adea")` for more info
 *   checking whether package ‘adea’ can be installed ... ERROR
     ```
     Installation failed.
-    See ‘/scratch/henrik/revdep/parallelly/checks/adea/new/adea.Rcheck/00install.out’ for details.
+    See ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/adea/new/adea.Rcheck/00install.out’ for details.
     ```
 
 ## Installation
@@ -38,7 +38,7 @@ Error: package or namespace load failed for ‘ROI.plugin.symphony’ in loadNam
  there is no package called ‘Rsymphony’
 Execution halted
 ERROR: lazy loading failed for package ‘adea’
-* removing ‘/scratch/henrik/revdep/parallelly/checks/adea/new/adea.Rcheck/adea’
+* removing ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/adea/new/adea.Rcheck/adea’
 
 
 ```
@@ -58,149 +58,19 @@ Error: package or namespace load failed for ‘ROI.plugin.symphony’ in loadNam
  there is no package called ‘Rsymphony’
 Execution halted
 ERROR: lazy loading failed for package ‘adea’
-* removing ‘/scratch/henrik/revdep/parallelly/checks/adea/old/adea.Rcheck/adea’
+* removing ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/adea/old/adea.Rcheck/adea’
 
 
 ```
-# alookr
-
-<details>
-
-* Version: 0.4.0
-* GitHub: https://github.com/choonghyunryu/alookr
-* Source code: https://github.com/cran/alookr
-* Date/Publication: 2025-09-16 02:50:02 UTC
-* Number of recursive dependencies: 149
-
-Run `revdepcheck::revdep_details(, "alookr")` for more info
-
-</details>
-
-## In both
-
-*   checking examples ... ERROR
-    ```
-    Running examples in ‘alookr-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: run_models
-    > ### Title: Fit binary classification model
-    > ### Aliases: run_models
-    > 
-    > ### ** Examples
-    > 
-    > library(dplyr)
-    ...
-     10. │   ├─purrr:::call_with_cleanup(...)
-     11. │   └─alookr (local) .f(.x[[i]], ...)
-     12. │     ├─future::value(.x)
-     13. │     └─future:::value.Future(.x)
-     14. │       └─future:::signalConditions(...)
-     15. │         └─base::stop(condition)
-     16. └─purrr (local) `<fn>`(`<smplErrr>`)
-     17.   └─cli::cli_abort(...)
-     18.     └─rlang::abort(...)
-    Execution halted
-    ```
-
-# bbw
-
-<details>
-
-* Version: 0.3.0
-* GitHub: https://github.com/rapidsurveys/bbw
-* Source code: https://github.com/cran/bbw
-* Date/Publication: 2025-01-16 09:00:06 UTC
-* Number of recursive dependencies: 125
-
-Run `revdepcheck::revdep_details(, "bbw")` for more info
-
-</details>
-
-## In both
-
-*   checking DESCRIPTION meta-information ... NOTE
-    ```
-      Missing dependency on R >= 4.2.0 because package code uses the pipe
-      placeholder syntax added in R 4.2.0.
-      File(s) using such syntax:
-        ‘boot_bw.R’ ‘boot_bw_estimate.R’ ‘post_strat_estimation.R’
-    ```
-
-# COTAN
-
-<details>
-
-* Version: 2.10.0
-* GitHub: https://github.com/seriph78/COTAN
-* Source code: https://github.com/cran/COTAN
-* Date/Publication: 2025-10-29
-* Number of recursive dependencies: 266
-
-Run `revdepcheck::revdep_details(, "COTAN")` for more info
-
-</details>
-
-## In both
-
-*   checking package dependencies ... ERROR
-    ```
-    Package required but not available: ‘gghalves’
-    
-    See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-    manual.
-    ```
-
-# crmPack
-
-<details>
-
-* Version: 2.0.1
-* GitHub: https://github.com/openpharma/crmPack
-* Source code: https://github.com/cran/crmPack
-* Date/Publication: 2025-12-04 14:40:20 UTC
-* Number of recursive dependencies: 120
-
-Run `revdepcheck::revdep_details(, "crmPack")` for more info
-
-</details>
-
-## In both
-
-*   checking tests ...
-    ```
-      Running ‘test-package-load.R’
-      Running ‘testthat.R’
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 50 lines of output:
-        'test-Model-class.R:1593:1', 'test-Model-class.R:1602:1',
-        'test-Model-methods.R:2493:1', 'test-Model-methods.R:2501:1',
-        'test-Model-validity.R:126:1', 'test-Model-validity.R:223:1',
-        'test-Model-validity.R:314:1', 'test-Model-validity.R:425:1',
-        'test-Model-validity.R:433:1', 'test-Model-validity.R:442:1',
-    ...
-      Expected `h_test_logging_enabled()` to be TRUE.
-      Differences:
-      `actual`:   <NA>
-      `expected`: TRUE
-      
-      
-      [ FAIL 3 | WARN 0 | SKIP 121 | PASS 3444 ]
-      Error:
-      ! Test failures.
-      Execution halted
-    ```
-
 # ctsem
 
 <details>
 
-* Version: 3.10.4
+* Version: 3.10.5
 * GitHub: https://github.com/cdriveraus/ctsem
 * Source code: https://github.com/cran/ctsem
-* Date/Publication: 2025-06-30 16:40:11 UTC
-* Number of recursive dependencies: 166
+* Date/Publication: 2026-01-20 06:10:27 UTC
+* Number of recursive dependencies: 170
 
 Run `revdepcheck::revdep_details(, "ctsem")` for more info
 
@@ -212,7 +82,7 @@ Run `revdepcheck::revdep_details(, "ctsem")` for more info
     ```
     Found the following significant warnings:
       Warning: namespace ‘colorspace’ is not available and has been replaced
-    See ‘/scratch/henrik/revdep/parallelly/checks/ctsem/new/ctsem.Rcheck/00install.out’ for details.
+    See ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/ctsem/new/ctsem.Rcheck/00install.out’ for details.
     ```
 
 *   checking re-building of vignette outputs ... WARNING
@@ -272,7 +142,7 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
     > ### ** Examples
     > 
     > collectri <- get_collectri(organism='human', split_complexes=FALSE)
-    [2026-01-06 16:39:26] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+    [2026-01-25 14:20:16] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
     Error in if (.keep) . else select(., -!!evs_col) : 
       argument is of length zero
     Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
@@ -311,8 +181,8 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
     --- finished re-building ‘decoupleR.Rmd’
     
     --- re-building ‘pw_bk.Rmd’ using rmarkdown
-    [2026-01-06 16:42:48] [WARN]    [OmnipathR] Accessing `PROGENy` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
-    [2026-01-06 16:42:51] [SUCCESS] [OmnipathR] Loaded 700239 annotation records from cache.
+    [2026-01-25 14:28:09] [WARN]    [OmnipathR] Accessing `PROGENy` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+    [2026-01-25 14:28:14] [SUCCESS] [OmnipathR] Loaded 700239 annotation records from cache.
     Warning: ggrepel: 445 unlabeled data points (too many overlaps). Consider increasing max.overlaps
     [WARNING] Could not fetch resource https://decoupler-py.readthedocs.io/en/1.4.0/_images/mlm.png: HttpExceptionRequest Request {
         host                 = "decoupler-py.readthedocs.io"
@@ -376,6 +246,30 @@ Run `revdepcheck::revdep_details(, "fmeffects")` for more info
     
     Error: Vignette re-building failed.
     Execution halted
+    ```
+
+# geocodebr
+
+<details>
+
+* Version: 0.6.0
+* GitHub: https://github.com/ipeaGIT/geocodebr
+* Source code: https://github.com/cran/geocodebr
+* Date/Publication: 2026-01-23 19:10:02 UTC
+* Number of recursive dependencies: 102
+
+Run `revdepcheck::revdep_details(, "geocodebr")` for more info
+
+</details>
+
+## In both
+
+*   checking package dependencies ... ERROR
+    ```
+    Package required but not available: ‘enderecobr’
+    
+    See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
+    manual.
     ```
 
 # InPAS
@@ -463,6 +357,47 @@ Run `revdepcheck::revdep_details(, "iscream")` for more info
       Execution halted
     ```
 
+# lidR
+
+<details>
+
+* Version: 4.2.3
+* GitHub: https://github.com/r-lidar/lidR
+* Source code: https://github.com/cran/lidR
+* Date/Publication: 2026-01-08 09:10:02 UTC
+* Number of recursive dependencies: 153
+
+Run `revdepcheck::revdep_details(, "lidR")` for more info
+
+</details>
+
+## In both
+
+*   checking tests ...
+    ```
+      Running ‘testthat.R’/software/c4/cbi/software/_rocky8/R-4.5.2-gcc13/lib64/R/bin/BATCH: line 60: 3183535 Aborted                 (core dumped) ${R_HOME}/bin/R -f ${in} ${opts} ${R_BATCH_OPTIONS} > ${out} 2>&1
+    
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 50 lines of output:
+                                                                                      
+      
+                                                                                      
+      
+                                                                                      
+    ...
+      
+                                                                                      
+      
+                                                                                      
+      
+                                                                                      
+      
+                                                                                      
+      terminate called after throwing an instance of 'std::length_error'
+        what():  basic_string::_M_create
+    ```
+
 # mappp
 
 <details>
@@ -527,7 +462,31 @@ Run `revdepcheck::revdep_details(, "outliers.ts.oga")` for more info
     ```
     Found the following significant warnings:
       Warning: no DISPLAY variable so Tk is not available
-    See ‘/scratch/henrik/revdep/parallelly/checks/outliers.ts.oga/new/outliers.ts.oga.Rcheck/00install.out’ for details.
+    See ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/outliers.ts.oga/new/outliers.ts.oga.Rcheck/00install.out’ for details.
+    ```
+
+# proffer
+
+<details>
+
+* Version: 0.2.2
+* GitHub: https://github.com/r-prof/proffer
+* Source code: https://github.com/cran/proffer
+* Date/Publication: 2024-11-15 16:00:02 UTC
+* Number of recursive dependencies: 36
+
+Run `revdepcheck::revdep_details(, "proffer")` for more info
+
+</details>
+
+## In both
+
+*   checking package dependencies ... ERROR
+    ```
+    Package required but not available: ‘RProtoBuf’
+    
+    See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
+    manual.
     ```
 
 # QDNAseq
@@ -538,7 +497,7 @@ Run `revdepcheck::revdep_details(, "outliers.ts.oga")` for more info
 * GitHub: https://github.com/ccagc/QDNAseq
 * Source code: https://github.com/cran/QDNAseq
 * Date/Publication: 2025-10-29
-* Number of recursive dependencies: 95
+* Number of recursive dependencies: 94
 
 Run `revdepcheck::revdep_details(, "QDNAseq")` for more info
 
@@ -683,5 +642,26 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
     
     It looks like this package (or a package it requires) has a startup
     message which cannot be suppressed: see ?packageStartupMessage.
+    ```
+
+# targets
+
+<details>
+
+* Version: 1.11.4
+* GitHub: https://github.com/ropensci/targets
+* Source code: https://github.com/cran/targets
+* Date/Publication: 2025-09-13 05:10:02 UTC
+* Number of recursive dependencies: 156
+
+Run `revdepcheck::revdep_details(, "targets")` for more info
+
+</details>
+
+## In both
+
+*   checking Rd cross-references ... NOTE
+    ```
+    Unknown package ‘qs’ in Rd xrefs
     ```
 
