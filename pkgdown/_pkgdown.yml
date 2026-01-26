@@ -45,6 +45,8 @@ navbar:
         href: https://parallelly.futureverse.org
       - text: progressr 
         href: https://progressr.futureverse.org
+      - text: future.p2p (experimental)
+        href: https://future.p2p.futureverse.org
       - text: future.tools (experimental)
         href: https://future.tools.futureverse.org
       - text: marshal (experimental)
