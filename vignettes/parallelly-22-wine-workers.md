@@ -96,7 +96,7 @@ These are typically harmless. Environment variable setting
 ## Windows-only CRAN packages 
 
 A small number of the CRAN packages install only on MS Windows. Here
-is how to see which are:
+is how to see which they are:
 
 ```r
 db <- read.dcf(url("https://cran.r-project.org/src/contrib/PACKAGES"))
