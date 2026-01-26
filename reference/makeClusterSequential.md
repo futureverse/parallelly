@@ -41,11 +41,11 @@ str(y)
 
 pid <- Sys.getpid()
 print(pid)
-#> [1] 3891781
+#> [1] 284882
 y <- clusterEvalQ(cl, Sys.getpid())
 str(y)
 #> List of 1
-#>  $ : int 3891781
+#>  $ : int 284882
 
 abc <- 3.14
 y <- clusterEvalQ(cl, { abc <- 42; abc })
