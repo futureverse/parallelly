@@ -71,6 +71,42 @@ print(cl)
 ```
 
 
+## Example: Installing packages in Wine
+
+To install packages in Wine, we need to make sure that the personal
+package library exists. To create this, call:
+
+```r
+void <- parallel::clusterEvalQ(cl[1], { 
+  dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE) 
+})
+```
+
+After this, _make sure to restart the above `cl` cluster_, which can do as:
+
+```r
+parallel::stopCluster(cl)
+for (kk in seq_along(cl)) cl[[kk]] <- cloneNode(cl[[kk]])
+```
+
+Now we have a personal package library:
+
+```r
+parallel::clusterEvalQ(cl[1], { .libPaths() })[[1]]
+[1] "C:/users/alice/AppData/Local/R/win-library/4.5"
+[2] "C:/PROG~FBU/R/R-45~RZJ.2/library"
+```
+
+At this point, we can install R packages, e.g.
+
+```r
+void <- parallel::clusterEvalQ(cl[1], { 
+  chooseCRANmirror(ind = 1L) 
+  install.packages("future")
+})
+```
+
+
 # Appendix
 
 ## Wine and R warnings
