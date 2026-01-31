@@ -73,31 +73,7 @@ print(cl)
 
 ## Example: Installing packages in Wine
 
-To install packages in Wine, we need to make sure that the personal
-package library exists. To create this, call:
-
-```r
-void <- parallel::clusterEvalQ(cl[1], { 
-  dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE) 
-})
-```
-
-After this, _make sure to restart the above `cl` cluster_, which can do as:
-
-```r
-parallel::stopCluster(cl)
-for (kk in seq_along(cl)) cl[[kk]] <- cloneNode(cl[[kk]])
-```
-
-Now we have a personal package library:
-
-```r
-parallel::clusterEvalQ(cl[1], { .libPaths() })[[1]]
-[1] "C:/users/alice/AppData/Local/R/win-library/4.5"
-[2] "C:/PROG~FBU/R/R-45~RZJ.2/library"
-```
-
-At this point, we can install R packages, e.g.
+We can install R packages as usual, e.g.
 
 ```r
 void <- parallel::clusterEvalQ(cl[1], { 
@@ -108,6 +84,35 @@ void <- parallel::clusterEvalQ(cl[1], {
 
 
 # Appendix
+
+## Using a personal package library in Wine
+
+When using Wine, the system package library - the last one reported by
+`.libPaths()` - is owned by the users that installed R in Wine. This
+means that is _not_ write protected for most users and any package can
+be installed there.
+
+Sometimes its preferred to install packages to a personal package
+library. To do this, all we have to do is pre-create the personal
+package library in Wine. This can be done as:
+
+```r
+void <- parallel::clusterEvalQ(cl[1], { 
+  dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE) 
+})
+```
+
+To validate that the personal package library exists, _restart the
+cluster_. Then call:
+
+```r
+parallel::clusterEvalQ(cl[1], { .libPaths() })[[1]]
+[1] "C:/users/alice/AppData/Local/R/win-library/4.5"
+[2] "C:/PROG~FBU/R/R-45~RZJ.2/library"
+```
+
+The first directory is the personal package library.
+
 
 ## Wine and R warnings
 
