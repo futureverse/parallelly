@@ -294,16 +294,20 @@ you put aside, this function is guaranteed to return at least one core.</p>
 machine has. This can be useful to reproduce errors reported by users
 on large system. For instance, even if your machine only has 16 cores,
 you can trick <code>availableCores()</code> to believe there are 192 cores, by:</p>
-<p></p><div class="sourceCode r"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>parallelly.availableCores.methods <span class="op">=</span> <span class="st">"system"</span><span class="op">)</span></span>
+<p></p><div class="sourceCode r"><pre><code><span><span class="fu"><a href="../reference/availableCores.html">availableCores</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; system</span></span>
+<span><span class="co">#&gt;     16</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>parallelly.availableCores.methods <span class="op">=</span> <span class="st">"system"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>parallelly.availableCores.system <span class="op">=</span> <span class="fl">192</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/availableCores.html">availableCores</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; system</span></span>
 <span><span class="co">#&gt;    192</span></span>
 <span><span class="fu"><a href="../reference/availableConnections.html">freeConnections</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 125</span></span>
 <span><span class="fu"><a href="../reference/availableCores.html">availableCores</a></span><span class="op">(</span>constraints <span class="op">=</span> <span class="st">"connections-16"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; connections-16</span></span>
 <span><span class="co">#&gt;            109</span></span></code></pre><p></p></div>
-<p>To achieve the same from outside of R, for instance, when running
+<p>To achieve the same from outside of R, for instance when running
 <code>R CMD check</code>, set the the corresponding environment variables, e.g.</p>
 <p></p><div class="sourceCode sh"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">$</span> export R_PARALLELLY_AVAILABLECORES_SYSTEM=192</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="ex">$</span> export R_PARALLELLY_AVAILABLECORES_METHODS=system</span>

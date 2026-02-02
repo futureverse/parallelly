@@ -213,17 +213,21 @@ machine has. This can be useful to reproduce errors reported by users on
 large system. For instance, even if your machine only has 16 cores, you
 can trick `availableCores()` to believe there are 192 cores, by:
 
+    availableCores()
+    #> system
+    #>     16
     options(parallelly.availableCores.methods = "system")
     options(parallelly.availableCores.system = 192)
     availableCores()
     #> system
     #>    192
     freeConnections()
+    #> [1] 125
     availableCores(constraints = "connections-16")
     #> connections-16
     #>            109
 
-To achieve the same from outside of R, for instance, when running
+To achieve the same from outside of R, for instance when running
 `R CMD check`, set the the corresponding environment variables, e.g.
 
     $ export R_PARALLELLY_AVAILABLECORES_SYSTEM=192
