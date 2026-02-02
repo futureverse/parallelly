@@ -206,13 +206,34 @@ error downstream. Instead, use:
 to put aside one of the cores from being used. Regardless how many cores
 you put aside, this function is guaranteed to return at least one core.
 
-## Advanced usage
+## Advanced usage for package developers
 
-It is possible to override the maximum number of cores on the machine as
-reported by `availableCores(methods = "system")`. This can be done by
-first specifying
-`options(parallelly.availableCores.methods = "mc.cores")` and then the
-number of cores to use, e.g. `options(mc.cores = 8)`.
+It is possible to emulate a larger number of CPU cores than what the
+machine has. This can be useful to reproduce errors reported by users on
+large system. For instance, even if your machine only has 16 cores, you
+can trick `availableCores()` to believe there are 192 cores, by:
+
+    options(parallelly.availableCores.methods = "system")
+    options(parallelly.availableCores.system = 192)
+    availableCores()
+    #> system
+    #>    192
+    freeConnections()
+    availableCores(constraints = "connections-16")
+    #> connections-16
+    #>            109
+
+To achieve the same from outside of R, for instance, when running
+`R CMD check`, set the the corresponding environment variables, e.g.
+
+    $ export R_PARALLELLY_AVAILABLECORES_SYSTEM=192
+    $ export R_PARALLELLY_AVAILABLECORES_METHODS=system
+    $ Rscript -e parallelly::availableCores
+    system
+       192
+    $ Rscript -e parallelly::availableCores --constraints="connections-16"
+    connections-16
+               109
 
 ## See also
 
@@ -223,7 +244,7 @@ To get the set of available workers regardless of machine, see
 
 ``` r
 message(paste("Number of cores available:", availableCores()))
-#> Number of cores available: 8
+#> Number of cores available: 192
 
 if (FALSE) { # \dontrun{
 options(mc.cores = 2L)
