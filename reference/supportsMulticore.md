@@ -57,6 +57,24 @@ environment variable `R_PARALLELLY_FORK_ENABLE` to `false`. Analogously,
 it is possible to override disabled forking by setting one of these to
 `TRUE`.
 
+## Why not forked processing?
+
+One reason for *not* using forked parallel processing in R is that is
+not guaranteed to be stable in all environments or in all contexts,
+which also depends on which functions are called in the forked
+processes. Here is what R Core developer of the
+[`parallel::mclapply()`](https://rdrr.io/r/parallel/mclapply.html)
+family of functions said on [R-devel
+(2020-04-29)](https://stat.ethz.ch/pipermail/r-devel/2020-April/079384.html):
+
+*"Do NOT use
+[`mcparallel()`](https://rdrr.io/r/parallel/mcparallel.html) in packages
+except as a non-default option that user can set ... Multicore is
+intended for HPC applications that need to use many cores for
+computing-heavy jobs, but it does not play well with RStudio and more
+importantly you \[as the developer\] don't know the resource available
+so only the user can tell you when it's safe to use."*
+
 ## Examples
 
 ``` r

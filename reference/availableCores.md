@@ -248,7 +248,7 @@ To get the set of available workers regardless of machine, see
 
 ``` r
 message(paste("Number of cores available:", availableCores()))
-#> Number of cores available: 192
+#> Number of cores available: 8
 
 if (FALSE) { # \dontrun{
 options(mc.cores = 2L)

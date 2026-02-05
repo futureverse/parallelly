@@ -37,7 +37,7 @@ is supported in the current R session."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -162,6 +162,22 @@ option <code>parallelly.fork.enable</code> to <code>FALSE</code>.  Alternatively
 set environment variable <code class="env">R_PARALLELLY_FORK_ENABLE</code> to <code>false</code>.
 Analogously, it is possible to override disabled forking by setting one
 of these to <code>TRUE</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="why-not-forked-processing-">Why not forked processing?<a class="anchor" aria-label="anchor" href="#why-not-forked-processing-"></a></h2>
+
+
+<p>One reason for <em>not</em> using forked parallel processing in R is that is
+not guaranteed to be stable in all environments or in all contexts,
+which also depends on which functions are called in the forked
+processes. Here is what R Core developer of the <code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">parallel::mclapply()</a></code>
+family of functions said on <a href="https://stat.ethz.ch/pipermail/r-devel/2020-April/079384.html" class="external-link">R-devel (2020-04-29)</a>:</p>
+<p><em>"Do NOT use <code><a href="https://rdrr.io/r/parallel/mcparallel.html" class="external-link">mcparallel()</a></code> in packages except as a non-default option
+that user can set ... Multicore is intended for HPC applications that
+need to use many cores for computing-heavy jobs, but it does not play
+well with RStudio and more importantly you [as the developer] don't
+know the resource available so only the user can tell you when it's
+safe to use."</em></p>
     </div>
 
     <div class="section level2">
