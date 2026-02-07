@@ -2,7 +2,9 @@
 
 ## Version (development version)
 
-- …
+### New Features
+
+- Give more information on invalid ‘RichSOCKnode’ connections.
 
 ## Version 1.46.1
 
