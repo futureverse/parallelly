@@ -17,7 +17,8 @@ summary.RichSOCKnode <- function(object, ...) {
     res$connection <- tryCatch({
       summary(con)$description
     }, error = function(ex) {
-      sprintf("ERROR: %s", conditionMessage(ex))
+      exists <- (res$connection_index %in% getAllConnections())
+      sprintf("ERROR: %s; %s connection #%d", conditionMessage(ex), if (exists) "existing" else "non-existing", res$connection_index)
     })
   }
   if (!is.null(host)) res$host <- host
