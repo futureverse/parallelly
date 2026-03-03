@@ -75,14 +75,15 @@ Query \code{\link[parallel]{detectCores}(logical = logical)}.
 Query \code{Cpus_allowed_list} of \verb{/proc/self/status}.
 
 \item \code{"cgroups.cpuset"} -
-On Unix, query control group (cgroup v1) value \code{cpuset.set}.
+On Unix, query control group (cgroup v1) \emph{affinity} value
+\code{cpuset.cpus}.
 
 \item \code{"cgroups.cpuquota"} -
-On Unix, query control group (cgroup v1) value
+On Unix, query control group (cgroup v1) \emph{quota} value
 \code{cpu.cfs_quota_us} / \code{cpu.cfs_period_us}.
 
 \item \code{"cgroups2.cpu.max"} -
-On Unix, query control group (cgroup v2) values \code{cpu.max}.
+On Unix, query control group (cgroup v2) \emph{quota} value \code{cpu.max}.
 
 \item \code{"nproc"} -
 On Unix, query system command \code{nproc}.

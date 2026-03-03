@@ -54,14 +54,15 @@
 #'    Query \code{Cpus_allowed_list} of `/proc/self/status`.
 #'
 #'  \item `"cgroups.cpuset"` -
-#'    On Unix, query control group (cgroup v1) value \code{cpuset.set}.
+#'    On Unix, query control group (cgroup v1) _affinity_ value
+#'    \code{cpuset.cpus}.
 #'
 #'  \item `"cgroups.cpuquota"` -
-#'    On Unix, query control group (cgroup v1) value
+#'    On Unix, query control group (cgroup v1) _quota_ value
 #'    \code{cpu.cfs_quota_us} / \code{cpu.cfs_period_us}.
 #'
 #'  \item `"cgroups2.cpu.max"` -
-#'    On Unix, query control group (cgroup v2) values \code{cpu.max}.
+#'    On Unix, query control group (cgroup v2) _quota_ value \code{cpu.max}.
 #'
 #'  \item `"nproc"` -
 #'    On Unix, query system command \code{nproc}.
