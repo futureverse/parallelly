@@ -6,6 +6,16 @@
 
 - Give more information on invalid ‘RichSOCKnode’ connections.
 
+### Bug Fixes
+
+- `availableWorkers(method = "Slurm")` expands the compressed hostname
+  representation given by environment variable `SLURM_JOB_NODELIST` to a
+  vector of hostnames. For this it uses `scontrol show hostnames`. If
+  `scontrol` is not available, it falls back to an internal parsing
+  algorithm. This internal algorithm would incorrectly pad some
+  hostnames with zero, e.g. `n[09-10]` would become `c("n09", "n010")`
+  whereas it should be `c("n09", "n10")`.
+
 ## Version 1.46.1
 
 CRAN release: 2026-01-08
