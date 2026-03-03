@@ -634,9 +634,18 @@ slurm_expand_nodelist <- function(nodelist, manual = getOption2("parallelly.slur
         
         ## Pad with zeros?
         pattern <- "^([0]*)[[:digit:]]+.*"
+        ## e.g. "[9-11]" => c("9", "10", "11")
+        ## e.g. "[09-11]" => c("09", "10", "11")
+        ## e.g. "[009-011]" => c("009", "010", "011")
+        ## e.g. "[009-11]" => c("009", "010", "011")
         if (grepl(pattern, set)) {
+          ## AD HOC: Amount of pad is decided by the _first_ 0:ed index
           pad <- gsub(pattern, "\\1", set)
-          idxs <- paste(pad, idxs, sep = "")
+          ns <- nchar(idxs)
+          ## AD HOC: Target width is decided by the first element
+          width <- ns[1] + nchar(pad)
+          ## AD HOC: Zero-pad indices to be of the same maximum length
+          idxs <- sprintf("%0*d", width, as.integer(idxs))
         }
 
         set <- paste(prefix, idxs, sep = "")
