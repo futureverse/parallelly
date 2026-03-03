@@ -11,7 +11,7 @@
 # Introduction
 
 This vignette shows how to set up parallel workers running R for MS
-Windows via Wine (\verb{https://www.winehq.org/}) on Linux and macOS. This
+Windows via Wine (https://www.winehq.org/) on Linux and macOS. This
 can be useful when we need to run R code or call R packages that work
 only on MS Windows.
 
