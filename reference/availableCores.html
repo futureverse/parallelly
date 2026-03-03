@@ -15,7 +15,7 @@ number of cores available is always at least one."><meta property="og:image" con
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9013</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -171,12 +171,13 @@ Query <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="externa
 <li><p><code>"/proc/self/status"</code> -
 Query <code>Cpus_allowed_list</code> of <code>/proc/self/status</code>.</p></li>
 <li><p><code>"cgroups.cpuset"</code> -
-On Unix, query control group (cgroup v1) value <code>cpuset.set</code>.</p></li>
+On Unix, query control group (cgroup v1) <em>affinity</em> value
+<code>cpuset.cpus</code>.</p></li>
 <li><p><code>"cgroups.cpuquota"</code> -
-On Unix, query control group (cgroup v1) value
+On Unix, query control group (cgroup v1) <em>quota</em> value
 <code>cpu.cfs_quota_us</code> / <code>cpu.cfs_period_us</code>.</p></li>
 <li><p><code>"cgroups2.cpu.max"</code> -
-On Unix, query control group (cgroup v2) values <code>cpu.max</code>.</p></li>
+On Unix, query control group (cgroup v2) <em>quota</em> value <code>cpu.max</code>.</p></li>
 <li><p><code>"nproc"</code> -
 On Unix, query system command <code>nproc</code>.</p></li>
 <li><p><code>"mc.cores"</code> -

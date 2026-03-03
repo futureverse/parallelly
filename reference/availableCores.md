@@ -89,14 +89,14 @@ supported:
 - `"/proc/self/status"` - Query `Cpus_allowed_list` of
   `/proc/self/status`.
 
-- `"cgroups.cpuset"` - On Unix, query control group (cgroup v1) value
-  `cpuset.set`.
+- `"cgroups.cpuset"` - On Unix, query control group (cgroup v1)
+  *affinity* value `cpuset.cpus`.
 
-- `"cgroups.cpuquota"` - On Unix, query control group (cgroup v1) value
-  `cpu.cfs_quota_us` / `cpu.cfs_period_us`.
+- `"cgroups.cpuquota"` - On Unix, query control group (cgroup v1)
+  *quota* value `cpu.cfs_quota_us` / `cpu.cfs_period_us`.
 
-- `"cgroups2.cpu.max"` - On Unix, query control group (cgroup v2) values
-  `cpu.max`.
+- `"cgroups2.cpu.max"` - On Unix, query control group (cgroup v2)
+  *quota* value `cpu.max`.
 
 - `"nproc"` - On Unix, query system command `nproc`.
 
