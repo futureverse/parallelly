@@ -11,7 +11,7 @@
 # Introduction
 
 This vignette shows how to set up parallel workers running R for MS
-Windows via Wine (<https://www.winehq.org/>) on Linux and macOS. This
+Windows via Wine (\verb{https://www.winehq.org/}) on Linux and macOS. This
 can be useful when we need to run R code or call R packages that work
 only on MS Windows.
 
@@ -146,7 +146,7 @@ win_only <- subset(db, OS_type == "windows")
 print(win_only$Package)
 ```
 
-As of 2026-01-21, this outputs:
+As of 2026-03-03, this outputs:
 
 ```r
  [1] "BiplotGUI"         "blatr"             "excel.link"
