@@ -601,6 +601,7 @@ produced. There are a few reasons for failing to set up remote workers.
 If this happens, start by asserting that you can SSH to the remote
 machine and launch `Rscript` by calling something like:
 
+
     {local}$ ssh -l alice remote.server.org
     {remote}$ Rscript --version
     R scripting front-end version 4.2.2 (2022-10-31)
@@ -609,6 +610,7 @@ machine and launch `Rscript` by calling something like:
 
 When you have confirmed the above to work, then confirm that you can
 achieve the same in a single command-line call;
+
 
     {local}$ ssh -l alice remote.server.org Rscript --version
     R scripting front-end version 4.2.2 (2022-10-31)

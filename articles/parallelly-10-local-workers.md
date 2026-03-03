@@ -15,6 +15,7 @@ the current machine, run some basic calculations in parallel, and then
 shut down the cluster.
 
 ``` r
+
 library(parallelly)
 library(parallel)
 
@@ -41,6 +42,7 @@ specify a character vector with that number of `"localhost"` entries,
 e.g.
 
 ``` r
+
 cl <- makeClusterPSOCK(c("localhost", "localhost"))
 ```
 
@@ -56,6 +58,7 @@ variables, and CGroups settings. For details, see
 For example,
 
 ``` r
+
 library(parallelly)
 cl <- makeClusterPSOCK(availableCores())
 print(cl)

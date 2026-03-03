@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -325,16 +325,15 @@ guaranteed to return a positive integer, and you can use
 <code>parallelly::availableCores(omit = 1)</code> to return all but one
 core and always at least one.</p>
 <p>Just like other software tools that “hijacks” all cores by default, R
-scripts, and packages that defaults to <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores()</a></code> number
+scripts, and packages that default to <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores()</a></code> number
 of parallel workers cause lots of suffering for fellow end-users and
 system administrators. For instance, a shared server with 48 cores will
 come to a halt already after a few users run parallel processing using
 <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores()</a></code> number of parallel workers. This problem gets
 worse on machines with many cores because they can host even more
-concurrent users. If these R users would have used
-<code><a href="../reference/availableCores.html">availableCores()</a></code> instead, then the system administrator can
-limit the number of cores each user get to, say, two (2), by setting the
-environment variable
+concurrent users. If the code would use <code><a href="../reference/availableCores.html">availableCores()</a></code>
+instead, then system administrators can limit the number of cores that
+each process gets to, say, two (2), by setting the environment variable
 <code>R_PARALLELLY_AVAILABLECORES_FALLBACK=2</code>. In contrast, it is
 <em>not</em> possible to override what
 <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> returns, cf. <a href="https://bugs.r-project.org/show_bug.cgi?id=17641" class="external-link">PR#17641 - WISH:
@@ -371,8 +370,8 @@ submitting using <code>qsub -pe smp 8 ...</code> and
 <code><a href="../reference/availableCores.html">help("availableCores", package = "parallelly")</a></code> for
 currently supported job schedulers, which includes ‘Fujitsu Technical
 Computing Suite’, ‘Load Sharing Facility’ (LSF), Simple Linux Utility
-for Resource Management (Slurm), Sun Grid Engine/Oracle Grid Engine/Son
-of Grid Engine (SGE), Univa Grid Engine (UGE), and TORQUE/PBS.</p>
+for Resource Management (Slurm), Sun/Oracle/Univa/Altair/Son of Grid
+Engine (AGE, SGE, UGE), and TORQUE/PBS.</p>
 <p>Of course, <code><a href="../reference/availableCores.html">availableCores()</a></code> respects also R options and
 environment variables commonly used to specify the number of parallel
 workers, e.g. R option <code>mc.cores</code> and Bioconductor

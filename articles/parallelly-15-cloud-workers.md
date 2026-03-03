@@ -14,6 +14,7 @@ This example launches a parallel worker on Google Compute Engine (GCE)
 running a container based VM (with a \#cloud-config specification).
 
 ``` r
+
 library(parallelly)
 
 public_ip <- "1.2.3.4"
@@ -45,6 +46,7 @@ AWS EC2 running one of the Amazon Machine Images (AMI) provided by Posit
 (<https://www.louisaslett.com/RStudio_AMI/>).
 
 ``` r
+
 library(parallelly)
 
 public_ip <- "1.2.3.4"

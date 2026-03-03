@@ -44,6 +44,7 @@ This example shows how to launch one worker running in Wine for Linux on
 the local machine.
 
 ``` r
+
 cl <- makeClusterPSOCK(
   1L,
   rscript = c(
@@ -66,6 +67,7 @@ print(cl)
 We can install R packages as usual, e.g.
 
 ``` r
+
 void <- parallel::clusterEvalQ(cl[1], { 
   chooseCRANmirror(ind = 1L) 
   install.packages("future")
@@ -86,6 +88,7 @@ library. To do this, all we have to do is pre-create the personal
 package library in Wine. This can be done as:
 
 ``` r
+
 void <- parallel::clusterEvalQ(cl[1], { 
   dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE) 
 })
@@ -127,6 +130,7 @@ A small number of the CRAN packages install only on MS Windows. Here is
 how to see which they are:
 
 ``` r
+
 db <- read.dcf(url("https://cran.r-project.org/src/contrib/PACKAGES"))
 db <- as.data.frame(db)
 win_only <- subset(db, OS_type == "windows")
