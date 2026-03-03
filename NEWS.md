@@ -2,7 +2,7 @@
 
 ## New Features
 
- * Given more information on invalid 'RichSOCKnode' connections.
+ * Give more information on invalid 'RichSOCKnode' connections.
 
 
 # Version 1.46.1 [2026-01-07]

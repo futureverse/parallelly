@@ -160,7 +160,7 @@ requests two cores on a single machine.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
-Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+Altair Grid Engine (AGE; acquired Univa Corporation in 2020),
 Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 
 \item \code{"Slurm"} -

@@ -140,7 +140,7 @@
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 #'    Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
-#'    Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+#'    Altair Grid Engine (AGE; acquired Univa Corporation in 2020),
 #'    Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 #     Open Grid Scheduler (OGS; open-source fork of SGE 6.2u5).
 #'
