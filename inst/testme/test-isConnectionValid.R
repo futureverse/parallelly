@@ -15,7 +15,7 @@ class(con_no_id) <- c("test_connection", class(con_no_id)) ## Inherit from conne
 attr(con_no_id, "conn_id") <- NULL ## Ensure no conn_id
 res <- connectionId(con_no_id)
 stopifnot(is.na(res))
-close(con_no_id)
+try(close(con_no_id))
 
 ## Test with a serialized connection (should return -1L)
 con_ser <- file(tempfile(), open = "w")
