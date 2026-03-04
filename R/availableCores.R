@@ -61,6 +61,14 @@
 #'    On Unix, query control group (cgroup v1) _quota_ value
 #'    \code{cpu.cfs_quota_us} / \code{cpu.cfs_period_us}.
 #'
+#'  \item `"cgroups2.cpuset.cpus"` -
+#'    On Unix, query control group (cgroup v2) _affinity_ value
+#'    \code{cpuset.cpus}.
+#'
+#'  \item `"cgroups2.cpuset.cpus.effective"` -
+#'    On Unix, query control group (cgroup v2) _effective affinity_ value
+#'    \code{cpuset.cpus.effective}.
+#'
 #'  \item `"cgroups2.cpu.max"` -
 #'    On Unix, query control group (cgroup v2) _quota_ value \code{cpu.max}.
 #'
@@ -268,7 +276,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @export
-availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
+availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
@@ -373,6 +381,14 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
         n <- as.integer(floor(n + 0.5))
 	if (n == 0L) n <- 1L  ## If CPU quota < 0.5, round up to one CPU
       }
+    } else if (method == "cgroups2.cpuset.cpus") {
+      ## Number of cores according to Unix cgroups v2 CPU set
+      n <- length(getCGroups2CpuSet("cpuset.cpus"))
+      if (n == 0L) n <- NA_integer_
+    } else if (method == "cgroups2.cpuset.cpus.effective") {
+      ## Number of cores according to Unix cgroups v2 effective CPU set
+      n <- length(getCGroups2CpuSet("cpuset.cpus.effective"))
+      if (n == 0L) n <- NA_integer_
     } else if (method == "cgroups2.cpu.max") {
       ## Number of cores according to Unix cgroups v2 CPU max quota
       n <- getCGroups2CpuMax()
@@ -436,7 +452,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     idx_fallback <- which(names(ncores) == "fallback")
     if (length(idx_fallback) == 1) {
       ## Use 'fallback' if and only there are only "special" options specified
-      special <- c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc")
+      special <- c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc")
       ## 'connections' and 'connections-N' are also "special" options
       special <- c(special, grep(pattern_connections, constraints, value = TRUE))
       others <- setdiff(names(ncores), c("fallback", special))

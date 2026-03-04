@@ -3,6 +3,9 @@
 ## New Features
 
  * Give more information on invalid 'RichSOCKnode' connections.
+ 
+ * Now `availableCores()` queries also Linux CGroups v2 CPU affinity
+   values `cpuset.cpus` and `cpuset.cpus.effective`.`
 
 ## Bug Fixes
 

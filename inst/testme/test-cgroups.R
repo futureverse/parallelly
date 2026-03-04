@@ -150,6 +150,16 @@ stopifnot(
   is.na(value) || value > 0
 )
 
+message("- availableCores(methods = 'cgroups2.cpuset.cpus')")
+n <- availableCores(methods = "cgroups2.cpuset.cpus", na.rm = FALSE)
+cat(sprintf("Number of cores: %s\n", n))
+stopifnot(length(n) == 1L, is.integer(n), is.na(n) || n >= 1L)
+
+message("- availableCores(methods = 'cgroups2.cpuset.cpus.effective')")
+n <- availableCores(methods = "cgroups2.cpuset.cpus.effective", na.rm = FALSE)
+cat(sprintf("Number of cores: %s\n", n))
+stopifnot(length(n) == 1L, is.integer(n), is.na(n) || n >= 1L)
+
 message("*** cgroups ... DONE")
 
 root <- system.file(package = "parallelly", "test-data", mustWork = TRUE)
