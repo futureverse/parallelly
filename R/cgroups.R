@@ -289,7 +289,7 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    fcns <- list(
      getCGroupsMounts, getCGroups, getCGroupsVersion,
      getCGroups1CpuSet, getCGroups1CpuPeriodMicroseconds, getCGroups1CpuQuota,
-     getCGroups2CpuMax
+     getCGroups2CpuSet, getCGroups2CpuMax
    )
    for (fcn in fcns) {
      environment(fcn)$.cache <- NULL
@@ -339,6 +339,8 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
 
    message(" - length(getCGroups1CpuSet()): ", length(getCGroups1CpuSet()))
    message(" - getCGroups1CpuQuota(): ", getCGroups1CpuQuota())
+   message(" - length(getCGroups2CpuSet('cpuset.cpus')): ", length(getCGroups2CpuSet("cpuset.cpus")))
+   message(" - length(getCGroups2CpuSet('cpuset.cpus.effective')): ", length(getCGroups2CpuSet("cpuset.cpus.effective")))
    message(" - getCGroups2CpuMax(): ", getCGroups2CpuMax())
 
    message(" - availableCores(which = 'all'):")
@@ -858,6 +860,87 @@ getCGroups1CpuQuota <- local({
 # --------------------------------------------------------------------------
 # CGroups v2 CPU settings
 # --------------------------------------------------------------------------
+#  Get cgroups v2 'cpuset.cpus'
+#
+#  @return An integer vector of CPU indices. If cgroups v2 field
+#  `cpuset.cpus` could not be queried, integer(0) is returned.
+#
+#  From 'Control Group v2' documentation [1]:
+#
+#  `cpuset.cpus`:
+#   A read-write multiple values file which exists on non-root
+#   cgroups.
+#
+#   It lists the requested CPUs to be used by tasks within this
+#   cgroup. The effective CPUs is described by `cpuset.cpus.effective`.
+#
+#   The format is the same as the cpuset.cpus file in cgroup v1.
+#
+#  [1] https://docs.kernel.org/admin-guide/cgroup-v2.html
+#
+getCGroups2CpuSet <- local({
+  .cache <- list()
+
+  function(name = c("cpuset.cpus", "cpuset.cpus.effective")) {
+    name <- match.arg(name)
+
+    res <- .cache[[name]]
+    if (!is.null(res)) return(res)
+
+    ## TEMPORARY: In case the cgroups options causes problems, make
+    ## it possible to override their values via hidden options
+    cpuset <- get_package_option(paste0("cgroups2.", name), NULL)
+    if (!is.null(cpuset)) return(cpuset)
+
+    ## e.g. /sys/fs/cgroup/cpuset.cpus or /sys/fs/cgroup/cpuset.cpus.effective
+    value0 <- getCGroups2Value(name)
+    if (is.na(value0)) {
+      res <- integer(0L)
+      .cache[[name]] <<- res
+      return(res)
+    }
+
+    ## Parse 0-63; 0-7,9; 0-7,10-12; etc.
+    code <- gsub("-", ":", value0, fixed = TRUE)
+    code <- sprintf("c(%s)", code)
+    expr <- tryCatch({
+      parse(text = code)
+    }, error = function(ex) {
+      warning(sprintf("Syntax error parsing cgroups v2 %s: %s", sQuote(name), sQuote(value0)))
+      integer(0L)
+    })
+
+    value <- tryCatch({
+      suppressWarnings(as.integer(eval(expr)))
+    }, error = function(ex) {
+      warning(sprintf("Failed to parse cgroups v2 %s: %s", sQuote(name), sQuote(value0)))
+      integer(0L)
+    })
+
+    ## Sanity checks
+    max_cores <- maxCores()
+    if (any(value < 0L | value >= max_cores)) {
+      warning(sprintf("[INTERNAL]: Will ignore the cgroups v2 CPU set, because it contains one or more CPU indices that is out of range [0,%d]: %s", max_cores - 1L, value0))
+      value <- integer(0L)
+    }
+
+    if (any(duplicated(value))) {
+      warning(sprintf("[INTERNAL]: Detected and dropped duplicated CPU indices in the cgroups v2 CPU set: %s", value0))
+      value <- unique(value)
+    }
+
+    cpuset <- value
+
+    ## Should never happen, but just in case
+    stop_if_not(length(cpuset) <= max_cores)
+
+    .cache[[name]] <<- cpuset
+
+    cpuset
+  }
+})
+
+
 #  @return A non-negative numeric.
 #  If cgroups is not in use, or could not be queried, NA_real_ is returned.
 #
