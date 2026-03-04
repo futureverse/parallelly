@@ -6,6 +6,11 @@
 
 - Give more information on invalid ‘RichSOCKnode’ connections.
 
+- Now
+  [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+  queries also Linux CGroups v2 CPU affinity values `cpuset.cpus` and
+  `cpuset.cpus.effective`.\`
+
 ### Bug Fixes
 
 - `availableWorkers(method = "Slurm")` expands the compressed hostname

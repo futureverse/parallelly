@@ -15,7 +15,7 @@ number of cores available is always at least one."><meta property="og:image" con
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9015</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -176,6 +176,12 @@ On Unix, query control group (cgroup v1) <em>affinity</em> value
 <li><p><code>"cgroups.cpuquota"</code> -
 On Unix, query control group (cgroup v1) <em>quota</em> value
 <code>cpu.cfs_quota_us</code> / <code>cpu.cfs_period_us</code>.</p></li>
+<li><p><code>"cgroups2.cpuset.cpus"</code> -
+On Unix, query control group (cgroup v2) <em>affinity</em> value
+<code>cpuset.cpus</code>.</p></li>
+<li><p><code>"cgroups2.cpuset.cpus.effective"</code> -
+On Unix, query control group (cgroup v2) <em>effective affinity</em> value
+<code>cpuset.cpus.effective</code>.</p></li>
 <li><p><code>"cgroups2.cpu.max"</code> -
 On Unix, query control group (cgroup v2) <em>quota</em> value <code>cpu.max</code>.</p></li>
 <li><p><code>"nproc"</code> -

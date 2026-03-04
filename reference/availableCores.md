@@ -95,6 +95,12 @@ supported:
 - `"cgroups.cpuquota"` - On Unix, query control group (cgroup v1)
   *quota* value `cpu.cfs_quota_us` / `cpu.cfs_period_us`.
 
+- `"cgroups2.cpuset.cpus"` - On Unix, query control group (cgroup v2)
+  *affinity* value `cpuset.cpus`.
+
+- `"cgroups2.cpuset.cpus.effective"` - On Unix, query control group
+  (cgroup v2) *effective affinity* value `cpuset.cpus.effective`.
+
 - `"cgroups2.cpu.max"` - On Unix, query control group (cgroup v2)
   *quota* value `cpu.max`.
 
