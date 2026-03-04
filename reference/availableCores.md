@@ -9,9 +9,10 @@ cores available is always at least one.
 availableCores(
   constraints = NULL,
   methods = getOption2("parallelly.availableCores.methods", c("system",
-    "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max",
-    "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF",
-    "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")),
+    "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus",
+    "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores",
+    "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE",
+    "Slurm", "fallback", "custom")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
