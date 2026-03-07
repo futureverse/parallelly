@@ -1,24 +1,17 @@
-# adea
+# adea (1.5.2)
 
-<details>
-
-* Version: 1.5.2
-* GitHub: NA
-* Source code: https://github.com/cran/adea
-* Date/Publication: 2024-11-12 18:00:02 UTC
-* Number of recursive dependencies: 54
+* Email: <mailto:manuel.munoz@uca.es>
+* GitHub mirror: <https://github.com/cran/adea>
 
 Run `revdepcheck::revdep_details(, "adea")` for more info
-
-</details>
 
 ## In both
 
 *   checking whether package ‘adea’ can be installed ... ERROR
-    ```
-    Installation failed.
-    See ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/adea/new/adea.Rcheck/00install.out’ for details.
-    ```
+     ```
+     Installation failed.
+     See ‘/scratch/henrik/revdep/parallelly/checks/adea/new/adea.Rcheck/00install.out’ for details.
+     ```
 
 ## Installation
 
@@ -38,7 +31,7 @@ Error: package or namespace load failed for ‘ROI.plugin.symphony’ in loadNam
  there is no package called ‘Rsymphony’
 Execution halted
 ERROR: lazy loading failed for package ‘adea’
-* removing ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/adea/new/adea.Rcheck/adea’
+* removing ‘/scratch/henrik/revdep/parallelly/checks/adea/new/adea.Rcheck/adea’
 
 
 ```
@@ -58,610 +51,670 @@ Error: package or namespace load failed for ‘ROI.plugin.symphony’ in loadNam
  there is no package called ‘Rsymphony’
 Execution halted
 ERROR: lazy loading failed for package ‘adea’
-* removing ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/adea/old/adea.Rcheck/adea’
+* removing ‘/scratch/henrik/revdep/parallelly/checks/adea/old/adea.Rcheck/adea’
 
 
 ```
-# ctsem
+# aramappings (0.1.3)
 
-<details>
+* GitHub: <https://github.com/manuelrubio/aramappings>
+* Email: <mailto:manuel.rubio@urjc.es>
+* GitHub mirror: <https://github.com/cran/aramappings>
 
-* Version: 3.10.5
-* GitHub: https://github.com/cdriveraus/ctsem
-* Source code: https://github.com/cran/ctsem
-* Date/Publication: 2026-01-20 06:10:27 UTC
-* Number of recursive dependencies: 170
+Run `revdepcheck::revdep_details(, "aramappings")` for more info
+
+## In both
+
+*   checking tests ...
+     ```
+     ...
+        4.       └─cli::cli_abort("Variable name {.val {as.character(name)}} must be a string.")
+        5.         └─rlang::abort(...)
+       ── Error ('test-ara_unconstrained_l2.R:127:3'): (code run outside of `test_that()`) ──
+       Error in `CVXR::Variable(N, m)`: Variable name "1" must be a string.
+       Backtrace:
+           ▆
+        1. └─aramappings::ara_unconstrained_l2(X, V, solver = "CVXR") at test-ara_unconstrained_l2.R:127:3
+        2.   └─aramappings:::ara_unconstrained_l2_CVXR(X, V)
+        3.     └─CVXR::Variable(N, m)
+        4.       └─cli::cli_abort("Variable name {.val {as.character(name)}} must be a string.")
+        5.         └─rlang::abort(...)
+       ── Error ('test-ara_unconstrained_linf.R:162:3'): (code run outside of `test_that()`) ──
+       Error in `CVXR::Variable(N, m)`: Variable name "1" must be a string.
+       Backtrace:
+           ▆
+        1. └─aramappings::ara_unconstrained_linf(X, V, weights = w, solver = "CVXR") at test-ara_unconstrained_linf.R:162:3
+        2.   └─aramappings:::ara_unconstrained_linf_CVXR(X, V)
+        3.     └─CVXR::Variable(N, m)
+        4.       └─cli::cli_abort("Variable name {.val {as.character(name)}} must be a string.")
+        5.         └─rlang::abort(...)
+       
+       [ FAIL 9 | WARN 0 | SKIP 0 | PASS 192 ]
+       Error:
+       ! Test failures.
+       Execution halted
+     ```
+
+*   checking dependencies in R code ... WARNING
+     ```
+     Missing or unexported object: ‘CVXR::solve’
+     ```
+
+# ctsem (3.10.6)
+
+* GitHub: <https://github.com/cdriveraus/ctsem>
+* Email: <mailto:charles.driver2@uzh.ch>
+* GitHub mirror: <https://github.com/cran/ctsem>
 
 Run `revdepcheck::revdep_details(, "ctsem")` for more info
-
-</details>
 
 ## In both
 
 *   checking whether package ‘ctsem’ can be installed ... WARNING
-    ```
-    Found the following significant warnings:
-      Warning: namespace ‘colorspace’ is not available and has been replaced
-    See ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/ctsem/new/ctsem.Rcheck/00install.out’ for details.
-    ```
+     ```
+     Found the following significant warnings:
+       Warning: namespace ‘colorspace’ is not available and has been replaced
+     See ‘/scratch/henrik/revdep/parallelly/checks/ctsem/new/ctsem.Rcheck/00install.out’ for details.
+     ```
 
 *   checking re-building of vignette outputs ... WARNING
-    ```
-    Error(s) in re-building vignettes:
-      ...
-    --- re-building ‘hierarchicalmanual.rnw’ using knitr_notangle
-    Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
-      texi2dvi script/program not available, using emulation
-    Error: processing vignette 'hierarchicalmanual.rnw' failed with diagnostics:
-    unable to run pdflatex on 'hierarchicalmanual.tex'
-    LaTeX errors:
-    ! LaTeX Error: File `apacite.sty' not found.
-    
-    ...
-    l.62 \bibliographystyle
-                           {apacite}     % Set bibliography style^^M
-    !  ==> Fatal error occurred, no output PDF file produced!
-    --- failed re-building ‘hierarchicalmanual.rnw’
-    
-    SUMMARY: processing the following file failed:
-      ‘hierarchicalmanual.rnw’
-    
-    Error: Vignette re-building failed.
-    Execution halted
-    ```
+     ```
+     ...
+       ...
+     --- re-building ‘hierarchicalmanual.rnw’ using knitr_notangle
+     Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
+       texi2dvi script/program not available, using emulation
+     Error: processing vignette 'hierarchicalmanual.rnw' failed with diagnostics:
+     unable to run pdflatex on 'hierarchicalmanual.tex'
+     LaTeX errors:
+     ! LaTeX Error: File `apacite.sty' not found.
+     
+     Type X to quit or <RETURN> to proceed,
+     or enter new name. (Default extension: sty)
+     
+     ! Emergency stop.
+     <read *> 
+              
+     l.62 \bibliographystyle
+                            {apacite}     % Set bibliography style^^M
+     !  ==> Fatal error occurred, no output PDF file produced!
+     --- failed re-building ‘hierarchicalmanual.rnw’
+     
+     SUMMARY: processing the following file failed:
+       ‘hierarchicalmanual.rnw’
+     
+     Error: Vignette re-building failed.
+     Execution halted
+     ```
 
-# decoupleR
+# decoupleR (2.16.0)
 
-<details>
-
-* Version: 2.16.0
-* GitHub: https://github.com/saezlab/decoupleR
-* Source code: https://github.com/cran/decoupleR
-* Date/Publication: 2025-10-29
-* Number of recursive dependencies: 265
+* GitHub: <https://github.com/saezlab/decoupleR>
+* Email: <mailto:pau.badia@uni-heidelberg.de>
 
 Run `revdepcheck::revdep_details(, "decoupleR")` for more info
-
-</details>
 
 ## In both
 
 *   checking examples ... ERROR
-    ```
-    Running examples in ‘decoupleR-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: get_collectri
-    > ### Title: CollecTRI gene regulatory network. Wrapper to access CollecTRI
-    > ###   gene regulatory network. CollecTRI is a comprehensive resource
-    > ###   containing a curated collection of transcription factors (TFs) and
-    > ###   their target genes. It is an expansion of DoRothEA. Each interaction
-    > ###   is weighted by its mode of regulation (either positive or negative).
-    > ### Aliases: get_collectri
-    > 
-    > ### ** Examples
-    > 
-    > collectri <- get_collectri(organism='human', split_complexes=FALSE)
-    [2026-01-25 14:20:16] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
-    Error in if (.keep) . else select(., -!!evs_col) : 
-      argument is of length zero
-    Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
-    Execution halted
-    ```
+     ```
+     Running examples in ‘decoupleR-Ex.R’ failed
+     The error most likely occurred in:
+     
+     > ### Name: get_collectri
+     > ### Title: CollecTRI gene regulatory network. Wrapper to access CollecTRI
+     > ###   gene regulatory network. CollecTRI is a comprehensive resource
+     > ###   containing a curated collection of transcription factors (TFs) and
+     > ###   their target genes. It is an expansion of DoRothEA. Each interaction
+     > ###   is weighted by its mode of regulation (either positive or negative).
+     > ### Aliases: get_collectri
+     > 
+     > ### ** Examples
+     > 
+     > collectri <- get_collectri(organism='human', split_complexes=FALSE)
+     [2026-03-07 14:24:32] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+     Error in if (.keep) . else select(., -!!evs_col) : 
+       argument is of length zero
+     Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
+     Execution halted
+     ```
 
 *   checking tests ...
-    ```
-      Running ‘testthat.R’
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 50 lines of output:
-       26. │ ├─col %in% colnames(data)
-       27. │ └─base::colnames(data)
-       28. │   └─base::is.data.frame(x)
-       29. ├─OmnipathR::filter_evidences(...)
-       30. │ └─expr(...) %>% eval_select(data) %>% names %>% ...
-       31. ├─OmnipathR:::if_null_len0(...)
-    ...
-       26. │ └─value %>% ...
-       27. ├─tidyselect::eval_select(., data)
-       28. │ └─tidyselect::tidyselect_data_has_predicates(data)
-       29. └─OmnipathR::unnest_evidences(., .keep = .keep)
-       30.   └─... %>% ...
-      
-      [ FAIL 5 | WARN 11 | SKIP 0 | PASS 29 ]
-      Error:
-      ! Test failures.
-      Execution halted
-    ```
+     ```
+     ...
+        11. │ └─... %>% ...
+        12. ├─dplyr::filter(., if_any(EVIDENCES_KEYS, ~not(map_lgl(.x, is.null))))
+        13. ├─OmnipathR::from_evidences(., .keep = .keep)
+        14. │ └─OmnipathR:::must_have_evidences(data, wide_ok = TRUE)
+        15. │   └─OmnipathR:::has_evidences(data, wide_ok = wide_ok)
+        16. │     └─data %>% has_column("evidences") %>% ...
+        17. ├─OmnipathR:::has_column(., "evidences")
+        18. │ ├─col %in% colnames(data)
+        19. │ └─base::colnames(data)
+        20. │   └─base::is.data.frame(x)
+        21. ├─OmnipathR::filter_evidences(...)
+        22. │ └─expr(...) %>% eval_select(data) %>% names %>% ...
+        23. ├─OmnipathR:::if_null_len0(...)
+        24. │ └─value1 %>% is_empty_2 %>% if (value2) value1
+        25. ├─OmnipathR:::is_empty_2(.)
+        26. │ └─value %>% ...
+        27. ├─tidyselect::eval_select(., data)
+        28. │ └─tidyselect::tidyselect_data_has_predicates(data)
+        29. └─OmnipathR::unnest_evidences(., .keep = .keep)
+        30.   └─... %>% ...
+       
+       [ FAIL 5 | WARN 7 | SKIP 0 | PASS 29 ]
+       Error:
+       ! Test failures.
+       Execution halted
+     ```
 
 *   checking re-building of vignette outputs ... ERROR
-    ```
-    Error(s) in re-building vignettes:
-    --- re-building ‘decoupleR.Rmd’ using rmarkdown
-    --- finished re-building ‘decoupleR.Rmd’
-    
-    --- re-building ‘pw_bk.Rmd’ using rmarkdown
-    [2026-01-25 14:28:09] [WARN]    [OmnipathR] Accessing `PROGENy` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
-    [2026-01-25 14:28:14] [SUCCESS] [OmnipathR] Loaded 700239 annotation records from cache.
-    Warning: ggrepel: 445 unlabeled data points (too many overlaps). Consider increasing max.overlaps
-    [WARNING] Could not fetch resource https://decoupler-py.readthedocs.io/en/1.4.0/_images/mlm.png: HttpExceptionRequest Request {
-        host                 = "decoupler-py.readthedocs.io"
-    ...
-    
-    Error: processing vignette 'tf_sc.Rmd' failed with diagnostics:
-    argument is of length zero
-    --- failed re-building ‘tf_sc.Rmd’
-    
-    SUMMARY: processing the following files failed:
-      ‘tf_bk.Rmd’ ‘tf_sc.Rmd’
-    
-    Error: Vignette re-building failed.
-    Execution halted
-    ```
+     ```
+     ...
+      17. ├─OmnipathR:::has_column(., "evidences")
+      18. │ ├─col %in% colnames(data)
+      19. │ └─base::colnames(data)
+      20. │   └─base::is.data.frame(x)
+      21. ├─OmnipathR::filter_evidences(...)
+      22. │ └─expr(...) %>% eval_select(data) %>% names %>% ...
+      23. ├─OmnipathR:::if_null_len0(...)
+      24. │ └─value1 %>% is_empty_2 %>% if (value2) value1
+      25. ├─OmnipathR:::is_empty_2(.)
+      26. │ └─value %>% ...
+      27. ├─tidyselect::eval_select(., data)
+      28. │ └─tidyselect::tidyselect_data_has_predicates(data)
+      29. └─OmnipathR::unnest_evidences(., .keep = .keep)
+      30.   └─... %>% ...
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     
+     Error: processing vignette 'tf_sc.Rmd' failed with diagnostics:
+     argument is of length zero
+     --- failed re-building ‘tf_sc.Rmd’
+     
+     SUMMARY: processing the following files failed:
+       ‘tf_bk.Rmd’ ‘tf_sc.Rmd’
+     
+     Error: Vignette re-building failed.
+     Execution halted
+     ```
 
 *   checking Rd cross-references ... WARNING
-    ```
-    Missing link(s) in Rd file 'run_gsva.Rd':
-      ‘GSVA::gsva’ ‘GeneSetCollection’
-    
-    See section 'Cross-references' in the 'Writing R Extensions' manual.
-    ```
+     ```
+     Missing link(s) in Rd file 'run_gsva.Rd':
+       ‘GSVA::gsva’ ‘GeneSetCollection’
+     
+     See section 'Cross-references' in the 'Writing R Extensions' manual.
+     ```
 
-# fmeffects
+# fmeffects (0.1.4)
 
-<details>
-
-* Version: 0.1.4
-* GitHub: https://github.com/holgstr/fmeffects
-* Source code: https://github.com/cran/fmeffects
-* Date/Publication: 2024-11-05 18:50:02 UTC
-* Number of recursive dependencies: 182
+* GitHub: <https://github.com/holgstr/fmeffects>
+* Email: <mailto:hbj.loewe@gmail.com>
+* GitHub mirror: <https://github.com/cran/fmeffects>
 
 Run `revdepcheck::revdep_details(, "fmeffects")` for more info
 
-</details>
-
 ## In both
 
 *   checking re-building of vignette outputs ... ERROR
-    ```
-    Error(s) in re-building vignettes:
-    --- re-building ‘fme_theory.Rmd’ using rmarkdown
-    [WARNING] Deprecated: --highlight-style. Use --syntax-highlighting instead.
-    --- finished re-building ‘fme_theory.Rmd’
-    
-    --- re-building ‘fmeffects.Rmd’ using rmarkdown
-    
-    Quitting from fmeffects.Rmd:121-127 [unnamed-chunk-11]
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    <error/purrr_error_indexed>
-    ...
-    ℹ In index: 1.
-    Caused by error in `.__Task__col_roles()`:
-    ! Assertion on 'names(rhs)' failed: Names must be a permutation of set {'feature','target','name','order','stratum','group','offset','weights_learner','weights_measure'}, but has extra elements {'always_included'}.
-    --- failed re-building ‘fmeffects.Rmd’
-    
-    SUMMARY: processing the following file failed:
-      ‘fmeffects.Rmd’
-    
-    Error: Vignette re-building failed.
-    Execution halted
-    ```
+     ```
+     ...
+      50. │                   └─fmeffects (local) simpson(prediction.s, subintervals)
+      51. │                     └─fmeffects (local) f(0/s + m)
+      52. │                       └─predictor$predict(observation.t)
+      53. │                         ├─data.table::as.data.table(self$model$predict_newdata(newdata))
+      54. │                         └─self$model$predict_newdata(newdata)
+      55. │                           └─mlr3:::.__Learner__predict_newdata(...)
+      56. └─mlr3 (local) `<fn>`(base::quote(`<named list>`))
+      57.   └─mlr3:::.__Task__col_roles(...)
+      58.     └─checkmate::assert_names(names(rhs), "unique", permutation.of = mlr_reflections$task_col_roles[[self$task_type]])
+      59.       └─checkmate::makeAssertion(x, res, .var.name, add)
+      60.         └─checkmate:::mstop(...)
+      61.           └─base::stop(simpleError(sprintf(msg, ...), call.))
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     
+     Error: processing vignette 'fmeffects.Rmd' failed with diagnostics:
+     ℹ In index: 1.
+     Caused by error in `.__Task__col_roles()`:
+     ! Assertion on 'names(rhs)' failed: Names must be a permutation of set {'feature','target','name','order','stratum','group','offset','weights_learner','weights_measure'}, but has extra elements {'always_included'}.
+     --- failed re-building ‘fmeffects.Rmd’
+     
+     SUMMARY: processing the following file failed:
+       ‘fmeffects.Rmd’
+     
+     Error: Vignette re-building failed.
+     Execution halted
+     ```
 
-# geocodebr
+# InPAS (2.18.1)
 
-<details>
-
-* Version: 0.6.0
-* GitHub: https://github.com/ipeaGIT/geocodebr
-* Source code: https://github.com/cran/geocodebr
-* Date/Publication: 2026-01-23 19:10:02 UTC
-* Number of recursive dependencies: 102
-
-Run `revdepcheck::revdep_details(, "geocodebr")` for more info
-
-</details>
-
-## In both
-
-*   checking package dependencies ... ERROR
-    ```
-    Package required but not available: ‘enderecobr’
-    
-    See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-    manual.
-    ```
-
-# InPAS
-
-<details>
-
-* Version: 2.18.1
-* GitHub: NA
-* Source code: https://github.com/cran/InPAS
-* Date/Publication: 2025-11-25
-* Number of recursive dependencies: 164
+* Email: <mailto:jou@morgridge.org>
 
 Run `revdepcheck::revdep_details(, "InPAS")` for more info
 
-</details>
-
 ## In both
 
 *   checking dependencies in R code ... NOTE
-    ```
-    There are ::: calls to the package's namespace in its code. A package
-      almost never needs to use ::: for its own objects:
-      ‘adjust_distalCPs’ ‘adjust_proximalCPs’ ‘adjust_proximalCPsByNBC’
-      ‘adjust_proximalCPsByPWM’ ‘calculate_mse’ ‘find_valleyBySpline’
-      ‘get_PAscore’ ‘get_PAscore2’ ‘remove_convergentUTR3s’
-      ‘search_distalCPs’ ‘search_proximalCPs’
-    ```
+     ```
+     There are ::: calls to the package's namespace in its code. A package
+       almost never needs to use ::: for its own objects:
+       ‘adjust_distalCPs’ ‘adjust_proximalCPs’ ‘adjust_proximalCPsByNBC’
+       ‘adjust_proximalCPsByPWM’ ‘calculate_mse’ ‘find_valleyBySpline’
+       ‘get_PAscore’ ‘get_PAscore2’ ‘remove_convergentUTR3s’
+       ‘search_distalCPs’ ‘search_proximalCPs’
+     ```
 
 *   checking Rd metadata ... NOTE
-    ```
-    Invalid package aliases in Rd file 'InPAS.Rd':
-      ‘-package’
-    ```
+     ```
+     Invalid package aliases in Rd file 'InPAS.Rd':
+       ‘-package’
+     ```
 
 *   checking Rd \usage sections ... NOTE
-    ```
-    Documented arguments not in \usage in Rd file 'get_UTR3TotalCov.Rd':
-      ‘gcCompensationensation’
-    
-    Functions with \usage entries need to have the appropriate \alias
-    entries, and all their arguments documented.
-    The \usage entries must correspond to syntactically valid R code.
-    See chapter ‘Writing R documentation files’ in the ‘Writing R
-    Extensions’ manual.
-    ```
+     ```
+     Documented arguments not in \usage in Rd file 'get_UTR3TotalCov.Rd':
+       ‘gcCompensationensation’
+     
+     Functions with \usage entries need to have the appropriate \alias
+     entries, and all their arguments documented.
+     The \usage entries must correspond to syntactically valid R code.
+     See chapter ‘Writing R documentation files’ in the ‘Writing R
+     Extensions’ manual.
+     ```
 
-# iscream
+# iscream (1.0.0)
 
-<details>
-
-* Version: 1.0.0
-* GitHub: https://github.com/huishenlab/iscream
-* Source code: https://github.com/cran/iscream
-* Date/Publication: 2025-10-29
-* Number of recursive dependencies: 147
+* GitHub: <https://github.com/huishenlab/iscream>
+* Email: <mailto:james.eapen@vai.org>
 
 Run `revdepcheck::revdep_details(, "iscream")` for more info
 
-</details>
+## In both
+
+*   checking tests ...
+     ```
+     ...
+       ── Error ('test-tabix.R:255:7'): check tabix.method ────────────────────────────
+       Error in `(function (cond)  .Internal(C_tryCatchHelper(addr, 1L, cond)))(structure(list(message = "'file_test(\"-x\", bin)' is not TRUE", call = NULL), class = c("simpleError", "error", "condition")))`: error in evaluating the argument 'obj' in selecting a method for function 'unname': 'file_test("-x", bin)' is not TRUE
+       Backtrace:
+            ▆
+         1. ├─testthat::with_mocked_bindings(...) at test-tabix.R:252:3
+         2. ├─testthat::expect_true(...) at test-tabix.R:255:7
+         3. │ └─testthat::quasi_label(enquo(object), label)
+         4. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+         5. ├─base::grepl(tabix_msg, iscream:::package_loader(), fixed = TRUE)
+         6. │ └─base::is.factor(x)
+         7. ├─iscream:::package_loader()
+         8. │ └─iscream::get_threads()
+         9. │   ├─base::unname(availableCores())
+        10. │   └─parallelly::availableCores()
+        11. │     └─parallelly:::slurm_expand_nodelist(sprintf("[%s]", bfr))
+        12. │       └─parallelly:::call_slurm_show_hostname(nodelist)
+        13. │         └─parallelly:::stop_if_not(file_test("-x", bin))
+        14. │           └─parallelly:::stopf(...)
+        15. │             └─base::stop(cond)
+        16. └─base (local) `<fn>`(`<smplErrr>`)
+       
+       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 362 ]
+       Error:
+       ! Test failures.
+       Execution halted
+     ```
+
+# ldaPrototype (0.3.2)
+
+* GitHub: <https://github.com/JonasRieger/ldaPrototype>
+* Email: <mailto:jonas.rieger@tu-dortmund.de>
+* GitHub mirror: <https://github.com/cran/ldaPrototype>
+
+Run `revdepcheck::revdep_details(, "ldaPrototype")` for more info
 
 ## In both
 
 *   checking tests ...
-    ```
-      Running ‘testthat.R’
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 50 lines of output:
-      0%   10   20   30   40   50   60   70   80   90   100%
-      [----|----|----|----|----|----|----|----|----|----|
-      **************************************************|
-      0%   10   20   30   40   50   60   70   80   90   100%
-      [----|----|----|----|----|----|----|----|----|----|
-      **************************************************|
-    ...
-       12. │       └─parallelly:::call_slurm_show_hostname(nodelist)
-       13. │         └─parallelly:::stop_if_not(file_test("-x", bin))
-       14. │           └─parallelly:::stopf(...)
-       15. │             └─base::stop(cond)
-       16. └─base (local) `<fn>`(`<smplErrr>`)
-      
-      [ FAIL 1 | WARN 0 | SKIP 2 | PASS 352 ]
-      Error:
-      ! Test failures.
-      Execution halted
-    ```
+     ```
+     ...
+        1. └─ldaPrototype::LDARep(...) at test_mergeTopics.R:6:1
+        2.   ├─base::suppressWarnings(parallelMap::parallelExport("docs", "vocab"))
+        3.   │ └─base::withCallingHandlers(...)
+        4.   └─parallelMap::parallelExport("docs", "vocab")
+        5.     └─parallelMap:::exportToSlavePkgParallel(n, get(n, envir = sys.parent()))
+        6.       └─parallel::clusterCall(...)
+        7.         └─parallel:::defaultCluster(cl)
+       ── Error ('test_rboTopics.R:6:1'): (code run outside of `test_that()`) ─────────
+       Error in `defaultCluster(cl)`: no cluster 'cl' supplied and none is registered
+       Backtrace:
+           ▆
+        1. ├─ldaPrototype::mergeTopics(...) at test_rboTopics.R:6:1
+        2. └─ldaPrototype::LDARep(...)
+        3.   ├─base::suppressWarnings(parallelMap::parallelExport("docs", "vocab"))
+        4.   │ └─base::withCallingHandlers(...)
+        5.   └─parallelMap::parallelExport("docs", "vocab")
+        6.     └─parallelMap:::exportToSlavePkgParallel(n, get(n, envir = sys.parent()))
+        7.       └─parallel::clusterCall(...)
+        8.         └─parallel:::defaultCluster(cl)
+       
+       [ FAIL 8 | WARN 0 | SKIP 0 | PASS 132 ]
+       Error:
+       ! Test failures.
+       There were 50 or more warnings (use warnings() to see the first 50)
+       Execution halted
+     ```
 
-# lidR
+# lidR (4.2.3)
 
-<details>
-
-* Version: 4.2.3
-* GitHub: https://github.com/r-lidar/lidR
-* Source code: https://github.com/cran/lidR
-* Date/Publication: 2026-01-08 09:10:02 UTC
-* Number of recursive dependencies: 153
+* GitHub: <https://github.com/r-lidar/lidR>
+* Email: <mailto:info@r-lidar.com>
+* GitHub mirror: <https://github.com/cran/lidR>
 
 Run `revdepcheck::revdep_details(, "lidR")` for more info
 
-</details>
-
 ## In both
 
 *   checking tests ...
-    ```
-      Running ‘testthat.R’/software/c4/cbi/software/_rocky8/R-4.5.2-gcc13/lib64/R/bin/BATCH: line 60: 3183535 Aborted                 (core dumped) ${R_HOME}/bin/R -f ${in} ${opts} ${R_BATCH_OPTIONS} > ${out} 2>&1
-    
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 50 lines of output:
-                                                                                      
-      
-                                                                                      
-      
-                                                                                      
-    ...
-      
-                                                                                      
-      
-                                                                                      
-      
-                                                                                      
-      
-                                                                                      
-      terminate called after throwing an instance of 'std::length_error'
-        what():  basic_string::_M_create
-    ```
+     ```
+     ...
+       
+                                                                                       
+       
+                                                                                       
+       
+                                                                                       
+       
+                                                                                       
+       
+                                                                                       
+       
+                                                                                       
+       Chunk 1 of 1 (100%): state ✓
+       
+                                                                                       
+       
+                                                                                       
+       
+                                                                                       
+       
+                                                                                       
+       
+                                                                                       
+       terminate called after throwing an instance of 'std::length_error'
+         what():  basic_string::_M_create
+     ```
 
-# mappp
+# mappp (1.0.0)
 
-<details>
-
-* Version: 1.0.0
-* GitHub: https://github.com/cole-brokamp/mappp
-* Source code: https://github.com/cran/mappp
-* Date/Publication: 2022-01-25 09:22:42 UTC
-* Number of recursive dependencies: 34
+* GitHub: <https://github.com/cole-brokamp/mappp>
+* Email: <mailto:cole.brokamp@gmail.com>
+* GitHub mirror: <https://github.com/cran/mappp>
 
 Run `revdepcheck::revdep_details(, "mappp")` for more info
 
-</details>
-
 ## In both
 
 *   checking dependencies in R code ... NOTE
-    ```
-    Namespace in Imports field not imported from: ‘pbmcapply’
-      All declared Imports should be used.
-    ```
+     ```
+     Namespace in Imports field not imported from: ‘pbmcapply’
+       All declared Imports should be used.
+     ```
 
-# NCC
+# NCC (1.0)
 
-<details>
-
-* Version: 1.0
-* GitHub: https://github.com/pavlakrotka/NCC
-* Source code: https://github.com/cran/NCC
-* Date/Publication: 2023-03-03 09:10:10 UTC
-* Number of recursive dependencies: 116
+* GitHub: <https://github.com/pavlakrotka/NCC>
+* Email: <mailto:pavla.krotka@meduniwien.ac.at>
+* GitHub mirror: <https://github.com/cran/NCC>
 
 Run `revdepcheck::revdep_details(, "NCC")` for more info
 
-</details>
-
 ## In both
 
 *   checking dependencies in R code ... NOTE
-    ```
-    Namespace in Imports field not imported from: ‘magick’
-      All declared Imports should be used.
-    ```
+     ```
+     Namespace in Imports field not imported from: ‘magick’
+       All declared Imports should be used.
+     ```
 
-# outliers.ts.oga
+# proffer (0.2.2)
 
-<details>
-
-* Version: 1.1.1
-* GitHub: NA
-* Source code: https://github.com/cran/outliers.ts.oga
-* Date/Publication: 2025-09-03 14:50:02 UTC
-* Number of recursive dependencies: 155
-
-Run `revdepcheck::revdep_details(, "outliers.ts.oga")` for more info
-
-</details>
-
-## In both
-
-*   checking whether package ‘outliers.ts.oga’ can be installed ... WARNING
-    ```
-    Found the following significant warnings:
-      Warning: no DISPLAY variable so Tk is not available
-    See ‘/c4/home/henrik/futureverse/parallelly/revdep/checks/outliers.ts.oga/new/outliers.ts.oga.Rcheck/00install.out’ for details.
-    ```
-
-# proffer
-
-<details>
-
-* Version: 0.2.2
-* GitHub: https://github.com/r-prof/proffer
-* Source code: https://github.com/cran/proffer
-* Date/Publication: 2024-11-15 16:00:02 UTC
-* Number of recursive dependencies: 36
+* GitHub: <https://github.com/r-prof/proffer>
+* Email: <mailto:will.landau.oss@gmail.com>
+* GitHub mirror: <https://github.com/cran/proffer>
 
 Run `revdepcheck::revdep_details(, "proffer")` for more info
-
-</details>
 
 ## In both
 
 *   checking package dependencies ... ERROR
-    ```
-    Package required but not available: ‘RProtoBuf’
-    
-    See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-    manual.
-    ```
+     ```
+     Package required but not available: ‘RProtoBuf’
+     
+     See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
+     manual.
+     ```
 
-# QDNAseq
+# QDNAseq (1.46.0)
 
-<details>
-
-* Version: 1.46.0
-* GitHub: https://github.com/ccagc/QDNAseq
-* Source code: https://github.com/cran/QDNAseq
-* Date/Publication: 2025-10-29
-* Number of recursive dependencies: 94
+* GitHub: <https://github.com/ccagc/QDNAseq>
+* Email: <mailto:d.sie@vumc.nl>
 
 Run `revdepcheck::revdep_details(, "QDNAseq")` for more info
-
-</details>
 
 ## In both
 
 *   checking re-building of vignette outputs ... WARNING
-    ```
-    Error(s) in re-building vignettes:
-    --- re-building ‘QDNAseq.Rnw’ using Sweave
-    EM algorithm started ... 
-    
-    Warning in allprior/tot :
-      Recycling array of length 1 in vector-array arithmetic is deprecated.
-      Use c() or as.vector() instead.
-    Warning in allprior/tot :
-      Recycling array of length 1 in vector-array arithmetic is deprecated.
-      Use c() or as.vector() instead.
-    ...
-    l.197 \RequirePackage
-                         {parnotes}^^M
-    !  ==> Fatal error occurred, no output PDF file produced!
-    --- failed re-building ‘QDNAseq.Rnw’
-    
-    SUMMARY: processing the following file failed:
-      ‘QDNAseq.Rnw’
-    
-    Error: Vignette re-building failed.
-    Execution halted
-    ```
+     ```
+     ...
+     Total time:0minutes
+     
+     Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
+       texi2dvi script/program not available, using emulation
+     Error: processing vignette 'QDNAseq.Rnw' failed with diagnostics:
+     unable to run pdflatex on 'QDNAseq.tex'
+     LaTeX errors:
+     ! LaTeX Error: File `nowidow.sty' not found.
+     
+     Type X to quit or <RETURN> to proceed,
+     or enter new name. (Default extension: sty)
+     
+     ! Emergency stop.
+     <read *> 
+              
+     l.197 \RequirePackage
+                          {parnotes}^^M
+     !  ==> Fatal error occurred, no output PDF file produced!
+     --- failed re-building ‘QDNAseq.Rnw’
+     
+     SUMMARY: processing the following file failed:
+       ‘QDNAseq.Rnw’
+     
+     Error: Vignette re-building failed.
+     Execution halted
+     ```
 
-# scruff
+# scruff (1.28.0)
 
-<details>
-
-* Version: 1.28.0
-* GitHub: https://github.com/campbio/scruff
-* Source code: https://github.com/cran/scruff
-* Date/Publication: 2025-10-29
-* Number of recursive dependencies: 173
+* GitHub: <https://github.com/campbio/scruff>
+* Email: <mailto:zhe@bu.edu>
 
 Run `revdepcheck::revdep_details(, "scruff")` for more info
-
-</details>
 
 ## In both
 
 *   checking DESCRIPTION meta-information ... NOTE
-    ```
-    License stub is invalid DCF.
-    ```
+     ```
+     License stub is invalid DCF.
+     ```
 
 *   checking dependencies in R code ... NOTE
-    ```
-    Namespace in Imports field not imported from: 'patchwork'
-      All declared Imports should be used.
-    Unexported object imported by a ':::' call: 'ShortRead:::.set_omp_threads'
-      See the note in ?`:::` about the use of this operator.
-    ```
+     ```
+     Namespace in Imports field not imported from: 'patchwork'
+       All declared Imports should be used.
+     Unexported object imported by a ':::' call: 'ShortRead:::.set_omp_threads'
+       See the note in ?`:::` about the use of this operator.
+     ```
 
 *   checking foreign function calls ... NOTE
-    ```
-    Foreign function call to a different package:
-      .Call(ShortRead:::.set_omp_threads, ...)
-    See chapter ‘System and foreign language interfaces’ in the ‘Writing R
-    Extensions’ manual.
-    ```
+     ```
+     Foreign function call to a different package:
+       .Call(ShortRead:::.set_omp_threads, ...)
+     See chapter ‘System and foreign language interfaces’ in the ‘Writing R
+     Extensions’ manual.
+     ```
 
 *   checking R code for possible problems ... NOTE
-    ```
-    .plotFracProteinCodingGenes: no visible binding for global variable
-      'genes'
-    .plotGenes: no visible binding for global variable 'genes'
-    .plotGenesPerMillionReads: no visible binding for global variable
-      'genes'
-    Undefined global functions or variables:
-      genes
-    ```
+     ```
+     .plotFracProteinCodingGenes: no visible binding for global variable
+       'genes'
+     .plotGenes: no visible binding for global variable 'genes'
+     .plotGenesPerMillionReads: no visible binding for global variable
+       'genes'
+     Undefined global functions or variables:
+       genes
+     ```
 
-# streetscape
+# streetscape (1.0.5)
 
-<details>
-
-* Version: 1.0.5
-* GitHub: NA
-* Source code: https://github.com/cran/streetscape
-* Date/Publication: 2025-01-21 14:50:03 UTC
-* Number of recursive dependencies: 131
+* Email: <mailto:xiaohaoy@umich.edu>
+* GitHub mirror: <https://github.com/cran/streetscape>
 
 Run `revdepcheck::revdep_details(, "streetscape")` for more info
-
-</details>
 
 ## In both
 
 *   checking data for ASCII and uncompressed saves ... WARNING
-    ```
-      code for methods in class “Rcpp_SpatCategories” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatCategories” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatDataFrame” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatDataFrame” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatFactor” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatFactor” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatMessages” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatMessages” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    ...
-      code for methods in class “Rcpp_SpatVectorProxy” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpatVectorProxy” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpPoly” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpPoly” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpPolyPart” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpPolyPart” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpPolygons” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-      code for methods in class “Rcpp_SpPolygons” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    ```
+     ```
+     ...
+       code for methods in class “Rcpp_SpatOptions” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatRaster” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatRaster” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatRasterCollection” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatRasterCollection” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatRasterStack” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatRasterStack” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatSRS” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatSRS” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatTime_v” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatTime_v” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatVector” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatVector” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatVectorCollection” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatVectorCollection” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatVectorProxy” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpatVectorProxy” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpPoly” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpPoly” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpPolyPart” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpPolyPart” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpPolygons” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+       code for methods in class “Rcpp_SpPolygons” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     ```
 
 *   checking whether startup messages can be suppressed ... NOTE
-    ```
-    code for methods in class “Rcpp_SpatCategories” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatCategories” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatDataFrame” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatDataFrame” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatFactor” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatFactor” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatMessages” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpatMessages” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    ...
-    code for methods in class “Rcpp_SpExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpPoly” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpPoly” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpPolyPart” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpPolyPart” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpPolygons” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    code for methods in class “Rcpp_SpPolygons” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
-    
-    It looks like this package (or a package it requires) has a startup
-    message which cannot be suppressed: see ?packageStartupMessage.
-    ```
+     ```
+     ...
+     code for methods in class “Rcpp_SpatRasterCollection” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatRasterCollection” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatRasterStack” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatRasterStack” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatSRS” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatSRS” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatTime_v” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatTime_v” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatVector” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatVector” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatVectorCollection” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatVectorCollection” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatVectorProxy” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpatVectorProxy” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpExtent” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpPoly” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpPoly” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpPolyPart” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpPolyPart” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpPolygons” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_SpPolygons” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     
+     It looks like this package (or a package it requires) has a startup
+     message which cannot be suppressed: see ?packageStartupMessage.
+     ```
 
-# targets
+# targets (1.12.0)
 
-<details>
-
-* Version: 1.11.4
-* GitHub: https://github.com/ropensci/targets
-* Source code: https://github.com/cran/targets
-* Date/Publication: 2025-09-13 05:10:02 UTC
-* Number of recursive dependencies: 156
+* GitHub: <https://github.com/ropensci/targets>
+* Email: <mailto:will.landau.oss@gmail.com>
+* GitHub mirror: <https://github.com/cran/targets>
 
 Run `revdepcheck::revdep_details(, "targets")` for more info
 
-</details>
+## In both
+
+*   checking examples ... ERROR
+     ```
+     Running examples in ‘targets-Ex.R’ failed
+     The error most likely occurred in:
+     
+     > ### Name: tar_renv
+     > ### Title: Set up package dependencies for compatibility with 'renv'
+     > ### Aliases: tar_renv
+     > 
+     > ### ** Examples
+     > 
+     > tar_dir({ # tar_dir() runs code from a temp dir for CRAN.
+     +   tar_script({
+     +     library(targets)
+     +     library(tarchetypes)
+     +     tar_option_set(packages = c("tibble", "qs"))
+     +     list()
+     +   }, ask = FALSE)
+     +   tar_renv()
+     +   writeLines(readLines("_targets_packages.R"))
+     + })
+     Error:
+     ! Error in tar_renv():
+       there is no package called ‘tarchetypes’
+       See https://books.ropensci.org/targets/debugging.html
+     Execution halted
+     ```
+
+# WeightedCluster (2.0)
+
+* Email: <mailto:matthias.studer@unige.ch>
+* GitHub mirror: <https://github.com/cran/WeightedCluster>
+
+Run `revdepcheck::revdep_details(, "WeightedCluster")` for more info
 
 ## In both
 
-*   checking Rd cross-references ... NOTE
-    ```
-    Unknown package ‘qs’ in Rd xrefs
-    ```
+*   checking re-building of vignette outputs ... WARNING
+     ```
+     ...
+     
+     --- re-building ‘WeightedClusterPreview.Rnw’ using knitr
+     Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
+       texi2dvi script/program not available, using emulation
+     Error: processing vignette 'WeightedClusterPreview.Rnw' failed with diagnostics:
+     unable to run pdflatex on 'WeightedClusterPreview.tex'
+     LaTeX errors:
+     ! LaTeX Error: File `textpos.sty' not found.
+     
+     Type X to quit or <RETURN> to proceed,
+     or enter new name. (Default extension: sty)
+     
+     ! Emergency stop.
+     <read *> 
+              
+     l.85 \usepackage
+                     {tikz}^^M
+     !  ==> Fatal error occurred, no output PDF file produced!
+     --- failed re-building ‘WeightedClusterPreview.Rnw’
+     
+     SUMMARY: processing the following files failed:
+       ‘WeightedClusterFR.Rnw’ ‘WeightedClusterPreview.Rnw’
+     
+     Error: Vignette re-building failed.
+     Execution halted
+     ```
 
