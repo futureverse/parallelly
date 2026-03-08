@@ -18,20 +18,20 @@ message("getCGroupsRoot(): ", parallelly:::getCGroupsRoot())
 message("getCGroupsRoot(): ", parallelly:::getCGroupsRoot())
 
 options(parallelly.cgroups.cpuset = 0:3)
-message("getCGroups1CpuSet(): ", parallelly:::getCGroups1CpuSet())
+message("getCGroups1CpuSet(): ", paste(parallelly:::getCGroups1CpuSet(), collapse = ", "))
 options(parallelly.cgroups.cpuset = NULL)
 
-options(parallelly.cgroups.cpuquota = 0:3)
+options(parallelly.cgroups.cpuquota = 2.5)
 message("getCGroups1CpuQuota(): ", parallelly:::getCGroups1CpuQuota())
 options(parallelly.cgroups.cpuquota = NULL)
 
 options(parallelly.cgroups2.cpuset.cpus = 0:3)
-message("getCGroups2CpuSet(): ", parallelly:::getCGroups2CpuSet())
-message("getCGroups2CpuSet('cpuset.cpus'): ", parallelly:::getCGroups2CpuSet("cpuset.cpus"))
+message("getCGroups2CpuSet(): ", paste(parallelly:::getCGroups2CpuSet(), collapse = ", "))
+message("getCGroups2CpuSet('cpuset.cpus'): ", paste(parallelly:::getCGroups2CpuSet("cpuset.cpus"), collapse = ", "))
 options(parallelly.cgroups2.cpuset.cpus = NULL)
 
 options(parallelly.cgroups2.cpuset.cpus.effective = 0:3)
-message("getCGroups2CpuSet('cpuset.cpus.effective'): ", parallelly:::getCGroups2CpuSet("cpuset.cpus.effective"))
+message("getCGroups2CpuSet('cpuset.cpus.effective'): ", paste(parallelly:::getCGroups2CpuSet("cpuset.cpus.effective"), collapse = ", "))
 options(parallelly.cgroups2.cpuset.cpus.effective = NULL)
 
 options(parallelly.cgroups2.cpu.max = 100000L)
