@@ -989,7 +989,7 @@ getCGroups2CpuMax <- local({
     }
   
     period <- as.integer(values[2])
-    if (is.na(period) && period <= 0L) {
+    if (is.na(period) || period <= 0L) {
       .cache <<- NA_real_
       return(.cache)
     }
