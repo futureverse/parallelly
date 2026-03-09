@@ -21,6 +21,10 @@
   hostnames with zero, e.g. `n[09-10]` would become `c("n09", "n010")`
   whereas it should be `c("n09", "n10")`.
 
+- `availableWorkers(method = "Slurm")` did not, as documented, fall back
+  to legacy environment variable `SLURM_NODELIST` when
+  `SLURM_JOB_NODELIST` is not set
+
 ## Version 1.46.1
 
 CRAN release: 2026-01-08
