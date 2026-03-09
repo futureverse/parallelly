@@ -719,7 +719,7 @@ availableWorkersSlurm <- function() {
   ## Example:
   ## SLURM_JOB_NODELIST=n1,n[3-8],n[23-25]
   nodelist <- getenv_chr("SLURM_JOB_NODELIST")
-  if (is.na(nodelist)) data <- getenv_chr("SLURM_NODELIST")
+  if (is.na(nodelist)) nodelist <- getenv_chr("SLURM_NODELIST")
   if (is.na(nodelist)) return(NA_character_)
 
   ## Parse and expand nodelist
