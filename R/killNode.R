@@ -175,7 +175,7 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
           }) ## local()
         } ## if (length(tempdir) == 1)
       } else {
-        if (debug) mdebug("Skipping, because signal was %d", signal)
+        if (debug) mdebugf("Skipping, because signal was %d", signal)
       } ## if (signal %in% ...)
     }) ## if (isTRUE(success)) local({ ... })
   }) ## on.exit()
