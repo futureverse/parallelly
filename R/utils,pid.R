@@ -249,7 +249,7 @@ pid_exists <- local({
 #' @importFrom tools pskill
 pid_kill <- function(pid, wait = 0.5, timeout = 30, debug = TRUE) {
   pid <- as.integer(pid)
-  stop_if_not(length(pid), !is.na(pid), pid >= 0L)
+  stop_if_not(length(pid) == 1L, !is.na(pid), pid >= 0L)
 
   setTimeLimit(elapsed = timeout)
   on.exit(setTimeLimit(elapsed = Inf))
