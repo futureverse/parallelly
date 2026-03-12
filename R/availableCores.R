@@ -751,7 +751,7 @@ availableCoresSlurm <- local({
           ## SLURM_TASKS_PER_NODE=2(x2),1(x3)  # Source: 'man sbatch'
           n <<- slurm_expand_nodecounts(nodecounts)
           if (anyNA(n)) {
-            n <<- NA_real_
+            n <<- NA_integer_
             return(n)
           }
   
