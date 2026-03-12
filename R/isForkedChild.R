@@ -10,19 +10,20 @@
 #'
 #' @export
 isForkedChild <- local({
-  isChild <- NULL
+  .cache <- NULL  ## Cannot name just 'isChild', bc R CMD check/codetools
   
   function() {
+    isChild <- .cache
     if (is.null(isChild)) {
       if (supportsMulticore()) {
         ## Asked for parallel:::isChild() to be exported /HB 2021-11-04
         ## https://bugs.r-project.org/show_bug.cgi?id=18230
-        isChild <<- importParallel("isChild")
+        isChild <- importParallel("isChild")
       } else {
-        isChild <<- function() FALSE
+        isChild <- function() FALSE
       }
+      .cache <<- isChild
     }
-    
     isChild()
   }
 })
