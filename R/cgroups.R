@@ -440,6 +440,9 @@ getCGroupsMounts <- local({
   .cache <- NULL
   
   function() {
+    mounts <- .cache
+    if (!is.null(mounts)) return(mounts)
+
     file <- file.path(procPath(), "self", "mounts")
     
     ## cgroups is not set?
