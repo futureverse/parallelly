@@ -323,7 +323,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       n <- freeConnections()
       if (!is.na(n)) {
         delta <- sub(pattern_connections, "\\1", method)
-        if (nzchar(delta) && nzchar(omit)) {
+        if (nzchar(delta)) {
           delta <- as.integer(delta)
           n <- max(0L, n + delta)
         }
