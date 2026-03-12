@@ -734,14 +734,14 @@ getCGroups1CpuSet <- local({
     expr <- tryCatch({
       parse(text = code)
     }, error = function(ex) {
-      warning(sprintf("Syntax error parsing %s: %s", sQuote(file), sQuote(value0)))
+      warning(sprintf("Syntax error parsing %s: %s", sQuote(code), sQuote(value0)))
       integer(0L)
     })
   
     value <- tryCatch({
       suppressWarnings(as.integer(eval(expr)))
     }, error = function(ex) {
-      warning(sprintf("Failed to parse %s: %s", sQuote(file), sQuote(value0)))
+      warning(sprintf("Failed to parse %s: %s", sQuote(code), sQuote(value0)))
       integer(0L)
     })
   
