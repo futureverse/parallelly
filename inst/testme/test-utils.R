@@ -91,4 +91,80 @@ message("*** inRCmdCheck() ...")
 cat(sprintf("R CMD check is running: %s\n", inRCmdCheck()))
 message("*** inRCmdCheck() ... DONE")
 
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# trim()
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+message("*** trim() ...")
+
+trim <- parallelly:::trim
+
+stopifnot(
+  identical(trim("  hello  "), "hello"),
+  identical(trim("hello"), "hello"),
+  identical(trim("\t hello \n"), "hello"),
+  identical(trim(""), ""),
+  identical(trim("  "), "")
+)
+
+message("*** trim() ... DONE")
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# commaq()
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+message("*** commaq() ...")
+
+commaq <- parallelly:::commaq
+
+res <- commaq("a")
+stopifnot(identical(res, sQuote("a")))
+
+res <- commaq(c("a", "b"))
+stopifnot(identical(res, paste(sQuote(c("a", "b")), collapse = ", ")))
+
+res <- commaq(character(0))
+stopifnot(identical(res, ""))
+
+message("*** commaq() ... DONE")
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# hpaste() - lastCollapse
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+message("*** hpaste() - lastCollapse ...")
+
+## Two-element vector with lastCollapse
+res <- hpaste(c("a", "b"), lastCollapse = " and ")
+stopifnot(identical(res, "a and b"))
+
+## Single-element vector
+res <- hpaste("a", lastCollapse = " and ")
+stopifnot(identical(res, "a"))
+
+message("*** hpaste() - lastCollapse ... DONE")
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# pid_exists() - argument validation
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+message("*** pid_exists() - argument validation ...")
+
+## Non-existent PID
+result <- pid_exists(2^31 - 1L)
+message("pid_exists(non-existent PID): ", result)
+stopifnot(is.logical(result), length(result) == 1L,
+          isFALSE(result) || is.na(result))
+
+## Invalid arguments
+res <- tryCatch(pid_exists(-1L), error = identity)
+stopifnot(inherits(res, "error"))
+
+res <- tryCatch(pid_exists(NA_real_), error = identity)
+stopifnot(inherits(res, "error"))
+
+message("*** pid_exists() - argument validation ... DONE")
+
+options(parallelly.debug = FALSE)
+
 message("*** utils ... DONE")
