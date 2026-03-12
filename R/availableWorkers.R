@@ -747,13 +747,13 @@ availableWorkersSlurm <- function() {
     }
 
     ## Always respect 'SLURM_CPUS_PER_TASK' (always a scalar), if that exists
-    n <- getenv_chr("SLURM_CPUS_PER_TASK")
+    n <- getenv_int("SLURM_CPUS_PER_TASK")
     if (!is.na(n)) {
       c0 <- c
       c <- rep(n, times = length(w))
       ## Is our assumption that SLURM_CPUS_PER_TASK <= SLURM_JOB_NODELIST, correct?
-      if (any(c < n)) {
-        c <- pmin(c, n)
+      if (any(c0 < n)) {
+        c <- pmin(c0, n)
         warnf("Unexpected values of Slurm environment variable. 'SLURM_CPUS_PER_TASK' specifies CPU counts on one or more nodes that is strictly less than what 'SLURM_CPUS_PER_TASK' specifies. Will use the minimum of the two for each node: %s < %s", sQuote(nodecounts), n)
       }
     }

@@ -365,7 +365,17 @@ for (kk in seq_along(specs)) {
 
 message("*** Slurm w/ SLURM_TASKS_PER_NODE ... DONE")
 
-
+message("*** Slurm odds'n'ends ...")
+# Respect SLURM_CPUS_PER_TASK, if set
+Sys.setenv(
+  SLURM_JOB_NODELIST = "n1",
+  SLURM_JOB_CPUS_PER_NODE = "10(x1)",
+  SLURM_CPUS_PER_TASK = "9"
+)
+w <- parallelly:::availableWorkersSlurm()
+str(w)
+stopifnot(length(w) == 9L, all(w == "n1"))
+message("*** Slurm odds'n'ends ... DONE")
 
 message("*** HPC related ... DONE")
 

@@ -22,6 +22,12 @@
    back to legacy environment variable `SLURM_NODELIST` when
    `SLURM_JOB_NODELIST` is not set
 
+ * `availableWorkers(method = "Slurm")` could return the wrong set of
+   hostnames if environment variables `SLURM_JOB_NODELIST`,
+   `SLURM_JOB_CPUS_PER_NODE` and `SLURM_CPUS_PER_TASK` were all set,
+   because `SLURM_CPUS_PER_TASK` was treated as a string, not an
+   integer, in comparisons.
+   
  * `makeClusterPSOCK(..., setup_strategy = "sequential")` would not
    respect internal R options for how to retry with another TCP port,
    if failing to start a cluster node.
