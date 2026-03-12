@@ -384,7 +384,7 @@ readWorkerPID <- function(pidfile, wait = 0.5, maxTries = 8L, verbose = FALSE) {
     file.remove(pidfile)
     
     if (length(pid0) > 0L) {
-      ## Use last one, if more than one ("should not happend")
+      ## Use last one, if more than one ("should not happen")
       pid <- as.integer(pid0[length(pid0)])
       if (verbose) mdebugf(" - pid: %s", pid)
       if (is.na(pid)) {
