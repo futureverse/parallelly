@@ -76,7 +76,7 @@ isNodeAlive.RichSOCKnode <- function(x, timeout = 0.0, ...) {
       setTimeLimit(cpu = timeout, elapsed = timeout, transient = TRUE)
       on.exit({
         setTimeLimit(cpu = Inf, elapsed = Inf, transient = FALSE)
-      })
+      }, add = TRUE)
     }
     res <- tryCatch({
       pid_exists(pid)
