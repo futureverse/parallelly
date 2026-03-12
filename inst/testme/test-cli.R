@@ -30,7 +30,7 @@ stopifnot(
   is.numeric(args[["num"]]), args[["num"]]  == 3.14,
   is.logical(args[["logical"]]), args[["logical"]] == TRUE,
   is.character(args[["name"]]), args[["name"]] == "abc",
-  is.numeric(args[["num"]]), args[["expr"]] == "3"
+  is.numeric(args[["expr"]]), args[["expr"]] == 3
 )
 
 cmdargs <- c("--int=42", "--num=3.14", "--logical=TRUE", "--name=abc")
