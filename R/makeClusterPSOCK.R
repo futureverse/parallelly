@@ -442,14 +442,14 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
         if (!inherits(node, "PSOCKConnectionError")) break
         
         if (kk < tries) {
+          if (verbose) mdebug(conditionMessage(node))
+          ## Retry with a new random port?
+          if (retryPort == "next") {
+            options$port <- max(options$port + 1L, 65535L)
+          } else if (retryPort == "available") {
+            options$port <- freePort()
+          }
           if (verbose) {
-            mdebug(conditionMessage(node))
-            ## Retry with a new random port?
-            if (retryPort == "next") {
-              options$port <- max(options$port + 1L, 65535L)
-            } else if (retryPort == "available") {
-              options$port <- freePort()
-            }
             mdebugf("%swaiting %g seconds before trying again",
                     verbose_prefix, delay)
           }

@@ -22,6 +22,10 @@
    back to legacy environment variable `SLURM_NODELIST` when
    `SLURM_JOB_NODELIST` is not set
 
+ * `makeClusterPSOCK(..., setup_strategy = "sequential")` would not
+   respect internal R options for how to retry with another TCP port,
+   if failing to start a cluster node.
+
 
 # Version 1.46.1 [2026-01-07]
 
