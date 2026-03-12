@@ -445,7 +445,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
           if (verbose) mdebug(conditionMessage(node))
           ## Retry with a new random port?
           if (retryPort == "next") {
-            options$port <- max(options$port + 1L, 65535L)
+            options$port <- min(options$port + 1L, 65535L)
           } else if (retryPort == "available") {
             options$port <- freePort()
           }
