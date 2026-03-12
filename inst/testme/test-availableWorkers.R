@@ -1,5 +1,7 @@
 library(parallelly)
 
+availableCoresPJM <- parallelly:::availableCoresPJM
+
 message("*** availableWorkers() ...")
 
 ## The default
@@ -127,7 +129,7 @@ message("*** read_pjm_nodefile() ...")
 workersT <- unique(workers0)
 pathname <- tempfile()
 writeLines(workersT, con = pathname)
-
+message(sprintf("Workers in 'PJM_O_NODEINF' file: [n=%d] %s", length(workersT), paste(sQuote(workersT), collapse = ", ")))
 data <- read_pjm_nodefile(pathname)
 str(data)
 stopifnot(
@@ -143,6 +145,9 @@ Sys.setenv(PJM_O_NODEINF = pathname)
 
 message("- PJM_VNODE_CORE=1")
 Sys.setenv(PJM_VNODE_CORE = "1")
+
+## Clear memoization cache
+environment(availableCoresPJM)$n <- NULL
 workers <- availableWorkers(methods = "PJM")
 print(workers)
 stopifnot(
@@ -154,6 +159,8 @@ message("- PJM_VNODE=", length(workersT))
 message("- PJM_VNODE_CORE=2")
 Sys.setenv(PJM_VNODE = length(workersT))
 Sys.setenv(PJM_VNODE_CORE = "2")
+## Clear memoization cache
+environment(availableCoresPJM)$n <- NULL
 workers <- availableWorkers(methods = "PJM")
 print(workers)
 stopifnot(
@@ -162,11 +169,12 @@ stopifnot(
   all(workersT %in% workers)
 )
 
-
 message("- PJM_VNODE=1 (incompatible => warning)")
 message("- PJM_VNODE_CORE=2")
 Sys.setenv(PJM_VNODE = "1")
 Sys.setenv(PJM_VNODE_CORE = "2")
+## Clear memoization cache
+environment(availableCoresPJM)$n <- NULL
 workers <- availableWorkers(methods = "PJM")
 print(workers)
 stopifnot(

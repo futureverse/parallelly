@@ -668,6 +668,7 @@ availableCoresLSF <- local({
 availableCoresPBS <- local({
   n <- NULL
   function() {
+    if (!is.null(n)) return(n)
     n <<- getenv_int("PBS_NUM_PPN")
     if (is.na(n)) {
       ## PBSPro sets 'NCPUS' but not 'PBS_NUM_PPN'
@@ -684,6 +685,7 @@ availableCoresPBS <- local({
 availableCoresPJM <- local({
   n <- NULL
   function() {
+    if (!is.null(n)) return(n)
     ## PJM_VNODE_CORE: e.g. pjsub -L vnode-core=8
     ## "This environment variable is set only when virtual nodes
     ##  are allocated, and it is not set when nodes are allocated."
@@ -705,6 +707,7 @@ availableCoresPJM <- local({
 availableCoresSGE <- local({
   n <- NULL
   function() {
+    if (!is.null(n)) return(n)
     n <<- getenv_int("NSLOTS")
     n
   }
@@ -715,6 +718,7 @@ availableCoresSGE <- local({
 availableCoresSlurm <- local({
   n <- NULL
   function() {
+    if (!is.null(n)) return(n)
     ## The assumption is that the following works regardless of
     ## number of nodes requested /HB 2020-09-18
     ## Example: --cpus-per-task={n}
