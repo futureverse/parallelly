@@ -2,6 +2,8 @@
 
 * Email: <mailto:manuel.munoz@uca.es>
 * GitHub mirror: <https://github.com/cran/adea>
+* CRAN: <https://cran.r-project.org/package=adea>
+* CRAN checks: <https://cran.r-project.org/web/checks/check_results_adea.html>
 
 Run `revdepcheck::revdep_details(, "adea")` for more info
 
@@ -55,56 +57,13 @@ ERROR: lazy loading failed for package ‘adea’
 
 
 ```
-# aramappings (0.1.3)
-
-* GitHub: <https://github.com/manuelrubio/aramappings>
-* Email: <mailto:manuel.rubio@urjc.es>
-* GitHub mirror: <https://github.com/cran/aramappings>
-
-Run `revdepcheck::revdep_details(, "aramappings")` for more info
-
-## In both
-
-*   checking tests ...
-     ```
-     ...
-        4.       └─cli::cli_abort("Variable name {.val {as.character(name)}} must be a string.")
-        5.         └─rlang::abort(...)
-       ── Error ('test-ara_unconstrained_l2.R:127:3'): (code run outside of `test_that()`) ──
-       Error in `CVXR::Variable(N, m)`: Variable name "1" must be a string.
-       Backtrace:
-           ▆
-        1. └─aramappings::ara_unconstrained_l2(X, V, solver = "CVXR") at test-ara_unconstrained_l2.R:127:3
-        2.   └─aramappings:::ara_unconstrained_l2_CVXR(X, V)
-        3.     └─CVXR::Variable(N, m)
-        4.       └─cli::cli_abort("Variable name {.val {as.character(name)}} must be a string.")
-        5.         └─rlang::abort(...)
-       ── Error ('test-ara_unconstrained_linf.R:162:3'): (code run outside of `test_that()`) ──
-       Error in `CVXR::Variable(N, m)`: Variable name "1" must be a string.
-       Backtrace:
-           ▆
-        1. └─aramappings::ara_unconstrained_linf(X, V, weights = w, solver = "CVXR") at test-ara_unconstrained_linf.R:162:3
-        2.   └─aramappings:::ara_unconstrained_linf_CVXR(X, V)
-        3.     └─CVXR::Variable(N, m)
-        4.       └─cli::cli_abort("Variable name {.val {as.character(name)}} must be a string.")
-        5.         └─rlang::abort(...)
-       
-       [ FAIL 9 | WARN 0 | SKIP 0 | PASS 192 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-*   checking dependencies in R code ... WARNING
-     ```
-     Missing or unexported object: ‘CVXR::solve’
-     ```
-
 # ctsem (3.10.6)
 
 * GitHub: <https://github.com/cdriveraus/ctsem>
 * Email: <mailto:charles.driver2@uzh.ch>
 * GitHub mirror: <https://github.com/cran/ctsem>
+* CRAN: <https://cran.r-project.org/package=ctsem>
+* CRAN checks: <https://cran.r-project.org/web/checks/check_results_ctsem.html>
 
 Run `revdepcheck::revdep_details(, "ctsem")` for more info
 
@@ -172,7 +131,7 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
      > ### ** Examples
      > 
      > collectri <- get_collectri(organism='human', split_complexes=FALSE)
-     [2026-03-07 14:24:32] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+     [2026-03-12 23:44:18] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
      Error in if (.keep) . else select(., -!!evs_col) : 
        argument is of length zero
      Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
@@ -252,6 +211,8 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 * GitHub: <https://github.com/holgstr/fmeffects>
 * Email: <mailto:hbj.loewe@gmail.com>
 * GitHub mirror: <https://github.com/cran/fmeffects>
+* CRAN: <https://cran.r-project.org/package=fmeffects>
+* CRAN checks: <https://cran.r-project.org/web/checks/check_results_fmeffects.html>
 
 Run `revdepcheck::revdep_details(, "fmeffects")` for more info
 
@@ -362,91 +323,13 @@ Run `revdepcheck::revdep_details(, "iscream")` for more info
        Execution halted
      ```
 
-# ldaPrototype (0.3.2)
-
-* GitHub: <https://github.com/JonasRieger/ldaPrototype>
-* Email: <mailto:jonas.rieger@tu-dortmund.de>
-* GitHub mirror: <https://github.com/cran/ldaPrototype>
-
-Run `revdepcheck::revdep_details(, "ldaPrototype")` for more info
-
-## In both
-
-*   checking tests ...
-     ```
-     ...
-        1. └─ldaPrototype::LDARep(...) at test_mergeTopics.R:6:1
-        2.   ├─base::suppressWarnings(parallelMap::parallelExport("docs", "vocab"))
-        3.   │ └─base::withCallingHandlers(...)
-        4.   └─parallelMap::parallelExport("docs", "vocab")
-        5.     └─parallelMap:::exportToSlavePkgParallel(n, get(n, envir = sys.parent()))
-        6.       └─parallel::clusterCall(...)
-        7.         └─parallel:::defaultCluster(cl)
-       ── Error ('test_rboTopics.R:6:1'): (code run outside of `test_that()`) ─────────
-       Error in `defaultCluster(cl)`: no cluster 'cl' supplied and none is registered
-       Backtrace:
-           ▆
-        1. ├─ldaPrototype::mergeTopics(...) at test_rboTopics.R:6:1
-        2. └─ldaPrototype::LDARep(...)
-        3.   ├─base::suppressWarnings(parallelMap::parallelExport("docs", "vocab"))
-        4.   │ └─base::withCallingHandlers(...)
-        5.   └─parallelMap::parallelExport("docs", "vocab")
-        6.     └─parallelMap:::exportToSlavePkgParallel(n, get(n, envir = sys.parent()))
-        7.       └─parallel::clusterCall(...)
-        8.         └─parallel:::defaultCluster(cl)
-       
-       [ FAIL 8 | WARN 0 | SKIP 0 | PASS 132 ]
-       Error:
-       ! Test failures.
-       There were 50 or more warnings (use warnings() to see the first 50)
-       Execution halted
-     ```
-
-# lidR (4.2.3)
-
-* GitHub: <https://github.com/r-lidar/lidR>
-* Email: <mailto:info@r-lidar.com>
-* GitHub mirror: <https://github.com/cran/lidR>
-
-Run `revdepcheck::revdep_details(, "lidR")` for more info
-
-## In both
-
-*   checking tests ...
-     ```
-     ...
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       Chunk 1 of 1 (100%): state ✓
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       terminate called after throwing an instance of 'std::length_error'
-         what():  basic_string::_M_create
-     ```
-
 # mappp (1.0.0)
 
 * GitHub: <https://github.com/cole-brokamp/mappp>
 * Email: <mailto:cole.brokamp@gmail.com>
 * GitHub mirror: <https://github.com/cran/mappp>
+* CRAN: <https://cran.r-project.org/package=mappp>
+* CRAN checks: <https://cran.r-project.org/web/checks/check_results_mappp.html>
 
 Run `revdepcheck::revdep_details(, "mappp")` for more info
 
@@ -463,6 +346,8 @@ Run `revdepcheck::revdep_details(, "mappp")` for more info
 * GitHub: <https://github.com/pavlakrotka/NCC>
 * Email: <mailto:pavla.krotka@meduniwien.ac.at>
 * GitHub mirror: <https://github.com/cran/NCC>
+* CRAN: <https://cran.r-project.org/package=NCC>
+* CRAN checks: <https://cran.r-project.org/web/checks/check_results_NCC.html>
 
 Run `revdepcheck::revdep_details(, "NCC")` for more info
 
@@ -472,24 +357,6 @@ Run `revdepcheck::revdep_details(, "NCC")` for more info
      ```
      Namespace in Imports field not imported from: ‘magick’
        All declared Imports should be used.
-     ```
-
-# proffer (0.2.2)
-
-* GitHub: <https://github.com/r-prof/proffer>
-* Email: <mailto:will.landau.oss@gmail.com>
-* GitHub mirror: <https://github.com/cran/proffer>
-
-Run `revdepcheck::revdep_details(, "proffer")` for more info
-
-## In both
-
-*   checking package dependencies ... ERROR
-     ```
-     Package required but not available: ‘RProtoBuf’
-     
-     See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-     manual.
      ```
 
 # QDNAseq (1.46.0)
@@ -576,6 +443,8 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 
 * Email: <mailto:xiaohaoy@umich.edu>
 * GitHub mirror: <https://github.com/cran/streetscape>
+* CRAN: <https://cran.r-project.org/package=streetscape>
+* CRAN checks: <https://cran.r-project.org/web/checks/check_results_streetscape.html>
 
 Run `revdepcheck::revdep_details(, "streetscape")` for more info
 
@@ -646,6 +515,8 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
 * GitHub: <https://github.com/ropensci/targets>
 * Email: <mailto:will.landau.oss@gmail.com>
 * GitHub mirror: <https://github.com/cran/targets>
+* CRAN: <https://cran.r-project.org/package=targets>
+* CRAN checks: <https://cran.r-project.org/web/checks/check_results_targets.html>
 
 Run `revdepcheck::revdep_details(, "targets")` for more info
 
@@ -683,6 +554,8 @@ Run `revdepcheck::revdep_details(, "targets")` for more info
 
 * Email: <mailto:matthias.studer@unige.ch>
 * GitHub mirror: <https://github.com/cran/WeightedCluster>
+* CRAN: <https://cran.r-project.org/package=WeightedCluster>
+* CRAN checks: <https://cran.r-project.org/web/checks/check_results_WeightedCluster.html>
 
 Run `revdepcheck::revdep_details(, "WeightedCluster")` for more info
 

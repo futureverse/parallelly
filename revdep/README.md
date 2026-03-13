@@ -2,7 +2,7 @@
 
 |field    |value                                                       |
 |:--------|:-----------------------------------------------------------|
-|version  |R version 4.5.2 (2025-10-31)                                |
+|version  |R version 4.5.3 (2026-03-11)                                |
 |os       |Rocky Linux 8.10 (Green Obsidian)                           |
 |system   |x86_64, linux-gnu                                           |
 |ui       |X11                                                         |
@@ -10,7 +10,7 @@
 |collate  |en_US.UTF-8                                                 |
 |ctype    |en_US.UTF-8                                                 |
 |tz       |America/Los_Angeles                                         |
-|date     |2026-03-07                                                  |
+|date     |2026-03-13                                                  |
 |pandoc   |3.8.3 @ /software/c4/cbi/software/pandoc-3.8.3/bin/pandoc   |
 |quarto   |1.8.26 @ /software/c4/cbi/software/quarto-1.8.26/bin/quarto |
 
@@ -18,7 +18,7 @@
 
 |package    |old    |new         |Δ  |
 |:----------|:------|:-----------|:--|
-|parallelly |1.46.1 |1.46.1-9016 |*  |
+|parallelly |1.46.1 |1.46.1-9033 |*  |
 
 # Revdeps
 
@@ -28,7 +28,7 @@
 |:-------|:-------|:-----|:-------|:----|
 |[adea](failures.md#adea)|1.5.2   |1     |        |     |
 
-## All (108)
+## All (106)
 
 |package             |version  |error |warning |note |
 |:-------------------|:--------|:-----|:-------|:----|
@@ -36,7 +36,6 @@
 |alookr              |0.5.1    |      |        |     |
 |AMR                 |3.0.1    |      |        |     |
 |apsimx              |2.8.235  |      |        |     |
-|[aramappings](problems.md#aramappings)|0.1.3    |1     |1       |     |
 |auxvecLASSO         |0.2.0    |      |        |     |
 |bbw                 |0.3.1    |      |        |     |
 |bigDM               |0.5.7    |      |        |     |
@@ -45,7 +44,7 @@
 |BiostatsUHNplus     |1.0.4    |      |        |     |
 |bootUR              |1.0.4    |      |        |     |
 |breathteststan      |0.8.9    |      |        |     |
-|caretSDM            |1.2.5    |      |        |     |
+|caretSDM            |1.5      |      |        |     |
 |cccrm               |3.0.6    |      |        |     |
 |COTAN               |2.10.3   |      |        |     |
 |CptNonPar           |0.3.2    |      |        |     |
@@ -85,9 +84,9 @@
 |jobqueue            |1.7.0    |      |        |     |
 |JuliaConnectoR      |1.1.5    |      |        |     |
 |kernelboot          |0.1.10   |      |        |     |
-|[ldaPrototype](problems.md#ldaprototype)|0.3.2    |1     |        |     |
+|ldaPrototype        |0.3.2    |      |        |     |
 |ldmppr              |1.1.3    |      |        |     |
-|[lidR](problems.md#lidr)|4.2.3    |1     |        |     |
+|lidR                |4.2.3    |      |        |     |
 |LipidMS             |3.1.2    |      |        |     |
 |LWFBrook90R         |0.6.3    |      |        |     |
 |[mappp](problems.md#mappp)|1.0.0    |      |        |1    |
@@ -103,7 +102,6 @@
 |parseRPDR           |1.1.2    |      |        |     |
 |PathwayVote         |0.1.3    |      |        |     |
 |pmartR              |2.5.1    |      |        |     |
-|[proffer](problems.md#proffer)|0.2.2    |1     |        |     |
 |[QDNAseq](problems.md#qdnaseq)|1.46.0   |      |1       |     |
 |qtl2pleio           |1.4.3    |      |        |     |
 |rACMEMEEV           |1.0.1    |      |        |     |
