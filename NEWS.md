@@ -4,7 +4,7 @@
 
  * `availableCores()` gained argument `fraction`, which allows you to
    specify that a certain fraction of the detected CPU cores should be
-   returned.
+   returned, e.g. `availableCores(fraction = 0.5)`.
 
  * Now `availableCores()` queries also Linux CGroups v2 CPU affinity
    values `cpuset.cpus` and `cpuset.cpus.effective`.`
