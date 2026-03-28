@@ -33,6 +33,13 @@
 #' If `"max"`, the maximum value is returned (be careful!)
 #' If `"all"`, all values are returned.
 #'
+#' @param fraction (numeric; in (0,1]) Fraction of cores to keep.
+#' Applied before `omit`.
+#' `availableCores(fraction = 0.5)` is equivalent to
+#' `max(1, floor(0.5 * availableCores()))` and
+#' `availableCores(fraction = 0.7, omit = 1)` is equivalent to
+#' `max(1, floor(0.7 * availableCores()) - 1)`.
+#'
 #' @param omit (integer; non-negative) Number of cores to not include.
 #'
 #' @param max (integer; positive) Maximum number of cores returned.
@@ -253,6 +260,16 @@
 #' }
 #'
 #' \dontrun{
+#' ## Use 50% of the available cores
+#' ncores <- availableCores(fraction = 0.5)
+#' message(paste("Number of cores to use:", ncores))
+#'
+#' ## Use 70% of the available cores, but leave one aside
+#' ncores <- availableCores(fraction = 0.7, omit = 1)
+#' message(paste("Number of cores to use:", ncores))
+#' }
+#'
+#' \dontrun{
 #' ## Use 75% of the cores on the system but never more than four
 #' options(parallelly.availableCores.custom = function() {
 #'   ncores <- max(parallel::detectCores(), 1L, na.rm = TRUE)
@@ -276,7 +293,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @export
-availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
+availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
@@ -289,6 +306,9 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
 
   which <- match.arg(which, choices = c("min", "max", "all"))
   stop_if_not(length(default) == 1, is.finite(default), default >= 1L)
+
+  stop_if_not(length(fraction) == 1L, is.numeric(fraction),
+              is.finite(fraction), fraction > 0, fraction <= 1)
 
   stop_if_not(length(omit) == 1L, is.numeric(omit),
               is.finite(omit), omit >= 0L)
@@ -501,6 +521,12 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     idxs <- which(ncores < min)
     ncores[idxs] <- as.integer(floor(min))
     names(ncores)[idxs] <- paste(names(ncores)[idxs], "*", sep = "")
+  }
+
+  ## Use only a fraction of the cores?
+  if (fraction < 1) {
+    ncores <- as.integer(floor(fraction * ncores))
+    ncores[ncores < 1L] <- 1L
   }
 
   ## Omit some of the cores?

@@ -2,10 +2,14 @@
 
 ## New Features
 
- * Give more information on invalid 'RichSOCKnode' connections.
- 
+ * `availableCores()` gained argument `fraction`, which allows you to
+   specify that a certain fraction of the detected CPU cores should be
+   returned.
+
  * Now `availableCores()` queries also Linux CGroups v2 CPU affinity
    values `cpuset.cpus` and `cpuset.cpus.effective`.`
+   
+ * Give more information on invalid 'RichSOCKnode' connections.
 
 ## Bug Fixes
 
