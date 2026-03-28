@@ -162,8 +162,8 @@ returns eight (8). See
 for currently supported job schedulers, which includes ‘Fujitsu
 Technical Computing Suite’, ‘Load Sharing Facility’ (LSF), Simple Linux
 Utility for Resource Management (Slurm), Sun Grid Engine/Oracle Grid
-Engine/Son of Grid Engine (SGE), Univa Grid Engine (UGE), and
-TORQUE/PBS.
+Engine/Son of Grid Engine/Univa Grid Engine/Altair Grid Engine (AGE,
+SGE, UGE), and TORQUE/PBS.
 
 Of course,
 [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)

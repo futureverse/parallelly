@@ -17,6 +17,7 @@ availableCores(
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
   which = c("min", "max", "all"),
+  fraction = getOption2("parallelly.availableCores.fraction", 1),
   omit = getOption2("parallelly.availableCores.omit", 0L),
   max = getOption2("parallelly.availableCores.max", Inf)
 )
@@ -62,6 +63,14 @@ availableCores(
   A character specifying which settings to return. If `"min"` (default),
   the minimum value is returned. If `"max"`, the maximum value is
   returned (be careful!) If `"all"`, all values are returned.
+
+- fraction:
+
+  (numeric; in (0,1\]) Fraction of cores to keep. Applied before `omit`.
+  `availableCores(fraction = 0.5)` is equivalent to
+  `max(1, floor(0.5 * availableCores()))` and
+  `availableCores(fraction = 0.7, omit = 1)` is equivalent to
+  `max(1, floor(0.7 * availableCores()) - 1)`.
 
 - omit:
 
@@ -267,6 +276,16 @@ if (FALSE) { # \dontrun{
 options(mc.cores = 1L)
 ncores <- availableCores() - 1      ## ncores = 0
 ncores <- availableCores(omit = 1)  ## ncores = 1
+message(paste("Number of cores to use:", ncores))
+} # }
+
+if (FALSE) { # \dontrun{
+## Use 50% of the available cores
+ncores <- availableCores(fraction = 0.5)
+message(paste("Number of cores to use:", ncores))
+
+## Use 70% of the available cores, but leave one aside
+ncores <- availableCores(fraction = 0.7, omit = 1)
 message(paste("Number of cores to use:", ncores))
 } # }
 
