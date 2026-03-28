@@ -22,8 +22,8 @@ fi
 ## Add packages to check
 revdep/run.R --add-children
 
-## Drop packages failing on CRAN (2026-03-12)
-revdep/run.R --rm aramappings fmeffects
+## Drop packages failing on CRAN (2026-03-27)
+revdep/run.R --rm aramappings
 
 ## Drop packages no longer on CRAN (2026-03-07)
 # revdep/run.R --rm ...
@@ -41,8 +41,8 @@ revdep/run.R --rm proffer  # requires 'RProtoBuf' -> ProtoBuf library
 revdep/run.R --rm iscream
 
 
-## Too many cores
-pkgs=(fmeffects gtfs2emis gtfs2gps rBiasCorrection simIDM WeightedCluster)
+## Set: Too many cores /2026-03-27
+pkgs=(fmeffects gtfs2emis gtfs2gps rtemis simIDM WeightedCluster)
 revdep/run.R --rm "${pkgs[@]}"
 
 ## Run revdep check
@@ -52,7 +52,6 @@ revdep/run.R
 ## ---------------------------------------------------------------------
 ## Phase 2
 ## ---------------------------------------------------------------------
-## Run them separately
+## Set: Too many cores /2026-03-27
 revdep/run.R --add "${pkgs[@]}"
 OMP_NUM_THREADS=4 NSLOTS=4 revdep/run.R
-

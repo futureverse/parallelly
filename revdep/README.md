@@ -10,7 +10,7 @@
 |collate  |en_US.UTF-8                                                 |
 |ctype    |en_US.UTF-8                                                 |
 |tz       |America/Los_Angeles                                         |
-|date     |2026-03-13                                                  |
+|date     |2026-03-27                                                  |
 |pandoc   |3.8.3 @ /software/c4/cbi/software/pandoc-3.8.3/bin/pandoc   |
 |quarto   |1.8.26 @ /software/c4/cbi/software/quarto-1.8.26/bin/quarto |
 
@@ -28,7 +28,7 @@
 |:-------|:-------|:-----|:-------|:----|
 |[adea](failures.md#adea)|1.5.2   |1     |        |     |
 
-## All (106)
+## All (107)
 
 |package             |version  |error |warning |note |
 |:-------------------|:--------|:-----|:-------|:----|
@@ -61,10 +61,10 @@
 |ecocbo              |1.0.0    |      |        |     |
 |ecodive             |2.2.2    |      |        |     |
 |EpiNow2             |1.8.0    |      |        |     |
-|fect                |2.1.0    |      |        |     |
+|fect                |2.2.0    |      |        |     |
 |[fmeffects](problems.md#fmeffects)|0.1.4    |1     |        |     |
 |fsemipar            |1.1.1    |      |        |     |
-|future              |1.69.0   |      |        |     |
+|future              |1.70.0   |      |        |     |
 |future.batchtools   |0.21.0   |      |        |     |
 |future.callr        |0.10.2   |      |        |     |
 |future.mirai        |0.10.1   |      |        |     |
@@ -79,15 +79,14 @@
 |iccTraj             |1.1.0    |      |        |     |
 |IFAA                |1.12.0   |      |        |     |
 |[InPAS](problems.md#inpas)|2.18.1   |      |        |3    |
-|[iscream](problems.md#iscream)|1.0.0    |1     |        |     |
 |JMbayes2            |0.6-0    |      |        |     |
 |jobqueue            |1.7.0    |      |        |     |
 |JuliaConnectoR      |1.1.5    |      |        |     |
 |kernelboot          |0.1.10   |      |        |     |
-|ldaPrototype        |0.3.2    |      |        |     |
+|[ldaPrototype](problems.md#ldaprototype)|0.3.2    |1     |        |     |
 |ldmppr              |1.1.3    |      |        |     |
-|lidR                |4.2.3    |      |        |     |
-|LipidMS             |3.1.2    |      |        |     |
+|[lidR](problems.md#lidr)|4.2.3    |1     |        |     |
+|LipidMS             |3.1.3    |      |        |     |
 |LWFBrook90R         |0.6.3    |      |        |     |
 |[mappp](problems.md#mappp)|1.0.0    |      |        |1    |
 |mice                |3.19.0   |      |        |     |
@@ -108,10 +107,11 @@
 |rBiasCorrection     |0.3.6    |      |        |     |
 |rbiom               |2.2.1    |      |        |     |
 |reproducible        |3.0.0    |      |        |     |
-|ResIN               |2.3.0    |      |        |     |
+|ResIN               |2.3.1    |      |        |     |
 |rivnet              |0.6.0    |      |        |     |
 |Rmfrac              |0.1.1    |      |        |     |
 |Rtapas              |1.2      |      |        |     |
+|rtemis              |1.0.0    |      |        |     |
 |SCDB                |0.6.0    |      |        |     |
 |[scruff](problems.md#scruff)|1.28.0   |      |        |4    |
 |sctransform         |0.4.3    |      |        |     |
@@ -122,7 +122,7 @@
 |simIDM              |0.1.0    |      |        |     |
 |sits                |1.5.4    |      |        |     |
 |sleacr              |0.1.3    |      |        |     |
-|spanishoddata       |0.2.2    |      |        |     |
+|spanishoddata       |0.2.3    |      |        |     |
 |specr               |1.0.0    |      |        |     |
 |Spower              |0.6      |      |        |     |
 |[streetscape](problems.md#streetscape)|1.0.5    |      |1       |1    |
@@ -131,7 +131,8 @@
 |TaxaNorm            |2.4      |      |        |     |
 |TDApplied           |3.0.4    |      |        |     |
 |tern.mmrm           |0.3.3    |      |        |     |
-|TSEAL               |0.1.3    |      |        |     |
+|TSEAL               |0.1.5    |      |        |     |
+|updog               |2.1.7    |      |        |     |
 |[WeightedCluster](problems.md#weightedcluster)|2.0      |      |1       |     |
 |whitewater          |0.1.4    |      |        |     |
 |wildmeta            |0.3.2    |      |        |     |
