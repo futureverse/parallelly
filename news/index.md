@@ -6,7 +6,8 @@
 
 - [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   gained argument `fraction`, which allows you to specify that a certain
-  fraction of the detected CPU cores should be returned.
+  fraction of the detected CPU cores should be returned,
+  e.g. `availableCores(fraction = 0.5)`.
 
 - Now
   [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
