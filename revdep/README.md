@@ -10,7 +10,7 @@
 |collate  |en_US.UTF-8                                                 |
 |ctype    |en_US.UTF-8                                                 |
 |tz       |America/Los_Angeles                                         |
-|date     |2026-03-27                                                  |
+|date     |2026-04-16                                                  |
 |pandoc   |3.8.3 @ /software/c4/cbi/software/pandoc-3.8.3/bin/pandoc   |
 |quarto   |1.8.26 @ /software/c4/cbi/software/quarto-1.8.26/bin/quarto |
 
@@ -22,20 +22,15 @@
 
 # Revdeps
 
-## Failed to check (1)
-
-|package |version |error |warning |note |
-|:-------|:-------|:-----|:-------|:----|
-|[adea](failures.md#adea)|1.5.2   |1     |        |     |
-
-## All (107)
+## All (110)
 
 |package             |version  |error |warning |note |
 |:-------------------|:--------|:-----|:-------|:----|
-|[adea](failures.md#adea)|1.5.2    |1     |        |     |
+|adea                |1.5.2    |      |        |     |
 |alookr              |0.5.1    |      |        |     |
 |AMR                 |3.0.1    |      |        |     |
 |apsimx              |2.8.235  |      |        |     |
+|aramappings         |0.2.0    |      |        |     |
 |auxvecLASSO         |0.2.0    |      |        |     |
 |bbw                 |0.3.1    |      |        |     |
 |bigDM               |0.5.7    |      |        |     |
@@ -59,17 +54,18 @@
 |desla               |0.3.1    |      |        |     |
 |drimmR              |1.0.3    |      |        |     |
 |ecocbo              |1.0.0    |      |        |     |
-|ecodive             |2.2.2    |      |        |     |
+|ecodive             |2.2.6    |      |        |     |
 |EpiNow2             |1.8.0    |      |        |     |
 |fect                |2.2.0    |      |        |     |
 |[fmeffects](problems.md#fmeffects)|0.1.4    |1     |        |     |
 |fsemipar            |1.1.1    |      |        |     |
+|furrr               |0.4.0    |      |        |     |
 |future              |1.70.0   |      |        |     |
 |future.batchtools   |0.21.0   |      |        |     |
 |future.callr        |0.10.2   |      |        |     |
 |future.mirai        |0.10.1   |      |        |     |
 |gastempt            |0.7.0    |      |        |     |
-|geocodebr           |0.6.1    |      |        |     |
+|geocodebr           |0.6.2    |      |        |     |
 |GetBCBData          |0.9.1    |      |        |     |
 |GREENeR             |1.0.1    |      |        |     |
 |gtfs2emis           |0.1.2    |      |        |     |
@@ -79,18 +75,19 @@
 |iccTraj             |1.1.0    |      |        |     |
 |IFAA                |1.12.0   |      |        |     |
 |[InPAS](problems.md#inpas)|2.18.1   |      |        |3    |
+|interflex           |1.4.0    |      |        |     |
 |JMbayes2            |0.6-0    |      |        |     |
 |jobqueue            |1.7.0    |      |        |     |
 |JuliaConnectoR      |1.1.5    |      |        |     |
 |kernelboot          |0.1.10   |      |        |     |
-|[ldaPrototype](problems.md#ldaprototype)|0.3.2    |1     |        |     |
+|ldaPrototype        |0.3.2    |      |        |     |
 |ldmppr              |1.1.3    |      |        |     |
-|[lidR](problems.md#lidr)|4.2.3    |1     |        |     |
+|[lidR](problems.md#lidr)|4.3.1    |      |        |1    |
 |LipidMS             |3.1.3    |      |        |     |
 |LWFBrook90R         |0.6.3    |      |        |     |
 |[mappp](problems.md#mappp)|1.0.0    |      |        |1    |
 |mice                |3.19.0   |      |        |     |
-|mlr3                |1.5.0    |      |        |     |
+|mlr3                |1.6.0    |      |        |     |
 |mmrm                |0.3.17   |      |        |     |
 |modeltime           |1.3.5    |      |        |     |
 |modeltuning         |0.1.3    |      |        |     |
@@ -117,12 +114,12 @@
 |sctransform         |0.4.3    |      |        |     |
 |SDModels            |2.0.2    |      |        |     |
 |seqimpute           |2.2.1    |      |        |     |
-|SEQTaRget           |1.3.6    |      |        |     |
-|SimDesign           |2.24     |      |        |     |
+|SEQTaRget           |1.4.1    |      |        |     |
+|SimDesign           |2.25     |      |        |     |
 |simIDM              |0.1.0    |      |        |     |
 |sits                |1.5.4    |      |        |     |
 |sleacr              |0.1.3    |      |        |     |
-|spanishoddata       |0.2.3    |      |        |     |
+|spanishoddata       |0.2.4    |      |        |     |
 |specr               |1.0.0    |      |        |     |
 |Spower              |0.6      |      |        |     |
 |[streetscape](problems.md#streetscape)|1.0.5    |      |1       |1    |
