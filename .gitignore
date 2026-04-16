@@ -28,3 +28,4 @@ docs/
 covr/
 *.gcda
 *.gcno
+.osgrep
