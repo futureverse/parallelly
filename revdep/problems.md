@@ -1,60 +1,3 @@
-# adea (1.5.2)
-
-* Email: <mailto:manuel.munoz@uca.es>
-* GitHub mirror: <https://github.com/cran/adea>
-
-Run `revdepcheck::revdep_details(, "adea")` for more info
-
-## In both
-
-*   checking whether package ‘adea’ can be installed ... ERROR
-     ```
-     Installation failed.
-     See ‘/scratch/henrik/revdep/parallelly/checks/adea/new/adea.Rcheck/00install.out’ for details.
-     ```
-
-## Installation
-
-### Devel
-
-```
-* installing *source* package ‘adea’ ...
-** this is package ‘adea’ version ‘1.5.2’
-** package ‘adea’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** data
-** demo
-** inst
-** byte-compile and prepare package for lazy loading
-Error: package or namespace load failed for ‘ROI.plugin.symphony’ in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]):
- there is no package called ‘Rsymphony’
-Execution halted
-ERROR: lazy loading failed for package ‘adea’
-* removing ‘/scratch/henrik/revdep/parallelly/checks/adea/new/adea.Rcheck/adea’
-
-
-```
-### CRAN
-
-```
-* installing *source* package ‘adea’ ...
-** this is package ‘adea’ version ‘1.5.2’
-** package ‘adea’ successfully unpacked and MD5 sums checked
-** using staged installation
-** R
-** data
-** demo
-** inst
-** byte-compile and prepare package for lazy loading
-Error: package or namespace load failed for ‘ROI.plugin.symphony’ in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]):
- there is no package called ‘Rsymphony’
-Execution halted
-ERROR: lazy loading failed for package ‘adea’
-* removing ‘/scratch/henrik/revdep/parallelly/checks/adea/old/adea.Rcheck/adea’
-
-
-```
 # ctsem (3.10.6)
 
 * GitHub: <https://github.com/cdriveraus/ctsem>
@@ -127,7 +70,7 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
      > ### ** Examples
      > 
      > collectri <- get_collectri(organism='human', split_complexes=FALSE)
-     [2026-03-27 17:38:45] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+     [2026-04-16 10:46:29] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
      Error in if (.keep) . else select(., -!!evs_col) : 
        argument is of length zero
      Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
@@ -215,24 +158,24 @@ Run `revdepcheck::revdep_details(, "fmeffects")` for more info
 *   checking re-building of vignette outputs ... ERROR
      ```
      ...
-      50. │                   └─fmeffects (local) simpson(prediction.s, subintervals)
-      51. │                     └─fmeffects (local) f(0/s + m)
-      52. │                       └─predictor$predict(observation.t)
-      53. │                         ├─data.table::as.data.table(self$model$predict_newdata(newdata))
-      54. │                         └─self$model$predict_newdata(newdata)
-      55. │                           └─mlr3:::.__Learner__predict_newdata(...)
-      56. └─mlr3 (local) `<fn>`(base::quote(`<named list>`))
-      57.   └─mlr3:::.__Task__col_roles(...)
-      58.     └─checkmate::assert_names(names(rhs), "unique", permutation.of = mlr_reflections$task_col_roles[[self$task_type]])
-      59.       └─checkmate::makeAssertion(x, res, .var.name, add)
-      60.         └─checkmate:::mstop(...)
-      61.           └─base::stop(simpleError(sprintf(msg, ...), call.))
+          ▆
+       1. └─fmeffects::fme(...)
+       2.   └─ForwardMarginalEffect$new(makePredictor(model, data), features = features, ...
+       3.     └─private$fme(...)
+       4.       └─furrr::future_map_dbl(...)
+       5.         └─furrr:::furrr_map_template(...)
+       6.           └─furrr:::furrr_template(...)
+       7.             └─furrr:::furrr_try_catch(...)
+       8.               └─base::tryCatch(expr = expr, purrr_error_indexed = rethrow_purrr_error_indexed)
+       9.                 └─base (local) tryCatchList(expr, classes, parentenv, handlers)
+      10.                   └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
+      11.                     └─value[[3L]](cond)
+      12.                       └─rlang::cnd_signal(cnd)
+      13.                         └─rlang:::signal_abort(cnd)
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      
      Error: processing vignette 'fmeffects.Rmd' failed with diagnostics:
-     ℹ In index: 1.
-     Caused by error in `.__Task__col_roles()`:
-     ! Assertion on 'names(rhs)' failed: Names must be a permutation of set {'feature','target','name','order','stratum','group','offset','weights_learner','weights_measure'}, but has extra elements {'always_included'}.
+     Assertion on 'names(rhs)' failed: Names must be a permutation of set {'feature','target','name','order','stratum','group','offset','weights_learner','weights_measure'}, but has extra elements {'always_included'}.
      --- failed re-building ‘fmeffects.Rmd’
      
      SUMMARY: processing the following file failed:
@@ -278,47 +221,7 @@ Run `revdepcheck::revdep_details(, "InPAS")` for more info
      Extensions’ manual.
      ```
 
-# ldaPrototype (0.3.2)
-
-* GitHub: <https://github.com/JonasRieger/ldaPrototype>
-* Email: <mailto:jonas.rieger@tu-dortmund.de>
-* GitHub mirror: <https://github.com/cran/ldaPrototype>
-
-Run `revdepcheck::revdep_details(, "ldaPrototype")` for more info
-
-## In both
-
-*   checking tests ...
-     ```
-     ...
-        1. └─ldaPrototype::LDARep(...) at test_mergeTopics.R:6:1
-        2.   ├─base::suppressWarnings(parallelMap::parallelExport("docs", "vocab"))
-        3.   │ └─base::withCallingHandlers(...)
-        4.   └─parallelMap::parallelExport("docs", "vocab")
-        5.     └─parallelMap:::exportToSlavePkgParallel(n, get(n, envir = sys.parent()))
-        6.       └─parallel::clusterCall(...)
-        7.         └─parallel:::defaultCluster(cl)
-       ── Error ('test_rboTopics.R:6:1'): (code run outside of `test_that()`) ─────────
-       Error in `defaultCluster(cl)`: no cluster 'cl' supplied and none is registered
-       Backtrace:
-           ▆
-        1. ├─ldaPrototype::mergeTopics(...) at test_rboTopics.R:6:1
-        2. └─ldaPrototype::LDARep(...)
-        3.   ├─base::suppressWarnings(parallelMap::parallelExport("docs", "vocab"))
-        4.   │ └─base::withCallingHandlers(...)
-        5.   └─parallelMap::parallelExport("docs", "vocab")
-        6.     └─parallelMap:::exportToSlavePkgParallel(n, get(n, envir = sys.parent()))
-        7.       └─parallel::clusterCall(...)
-        8.         └─parallel:::defaultCluster(cl)
-       
-       [ FAIL 8 | WARN 0 | SKIP 0 | PASS 132 ]
-       Error:
-       ! Test failures.
-       There were 50 or more warnings (use warnings() to see the first 50)
-       Execution halted
-     ```
-
-# lidR (4.2.3)
+# lidR (4.3.1)
 
 * GitHub: <https://github.com/r-lidar/lidR>
 * Email: <mailto:info@r-lidar.com>
@@ -328,34 +231,17 @@ Run `revdepcheck::revdep_details(, "lidR")` for more info
 
 ## In both
 
-*   checking tests ...
+*   checking compiled code ... NOTE
      ```
-     ...
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       Chunk 1 of 1 (100%): state ✓
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       
-                                                                                       
-       terminate called after throwing an instance of 'std::length_error'
-         what():  basic_string::_M_create
+     File ‘lidR/libs/lidR.so’:
+       Found non-API calls to R: ‘LEVELS’, ‘R_curErrorBuf’, ‘SETLENGTH’,
+         ‘SET_GROWABLE_BIT’, ‘SET_TRUELENGTH’, ‘TRUELENGTH’, ‘XTRUELENGTH’
+     
+     Compiled code should not call non-API entry points in R.
+     
+     See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual,
+     and section ‘Moving into C API compliance’ for issues with the use of
+     non-API entry points.
      ```
 
 # mappp (1.0.0)
