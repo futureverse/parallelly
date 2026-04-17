@@ -12,7 +12,7 @@
    be returned, e.g. `availableCores(fraction = 0.5)`.
 
  * Now `availableCores()` queries also Linux CGroups v2 CPU affinity
-   values `cpuset.cpus` and `cpuset.cpus.effective`.`
+   values `cpuset.cpus` and `cpuset.cpus.effective`.
    
  * Give more information on invalid 'RichSOCKnode' connections.
 
