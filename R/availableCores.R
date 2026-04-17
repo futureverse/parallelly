@@ -22,8 +22,8 @@
 #' \code{\link[parallel]{detectCores}(logical = logical)}, which,
 #' _if supported_, returns the number of logical CPUs (TRUE) or physical
 #' CPUs/cores (FALSE).
-#' At least as of R 4.2.2, `detectCores()` this argument on Linux.
-#' This argument is only if argument `methods` includes `"system"`.
+#' At least as of R 4.2.2, `detectCores()` ignores this argument on Linux.
+#' This argument is only used if argument `methods` includes `"system"`.
 #'
 #' @param default The default number of cores to return if no non-missing
 #' settings are available.
@@ -32,6 +32,13 @@
 #' If `"min"` (default), the minimum value is returned.
 #' If `"max"`, the maximum value is returned (be careful!)
 #' If `"all"`, all values are returned.
+#'
+#' @param fraction (numeric; in (0,1]) Fraction of cores to keep.
+#' Applied before `omit`.
+#' `availableCores(fraction = 0.5)` is equivalent to
+#' `max(1, floor(0.5 * availableCores()))` and
+#' `availableCores(fraction = 0.7, omit = 1)` is equivalent to
+#' `max(1, floor(0.7 * availableCores()) - 1)`.
 #'
 #' @param omit (integer; non-negative) Number of cores to not include.
 #'
@@ -54,14 +61,23 @@
 #'    Query \code{Cpus_allowed_list} of `/proc/self/status`.
 #'
 #'  \item `"cgroups.cpuset"` -
-#'    On Unix, query control group (cgroup v1) value \code{cpuset.set}.
+#'    On Unix, query control group (cgroup v1) _affinity_ value
+#'    \code{cpuset.cpus}.
 #'
 #'  \item `"cgroups.cpuquota"` -
-#'    On Unix, query control group (cgroup v1) value
+#'    On Unix, query control group (cgroup v1) _quota_ value
 #'    \code{cpu.cfs_quota_us} / \code{cpu.cfs_period_us}.
 #'
+#'  \item `"cgroups2.cpuset.cpus"` -
+#'    On Unix, query control group (cgroup v2) _affinity_ value
+#'    \code{cpuset.cpus}.
+#'
+#'  \item `"cgroups2.cpuset.cpus.effective"` -
+#'    On Unix, query control group (cgroup v2) _effective affinity_ value
+#'    \code{cpuset.cpus.effective}.
+#'
 #'  \item `"cgroups2.cpu.max"` -
-#'    On Unix, query control group (cgroup v2) values \code{cpu.max}.
+#'    On Unix, query control group (cgroup v2) _quota_ value \code{cpu.max}.
 #'
 #'  \item `"nproc"` -
 #'    On Unix, query system command \code{nproc}.
@@ -83,7 +99,7 @@
 #'  \item `"connections"` or `"connections-N"` -
 #'    Query the current number of available R connections per
 #'    [freeConnections()].  This is the maximum number of socket-based
-#'    **parallel** cluster nodes that are possible launch, because each
+#'    **parallel** cluster nodes that are possible to launch, because each
 #'    one needs its own R connection.
 #'    The `"connections-N"` form (e.g. `connections-16`) works like
 #'    `"connections"` but uses `freeConnections() - N` as the upper limit,
@@ -140,7 +156,7 @@
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 #'    Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
-#'    Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+#'    Altair Grid Engine (AGE; acquired Univa Corporation in 2020),
 #'    Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 #     Open Grid Scheduler (OGS; open-source fork of SGE 6.2u5).
 #'
@@ -153,7 +169,7 @@
 #'    If \env{SLURM_CPUS_PER_TASK} is not set, then it will fall back to
 #'    use \env{SLURM_CPUS_ON_NODE} if the job is a single-node job
 #'    (\env{SLURM_JOB_NUM_NODES} is 1), e.g. `sbatch --ntasks=2 hello.sh`.
-#'    To make sure all tasks are assign to a single node, specify
+#'    To make sure all tasks are assigned to a single node, specify
 #'    `--nodes=1`, e.g. `sbatch --nodes=1 --ntasks=16 hello.sh`.
 #'
 #'  \item `"custom"` -
@@ -191,12 +207,41 @@
 #' to put aside one of the cores from being used.  Regardless how many cores
 #' you put aside, this function is guaranteed to return at least one core.
 #'
-#' @section Advanced usage:
-#' It is possible to override the maximum number of cores on the machine
-#' as reported by `availableCores(methods = "system")`.  This can be
-#' done by first specifying
-#' `options(parallelly.availableCores.methods = "mc.cores")` and
-#' then the number of cores to use, e.g. `options(mc.cores = 8)`.
+#' @section Advanced usage for package developers:
+#' It is possible to emulate a larger number of CPU cores than what the
+#' machine has. This can be useful to reproduce errors reported by users
+#' on large system. For instance, even if your machine only has 16 cores,
+#' you can trick `availableCores()` to believe there are 192 cores, by:
+#'
+#' ```r
+#' availableCores()
+#' #> system
+#' #>     16
+#' options(parallelly.availableCores.methods = "system")
+#' options(parallelly.availableCores.system = 192)
+#' availableCores()
+#' #> system
+#' #>    192
+#' freeConnections()
+#' #> [1] 125
+#' availableCores(constraints = "connections-16")
+#' #> connections-16 
+#' #>            109
+#' ```
+#'
+#' To achieve the same from outside of R, for instance when running
+#' `R CMD check`, set the the corresponding environment variables, e.g.
+#' 
+#' ```sh
+#' $ export R_PARALLELLY_AVAILABLECORES_SYSTEM=192
+#' $ export R_PARALLELLY_AVAILABLECORES_METHODS=system
+#' $ Rscript -e parallelly::availableCores
+#' system
+#'    192
+#' $ Rscript -e parallelly::availableCores --constraints="connections-16"
+#' connections-16
+#'            109
+#' ```
 #'
 #' @examples
 #' message(paste("Number of cores available:", availableCores()))
@@ -211,6 +256,16 @@
 #' options(mc.cores = 1L)
 #' ncores <- availableCores() - 1      ## ncores = 0
 #' ncores <- availableCores(omit = 1)  ## ncores = 1
+#' message(paste("Number of cores to use:", ncores))
+#' }
+#'
+#' \dontrun{
+#' ## Use 50% of the available cores
+#' ncores <- availableCores(fraction = 0.5)
+#' message(paste("Number of cores to use:", ncores))
+#'
+#' ## Use 70% of the available cores, but leave one aside
+#' ncores <- availableCores(fraction = 0.7, omit = 1)
 #' message(paste("Number of cores to use:", ncores))
 #' }
 #'
@@ -238,7 +293,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @export
-availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
+availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
@@ -251,6 +306,9 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
 
   which <- match.arg(which, choices = c("min", "max", "all"))
   stop_if_not(length(default) == 1, is.finite(default), default >= 1L)
+
+  stop_if_not(length(fraction) == 1L, is.numeric(fraction),
+              is.finite(fraction), fraction > 0, fraction <= 1)
 
   stop_if_not(length(omit) == 1L, is.numeric(omit),
               is.finite(omit), omit >= 0L)
@@ -285,7 +343,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       n <- freeConnections()
       if (!is.na(n)) {
         delta <- sub(pattern_connections, "\\1", method)
-        if (nzchar(delta) && nzchar(omit)) {
+        if (nzchar(delta)) {
           delta <- as.integer(delta)
           n <- max(0L, n + delta)
         }
@@ -343,6 +401,14 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
         n <- as.integer(floor(n + 0.5))
 	if (n == 0L) n <- 1L  ## If CPU quota < 0.5, round up to one CPU
       }
+    } else if (method == "cgroups2.cpuset.cpus") {
+      ## Number of cores according to Unix cgroups v2 CPU set
+      n <- length(getCGroups2CpuSet("cpuset.cpus"))
+      if (n == 0L) n <- NA_integer_
+    } else if (method == "cgroups2.cpuset.cpus.effective") {
+      ## Number of cores according to Unix cgroups v2 effective CPU set
+      n <- length(getCGroups2CpuSet("cpuset.cpus.effective"))
+      if (n == 0L) n <- NA_integer_
     } else if (method == "cgroups2.cpu.max") {
       ## Number of cores according to Unix cgroups v2 CPU max quota
       n <- getCGroups2CpuMax()
@@ -369,7 +435,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
         fcn()
       })
       if (length(n) != 1L) {
-        stop("Function specified by option 'parallelly.availableCores.custom' does not a single value")
+        stop("Function specified by option 'parallelly.availableCores.custom' does not return a single value")
       }
       n <- as.integer(n)
     } else {
@@ -406,7 +472,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     idx_fallback <- which(names(ncores) == "fallback")
     if (length(idx_fallback) == 1) {
       ## Use 'fallback' if and only there are only "special" options specified
-      special <- c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc")
+      special <- c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc")
       ## 'connections' and 'connections-N' are also "special" options
       special <- c(special, grep(pattern_connections, constraints, value = TRUE))
       others <- setdiff(names(ncores), c("fallback", special))
@@ -455,6 +521,12 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     idxs <- which(ncores < min)
     ncores[idxs] <- as.integer(floor(min))
     names(ncores)[idxs] <- paste(names(ncores)[idxs], "*", sep = "")
+  }
+
+  ## Use only a fraction of the cores?
+  if (fraction < 1) {
+    ncores <- as.integer(floor(fraction * ncores))
+    ncores[ncores < 1L] <- 1L
   }
 
   ## Omit some of the cores?
@@ -622,6 +694,7 @@ availableCoresLSF <- local({
 availableCoresPBS <- local({
   n <- NULL
   function() {
+    if (!is.null(n)) return(n)
     n <<- getenv_int("PBS_NUM_PPN")
     if (is.na(n)) {
       ## PBSPro sets 'NCPUS' but not 'PBS_NUM_PPN'
@@ -638,6 +711,7 @@ availableCoresPBS <- local({
 availableCoresPJM <- local({
   n <- NULL
   function() {
+    if (!is.null(n)) return(n)
     ## PJM_VNODE_CORE: e.g. pjsub -L vnode-core=8
     ## "This environment variable is set only when virtual nodes
     ##  are allocated, and it is not set when nodes are allocated."
@@ -659,6 +733,7 @@ availableCoresPJM <- local({
 availableCoresSGE <- local({
   n <- NULL
   function() {
+    if (!is.null(n)) return(n)
     n <<- getenv_int("NSLOTS")
     n
   }
@@ -669,6 +744,7 @@ availableCoresSGE <- local({
 availableCoresSlurm <- local({
   n <- NULL
   function() {
+    if (!is.null(n)) return(n)
     ## The assumption is that the following works regardless of
     ## number of nodes requested /HB 2020-09-18
     ## Example: --cpus-per-task={n}
@@ -701,7 +777,7 @@ availableCoresSlurm <- local({
           ## SLURM_TASKS_PER_NODE=2(x2),1(x3)  # Source: 'man sbatch'
           n <<- slurm_expand_nodecounts(nodecounts)
           if (anyNA(n)) {
-            n <<- NA_real_
+            n <<- NA_integer_
             return(n)
           }
   

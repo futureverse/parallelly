@@ -18,12 +18,21 @@ message("getCGroupsRoot(): ", parallelly:::getCGroupsRoot())
 message("getCGroupsRoot(): ", parallelly:::getCGroupsRoot())
 
 options(parallelly.cgroups.cpuset = 0:3)
-message("getCGroups1CpuSet(): ", parallelly:::getCGroups1CpuSet())
+message("getCGroups1CpuSet(): ", paste(parallelly:::getCGroups1CpuSet(), collapse = ", "))
 options(parallelly.cgroups.cpuset = NULL)
 
-options(parallelly.cgroups.cpuquota = 0:3)
+options(parallelly.cgroups.cpuquota = 2.5)
 message("getCGroups1CpuQuota(): ", parallelly:::getCGroups1CpuQuota())
 options(parallelly.cgroups.cpuquota = NULL)
+
+options(parallelly.cgroups2.cpuset.cpus = 0:3)
+message("getCGroups2CpuSet(): ", paste(parallelly:::getCGroups2CpuSet(), collapse = ", "))
+message("getCGroups2CpuSet('cpuset.cpus'): ", paste(parallelly:::getCGroups2CpuSet("cpuset.cpus"), collapse = ", "))
+options(parallelly.cgroups2.cpuset.cpus = NULL)
+
+options(parallelly.cgroups2.cpuset.cpus.effective = 0:3)
+message("getCGroups2CpuSet('cpuset.cpus.effective'): ", paste(parallelly:::getCGroups2CpuSet("cpuset.cpus.effective"), collapse = ", "))
+options(parallelly.cgroups2.cpuset.cpus.effective = NULL)
 
 options(parallelly.cgroups2.cpu.max = 100000L)
 message("getCGroups2CpuMax(): ", parallelly:::getCGroups2CpuMax())
@@ -121,6 +130,16 @@ stopifnot(
   is.na(value) || value > 0
 )
 
+message("- getCGroups2CpuSet()")
+value <- parallelly:::getCGroups2CpuSet()
+cat(sprintf("CPU set: [n=%d] %s\n", length(value), paste(sQuote(value), collapse = ", ")))
+stopifnot(length(value) >= 0L, is.integer(value), !any(is.na(value)))
+
+message("- getCGroups2CpuSet('cpuset.cpus.effective')")
+value <- parallelly:::getCGroups2CpuSet("cpuset.cpus.effective")
+cat(sprintf("CPU set: [n=%d] %s\n", length(value), paste(sQuote(value), collapse = ", ")))
+stopifnot(length(value) >= 0L, is.integer(value), !any(is.na(value)))
+
 message("- getCGroups2CpuMax()")
 value <- parallelly:::getCGroups2CpuMax()
 cat(sprintf("CPU quota (ratio): %g\n", value))
@@ -130,6 +149,16 @@ stopifnot(
   !is.infinite(value),
   is.na(value) || value > 0
 )
+
+message("- availableCores(methods = 'cgroups2.cpuset.cpus')")
+n <- availableCores(methods = "cgroups2.cpuset.cpus", na.rm = FALSE)
+cat(sprintf("Number of cores: %s\n", n))
+stopifnot(length(n) == 1L, is.integer(n), is.na(n) || n >= 1L)
+
+message("- availableCores(methods = 'cgroups2.cpuset.cpus.effective')")
+n <- availableCores(methods = "cgroups2.cpuset.cpus.effective", na.rm = FALSE)
+cat(sprintf("Number of cores: %s\n", n))
+stopifnot(length(n) == 1L, is.integer(n), is.na(n) || n >= 1L)
 
 message("*** cgroups ... DONE")
 

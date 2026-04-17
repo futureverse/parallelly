@@ -6,7 +6,7 @@
 #' or a mix of such. For external workers, the default is to use SSH to
 #' connect to those external machines.  This function works similarly to
 #' \code{\link[parallel:makeCluster]{makePSOCKcluster}()} of the
-#' \pkg{parallel} package, but provides additional and more flexibility
+#' \pkg{parallel} package, but provides additional and more flexible
 #' options for controlling the setup of the system calls that launch the
 #' background \R workers, and how to connect to external machines.
 #'
@@ -85,10 +85,10 @@
 #' fewer than 32 CPU cores.  For example, on a eight-core machine, this
 #' may run the CPU at 400% of its capacity, which has a significant
 #' negative effect on the current R process, but also on all other processes
-#' running on the same machine.  This also a problem on systems where R
+#' running on the same machine.  This is also a problem on systems where R
 #' gets allotted a specific number of CPU cores, which is the case on
 #' high-performance compute (HPC) clusters, but also on other shared systems
-#' that limits user processes via Linux Control Groups (cgroups).
+#' that limit user processes via Linux Control Groups (cgroups).
 #' For example, a free account on Posit Cloud is limited to a single
 #' CPU core. Parallelizing with 32 workers when only having access to
 #' a single core, will result in 3200% overuse and 32 concurrent R
@@ -189,7 +189,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     if (length(workers) > free) {
       msg <- sprintf("Cannot create %d parallel PSOCK nodes. Each node needs one connection, but there are only %d connections left out of the maximum %d available on this R installation", length(workers), free, availableConnections())
       if (getRversion() >= "4.4.0") {
-        msg <- sprintf("%s. To increase this limit in R (>= 4.4.0), use command-line option '--max-connections=N' when launching R.", msg)
+        msg <- sprintf("%s. To increase this limit in R (>= 4.4.0), use command-line option '--max-connections=N' when launching R", msg)
       }
 
       ## Could it be that 'workers' is a function of detectCores(), i.e.
@@ -442,14 +442,14 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
         if (!inherits(node, "PSOCKConnectionError")) break
         
         if (kk < tries) {
+          if (verbose) mdebug(conditionMessage(node))
+          ## Retry with a new random port?
+          if (retryPort == "next") {
+            options$port <- min(options$port + 1L, 65535L)
+          } else if (retryPort == "available") {
+            options$port <- freePort()
+          }
           if (verbose) {
-            mdebug(conditionMessage(node))
-            ## Retry with a new random port?
-            if (retryPort == "next") {
-              options$port <- max(options$port + 1L, 65535L)
-            } else if (retryPort == "available") {
-              options$port <- freePort()
-            }
             mdebugf("%swaiting %g seconds before trying again",
                     verbose_prefix, delay)
           }

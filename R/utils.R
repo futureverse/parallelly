@@ -132,7 +132,7 @@ assert_system_is_supported <- local({
   ## utils::osVersion is only available in R (>= 3.5.0)
   osVersion <- function() {
     ns <- getNamespace("utils")
-    if (!exists("osVersion", envir = ns, inherits = TRUE)) {
+    if (exists("osVersion", envir = ns, inherits = TRUE)) {
       osVersion <- get("osVersion", envir = ns, inherits = TRUE)
       osVersion
     } else {

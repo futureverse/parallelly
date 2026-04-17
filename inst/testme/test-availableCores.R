@@ -624,4 +624,50 @@ if (file.exists("/proc/self/status")) {
 message("*** /proc/self/status method ... done")
 
 
+message("*** fraction parameter ...")
+
+## fraction = 1 should be the same as default
+n0 <- availableCores()
+n <- availableCores(fraction = 1.0)
+stopifnot(identical(n, n0))
+
+## fraction = 0.5 on system cores (which we know)
+n_sys <- availableCores(methods = "system")
+n <- availableCores(methods = "system", fraction = 0.5)
+stopifnot(length(n) == 1, is.integer(n), n >= 1L)
+stopifnot(n == max(1L, as.integer(floor(0.5 * n_sys))))
+
+## fraction = 0.7 with omit = 1
+n <- availableCores(methods = "system", fraction = 0.7, omit = 1)
+stopifnot(length(n) == 1, is.integer(n), n >= 1L)
+expected <- max(1L, as.integer(floor(0.7 * n_sys)) - 1L)
+stopifnot(n == expected)
+
+## fraction should always return at least 1
+n <- availableCores(methods = "system", fraction = 0.01)
+stopifnot(n >= 1L)
+
+## fraction combined with omit should always return at least 1
+n <- availableCores(methods = "system", fraction = 0.01, omit = 100)
+stopifnot(n >= 1L)
+
+## Input validation
+res <- tryCatch(availableCores(fraction = 0), error = identity)
+stopifnot(inherits(res, "error"))
+
+res <- tryCatch(availableCores(fraction = -0.5), error = identity)
+stopifnot(inherits(res, "error"))
+
+res <- tryCatch(availableCores(fraction = 1.5), error = identity)
+stopifnot(inherits(res, "error"))
+
+res <- tryCatch(availableCores(fraction = NA), error = identity)
+stopifnot(inherits(res, "error"))
+
+res <- tryCatch(availableCores(fraction = "half"), error = identity)
+stopifnot(inherits(res, "error"))
+
+message("*** fraction parameter ... done")
+
+
 message("*** availableCores() ... DONE")

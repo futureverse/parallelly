@@ -7,13 +7,15 @@
 availableCores(
   constraints = NULL,
   methods = getOption2("parallelly.availableCores.methods", c("system",
-    "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max",
-    "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF",
-    "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")),
+    "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus",
+    "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores",
+    "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE",
+    "Slurm", "fallback", "custom")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
   which = c("min", "max", "all"),
+  fraction = getOption2("parallelly.availableCores.fraction", 1),
   omit = getOption2("parallelly.availableCores.omit", 0L),
   max = getOption2("parallelly.availableCores.max", Inf)
 )
@@ -38,8 +40,8 @@ of available cores.}
 \code{\link[parallel]{detectCores}(logical = logical)}, which,
 \emph{if supported}, returns the number of logical CPUs (TRUE) or physical
 CPUs/cores (FALSE).
-At least as of R 4.2.2, \code{detectCores()} this argument on Linux.
-This argument is only if argument \code{methods} includes \code{"system"}.}
+At least as of R 4.2.2, \code{detectCores()} ignores this argument on Linux.
+This argument is only used if argument \code{methods} includes \code{"system"}.}
 
 \item{default}{The default number of cores to return if no non-missing
 settings are available.}
@@ -48,6 +50,13 @@ settings are available.}
 If \code{"min"} (default), the minimum value is returned.
 If \code{"max"}, the maximum value is returned (be careful!)
 If \code{"all"}, all values are returned.}
+
+\item{fraction}{(numeric; in (0,1]) Fraction of cores to keep.
+Applied before \code{omit}.
+\code{availableCores(fraction = 0.5)} is equivalent to
+\code{max(1, floor(0.5 * availableCores()))} and
+\code{availableCores(fraction = 0.7, omit = 1)} is equivalent to
+\code{max(1, floor(0.7 * availableCores()) - 1)}.}
 
 \item{omit}{(integer; non-negative) Number of cores to not include.}
 
@@ -75,14 +84,23 @@ Query \code{\link[parallel]{detectCores}(logical = logical)}.
 Query \code{Cpus_allowed_list} of \verb{/proc/self/status}.
 
 \item \code{"cgroups.cpuset"} -
-On Unix, query control group (cgroup v1) value \code{cpuset.set}.
+On Unix, query control group (cgroup v1) \emph{affinity} value
+\code{cpuset.cpus}.
 
 \item \code{"cgroups.cpuquota"} -
-On Unix, query control group (cgroup v1) value
+On Unix, query control group (cgroup v1) \emph{quota} value
 \code{cpu.cfs_quota_us} / \code{cpu.cfs_period_us}.
 
+\item \code{"cgroups2.cpuset.cpus"} -
+On Unix, query control group (cgroup v2) \emph{affinity} value
+\code{cpuset.cpus}.
+
+\item \code{"cgroups2.cpuset.cpus.effective"} -
+On Unix, query control group (cgroup v2) \emph{effective affinity} value
+\code{cpuset.cpus.effective}.
+
 \item \code{"cgroups2.cpu.max"} -
-On Unix, query control group (cgroup v2) values \code{cpu.max}.
+On Unix, query control group (cgroup v2) \emph{quota} value \code{cpu.max}.
 
 \item \code{"nproc"} -
 On Unix, query system command \code{nproc}.
@@ -104,7 +122,7 @@ package.
 \item \code{"connections"} or \code{"connections-N"} -
 Query the current number of available R connections per
 \code{\link[=freeConnections]{freeConnections()}}.  This is the maximum number of socket-based
-\strong{parallel} cluster nodes that are possible launch, because each
+\strong{parallel} cluster nodes that are possible to launch, because each
 one needs its own R connection.
 The \code{"connections-N"} form (e.g. \code{connections-16}) works like
 \code{"connections"} but uses \code{freeConnections() - N} as the upper limit,
@@ -160,7 +178,7 @@ requests two cores on a single machine.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
-Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+Altair Grid Engine (AGE; acquired Univa Corporation in 2020),
 Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 
 \item \code{"Slurm"} -
@@ -172,7 +190,7 @@ e.g. \verb{sbatch --cpus-per-task=2 hello.sh} or by adding
 If \env{SLURM_CPUS_PER_TASK} is not set, then it will fall back to
 use \env{SLURM_CPUS_ON_NODE} if the job is a single-node job
 (\env{SLURM_JOB_NUM_NODES} is 1), e.g. \verb{sbatch --ntasks=2 hello.sh}.
-To make sure all tasks are assign to a single node, specify
+To make sure all tasks are assigned to a single node, specify
 \code{--nodes=1}, e.g. \verb{sbatch --nodes=1 --ntasks=16 hello.sh}.
 
 \item \code{"custom"} -
@@ -210,13 +228,40 @@ to put aside one of the cores from being used.  Regardless how many cores
 you put aside, this function is guaranteed to return at least one core.
 }
 
-\section{Advanced usage}{
+\section{Advanced usage for package developers}{
 
-It is possible to override the maximum number of cores on the machine
-as reported by \code{availableCores(methods = "system")}.  This can be
-done by first specifying
-\code{options(parallelly.availableCores.methods = "mc.cores")} and
-then the number of cores to use, e.g. \code{options(mc.cores = 8)}.
+It is possible to emulate a larger number of CPU cores than what the
+machine has. This can be useful to reproduce errors reported by users
+on large system. For instance, even if your machine only has 16 cores,
+you can trick \code{availableCores()} to believe there are 192 cores, by:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{availableCores()
+#> system
+#>     16
+options(parallelly.availableCores.methods = "system")
+options(parallelly.availableCores.system = 192)
+availableCores()
+#> system
+#>    192
+freeConnections()
+#> [1] 125
+availableCores(constraints = "connections-16")
+#> connections-16 
+#>            109
+}\if{html}{\out{</div>}}
+
+To achieve the same from outside of R, for instance when running
+\verb{R CMD check}, set the the corresponding environment variables, e.g.
+
+\if{html}{\out{<div class="sourceCode sh">}}\preformatted{$ export R_PARALLELLY_AVAILABLECORES_SYSTEM=192
+$ export R_PARALLELLY_AVAILABLECORES_METHODS=system
+$ Rscript -e parallelly::availableCores
+system
+   192
+$ Rscript -e parallelly::availableCores --constraints="connections-16"
+connections-16
+           109
+}\if{html}{\out{</div>}}
 }
 
 \examples{
@@ -232,6 +277,16 @@ message(paste("Number of cores available:", availableCores()))
 options(mc.cores = 1L)
 ncores <- availableCores() - 1      ## ncores = 0
 ncores <- availableCores(omit = 1)  ## ncores = 1
+message(paste("Number of cores to use:", ncores))
+}
+
+\dontrun{
+## Use 50\% of the available cores
+ncores <- availableCores(fraction = 0.5)
+message(paste("Number of cores to use:", ncores))
+
+## Use 70\% of the available cores, but leave one aside
+ncores <- availableCores(fraction = 0.7, omit = 1)
 message(paste("Number of cores to use:", ncores))
 }
 

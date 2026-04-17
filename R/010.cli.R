@@ -1,4 +1,4 @@
-parse_cmd_args <- function(patterns = list(), cmdargs = getOption("future.p2p.tests.cmdargs", commandArgs(trailingOnly = TRUE))) {
+parse_cmd_args <- function(patterns = list(), cmdargs = getOption(sprintf("%s.tests.cmdargs", .packageName), commandArgs(trailingOnly = TRUE))) {
   args <- list()
   for (pattern in patterns) {
     type <- attr(pattern, "type")

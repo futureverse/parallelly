@@ -1,5 +1,7 @@
 library(parallelly)
 
+availableCoresPJM <- parallelly:::availableCoresPJM
+
 message("*** availableWorkers() ...")
 
 ## The default
@@ -127,7 +129,7 @@ message("*** read_pjm_nodefile() ...")
 workersT <- unique(workers0)
 pathname <- tempfile()
 writeLines(workersT, con = pathname)
-
+message(sprintf("Workers in 'PJM_O_NODEINF' file: [n=%d] %s", length(workersT), paste(sQuote(workersT), collapse = ", ")))
 data <- read_pjm_nodefile(pathname)
 str(data)
 stopifnot(
@@ -143,6 +145,9 @@ Sys.setenv(PJM_O_NODEINF = pathname)
 
 message("- PJM_VNODE_CORE=1")
 Sys.setenv(PJM_VNODE_CORE = "1")
+
+## Clear memoization cache
+environment(availableCoresPJM)$n <- NULL
 workers <- availableWorkers(methods = "PJM")
 print(workers)
 stopifnot(
@@ -154,6 +159,8 @@ message("- PJM_VNODE=", length(workersT))
 message("- PJM_VNODE_CORE=2")
 Sys.setenv(PJM_VNODE = length(workersT))
 Sys.setenv(PJM_VNODE_CORE = "2")
+## Clear memoization cache
+environment(availableCoresPJM)$n <- NULL
 workers <- availableWorkers(methods = "PJM")
 print(workers)
 stopifnot(
@@ -162,11 +169,12 @@ stopifnot(
   all(workersT %in% workers)
 )
 
-
 message("- PJM_VNODE=1 (incompatible => warning)")
 message("- PJM_VNODE_CORE=2")
 Sys.setenv(PJM_VNODE = "1")
 Sys.setenv(PJM_VNODE_CORE = "2")
+## Clear memoization cache
+environment(availableCoresPJM)$n <- NULL
 workers <- availableWorkers(methods = "PJM")
 print(workers)
 stopifnot(
@@ -244,7 +252,11 @@ specs <- list(
   "n[1-13]" = sprintf("n%d", c(1:13)),
   ## scontrol show hostname treats "n[1,3-4,  11-13]" == "n[1,3-4,0011-13]"
   "n[1,3-4,  11-13]" = c("n1", "n3", "n4", "n0011", "n0012", "n0013"),
-  "a1,b[   02-04,6-7]" = c("a1", "b00002", "b00003", "b00004", "b6", "b7")
+  "a1,b[   02-04,6-7]" = c("a1", "b00002", "b00003", "b00004", "b6", "b7"),
+  "b04-[09-11]" = c("b04-09", "b04-10", "b04-11"),
+  "b04-[009-011]" = c("b04-009", "b04-010", "b04-011"),
+  "b04-[0009-11]" = c("b04-0009", "b04-0010", "b04-0011"),
+  "b04-[9-011]" = c("b04-9", "b04-10", "b04-11")
 )
 
 ## All combined
@@ -353,7 +365,17 @@ for (kk in seq_along(specs)) {
 
 message("*** Slurm w/ SLURM_TASKS_PER_NODE ... DONE")
 
-
+message("*** Slurm odds'n'ends ...")
+# Respect SLURM_CPUS_PER_TASK, if set
+Sys.setenv(
+  SLURM_JOB_NODELIST = "n1",
+  SLURM_JOB_CPUS_PER_NODE = "10(x1)",
+  SLURM_CPUS_PER_TASK = "9"
+)
+w <- parallelly:::availableWorkersSlurm()
+str(w)
+stopifnot(length(w) == 9L, all(w == "n1"))
+message("*** Slurm odds'n'ends ... DONE")
 
 message("*** HPC related ... DONE")
 

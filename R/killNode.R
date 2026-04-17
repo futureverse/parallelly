@@ -8,7 +8,7 @@
 #' supported on all operating systems (i.e. Unix, macOS, and MS Windows).
 #' All other signals are platform specific, cf. [tools::pskill()].
 #'
-#' With the exception for MS Windows, as explained below, using `SIGINT`
+#' With the exception of MS Windows, as explained below, using `SIGINT`
 #' will trigger an R \code{\link[base:conditions]{interrupt}} condition that
 #' can be caught with [tryCatch()] and [withCallingHandlers()] using an
 #' `interrupt` calling handler.
@@ -24,8 +24,8 @@
 #' As a matter of fact, on MS Windows, `SIGINT` works identically to
 #' `SIGTERM`, where they both terminate the cluster node abruptly without
 #' giving the R process a chance to exit gracefully. This means that R will
-#' _not_ clean up after itself, e.g. there its temporary directory will
-#' remain also after R terminates. 
+#' _not_ clean up after itself, e.g. its temporary directory will
+#' remain even after R terminates. 
 #'
 #' @param \ldots Not used.
 #'
@@ -39,7 +39,7 @@
 #' Note that the preferred way to terminate a cluster is via
 #' [parallel::stopCluster()], because it terminates the cluster nodes
 #' by kindly asking each of them to nicely shut themselves down.
-#' Using `killNode()` is a much more sever approach. It abruptly
+#' Using `killNode()` is a much more severe approach. It abruptly
 #' terminates the underlying R process, possibly without giving the
 #' parallel worker a chance to terminate gracefully.  For example,
 #' it might get terminated in the middle of writing to file.
@@ -112,7 +112,7 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
         on.exit(mdebug_pop("Post-kill cleanup ... done"))
       }
 
-      ## We can only assue worker has been terminates if
+      ## We can only assume worker has been terminated if
       ## SIGTERM or SIGKILL was used
       if (signal %in% c(tools::SIGTERM, tools::SIGKILL)) {
         ## (a) Close socket connection, if it exists
@@ -175,7 +175,7 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
           }) ## local()
         } ## if (length(tempdir) == 1)
       } else {
-        if (debug) mdebug("Skipping, because signal was %d", signal)
+        if (debug) mdebugf("Skipping, because signal was %d", signal)
       } ## if (signal %in% ...)
     }) ## if (isTRUE(success)) local({ ... })
   }) ## on.exit()
@@ -260,7 +260,7 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
 
   ## system() does not support argument 'timeout' in R (<= 3.4.0)
   if (getRversion() < "3.5.0") {
-    if (timeout > 0) warning("killNode() does not support argument 'timeout' in R (< 3.5.0) for cluster nodes running on a remote maching")
+    if (timeout > 0) warning("killNode() does not support argument 'timeout' in R (< 3.5.0) for cluster nodes running on a remote machine")
     system <- function(..., timeout) base::system(...)
   }
   

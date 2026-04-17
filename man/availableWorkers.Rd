@@ -84,11 +84,11 @@ with two cores.
 Query the "Grid Engine" scheduler environment variable \env{PE_HOSTFILE}.
 An example of a job submission that results in this is
 \verb{qsub -pe mpi 8} (or \verb{qsub -pe ompi 8}), which
-requests eight cores on a any number of machines.
+requests eight cores on any number of machines.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
-Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+Altair Grid Engine (AGE; acquired Univa Corporation in 2020),
 Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 
 \item \code{"Slurm"} -
@@ -96,7 +96,7 @@ Query Slurm environment variable \env{SLURM_JOB_NODELIST} (fallback
 to legacy \env{SLURM_NODELIST}) and parse set of nodes.
 Then query Slurm environment variable \env{SLURM_JOB_CPUS_PER_NODE}
 (fallback \env{SLURM_TASKS_PER_NODE}) to infer how many CPU cores
-Slurm have allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
+Slurm has allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
 is set, which is always a scalar, then that is respected too, i.e.
 if it is smaller, then that is used for all nodes.
 For example, if \code{SLURM_NODELIST="n1,n[03-05]"} (expands to

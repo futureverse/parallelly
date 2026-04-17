@@ -62,12 +62,12 @@
 #'    Query the "Grid Engine" scheduler environment variable \env{PE_HOSTFILE}.
 #'    An example of a job submission that results in this is
 #'    `qsub -pe mpi 8` (or `qsub -pe ompi 8`), which
-#'    requests eight cores on a any number of machines.
+#'    requests eight cores on any number of machines.
 #'    Known Grid Engine schedulers are
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 #'    Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
-#'    Altair Grid Engine (AGE; acquires Univa Corporation in 2020),
+#'    Altair Grid Engine (AGE; acquired Univa Corporation in 2020),
 #'    Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 #     Open Grid Scheduler (OGS; open-source fork of SGE 6.2u5).
 #'
@@ -76,7 +76,7 @@
 #'    to legacy \env{SLURM_NODELIST}) and parse set of nodes.
 #'    Then query Slurm environment variable \env{SLURM_JOB_CPUS_PER_NODE}
 #'    (fallback \env{SLURM_TASKS_PER_NODE}) to infer how many CPU cores
-#'    Slurm have allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
+#'    Slurm has allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
 #'    is set, which is always a scalar, then that is respected too, i.e.
 #'    if it is smaller, then that is used for all nodes.
 #'    For example, if `SLURM_NODELIST="n1,n[03-05]"` (expands to
@@ -562,7 +562,7 @@ supports_scontrol_show_hostname <- local({
 
     ## Sanity check
     if (!isTRUE(all.equal(sort(hosts), sort(truth)))) {
-      warnf("Internal availableWorkers() validation failed: 'scontrol show hostnames %s' did not return the expected results.  Expected c(%s) but got c(%s).  Will still use it this methods but please report this to the maintainer of the 'parallelly' package", shQuote(nodelist), commaq(truth), commaq(hosts), immediate. = TRUE)
+      warnf("Internal availableWorkers() validation failed: 'scontrol show hostnames %s' did not return the expected results.  Expected c(%s) but got c(%s).  Will still use this method but please report this to the maintainer of the 'parallelly' package", shQuote(nodelist), commaq(truth), commaq(hosts), immediate. = TRUE)
     }
     
     value <- TRUE
@@ -634,9 +634,18 @@ slurm_expand_nodelist <- function(nodelist, manual = getOption2("parallelly.slur
         
         ## Pad with zeros?
         pattern <- "^([0]*)[[:digit:]]+.*"
+        ## e.g. "[9-11]" => c("9", "10", "11")
+        ## e.g. "[09-11]" => c("09", "10", "11")
+        ## e.g. "[009-011]" => c("009", "010", "011")
+        ## e.g. "[009-11]" => c("009", "010", "011")
         if (grepl(pattern, set)) {
+          ## AD HOC: Amount of pad is decided by the _first_ 0:ed index
           pad <- gsub(pattern, "\\1", set)
-          idxs <- paste(pad, idxs, sep = "")
+          ns <- nchar(idxs)
+          ## AD HOC: Target width is decided by the first element
+          width <- ns[1] + nchar(pad)
+          ## AD HOC: Zero-pad indices to be of the same maximum length
+          idxs <- sprintf("%0*d", width, as.integer(idxs))
         }
 
         set <- paste(prefix, idxs, sep = "")
@@ -710,7 +719,7 @@ availableWorkersSlurm <- function() {
   ## Example:
   ## SLURM_JOB_NODELIST=n1,n[3-8],n[23-25]
   nodelist <- getenv_chr("SLURM_JOB_NODELIST")
-  if (is.na(nodelist)) data <- getenv_chr("SLURM_NODELIST")
+  if (is.na(nodelist)) nodelist <- getenv_chr("SLURM_NODELIST")
   if (is.na(nodelist)) return(NA_character_)
 
   ## Parse and expand nodelist
@@ -738,14 +747,14 @@ availableWorkersSlurm <- function() {
     }
 
     ## Always respect 'SLURM_CPUS_PER_TASK' (always a scalar), if that exists
-    n <- getenv_chr("SLURM_CPUS_PER_TASK")
+    n <- getenv_int("SLURM_CPUS_PER_TASK")
     if (!is.na(n)) {
       c0 <- c
       c <- rep(n, times = length(w))
       ## Is our assumption that SLURM_CPUS_PER_TASK <= SLURM_JOB_NODELIST, correct?
-      if (any(c < n)) {
-        c <- pmin(c, n)
-        warnf("Unexpected values of Slurm environment variable. 'SLURM_CPUS_PER_TASK' specifies CPU counts on one or more nodes that is strictly less than what 'SLURM_CPUS_PER_TASK' specifies. Will use the minimum of the two for each node: %s < %s", sQuote(nodecounts), n)
+      if (any(c0 < n)) {
+        c <- pmin(c0, n)
+        warnf("Unexpected values of Slurm environment variable. The Slurm environment variables specify CPU counts on one or more nodes that is strictly less than what 'SLURM_CPUS_PER_TASK' specifies. Will use the minimum of the two for each node: %s < %s", sQuote(nodecounts), n)
       }
     }
 

@@ -134,6 +134,7 @@ nproc
 ntasks
 parallelization
 parallelly
+parsers
 pc
 pid
 plink

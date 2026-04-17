@@ -52,7 +52,7 @@
 #' @export
 makeClusterMPI <- function(workers, ..., autoStop = FALSE, verbose = isTRUE(getOption("parallelly.debug"))) {
   if (verbose) {
-    mdebug_push("smakeClusterMPI() ...")
+    mdebug_push("makeClusterMPI() ...")
     on.exit(mdebug_pop("makeClusterMPI() ... done"))
   }
 

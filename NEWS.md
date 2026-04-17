@@ -1,3 +1,42 @@
+# Version 1.47.0 [2026-04-16]
+
+## New Features
+
+ * `availableCores()` gained argument `fraction`, which allows you to
+   specify that a certain fraction of the available CPU cores should
+   be returned, e.g. `availableCores(fraction = 0.5)`.
+
+ * Now `availableCores()` queries also Linux CGroups v2 CPU affinity
+   values `cpuset.cpus` and `cpuset.cpus.effective`.`
+   
+ * Give more information on invalid 'RichSOCKnode' connections.
+
+## Bug Fixes
+
+ * `availableWorkers(method = "Slurm")` expands the compressed
+   hostname representation given by environment variable
+   `SLURM_JOB_NODELIST` to a vector of hostnames. For this it uses
+   `scontrol show hostnames`. If `scontrol` is not available, it falls
+   back to an internal parsing algorithm. This internal algorithm
+   would incorrectly pad some hostnames with zero, e.g. `n[09-10]`
+   would become `c("n09", "n010")` whereas it should be `c("n09",
+   "n10")`.
+
+ * `availableWorkers(method = "Slurm")` did not, as documented, fall
+   back to legacy environment variable `SLURM_NODELIST` when
+   `SLURM_JOB_NODELIST` is not set
+
+ * `availableWorkers(method = "Slurm")` could return the wrong set of
+   hostnames if environment variables `SLURM_JOB_NODELIST`,
+   `SLURM_JOB_CPUS_PER_NODE` and `SLURM_CPUS_PER_TASK` were all set,
+   because `SLURM_CPUS_PER_TASK` was treated as a string, not an
+   integer, in comparisons.
+   
+ * `makeClusterPSOCK(..., setup_strategy = "sequential")` would not
+   respect internal R options for how to retry with another TCP port,
+   if failing to start a cluster node.
+
+
 # Version 1.46.1 [2026-01-07]
 
 ## Bug Fixes
@@ -38,7 +77,7 @@
  * Option `parallelly.supportsMulticore.disableOn` was documented to
    disable forked ("multicore") processing in the RStudio Terminal,
    but that was not the case due to a thinko. Default options and the
-   documentation has now been updated to reflect that it is only
+   documentation have now been updated to reflect that it is only
    disabled in the RStudio Console.
 
 ## Bug Fixes
@@ -56,13 +95,13 @@
 
 ## Deprecated and Defunct
 
- * In previous version, `makeClusterPSOCK()` started to collect
+ * In the previous version, `makeClusterPSOCK()` started to collect
    session information on each parallel worker, which included
    `capabilities()`. However, for unknown reasons, `capabilities()`
-   caused the cluster creation to fail GitHub Actions running
+   caused the cluster creation to fail on GitHub Actions running
    macOS. The problem could be reproduced neither locally, on the
    mac-builder, nor on the CRAN macOS servers. Because this feature is
-   non-critical and only introduced in the previous version, I decided
+   non-critical and was only introduced in the previous version, I decided
    to remove the collection of `capabilities()` again.
  
 
@@ -81,15 +120,15 @@
  * If `killNode(..., signal = tools::SIGTERM)` successfully signaled
    the cluster node, it will now close any existing socket connection
    to the node. If the node is running on the local host, it will also
-   remove its temporary directory, because the the node's R process
-   might not have been exited gracefully.
+   remove its temporary directory, because the node's R process
+   might not have exited gracefully.
    
  * The session information collected by `makeClusterPSOCK()` now
    contains more details on each worker, e.g. the `tempdir()` folder,
    `capabilities()`, and `extSoftVersion()`.
 
  * Cluster nodes created by `makeClusterPSOCK()` gained attribute
-   `calls`, which records the `sys.calls()`. This can be useful when
+   `calls`, which record the `sys.calls()`. This can be useful when
    troubleshooting from where a cluster was created. Analogously,
    setting R option `parallelly.makeNodePSOCK.calls` to TRUE will
    relay the call stack in the system call that launched the cluster
@@ -103,7 +142,7 @@
  * `availableCores()` would produce an error on `Error in scan(file =
    file, what = what, ...)` on systems that have a `/proc/self/mounts`
    file with syntax errors. Such files have been reported on Windows
-   Subsystem for Linux version 2 (WSL 2), where spaces in Windows path
+   Subsystem for Linux version 2 (WSL 2), where spaces in Windows paths
    have not been properly escaped for some entries. Now such invalid
    entries are skipped, before parsing the mount table.
 
@@ -125,7 +164,7 @@
 ## Bug Fixes
 
  * `availableCores()` would not respect `method = "fallback"`, since
-   v1.41.0 (2024-12-18), on system with a value for `method =
+   v1.41.0 (2024-12-18), on a system with a value for `method =
    "/proc/self/status"`.
 
 
@@ -163,7 +202,7 @@
 
  * `isNodeAlive()` could produce warnings on `doTryCatch(return(expr),
    name, parentenv, handler) : NAs introduced by coercion` on MS
-   Windows. Improved the internal `tasklist` parses used to test
+   Windows. Improved the internal `tasklist` parsers used to test
    whether a process is alive.
  
  * `availableCores()` could produce `Error: Error in
@@ -181,13 +220,13 @@
 
 ## Bug Fixes
 
- * Call `isNodeAlive()` and `killNode()` on cluster nodes running on
+ * Calling `isNodeAlive()` and `killNode()` on cluster nodes running on
    external machines would produce `Error in match.arg(type, choices =
    known_types, several.ok = FALSE) : 'arg' must be of length 1`. This
    bug was introduced in version 1.38.0 (2024-07-27), when adding
    richer support for the `rscript_sh` argument.
 
- * Call `isNodeAlive()` and `killNode()` on cluster nodes running on
+ * Calling `isNodeAlive()` and `killNode()` on cluster nodes running on
    external machines would produce `Error: ‘length(rsh_call) == 1L’ is
    not TRUE` if option `rshopts` were specified during creation.
 
