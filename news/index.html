@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.46.1-9033</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,15 +78,15 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.47.0" id="version-1470">Version 1.47.0<a class="anchor" aria-label="anchor" href="#version-1470"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> gained argument <code>fraction</code>, which allows you to specify that a certain fraction of the detected CPU cores should be returned, e.g. <code>availableCores(fraction = 0.5)</code>.</p></li>
+<h3 id="new-features-1-47-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-47-0"></a></h3>
+<ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> gained argument <code>fraction</code>, which allows you to specify that a certain fraction of the available CPU cores should be returned, e.g. <code>availableCores(fraction = 0.5)</code>.</p></li>
 <li><p>Now <code><a href="../reference/availableCores.html">availableCores()</a></code> queries also Linux CGroups v2 CPU affinity values <code>cpuset.cpus</code> and <code>cpuset.cpus.effective</code>.`</p></li>
 <li><p>Give more information on invalid ‘RichSOCKnode’ connections.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-1-47-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-47-0"></a></h3>
 <ul><li><p><code>availableWorkers(method = "Slurm")</code> expands the compressed hostname representation given by environment variable <code>SLURM_JOB_NODELIST</code> to a vector of hostnames. For this it uses <code>scontrol show hostnames</code>. If <code>scontrol</code> is not available, it falls back to an internal parsing algorithm. This internal algorithm would incorrectly pad some hostnames with zero, e.g. <code>n[09-10]</code> would become <code>c("n09", "n010")</code> whereas it should be <code>c("n09", "n10")</code>.</p></li>
 <li><p><code>availableWorkers(method = "Slurm")</code> did not, as documented, fall back to legacy environment variable <code>SLURM_NODELIST</code> when <code>SLURM_JOB_NODELIST</code> is not set</p></li>
 <li><p><code>availableWorkers(method = "Slurm")</code> could return the wrong set of hostnames if environment variables <code>SLURM_JOB_NODELIST</code>, <code>SLURM_JOB_CPUS_PER_NODE</code> and <code>SLURM_CPUS_PER_TASK</code> were all set, because <code>SLURM_CPUS_PER_TASK</code> was treated as a string, not an integer, in comparisons.</p></li>
