@@ -1,6 +1,12 @@
 # Changelog
 
+## Version (development version)
+
+- …
+
 ## Version 1.47.0
+
+CRAN release: 2026-04-17
 
 ### New Features
 
@@ -12,7 +18,7 @@
 - Now
   [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   queries also Linux CGroups v2 CPU affinity values `cpuset.cpus` and
-  `cpuset.cpus.effective`.\`
+  `cpuset.cpus.effective`.
 
 - Give more information on invalid ‘RichSOCKnode’ connections.
 
