@@ -2,6 +2,10 @@
 #'
 #' The created cluster has only one node.
 #'
+#' @return
+#' Returns a `cluster` object of class `sequential_cluster` of length one.
+#' The element is is a cluster node of class `sequential_node`.
+#' 
 #' @examplesIf (getRversion() >= "4.4.0")
 #' library(parallel)
 #' 
