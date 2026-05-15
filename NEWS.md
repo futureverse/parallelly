@@ -2,7 +2,7 @@
 
 ## Bug Fixes
 
- * Now `makeClusterPSOCK(workers)` produce a more informative error
+ * Now `makeClusterPSOCK(workers)` produces a more informative error
    message if `workers` is not an integer or a character vector.
 
 
