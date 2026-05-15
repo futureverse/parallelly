@@ -38,12 +38,12 @@ The three connections standard input ("stdin"), standard output ("stdout"),
 and standard error ("stderr") always exists and have indices 0, 1, and 2.
 Any connection opened beyond these will get index three or greater,
 depending on availability as given by \code{\link[base:showConnections]{base::showConnections()}}.
-To get the connection with a given index, use \code{\link[base:showConnections]{base::getConnection()}}.
+To get the connection with a given index, use \code{\link[base:getConnection]{base::getConnection()}}.
 \strong{Unfortunately, this index representation of connections is non-robust},
 e.g. there are cases where two or more 'connection' objects can end up with
 the same index and if used, the written output may end up at the wrong
 destination and files and database might get corrupted.  This can for
-instance happen if \code{\link[base:showConnections]{base::closeAllConnections()}} is used (*).
+instance happen if \code{\link[base:closeAllConnections]{base::closeAllConnections()}} is used (*).
 \strong{In contrast, \code{id <- connectionId(con)} gives an identifier that is unique
 to that 'connection' object.}  This identifier is based on the internal
 pointer address of the object.  The risk for two connections in the same
@@ -62,7 +62,7 @@ If you think there is a need to use it, it is much safer to restart \R
 because that is guaranteed to give you a working \R session with
 non-clashing connections.
 It might also be that \code{closeAllConnections()} is used because
-\code{\link[base:base-internal]{base::sys.save.image()}} is called, which might happen if \R is being
+\code{\link[base:sys.save.image]{base::sys.save.image()}} is called, which might happen if \R is being
 forced to terminate.
 }
 
@@ -112,5 +112,5 @@ close(con)
 }
 \seealso{
 See \code{\link[base:showConnections]{base::showConnections()}} for currently open connections and their
-indices. To get a connection by its index, use \code{\link[base:showConnections]{base::getConnection()}}.
+indices. To get a connection by its index, use \code{\link[base:getConnection]{base::getConnection()}}.
 }

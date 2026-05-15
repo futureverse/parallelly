@@ -1,5 +1,5 @@
 Package: parallelly
-Version: 1.47.0-9000
+Version: 1.47.0-9001
 Title: Enhancing the 'parallel' Package
 Imports:
     parallel,
@@ -26,5 +26,5 @@ URL: https://parallelly.futureverse.org, https://github.com/futureverse/parallel
 BugReports: https://github.com/futureverse/parallelly/issues
 Language: en-US
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.0.0

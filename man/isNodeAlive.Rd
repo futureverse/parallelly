@@ -44,6 +44,6 @@ print(isNodeAlive(cl))
 
 }
 \seealso{
-Use \code{\link[parallel:makeCluster]{parallel::stopCluster()}} to shut down cluster nodes.
+Use \code{\link[parallel:stopCluster]{parallel::stopCluster()}} to shut down cluster nodes.
 If that's not sufficient, \code{\link[=killNode]{killNode()}} may be attempted.
 }

@@ -136,7 +136,7 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.makeNodePSOCK.useXDR}:}{(logical) If FALSE (default), the communication between master and workers, which is binary, will use small-endian (faster), otherwise big-endian ("XDR"; slower).}
 
-\item{\code{parallelly.makeNodePSOCK.socketOptions}:}{(character string) If set to another value than \code{"NULL"}, then option \code{socketOptions} is set to this value on the workers during startup. See \code{\link[base:connections]{base::socketConnection()}} for details. (defaults to \code{"no-delay"})}
+\item{\code{parallelly.makeNodePSOCK.socketOptions}:}{(character string) If set to another value than \code{"NULL"}, then option \code{socketOptions} is set to this value on the workers during startup. See \code{\link[base:socketConnection]{base::socketConnection()}} for details. (defaults to \code{"no-delay"})}
 
 \item{\code{parallelly.makeNodePSOCK.rshcmd}:}{(character vector) The command to be run on the master to launch a process on another host.}
 

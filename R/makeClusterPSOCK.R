@@ -165,6 +165,9 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     checkNumberOfLocalWorkers(workers)
     
     workers <- rep(localhostHostname, times = workers)
+  } else if (is.character(workers)) {
+  } else {
+    stopf("Argument 'workers' should be either an integer or a character vector, not an object of mode %s", sQuote(mode(workers)))
   }
 
   if (!is.null(user)) {
