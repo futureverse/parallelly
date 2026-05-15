@@ -2,7 +2,10 @@
 
 ## Version (development version)
 
-- …
+### Bug Fixes
+
+- Now `makeClusterPSOCK(workers)` produce a more informative error
+  message if `workers` is not an integer or a character vector.
 
 ## Version 1.47.0
 

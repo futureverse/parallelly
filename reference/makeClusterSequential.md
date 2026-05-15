@@ -8,6 +8,11 @@ The created cluster has only one node.
 makeClusterSequential()
 ```
 
+## Value
+
+Returns a `cluster` object of class `sequential_cluster` of length one.
+The element is is a cluster node of class `sequential_node`.
+
 ## Details
 
 Expression and function calls are evaluated in a local environment,
@@ -41,11 +46,11 @@ str(y)
 
 pid <- Sys.getpid()
 print(pid)
-#> [1] 3269313
+#> [1] 395857
 y <- clusterEvalQ(cl, Sys.getpid())
 str(y)
 #> List of 1
-#>  $ : int 3269313
+#>  $ : int 395857
 
 abc <- 3.14
 y <- clusterEvalQ(cl, { abc <- 42; abc })
