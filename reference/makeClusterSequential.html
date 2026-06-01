@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,6 +98,14 @@ The element is is a cluster node of class <code>sequential_node</code>.</p>
 inheriting the global environment.</p>
     </div>
     <div class="section level2">
+    <h2 id="alternative-usage">Alternative usage<a class="anchor" aria-label="anchor" href="#alternative-usage"></a></h2>
+
+
+<p>In R (&gt;= 4.5.0), an alternative to using
+<code>cl &lt;- parallelly::makeClusterSequential()</code> is:</p>
+<p></p><div class="sourceCode r"><pre><code><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">1L</span>, type <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="va"><a href="../reference/makeClusterSequential.html">SEQ</a></span><span class="op">)</span></span></code></pre><p></p></div>
+    </div>
+    <div class="section level2">
     <h2 id="requirements">Requirements<a class="anchor" aria-label="anchor" href="#requirements"></a></h2>
 
 
@@ -129,11 +137,11 @@ works in webR, meaning you can use it for code that rely on the
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">pid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getpid.html" class="external-link">Sys.getpid</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pid</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3653683</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4064128</span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">clusterEvalQ</a></span><span class="op">(</span><span class="va">cl</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.getpid.html" class="external-link">Sys.getpid</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ : int 3653683</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ : int 4064128</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fl">3.14</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">clusterEvalQ</a></span><span class="op">(</span><span class="va">cl</span>, <span class="op">{</span> <span class="va">abc</span> <span class="op">&lt;-</span> <span class="fl">42</span>; <span class="va">abc</span> <span class="op">}</span><span class="op">)</span></span></span>

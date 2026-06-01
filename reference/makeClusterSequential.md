@@ -18,6 +18,13 @@ The element is is a cluster node of class `sequential_node`.
 Expression and function calls are evaluated in a local environment,
 inheriting the global environment.
 
+## Alternative usage
+
+In R (\>= 4.5.0), an alternative to using
+`cl <- parallelly::makeClusterSequential()` is:
+
+    cl <- parallel::makeCluster(1L, type = parallelly::SEQ)
+
 ## Requirements
 
 This function is only defined for R (\>= 4.4.0).
@@ -46,11 +53,11 @@ str(y)
 
 pid <- Sys.getpid()
 print(pid)
-#> [1] 3653683
+#> [1] 4064128
 y <- clusterEvalQ(cl, Sys.getpid())
 str(y)
 #> List of 1
-#>  $ : int 3653683
+#>  $ : int 4064128
 
 abc <- 3.14
 y <- clusterEvalQ(cl, { abc <- 42; abc })
