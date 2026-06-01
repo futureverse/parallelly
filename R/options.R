@@ -18,15 +18,17 @@
 #'
 #'  \item{`parallelly.availableCores.custom`:}{(function) If set and a function, then this function will be called (without arguments) by [availableCores()] where its value, coerced to an integer, is interpreted as a number of cores.}
 #'
-#'  \item{`parallelly.availableCores.fallback`:}{(integer) Number of cores to use when no core-specifying settings are detected other than `"system"` and `"nproc"`.  This options makes it possible to set the default number of cores returned by `availableCores()` / `availableWorkers()` yet allow users and schedulers to override it.  In multi-tenant environment, such as HPC clusters, it is useful to set environment variable \env{R_PARALLELLY_AVAILABLECORES_FALLBACK} to `1`, which will set this option when the package is loaded.}
+#'  \item{`parallelly.availableCores.fallback`:}{(integer) The default number of cores to use when no core-specifying settings are detected other than `"system"` and `"nproc"`.  This options makes it possible to set the default number of cores returned by `availableCores()` / `availableWorkers()` yet allow users and schedulers to override it.  In multi-tenant environment, such as HPC clusters, it is useful to set environment variable \env{R_PARALLELLY_AVAILABLECORES_FALLBACK} to `1`, which will set this option when the package is loaded.}
 #' 
-#'  \item{`parallelly.availableCores.system`:}{(integer) Number of "system" cores used instead of what is reported by \code{\link{availableCores}(which = "system")}. This option allows you to effectively override what `parallel::detectCores()` reports the system has.}
+#'  \item{`parallelly.availableCores.system`:}{(integer) The default number of "system" cores used instead of what is reported by \code{\link{availableCores}(which = "system")}. This option allows you to effectively override what `parallel::detectCores()` reports the system has.}
 #'
-#'  \item{`parallelly.availableCores.min`:}{(integer) The minimum number of cores [availableCores()] is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (`*`).  (Default: `1L`)}
+#'  \item{`parallelly.availableCores.min`:}{(integer) The default minimum number of cores [availableCores()] is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (`*`).  (Default: `1L`)}
 #'
-#'  \item{`parallelly.availableCores.omit`:}{(integer; non-negative) Number of cores to set aside, i.e. not to include.}
+#'  \item{`parallelly.availableCores.fraction`:}{(numeric; in `[0,1]`) The default fraction of cores to keep.}
 #'
-#'  \item{`parallelly.availableCores.max`:}{(integer; positive) Maximum number of cores to return.}
+#'  \item{`parallelly.availableCores.omit`:}{(integer; non-negative) The default number of cores to set aside, i.e. not to include.}
+#'
+#'  \item{`parallelly.availableCores.max`:}{(integer; positive) The default maximum number of cores to return.}
 #'
 #'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")`)}
 #'
@@ -143,6 +145,7 @@
 #' @aliases parallelly.debug
 #' @aliases parallelly.availableCores.custom
 #' @aliases parallelly.availableCores.fallback
+#' @aliases parallelly.availableCores.fraction
 #' @aliases parallelly.availableCores.logical
 #' @aliases parallelly.availableCores.max
 #' @aliases parallelly.availableCores.methods
@@ -157,6 +160,7 @@
 #' @aliases parallelly.supportsMulticore.disableOn
 #' @aliases parallelly.supportsMulticore.unstable
 #' @aliases R_PARALLELLY_AVAILABLECORES_FALLBACK
+#' @aliases R_PARALLELLY_AVAILABLECORES_FRACTION
 #' @aliases R_PARALLELLY_AVAILABLECORES_LOGICAL
 #' @aliases R_PARALLELLY_AVAILABLECORES_MAX
 #' @aliases R_PARALLELLY_AVAILABLECORES_METHODS
@@ -336,6 +340,7 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("availableCores.min", mode = "integer", disallow = "NA", debug = debug)
   update_package_option("availableCores.system", mode = "integer", disallow = NULL, debug = debug)
   update_package_option("availableCores.logical", mode = "logical", debug = debug)
+  update_package_option("availableCores.fraction", mode = "double", debug = debug)
   update_package_option("availableCores.omit", mode = "integer", debug = debug)
   update_package_option("availableCores.max", mode = "numeric", disallow = "NA", debug = debug)
 

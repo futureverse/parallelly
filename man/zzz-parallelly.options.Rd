@@ -6,6 +6,7 @@
 \alias{parallelly.debug}
 \alias{parallelly.availableCores.custom}
 \alias{parallelly.availableCores.fallback}
+\alias{parallelly.availableCores.fraction}
 \alias{parallelly.availableCores.logical}
 \alias{parallelly.availableCores.max}
 \alias{parallelly.availableCores.methods}
@@ -20,6 +21,7 @@
 \alias{parallelly.supportsMulticore.disableOn}
 \alias{parallelly.supportsMulticore.unstable}
 \alias{R_PARALLELLY_AVAILABLECORES_FALLBACK}
+\alias{R_PARALLELLY_AVAILABLECORES_FRACTION}
 \alias{R_PARALLELLY_AVAILABLECORES_LOGICAL}
 \alias{R_PARALLELLY_AVAILABLECORES_MAX}
 \alias{R_PARALLELLY_AVAILABLECORES_METHODS}
@@ -87,15 +89,17 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.availableCores.custom}:}{(function) If set and a function, then this function will be called (without arguments) by \code{\link[=availableCores]{availableCores()}} where its value, coerced to an integer, is interpreted as a number of cores.}
 
-\item{\code{parallelly.availableCores.fallback}:}{(integer) Number of cores to use when no core-specifying settings are detected other than \code{"system"} and \code{"nproc"}.  This options makes it possible to set the default number of cores returned by \code{availableCores()} / \code{availableWorkers()} yet allow users and schedulers to override it.  In multi-tenant environment, such as HPC clusters, it is useful to set environment variable \env{R_PARALLELLY_AVAILABLECORES_FALLBACK} to \code{1}, which will set this option when the package is loaded.}
+\item{\code{parallelly.availableCores.fallback}:}{(integer) The default number of cores to use when no core-specifying settings are detected other than \code{"system"} and \code{"nproc"}.  This options makes it possible to set the default number of cores returned by \code{availableCores()} / \code{availableWorkers()} yet allow users and schedulers to override it.  In multi-tenant environment, such as HPC clusters, it is useful to set environment variable \env{R_PARALLELLY_AVAILABLECORES_FALLBACK} to \code{1}, which will set this option when the package is loaded.}
 
-\item{\code{parallelly.availableCores.system}:}{(integer) Number of "system" cores used instead of what is reported by \code{\link{availableCores}(which = "system")}. This option allows you to effectively override what \code{parallel::detectCores()} reports the system has.}
+\item{\code{parallelly.availableCores.system}:}{(integer) The default number of "system" cores used instead of what is reported by \code{\link{availableCores}(which = "system")}. This option allows you to effectively override what \code{parallel::detectCores()} reports the system has.}
 
-\item{\code{parallelly.availableCores.min}:}{(integer) The minimum number of cores \code{\link[=availableCores]{availableCores()}} is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (\code{*}).  (Default: \code{1L})}
+\item{\code{parallelly.availableCores.min}:}{(integer) The default minimum number of cores \code{\link[=availableCores]{availableCores()}} is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (\code{*}).  (Default: \code{1L})}
 
-\item{\code{parallelly.availableCores.omit}:}{(integer; non-negative) Number of cores to set aside, i.e. not to include.}
+\item{\code{parallelly.availableCores.fraction}:}{(numeric; in \verb{[0,1]}) The default fraction of cores to keep.}
 
-\item{\code{parallelly.availableCores.max}:}{(integer; positive) Maximum number of cores to return.}
+\item{\code{parallelly.availableCores.omit}:}{(integer; non-negative) The default number of cores to set aside, i.e. not to include.}
+
+\item{\code{parallelly.availableCores.max}:}{(integer; positive) The default maximum number of cores to return.}
 
 \item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")})}
 
