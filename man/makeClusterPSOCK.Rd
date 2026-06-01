@@ -258,10 +258,15 @@ background \R workers, and how to connect to external machines.
 }
 \section{Alternative usage}{
 
-In R (>= 4.5.0), an alternatively to using
+In R (>= 4.5.0), an alternative to using
 \code{cl <- parallelly::makeClusterPSOCK(workers)} is:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{cl <- parallel::makeCluster(workers, type = parallelly::RPSOCK)
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cl <- parallel::makeCluster(workers, type = parallelly::RPSOCK)
+}\if{html}{\out{</div>}}
+
+and in R (>= 4.6.0), it can also be created as:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cl <- parallel::makeCluster(workers, type = "RPSOCK")
 }\if{html}{\out{</div>}}
 
 where the 'R' in RPSOCK stands for "Rich", which reflects that the cluster

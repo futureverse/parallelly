@@ -35,6 +35,14 @@
 #' Expression and function calls are evaluated in a local environment,
 #' inheriting the global environment.
 #'
+#' @section Alternative usage:
+#' In R (>= 4.5.0), an alternative to using
+#' `cl <- parallelly::makeClusterSequential()` is:
+#'
+#' ```r
+#' cl <- parallel::makeCluster(1L, type = parallelly::SEQ)
+#' ```
+#'
 #' @section Requirements:
 #' This function is only defined for R (>= 4.4.0).
 #'

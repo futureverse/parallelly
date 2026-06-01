@@ -43,11 +43,10 @@ packages are installed.}
 }
 \section{Alternative usage}{
 
-
-In R (>= 4.4.0), an alternatively to using
+In R (>= 4.5.0), an alternative to using
 \code{cl <- parallelly::makeClusterMPI(workers)} is:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{cl <- parallel::makeCluster(workers, type = parallelly::MPI)
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cl <- parallel::makeCluster(workers, type = parallelly::RMPI)
 }\if{html}{\out{</div>}}
 }
 

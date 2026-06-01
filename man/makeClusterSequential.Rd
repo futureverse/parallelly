@@ -18,6 +18,15 @@ The created cluster has only one node.
 Expression and function calls are evaluated in a local environment,
 inheriting the global environment.
 }
+\section{Alternative usage}{
+
+In R (>= 4.5.0), an alternative to using
+\code{cl <- parallelly::makeClusterSequential()} is:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cl <- parallel::makeCluster(1L, type = parallelly::SEQ)
+}\if{html}{\out{</div>}}
+}
+
 \section{Requirements}{
 
 This function is only defined for R (>= 4.4.0).

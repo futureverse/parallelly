@@ -22,12 +22,11 @@
 #' of a list of `"MPInode"` workers.
 #'
 #' @section Alternative usage:
-#'
-#' In R (>= 4.4.0), an alternatively to using
+#' In R (>= 4.5.0), an alternative to using
 #' `cl <- parallelly::makeClusterMPI(workers)` is:
 #'
-#' ```
-#' cl <- parallel::makeCluster(workers, type = parallelly::MPI)
+#' ```r
+#' cl <- parallel::makeCluster(workers, type = parallelly::RMPI)
 #' ```
 #'
 #' @examples

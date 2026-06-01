@@ -61,11 +61,17 @@
 #' inherit from `RichSOCKnode`).
 #'
 #' @section Alternative usage:
-#' In R (>= 4.5.0), an alternatively to using
+#' In R (>= 4.5.0), an alternative to using
 #' `cl <- parallelly::makeClusterPSOCK(workers)` is:
 #'
-#' ```
+#' ```r
 #' cl <- parallel::makeCluster(workers, type = parallelly::RPSOCK)
+#' ```
+#'
+#' and in R (>= 4.6.0), it can also be created as:
+#'
+#' ```r
+#' cl <- parallel::makeCluster(workers, type = "RPSOCK")
 #' ```
 #'
 #' where the 'R' in RPSOCK stands for "Rich", which reflects that the cluster
