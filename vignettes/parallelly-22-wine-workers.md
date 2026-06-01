@@ -32,16 +32,16 @@ win11
 Then, install [R for Windows] in Wine, by:
 
 ```sh
-$ wget https://cran.r-project.org/bin/windows/base/R-4.5.2-win.exe
-$ wine R-4.5.2-win.exe /SILENT
+$ wget https://cran.r-project.org/bin/windows/base/R-4.6.0-win.exe
+$ wine R-4.6.0-win.exe /SILENT
 ```
 
 Finally, verify that R is available in Wine;
 
 ```sh
-$ wine "C:/Program Files/R/R-4.5.2/bin/x64/Rscript.exe" --version
+$ wine "C:/Program Files/R/R-4.6.0/bin/x64/Rscript.exe" --version
 ...
-Rscript (R) version 4.5.2 (2025-10-31)
+Rscript (R) version 4.6.0 (2026-04-24)
 ```
 
 
@@ -62,12 +62,12 @@ cl <- makeClusterPSOCK(
     ## Don't pass LC_* and R_LIBS* environments from host to Wine
     sprintf("%s=", grep("^(LC_|R_LIBS)", names(Sys.getenv()), value = TRUE)),
     "wine",
-    "C:/Program Files/R/R-4.5.2/bin/x64/Rscript.exe"
+    "C:/Program Files/R/R-4.6.0/bin/x64/Rscript.exe"
   )
 )
 print(cl)
 #> Socket cluster with 1 node on host 'localhost'
-#> (R version 4.5.2 (2025-10-31 ucrt), platform x86_64-w64-mingw32)
+#> (R version 4.6.0 (2026-04-24 ucrt), platform x86_64-w64-mingw32)
 ```
 
 
@@ -106,9 +106,9 @@ To validate that the personal package library exists, _restart the
 cluster_. Then call:
 
 ```r
-parallel::clusterEvalQ(cl[1], { .libPaths() })[[1]]
-[1] "C:/users/alice/AppData/Local/R/win-library/4.5"
-[2] "C:/PROG~FBU/R/R-45~RZJ.2/library"
+parallel::clusterEvalQ(cl[1], { .libPaths() })
+[1] "C:/users/alice/AppData/Local/R/win-library/4.6"
+[2] "C:/PROG~FBU/R/R-46~UP1.0/library"
 ```
 
 The first directory is the personal package library.
@@ -146,13 +146,14 @@ win_only <- subset(db, OS_type == "windows")
 print(win_only$Package)
 ```
 
-As of 2026-03-03, this outputs:
+As of 2026-05-22, this outputs:
 
 ```r
- [1] "BiplotGUI"         "blatr"             "excel.link"
- [4] "KeyboardSimulator" "MDSGUI"            "MediaNews"
- [7] "R2PPT"             "R2wd"              "rFUSION"
-[10] "RWinEdt"           "spectrino"         "taskscheduleR"
+ [1] "BiplotGUI"         "blatr"             "excel.link" 
+ [4] "hespdiv"           "KeyboardSimulator" "MDSGUI"
+ [7] "MediaNews"         "R2PPT"             "R2wd"
+[10] "RDesk"             "rFUSION"           "RWinEdt"
+[13] "spectrino"         "taskscheduleR"
 ```
 
 [R for Windows]: https://cran.r-project.org/bin/windows/base/
