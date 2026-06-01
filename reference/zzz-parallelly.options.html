@@ -23,7 +23,7 @@ further notice."><meta property="og:image" content="https://parallelly.futurever
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -115,23 +115,27 @@ further notice.</em></p>
 
 
 <dt><code>parallelly.availableCores.fallback</code>:</dt>
-<dd><p>(integer) Number of cores to use when no core-specifying settings are detected other than <code>"system"</code> and <code>"nproc"</code>.  This options makes it possible to set the default number of cores returned by <code><a href="availableCores.html">availableCores()</a></code> / <code><a href="availableWorkers.html">availableWorkers()</a></code> yet allow users and schedulers to override it.  In multi-tenant environment, such as HPC clusters, it is useful to set environment variable <code class="env">R_PARALLELLY_AVAILABLECORES_FALLBACK</code> to <code>1</code>, which will set this option when the package is loaded.</p></dd>
+<dd><p>(integer) The default number of cores to use when no core-specifying settings are detected other than <code>"system"</code> and <code>"nproc"</code>.  This options makes it possible to set the default number of cores returned by <code><a href="availableCores.html">availableCores()</a></code> / <code><a href="availableWorkers.html">availableWorkers()</a></code> yet allow users and schedulers to override it.  In multi-tenant environment, such as HPC clusters, it is useful to set environment variable <code class="env">R_PARALLELLY_AVAILABLECORES_FALLBACK</code> to <code>1</code>, which will set this option when the package is loaded.</p></dd>
 
 
 <dt><code>parallelly.availableCores.system</code>:</dt>
-<dd><p>(integer) Number of "system" cores used instead of what is reported by <code><a href="availableCores.html">availableCores</a>(which = "system")</code>. This option allows you to effectively override what <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> reports the system has.</p></dd>
+<dd><p>(integer) The default number of "system" cores used instead of what is reported by <code><a href="availableCores.html">availableCores</a>(which = "system")</code>. This option allows you to effectively override what <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> reports the system has.</p></dd>
 
 
 <dt><code>parallelly.availableCores.min</code>:</dt>
-<dd><p>(integer) The minimum number of cores <code><a href="availableCores.html">availableCores()</a></code> is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (<code>*</code>).  (Default: <code>1L</code>)</p></dd>
+<dd><p>(integer) The default minimum number of cores <code><a href="availableCores.html">availableCores()</a></code> is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (<code>*</code>).  (Default: <code>1L</code>)</p></dd>
+
+
+<dt><code>parallelly.availableCores.fraction</code>:</dt>
+<dd><p>(numeric; in <code>[0,1]</code>) The default fraction of cores to keep.</p></dd>
 
 
 <dt><code>parallelly.availableCores.omit</code>:</dt>
-<dd><p>(integer; non-negative) Number of cores to set aside, i.e. not to include.</p></dd>
+<dd><p>(integer; non-negative) The default number of cores to set aside, i.e. not to include.</p></dd>
 
 
 <dt><code>parallelly.availableCores.max</code>:</dt>
-<dd><p>(integer; positive) Maximum number of cores to return.</p></dd>
+<dd><p>(integer; positive) The default maximum number of cores to return.</p></dd>
 
 
 <dt><code>parallelly.availableWorkers.methods</code>:</dt>

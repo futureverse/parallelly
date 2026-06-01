@@ -43,9 +43,10 @@ and
 
 - `parallelly.availableCores.fallback`::
 
-  (integer) Number of cores to use when no core-specifying settings are
-  detected other than `"system"` and `"nproc"`. This options makes it
-  possible to set the default number of cores returned by
+  (integer) The default number of cores to use when no core-specifying
+  settings are detected other than `"system"` and `"nproc"`. This
+  options makes it possible to set the default number of cores returned
+  by
   [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   /
   [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
@@ -56,7 +57,8 @@ and
 
 - `parallelly.availableCores.system`::
 
-  (integer) Number of "system" cores used instead of what is reported by
+  (integer) The default number of "system" cores used instead of what is
+  reported by
   [`availableCores`](https://parallelly.futureverse.org/reference/availableCores.md)`(which = "system")`.
   This option allows you to effectively override what
   [`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html)
@@ -64,20 +66,24 @@ and
 
 - `parallelly.availableCores.min`::
 
-  (integer) The minimum number of cores
+  (integer) The default minimum number of cores
   [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   is allowed to return. This can be used to force multiple cores on a
   single-core environment. If this is limit is applied, the names of the
   returned value are appended with an asterisk (`*`). (Default: `1L`)
 
+- `parallelly.availableCores.fraction`::
+
+  (numeric; in `[0,1]`) The default fraction of cores to keep.
+
 - `parallelly.availableCores.omit`::
 
-  (integer; non-negative) Number of cores to set aside, i.e. not to
-  include.
+  (integer; non-negative) The default number of cores to set aside, i.e.
+  not to include.
 
 - `parallelly.availableCores.max`::
 
-  (integer; positive) Maximum number of cores to return.
+  (integer; positive) The default maximum number of cores to return.
 
 - `parallelly.availableWorkers.methods`::
 

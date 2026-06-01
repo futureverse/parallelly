@@ -43,12 +43,12 @@ cl <- makeClusterPSOCK(2, dryrun = TRUE)
 #> ----------------------------------------------------------------------
 #> Manually, start worker #1 on local machine ‘localhost’ with:
 #> 
-#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.0-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11638 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
+#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.0-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11790 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
 #> 
 #> ----------------------------------------------------------------------
 #> Manually, start worker #2 on local machine ‘localhost’ with:
 #> 
-#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.0-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11638 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
+#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.0-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11790 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
 #> 
 cl <- autoStopCluster(cl)
 print(cl)
@@ -56,6 +56,6 @@ print(cl)
 rm(list = "cl")
 gc()
 #>           used (Mb) gc trigger  (Mb) max used  (Mb)
-#> Ncells 1035792 55.4    2027138 108.3  2027138 108.3
-#> Vcells 1896593 14.5    8388608  64.0  6593519  50.4
+#> Ncells 1037092 55.4    2031265 108.5  2031265 108.5
+#> Vcells 1899585 14.5    8388608  64.0  6592687  50.3
 ```
