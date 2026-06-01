@@ -139,67 +139,70 @@
 #' @seealso
 #' To set \R options when \R starts (even before the \pkg{parallelly} package is loaded), see the \link[base]{Startup} help page.  The \href{https://cran.r-project.org/package=startup}{\pkg{startup}} package provides a friendly mechanism for configuring \R's startup process.
 #'
-#' @aliases
-#' parallelly.options 
-#' parallelly.debug
-
-#' parallelly.availableCores.custom
-#' parallelly.availableCores.methods
-#' parallelly.availableCores.min
-#' parallelly.availableCores.fallback
-#' parallelly.availableCores.omit
-#' parallelly.availableCores.max
-#' parallelly.availableCores.system
-#' parallelly.availableWorkers.methods
-#' parallelly.availableWorkers.custom
-#' parallelly.fork.enable
-#' parallelly.maxWorkers.localhost
-#' parallelly.supportsMulticore.disableOn
-#' parallelly.supportsMulticore.unstable
-#' R_PARALLELLY_AVAILABLECORES_FALLBACK
-#' R_PARALLELLY_AVAILABLECORES_OMIT
-#' R_PARALLELLY_AVAILABLECORES_MAX
-#' R_PARALLELLY_AVAILABLECORES_SYSTEM
-#' R_PARALLELLY_AVAILABLECORES_MIN
-#' R_PARALLELLY_FORK_ENABLE
-#' R_PARALLELLY_SUPPORTSMULTICORE_DISABLEON
-#' R_PARALLELLY_SUPPORTSMULTICORE_UNSTABLE
-#'
-#' future.availableCores.custom
-#' future.availableCores.methods
-#' future.availableCores.fallback
-#' future.availableCores.system
-#' future.availableWorkers.methods
-#' future.availableWorkers.custom
-#' future.fork.enable
-#' future.supportsMulticore.unstable
-#' R_FUTURE_AVAILABLECORES_FALLBACK
-#' R_FUTURE_AVAILABLECORES_SYSTEM
-#' R_FUTURE_FORK_ENABLE
-#' R_FUTURE_SUPPORTSMULTICORE_UNSTABLE
-#'
-#' parallelly.makeNodePSOCK.setup_strategy
-#' parallelly.makeNodePSOCK.validate
-#' parallelly.makeNodePSOCK.connectTimeout
-#' parallelly.makeNodePSOCK.timeout
-#' parallelly.makeNodePSOCK.useXDR
-#' parallelly.makeNodePSOCK.socketOptions
-#' parallelly.makeNodePSOCK.rshcmd
-#' parallelly.makeNodePSOCK.rshopts
-#' parallelly.makeNodePSOCK.tries
-#' parallelly.makeNodePSOCK.tries.delay
-#' parallelly.makeNodePSOCK.calls
-#' R_PARALLELLY_MAKENODEPSOCK_SETUP_STRATEGY
-#' R_PARALLELLY_MAKENODEPSOCK_VALIDATE
-#' R_PARALLELLY_MAKENODEPSOCK_CONNECTTIMEOUT
-#' R_PARALLELLY_MAKENODEPSOCK_TIMEOUT
-#' R_PARALLELLY_MAKENODEPSOCK_USEXDR
-#' R_PARALLELLY_MAKENODEPSOCK_SOCKETOPTIONS
-#' R_PARALLELLY_MAKENODEPSOCK_RSHCMD
-#' R_PARALLELLY_MAKENODEPSOCK_RSHOPTS
-#' R_PARALLELLY_MAKENODEPSOCK_TRIES
-#' R_PARALLELLY_MAKENODEPSOCK_TRIES_DELAY
-#' R_PARALLELLY_MAKENODEPSOCK_CALLS
+#' @aliases parallelly.options
+#' @aliases parallelly.debug
+#' @aliases parallelly.availableCores.custom
+#' @aliases parallelly.availableCores.fallback
+#' @aliases parallelly.availableCores.logical
+#' @aliases parallelly.availableCores.max
+#' @aliases parallelly.availableCores.methods
+#' @aliases parallelly.availableCores.min
+#' @aliases parallelly.availableCores.omit
+#' @aliases parallelly.availableCores.system
+#' @aliases parallelly.availableWorkers.custom
+#' @aliases parallelly.availableWorkers.methods
+#' @aliases parallelly.fork.enable
+#' @aliases parallelly.maxWorkers.localhost
+#' @aliases parallelly.maxWorkers.localhost.ignore
+#' @aliases parallelly.supportsMulticore.disableOn
+#' @aliases parallelly.supportsMulticore.unstable
+#' @aliases R_PARALLELLY_AVAILABLECORES_FALLBACK
+#' @aliases R_PARALLELLY_AVAILABLECORES_LOGICAL
+#' @aliases R_PARALLELLY_AVAILABLECORES_MAX
+#' @aliases R_PARALLELLY_AVAILABLECORES_METHODS
+#' @aliases R_PARALLELLY_AVAILABLECORES_MIN
+#' @aliases R_PARALLELLY_AVAILABLECORES_OMIT
+#' @aliases R_PARALLELLY_AVAILABLECORES_SYSTEM
+#' @aliases R_PARALLELLY_AVAILABLEWORKERS_METHODS
+#' @aliases R_PARALLELLY_FORK_ENABLE
+#' @aliases R_PARALLELLY_MAXWORKERS_LOCALHOST
+#' @aliases R_PARALLELLY_MAXWORKERS_LOCALHOST_IGNORE
+#' @aliases R_PARALLELLY_SUPPORTSMULTICORE_DISABLEON
+#' @aliases R_PARALLELLY_SUPPORTSMULTICORE_UNSTABLE
+#' @aliases future.availableCores.custom
+#' @aliases future.availableCores.methods
+#' @aliases future.availableCores.fallback
+#' @aliases future.availableCores.system
+#' @aliases future.availableWorkers.methods
+#' @aliases future.availableWorkers.custom
+#' @aliases future.fork.enable
+#' @aliases future.supportsMulticore.unstable
+#' @aliases R_FUTURE_AVAILABLECORES_FALLBACK
+#' @aliases R_FUTURE_AVAILABLECORES_SYSTEM
+#' @aliases R_FUTURE_FORK_ENABLE
+#' @aliases R_FUTURE_SUPPORTSMULTICORE_UNSTABLE
+#' @aliases parallelly.makeNodePSOCK.setup_strategy
+#' @aliases parallelly.makeNodePSOCK.validate
+#' @aliases parallelly.makeNodePSOCK.connectTimeout
+#' @aliases parallelly.makeNodePSOCK.timeout
+#' @aliases parallelly.makeNodePSOCK.useXDR
+#' @aliases parallelly.makeNodePSOCK.socketOptions
+#' @aliases parallelly.makeNodePSOCK.rshcmd
+#' @aliases parallelly.makeNodePSOCK.rshopts
+#' @aliases parallelly.makeNodePSOCK.tries
+#' @aliases parallelly.makeNodePSOCK.tries.delay
+#' @aliases parallelly.makeNodePSOCK.calls
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_SETUP_STRATEGY
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_VALIDATE
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_CONNECTTIMEOUT
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_TIMEOUT
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_USEXDR
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_SOCKETOPTIONS
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_RSHCMD
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_RSHOPTS
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_TRIES
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_TRIES_DELAY
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_CALLS
 #'
 ## Internal options and environment variables _not_ documented here:
 ## parallelly.localhost.hostname
