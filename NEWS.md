@@ -2,6 +2,10 @@
 
 ## Bug Fixes
 
+ * `availableCores(methods = "cgroups2.cpuset.cpus")` would produce
+   "Error : 'length(cpuset) <= max_cores' is not TRUE" if CGroups v2
+   'cpuset.cpus' comprised an empty string.
+ 
  * Now `makeClusterPSOCK(workers)` produces a more informative error
    message if `workers` is not an integer or a character vector.
 

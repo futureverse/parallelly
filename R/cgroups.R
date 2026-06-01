@@ -622,7 +622,13 @@ getCGroupsValue <- local({
       file <- file.path(path, field)
       if (file_test("-f", file)) {
         value <- readLines(file, warn = FALSE)
-        if (length(value) == 0L) value <- NA_character_
+        if (length(value) == 0L) {
+          ## Empty file
+          value <- NA_character_
+        } else if (length(value) == 1L && nchar(value) == 0L) {
+          ## Empty line
+          value <- NA_character_
+        }        
         attr(value, "path") <- path
         cache_controller[[field]] <- value
         .cache[[controller]] <<- cache_controller
