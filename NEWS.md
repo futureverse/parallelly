@@ -6,6 +6,11 @@
    "Error : 'length(cpuset) <= max_cores' is not TRUE" if CGroups v2
    'cpuset.cpus' comprised an empty string.
  
+ * `availableCores(methods = "cgroups2.cpuset.cpus.effective")` would
+   produce "Error in if (any(value < 0L | value >= max_cores)) { :
+   missing value where TRUE/FALSE needed" if `parallel::detectCores()`
+   returned a missing value.
+ 
  * Now `makeClusterPSOCK(workers)` produces a more informative error
    message if `workers` is not an integer or a character vector.
 
