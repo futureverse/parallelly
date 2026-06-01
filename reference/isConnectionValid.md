@@ -142,7 +142,7 @@ connectionId(y$stderr)       ##  2L
 isConnectionValid(y$con)     ## FALSE with attribute 'reason'
 #> [1] FALSE
 #> attr(,"reason")
-#> [1] "Connection (connection: index=6, description=\"/tmp/hb/Rtmpvj4zyI/file255be3e4193aa\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=-1) is no longer valid. It differ from the currently registered R connection with the same index 6 (connection: index=6, description=\"/tmp/hb/Rtmpvj4zyI/file255be3e4193aa\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=1477, raw_id=\"<pointer: 0x5c5>\")"
+#> [1] "Connection (connection: index=6, description=\"/tmp/hb/RtmpLBNeUS/file378161513ebb54\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=-1) is no longer valid. It differ from the currently registered R connection with the same index 6 (connection: index=6, description=\"/tmp/hb/RtmpLBNeUS/file378161513ebb54\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=1477, raw_id=\"<pointer: 0x5c5>\")"
 connectionId(y$con)          ## -1L
 #> [1] -1
 close(con)

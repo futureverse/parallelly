@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,9 @@
 <h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>Now <code>makeClusterPSOCK(workers)</code> produces a more informative error message if <code>workers</code> is not an integer or a character vector.</li>
+<ul><li><p><code>availableCores(methods = "cgroups2.cpuset.cpus")</code> would produce “Error : ‘length(cpuset) &lt;= max_cores’ is not TRUE” if CGroups v2 ‘cpuset.cpus’ comprised an empty string.</p></li>
+<li><p><code>availableCores(methods = "cgroups2.cpuset.cpus.effective")</code> would produce “Error in if (any(value &lt; 0L | value &gt;= max_cores)) { : missing value where TRUE/FALSE needed” if <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> returned a missing value.</p></li>
+<li><p>Now <code>makeClusterPSOCK(workers)</code> produces a more informative error message if <code>workers</code> is not an integer or a character vector.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
