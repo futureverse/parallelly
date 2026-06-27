@@ -189,6 +189,12 @@ that creates the individual cluster nodes.
   [`base::socketConnection()`](https://rdrr.io/r/base/connections.html)
   for details. (defaults to `"no-delay"`)
 
+- `parallelly.makeNodePSOCK.rscript_call`::
+
+  (character string or R expression) The R expression that is used to
+  start the R worker event loop on the worker node. (defaults to
+  `"workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"`)
+
 - `parallelly.makeNodePSOCK.rshcmd`::
 
   (character vector) The command to be run on the master to launch a

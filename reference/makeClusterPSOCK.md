@@ -38,6 +38,7 @@ makeNodePSOCK(
   rscript_envs = NULL,
   rscript_libs = NULL,
   rscript_startup = NULL,
+  rscript_call = getOption2("parallelly.makeNodePSOCK.rscript_call", NULL),
   rscript_sh = c("auto", "cmd", "sh", "none"),
   default_packages = c("datasets", "utils", "grDevices", "graphics", "stats", if
     (methods) "methods"),
@@ -192,6 +193,14 @@ makeNodePSOCK(
   the worker's event loop. For instance, use
   `rscript_startup = 'setwd("/path/to")'` to set the working directory
   to `/path/to` on *all* workers.
+
+- rscript_call:
+
+  An R expression or a character string of R code that is used to launch
+  the worker event loop (default:
+  `getOption("parallelly.makeNodePSOCK.rscript_call", NULL)`). If
+  `NULL`, it defaults to
+  `"workRSOCK<-tryCatch( parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK );workRSOCK()"`.
 
 - rscript_sh:
 

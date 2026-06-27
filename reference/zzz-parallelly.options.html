@@ -23,7 +23,7 @@ further notice."><meta property="og:image" content="https://parallelly.futurever
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -205,6 +205,10 @@ running R in the RStudio Terminal.
 
 <dt><code>parallelly.makeNodePSOCK.socketOptions</code>:</dt>
 <dd><p>(character string) If set to another value than <code>"NULL"</code>, then option <code>socketOptions</code> is set to this value on the workers during startup. See <code><a href="https://rdrr.io/r/base/connections.html" class="external-link">base::socketConnection()</a></code> for details. (defaults to <code>"no-delay"</code>)</p></dd>
+
+
+<dt><code>parallelly.makeNodePSOCK.rscript_call</code>:</dt>
+<dd><p>(character string or R expression) The R expression that is used to start the R worker event loop on the worker node. (defaults to <code>"workRSOCK&lt;-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"</code>)</p></dd>
 
 
 <dt><code>parallelly.makeNodePSOCK.rshcmd</code>:</dt>

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,6 +79,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> and <code><a href="../reference/makeClusterPSOCK.html">makeNodePSOCK()</a></code> gained argument <code>rscript_call</code> to customize the parallel worker loop, which defaults to <code>parallel:::.workRSOCK()</code>.</p></li>
+<li><p>Add internal worker loop <code>parallelly:::workRPSOCK()</code> that takes optional argument <code>workCommand</code> to customize the default <code>parallel:::workCommand()</code>.</p></li>
+</ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p><code>availableCores(methods = "cgroups2.cpuset.cpus")</code> would produce “Error : ‘length(cpuset) &lt;= max_cores’ is not TRUE” if CGroups v2 ‘cpuset.cpus’ comprised an empty string.</p></li>

@@ -29,7 +29,7 @@ background R workers, and how to connect to external machines."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -133,6 +133,7 @@ background <span style="R">R</span> workers, and how to connect to external mach
 <span>  rscript_envs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rscript_libs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rscript_startup <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rscript_call <span class="op">=</span> <span class="fu">getOption2</span><span class="op">(</span><span class="st">"parallelly.makeNodePSOCK.rscript_call"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>  rscript_sh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"cmd"</span>, <span class="st">"sh"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  default_packages <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"datasets"</span>, <span class="st">"utils"</span>, <span class="st">"grDevices"</span>, <span class="st">"graphics"</span>, <span class="st">"stats"</span>, <span class="kw">if</span></span>
 <span>    <span class="op">(</span><span class="va">methods</span><span class="op">)</span> <span class="st">"methods"</span><span class="op">)</span>,</span>
@@ -285,6 +286,15 @@ or a list with a mix of these, that will be evaluated on the <span style="R">R</
 prior to launching the worker's event loop.
 For instance, use <code>rscript_startup = 'setwd("/path/to")'</code>
 to set the working directory to <code class="file">/path/to</code> on <em>all</em> workers.</p></dd>
+
+
+<dt id="arg-rscript-call">rscript_call<a class="anchor" aria-label="anchor" href="#arg-rscript-call"></a></dt>
+<dd><p>An <span style="R">R</span> expression or a character string of <span style="R">R</span> code
+that is used to launch the worker event loop
+(default:
+<code>getOption("parallelly.makeNodePSOCK.rscript_call", NULL)</code>).
+If <code>NULL</code>, it defaults to
+<code>"workRSOCK&lt;-tryCatch( parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK );workRSOCK()"</code>.</p></dd>
 
 
 <dt id="arg-rscript-sh">rscript_sh<a class="anchor" aria-label="anchor" href="#arg-rscript-sh"></a></dt>
