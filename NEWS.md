@@ -6,6 +6,10 @@
    `rscript_call` to customize the parallel worker loop, which
    defaults to `parallel:::.workRSOCK()`.
 
+ * Add internal worker loop `parallelly:::workRPSOCK()` that takes
+   optional argument `workCommand` to customize the default
+   `parallel:::workCommand()`.
+
 ## Bug Fixes
 
  * `availableCores(methods = "cgroups2.cpuset.cpus")` would produce
