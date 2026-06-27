@@ -227,4 +227,25 @@ options <- makeNodePSOCK(action = "options", port = 12345L, renice = 19L)
 stopifnot(inherits(options, "makeNodePSOCKOptions"))
 
 
+## Test with rscript_call
+message("- rscript_call ...")
+options <- makeNodePSOCK(action = "options", port = 12345L, rscript_call = "message('hello')")
+stopifnot(inherits(options, "makeNodePSOCKOptions"))
+stopifnot(grepl("message\\([\"']hello[\"']\\)", options$cmd))
+
+options <- makeNodePSOCK(action = "options", port = 12345L, rscript_call = quote(message('hello')))
+stopifnot(inherits(options, "makeNodePSOCKOptions"))
+stopifnot(grepl("message\\([\"']hello[\"']\\)", options$cmd))
+
+options <- tryCatch(makeNodePSOCK(action = "options", port = 12345L, rscript_call = "foo{"), error = identity)
+stopifnot(inherits(options, "error"))
+
+# Test R option customization
+options(parallelly.makeNodePSOCK.rscript_call = "message('opt_hello')")
+options <- makeNodePSOCK(action = "options", port = 12345L)
+stopifnot(inherits(options, "makeNodePSOCKOptions"))
+stopifnot(grepl("message\\([\"']opt_hello[\"']\\)", options$cmd))
+options(parallelly.makeNodePSOCK.rscript_call = NULL)
+
+
 message("*** makeNodePSOCK() ... DONE")

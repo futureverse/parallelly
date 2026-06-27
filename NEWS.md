@@ -1,5 +1,11 @@
 # Version (development version)
 
+## New Features
+
+ * `makeClusterPSOCK()` and `makeNodePSOCK()` gained argument
+   `rscript_call` to customize the parallel worker loop, which
+   defaults to `parallel:::.workRSOCK()`.
+
 ## Bug Fixes
 
  * `availableCores(methods = "cgroups2.cpuset.cpus")` would produce

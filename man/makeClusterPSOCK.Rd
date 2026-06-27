@@ -32,6 +32,7 @@ makeNodePSOCK(
   rscript_envs = NULL,
   rscript_libs = NULL,
   rscript_startup = NULL,
+  rscript_call = getOption2("parallelly.makeNodePSOCK.rscript_call", NULL),
   rscript_sh = c("auto", "cmd", "sh", "none"),
   default_packages = c("datasets", "utils", "grDevices", "graphics", "stats", if
     (methods) "methods"),
@@ -147,6 +148,13 @@ or a list with a mix of these, that will be evaluated on the \R worker
 prior to launching the worker's event loop.
 For instance, use \code{rscript_startup = 'setwd("/path/to")'}
 to set the working directory to \file{/path/to} on \emph{all} workers.}
+
+\item{rscript_call}{An \R expression or a character string of \R code
+that is used to launch the worker event loop
+(default:
+\code{getOption("parallelly.makeNodePSOCK.rscript_call", NULL)}).
+If \code{NULL}, it defaults to
+\code{"workRSOCK<-tryCatch( parallel:::.workRSOCK, error=function(e) parallel:::.slaveRSOCK );workRSOCK()"}.}
 
 \item{rscript_sh}{The type of shell used where \code{rscript} is launched,
 which should be \code{"sh"} is launched via a POSIX shell and \code{"cmd"} if

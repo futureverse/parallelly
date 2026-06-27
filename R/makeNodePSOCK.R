@@ -50,6 +50,16 @@
 #' For instance, use `rscript_startup = 'setwd("/path/to")'`
 #' to set the working directory to \file{/path/to} on _all_ workers.
 #' 
+#' @param rscript_call An \R expression or a character string of \R code
+#' that is used to launch the worker event loop
+#' (default:
+#' `getOption("parallelly.makeNodePSOCK.rscript_call", NULL)`).
+#' If `NULL`, it defaults to
+#' `"workRSOCK<-tryCatch(
+#'    parallel:::.workRSOCK,
+#'    error=function(e) parallel:::.slaveRSOCK
+#' );workRSOCK()"`.
+#' 
 #' @param rscript_sh The type of shell used where `rscript` is launched,
 #' which should be `"sh"` is launched via a POSIX shell and `"cmd"` if 
 #' launched via an MS Windows shell.  This controls how shell command-line
@@ -381,7 +391,7 @@
 #' @importFrom tools pskill
 #' @importFrom utils flush.console
 #' @export
-makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "localhost"), master = NULL, port, connectTimeout = getOption2("parallelly.makeNodePSOCK.connectTimeout", 2 * 60), timeout = getOption2("parallelly.makeNodePSOCK.timeout", 30 * 24 * 60 * 60), rscript = NULL, homogeneous = NULL, rscript_args = NULL, rscript_envs = NULL, rscript_libs = NULL, rscript_startup = NULL, rscript_sh = c("auto", "cmd", "sh", "none"), default_packages = c("datasets", "utils", "grDevices", "graphics", "stats", if (methods) "methods"), methods = TRUE, socketOptions = getOption2("parallelly.makeNodePSOCK.socketOptions", "no-delay"), useXDR = getOption2("parallelly.makeNodePSOCK.useXDR", FALSE), outfile = "/dev/null", renice = NA_integer_, rshcmd = getOption2("parallelly.makeNodePSOCK.rshcmd", NULL), user = NULL, revtunnel = NA, rshlogfile = NULL, rshopts = getOption2("parallelly.makeNodePSOCK.rshopts", NULL), rank = 1L, manual = FALSE, dryrun = FALSE, quiet = FALSE, setup_strategy = getOption2("parallelly.makeNodePSOCK.setup_strategy", "parallel"), calls = getOption2("parallelly.makeNodePSOCK.calls", FALSE), action = c("launch", "options"), verbose = FALSE) {
+makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "localhost"), master = NULL, port, connectTimeout = getOption2("parallelly.makeNodePSOCK.connectTimeout", 2 * 60), timeout = getOption2("parallelly.makeNodePSOCK.timeout", 30 * 24 * 60 * 60), rscript = NULL, homogeneous = NULL, rscript_args = NULL, rscript_envs = NULL, rscript_libs = NULL, rscript_startup = NULL, rscript_call = getOption2("parallelly.makeNodePSOCK.rscript_call", NULL), rscript_sh = c("auto", "cmd", "sh", "none"), default_packages = c("datasets", "utils", "grDevices", "graphics", "stats", if (methods) "methods"), methods = TRUE, socketOptions = getOption2("parallelly.makeNodePSOCK.socketOptions", "no-delay"), useXDR = getOption2("parallelly.makeNodePSOCK.useXDR", FALSE), outfile = "/dev/null", renice = NA_integer_, rshcmd = getOption2("parallelly.makeNodePSOCK.rshcmd", NULL), user = NULL, revtunnel = NA, rshlogfile = NULL, rshopts = getOption2("parallelly.makeNodePSOCK.rshopts", NULL), rank = 1L, manual = FALSE, dryrun = FALSE, quiet = FALSE, setup_strategy = getOption2("parallelly.makeNodePSOCK.setup_strategy", "parallel"), calls = getOption2("parallelly.makeNodePSOCK.calls", FALSE), action = c("launch", "options"), verbose = FALSE) {
   verbose <- as.logical(verbose)
   stop_if_not(length(verbose) == 1L, !is.na(verbose))
   verbose_prefix <- "[local output] "
@@ -406,6 +416,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
     rscript_envs = rscript_envs,
     rscript_libs = rscript_libs,
     rscript_startup = rscript_startup,
+    rscript_call = rscript_call,
     rscript_sh = rscript_sh,
     default_packages = default_packages,
     methods = methods,
@@ -679,6 +690,23 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
     rscript_startup <- unlist(rscript_startup, use.names = FALSE)
   }
 
+  if (is.null(rscript_call)) {
+    rscript_call <- "workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"
+  }
+
+  if (is.language(rscript_call)) {
+    rscript_call <- deparse(rscript_call, width.cutoff = 500L)
+    ## We cannot use newline between statements because
+    ## it needs to be passed as a one line string via -e <code>
+    rscript_call <- paste(rscript_call, collapse = ";")
+  }
+  rscript_call <- as.character(rscript_call)
+  tryCatch({
+    parse(text = rscript_call)
+  }, error = function(ex) {
+    stopf("Syntax error in argument 'rscript_call': %s", conditionMessage(ex))
+  })
+
   if (!is.null(rscript_libs)) {
     rscript_libs <- as.character(rscript_libs)
     stop_if_not(!anyNA(rscript_libs))
@@ -874,9 +902,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
 
   ## .{slave,work}RSOCK() command already specified?
   if (!any(grepl("parallel:::[.](slave|work)RSOCK[(][)]", rscript_args))) {
-    ## In R (>= 4.1.0), parallel:::.slaveRSOCK() was renamed to .workRSOCK()
-    cmd <- "workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"
-    rscript_args_internal <- c(rscript_args_internal, "-e", shQuote(cmd, type = rscript_sh[1]))
+    rscript_args_internal <- c(rscript_args_internal, "-e", shQuote(rscript_call, type = rscript_sh[1]))
   }
 
   ## Append or inject rscript_args_internal?
@@ -975,6 +1001,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
     rscript_envs = rscript_envs,
     rscript_libs = rscript_libs,
     rscript_startup = rscript_startup,
+    rscript_call = rscript_call,
     rscript_sh = rscript_sh,
     default_packages = default_packages,
     methods = methods,

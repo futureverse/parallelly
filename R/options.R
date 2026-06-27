@@ -77,6 +77,8 @@
 #'
 #'  \item{`parallelly.makeNodePSOCK.socketOptions`:}{(character string) If set to another value than `"NULL"`, then option `socketOptions` is set to this value on the workers during startup. See [base::socketConnection()] for details. (defaults to `"no-delay"`)}
 #'
+#'  \item{`parallelly.makeNodePSOCK.rscript_call`:}{(character string or R expression) The R expression that is used to start the R worker event loop on the worker node. (defaults to `"workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"`) }
+#'
 #'  \item{`parallelly.makeNodePSOCK.rshcmd`:}{(character vector) The command to be run on the master to launch a process on another host.}
 #'
 #'  \item{`parallelly.makeNodePSOCK.rshopts`:}{(character vector) Addition command-line options appended to `rshcmd`.  These arguments are only applied when connecting to non-localhost machines.}
@@ -193,6 +195,7 @@
 #' @aliases parallelly.makeNodePSOCK.socketOptions
 #' @aliases parallelly.makeNodePSOCK.rshcmd
 #' @aliases parallelly.makeNodePSOCK.rshopts
+#' @aliases parallelly.makeNodePSOCK.rscript_call
 #' @aliases parallelly.makeNodePSOCK.tries
 #' @aliases parallelly.makeNodePSOCK.tries.delay
 #' @aliases parallelly.makeNodePSOCK.calls
@@ -204,6 +207,7 @@
 #' @aliases R_PARALLELLY_MAKENODEPSOCK_SOCKETOPTIONS
 #' @aliases R_PARALLELLY_MAKENODEPSOCK_RSHCMD
 #' @aliases R_PARALLELLY_MAKENODEPSOCK_RSHOPTS
+#' @aliases R_PARALLELLY_MAKENODEPSOCK_RSCRIPT_CALL
 #' @aliases R_PARALLELLY_MAKENODEPSOCK_TRIES
 #' @aliases R_PARALLELLY_MAKENODEPSOCK_TRIES_DELAY
 #' @aliases R_PARALLELLY_MAKENODEPSOCK_CALLS
@@ -364,6 +368,7 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("makeNodePSOCK.rshopts", mode = "character", split = ",", debug = debug)
   update_package_option("makeNodePSOCK.tries", mode = "integer", debug = debug)
   update_package_option("makeNodePSOCK.tries.delay", mode = "numeric", debug = debug)
+  update_package_option("makeNodePSOCK.rscript_call", mode = "character", debug = debug)
   update_package_option("makeNodePSOCK.rscript_label", mode = "character", debug = debug)
   update_package_option("makeNodePSOCK.sessionInfo.pkgs", mode = "character", split = ",", debug = debug)
   update_package_option("makeNodePSOCK.autoKill", mode = "logical", debug = debug)

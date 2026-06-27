@@ -54,6 +54,7 @@
 \alias{parallelly.makeNodePSOCK.socketOptions}
 \alias{parallelly.makeNodePSOCK.rshcmd}
 \alias{parallelly.makeNodePSOCK.rshopts}
+\alias{parallelly.makeNodePSOCK.rscript_call}
 \alias{parallelly.makeNodePSOCK.tries}
 \alias{parallelly.makeNodePSOCK.tries.delay}
 \alias{parallelly.makeNodePSOCK.calls}
@@ -65,6 +66,7 @@
 \alias{R_PARALLELLY_MAKENODEPSOCK_SOCKETOPTIONS}
 \alias{R_PARALLELLY_MAKENODEPSOCK_RSHCMD}
 \alias{R_PARALLELLY_MAKENODEPSOCK_RSHOPTS}
+\alias{R_PARALLELLY_MAKENODEPSOCK_RSCRIPT_CALL}
 \alias{R_PARALLELLY_MAKENODEPSOCK_TRIES}
 \alias{R_PARALLELLY_MAKENODEPSOCK_TRIES_DELAY}
 \alias{R_PARALLELLY_MAKENODEPSOCK_CALLS}
@@ -148,6 +150,8 @@ The below \R options and environment variables control the default results of \c
 \item{\code{parallelly.makeNodePSOCK.useXDR}:}{(logical) If FALSE (default), the communication between master and workers, which is binary, will use small-endian (faster), otherwise big-endian ("XDR"; slower).}
 
 \item{\code{parallelly.makeNodePSOCK.socketOptions}:}{(character string) If set to another value than \code{"NULL"}, then option \code{socketOptions} is set to this value on the workers during startup. See \code{\link[base:socketConnection]{base::socketConnection()}} for details. (defaults to \code{"no-delay"})}
+
+\item{\code{parallelly.makeNodePSOCK.rscript_call}:}{(character string or R expression) The R expression that is used to start the R worker event loop on the worker node. (defaults to \code{"workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"}) }
 
 \item{\code{parallelly.makeNodePSOCK.rshcmd}:}{(character vector) The command to be run on the master to launch a process on another host.}
 
