@@ -235,9 +235,7 @@ stopifnot(grepl("message\\([\"']hello[\"']\\)", options$cmd))
 
 options <- makeNodePSOCK(action = "options", port = 12345L, rscript_call = quote(message('hello')))
 stopifnot(inherits(options, "makeNodePSOCKOptions"))
-cat(options$cmd)
-print(options$cmd)
-stopifnot(grepl("message\\([\"']hello[\"']\\)", options$cmd))
+stopifnot(grepl("message\\([\\\"']+hello[\\\"']+\\)", options$cmd))
 
 options <- tryCatch(makeNodePSOCK(action = "options", port = 12345L, rscript_call = "foo{"), error = identity)
 stopifnot(inherits(options, "error"))
