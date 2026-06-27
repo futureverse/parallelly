@@ -231,6 +231,7 @@ stopifnot(inherits(options, "makeNodePSOCKOptions"))
 message("- rscript_call ...")
 options <- makeNodePSOCK(action = "options", port = 12345L, rscript_call = "message('hello')")
 stopifnot(inherits(options, "makeNodePSOCKOptions"))
+print(options$cmd)
 stopifnot(grepl("message\\([\"']hello[\"']\\)", options$cmd))
 
 options <- makeNodePSOCK(action = "options", port = 12345L, rscript_call = quote(message('hello')))
