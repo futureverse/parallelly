@@ -28,7 +28,7 @@ An object of class `class(x)`.
 # \donttest{
 cl <- makeClusterPSOCK(2)
 print(cl)
-#> Socket cluster with 2 nodes on host ‘localhost’ (R version 4.5.3 (2026-03-11), platform x86_64-pc-linux-gnu)
+#> Socket cluster with 2 nodes on host ‘localhost’ (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)
 
 ## Terminate the second cluster node
 parallel::stopCluster(cl[2])
@@ -38,12 +38,12 @@ Sys.sleep(1.0)
 print(isNodeAlive(cl))
 #> [1]  TRUE FALSE
 print(cl)
-#> Socket cluster with 2 nodes on host ‘localhost’ (R version 4.5.3 (2026-03-11), platform x86_64-pc-linux-gnu). 1 node (#2) has a broken connection (ERROR: invalid connection; non-existing connection #6)
+#> Socket cluster with 2 nodes on host ‘localhost’ (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu). 1 node (#2) has a broken connection (ERROR: invalid connection; non-existing connection #6)
 
 ## "Restart" it
 cl[2] <- cloneNode(cl[2])
 print(cl)
-#> Socket cluster with 2 nodes on host ‘localhost’ (R version 4.5.3 (2026-03-11), platform x86_64-pc-linux-gnu)
+#> Socket cluster with 2 nodes on host ‘localhost’ (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)
 
 ## Check all nodes
 print(isNodeAlive(cl))

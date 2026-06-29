@@ -1,6 +1,6 @@
 # Changelog
 
-## Version (development version)
+## Version 1.48.0
 
 ### New Features
 
