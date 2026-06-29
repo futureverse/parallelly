@@ -619,7 +619,7 @@ Found the following files/directories:
 
 Those \verb{Rscript<hexcode>} files are from background R worker processes,
 which almost always are parallel \code{cluster}:s that we forgot to stop
-at the end.  To stop all \code{cluster} workers, use \code{\link[parallel:stopCluster]{parallel::stopCluster()}}
+at the end.  To stop all \code{cluster} workers, use \code{\link[parallel:makeCluster]{parallel::stopCluster()}}
 at the end of your examples(*), vignettes, and package tests for every
 \code{cluster} object that is created.
 

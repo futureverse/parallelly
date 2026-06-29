@@ -1,4 +1,4 @@
-The **parallelly** package provides functions that enhance the **parallel** packages.  For example, `availableCores()` gives the number of CPU cores available to your R process as given by R options and environment variables, including those set by job schedulers on high-performance compute (HPC) clusters.  If R runs under 'cgroups' or in a Linux container, then their settings are acknowledged too.  If nothing else is set, then it will fall back to `parallel::detectCores()`.  Another example is `makeClusterPSOCK()`, which is backward compatible with `parallel::makePSOCKcluster()` while doing a better job in setting up remote cluster workers without having to know your local public IP address and configuring the firewall to do port-forwarding to your local computer.  The functions and features added to this package are written to be backward compatible with the **parallel** package, such that they may be incorporated there later.  The **parallelly** package comes with an open invitation for the R Core Team to adopt all or parts of its code into the **parallel** package.
+The **parallelly** package provides functions that enhance the **parallel** packages.  For example, `availableCores()` gives the number of CPU cores available to your R process as given by R options and environment variables, including those set by job schedulers on high-performance compute (HPC) clusters.  If R runs under CGroups or in a Linux container, then their settings are acknowledged too.  If nothing else is set, then it will fall back to `parallel::detectCores()`.  Another example is `parallel::makeCluster(2, type = "RPSOCK")`, which is backward compatible with `parallel::makeCluster()` while doing a better job in setting up remote cluster workers without having to know your local public IP address and configuring the firewall to do port-forwarding to your local computer.  The functions and features added to this package are written to be backward compatible with the **parallel** package, such that they may be incorporated there later.  The **parallelly** package comes with an open invitation for the R Core Team to adopt all or parts of its code into the **parallel** package.
 
 
 ## Feature Comparison 'parallelly' vs 'parallel' 
@@ -25,14 +25,14 @@ The **parallelly** package provides functions that enhance the **parallel** pack
 | check if local and remote workers are alive          |   ✓  | N/A |
 | restart local and remote workers                     |   ✓  | N/A |
 | defaults via options & environment variables         |   ✓  | N/A |
-| respecting CPU resources allocated by cgroups, Linux containers, and HPC schedulers |   ✓  | N/A |
+| respecting CPU resources allocated by CGroups, Linux containers, and HPC schedulers |   ✓  | N/A |
 | early error if requesting more workers than possible |   ✓  | N/A |
 | informative error messages                           |   ✓  | N/A |
 
 
 ## Compatibility with the parallel package
 
-Any cluster created by the **parallelly** package is fully compatible with the clusters created by the **parallel** package and can be used by all of **parallel**'s functions for cluster processing, e.g. `parallel::clusterEvalQ()` and `parallel::parLapply()`.  The `parallelly::makeClusterPSOCK()` function can be used as a stand-in replacement of the `parallel::makePSOCKcluster()`, or equivalently, `parallel::makeCluster(..., type = "PSOCK")`.
+Any cluster created by the **parallelly** package is fully compatible with the clusters created by the **parallel** package and can be used by all of **parallel**'s functions for cluster processing, e.g. `parallel::clusterEvalQ()` and `parallel::parLapply()`. The `parallel::makeCluster(..., type = "RPSOCK")` is a more powerful and stand-in replacement of the default `parallel::makeCluster(..., type = "PSOCK")`.
 
 Most of **parallelly** functions apply also to clusters created by the **parallel** package.  For example,
 
@@ -44,6 +44,16 @@ cl <- parallelly::autoStopCluster(cl)
 makes the cluster created by **parallel** to shut down automatically when R's garbage collector removes the cluster object.  This lowers the risk for leaving stray R worker processes running in the background by mistake.  Another way to achieve the above in a single call is to use:
 
 ```r
+cl <- parallel::makeCluster(2, type = "RPSOCK", autoStop = TRUE)
+```
+
+For older versions of R, use:
+
+```r
+# R (>= 4.5 && <= 4.6):
+cl <- parallel::makeCluster(2, type = parallelly::RPSOCK, autoStop = TRUE)
+
+# R (< 4.5):
 cl <- parallelly::makeClusterPSOCK(2, autoStop = TRUE)
 ```
 
@@ -57,7 +67,7 @@ Did you know that `parallel::detectCores()` might return NA on some systems, or 
 Just like other software tools that "hijacks" all cores by default, R scripts, and packages that default to `detectCores()` number of parallel workers cause lots of suffering for fellow end-users and system administrators.  For instance, a shared server with 48 cores will come to a halt already after a few users run parallel processing using `detectCores()` number of parallel workers.  This problem gets worse on machines with many cores because they can host even more concurrent users.  If the code would use `availableCores()` instead, then system administrators can limit the number of cores that each process gets to, say, two (2), by setting the environment variable `R_PARALLELLY_AVAILABLECORES_FALLBACK=2`.
 In contrast, it is _not_ possible to override what `parallel::detectCores()` returns, cf. [PR#17641 - WISH: Make parallel::detectCores() agile to new env var R_DEFAULT_CORES ](https://bugs.r-project.org/show_bug.cgi?id=17641).
 
-Similarly, `availableCores()` is also agile to CPU limitations set by Unix control groups (cgroups), which is often used by Linux containers (e.g. Docker, Apptainer / Singularity, and Podman) and Kubernetes (K8s) environments.  For example, `docker run --cpuset-cpus=0-2,8 ...` sets the CPU affinity so that the processes can only run on CPUs 0, 1, 2, and 8 on the host system.  In this case `availableCores()` detects this and returns four (4).  Another example is `docker run --cpu=3.4 ...`, which throttles the CPU quota to on average 3.4 CPUs on the host system.  In this case `availableCores()` detects this and returns three (3), because it rounds to the nearest integer.  In contrast, `parallel::detectCores()` completely ignores such cgroups settings and returns the number of CPUs on the host system, which results in CPU overuse and degraded performance.  Continuous Integration (CI) services (e.g. GitHub Actions, Travis CI, and AppVeyor CI) and cloud services (e.g. Posit Cloud) use these types of cgroups settings under the hood, which means `availableCores()` respects their CPU allocations.
+Similarly, `availableCores()` is also agile to CPU limitations set by Unix control groups (CGroups), which is often used by Linux containers (e.g. Docker, Apptainer / Singularity, and Podman) and Kubernetes (K8s) environments.  For example, `docker run --cpuset-cpus=0-2,8 ...` sets the CPU affinity so that the processes can only run on CPUs 0, 1, 2, and 8 on the host system.  In this case `availableCores()` detects this and returns four (4).  Another example is `docker run --cpu=3.4 ...`, which throttles the CPU quota to on average 3.4 CPUs on the host system.  In this case `availableCores()` detects this and returns three (3), because it rounds to the nearest integer.  In contrast, `parallel::detectCores()` completely ignores such CGroups settings and returns the number of CPUs on the host system, which results in CPU overuse and degraded performance.  Continuous Integration (CI) services (e.g. GitHub Actions, Travis CI, and AppVeyor CI) and cloud services (e.g. Posit Cloud) use these types of CGroups settings under the hood, which means `availableCores()` respects their CPU allocations.
 
 If running on an HPC cluster with a job scheduler, a script that uses `availableCores()` will run the number of parallel workers that the job scheduler has assigned to the job.  For example, if we submit a Slurm job as `sbatch --cpus-per-task=16 ...`, then `availableCores()` returns 16, because it respects the `SLURM_*` environment variables set by the scheduler.  On Son of Grid Engine (SGE), the scheduler sets `NSLOTS` when submitting using `qsub -pe smp 8 ...` and `availableCores()` returns eight (8).  See `help("availableCores", package = "parallelly")` for currently supported job schedulers, which includes 'Fujitsu Technical Computing Suite', 'Load Sharing Facility' (LSF), Simple Linux Utility for Resource Management (Slurm), Sun Grid Engine/Oracle Grid Engine/Son of Grid Engine/Univa Grid Engine/Altair Grid Engine (AGE, SGE, UGE), and TORQUE/PBS.
 
@@ -72,7 +82,7 @@ The below table summarizes the benefits:
 | Guaranteed to return a positive integer |        ✓        | no (may return `NA_integer_`) |
 | Safely use all but some cores           |        ✓        | no (may return zero or less)  |
 | Can be overridden, e.g. by a sysadm     |        ✓        |              no               |
-| Respects cgroups and Linux containers   |        ✓        |              no               |
+| Respects CGroups and Linux containers   |        ✓        |              no               |
 | Respects job scheduler allocations      |        ✓        |              no               |
 | Respects CRAN policies                  |        ✓        |              no               |
 | Respects Bioconductor policies          |        ✓        |              no               |

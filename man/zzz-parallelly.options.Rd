@@ -157,7 +157,7 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.makeNodePSOCK.useXDR}:}{(logical) If FALSE (default), the communication between master and workers, which is binary, will use small-endian (faster), otherwise big-endian ("XDR"; slower).}
 
-\item{\code{parallelly.makeNodePSOCK.socketOptions}:}{(character string) If set to another value than \code{"NULL"}, then option \code{socketOptions} is set to this value on the workers during startup. See \code{\link[base:socketConnection]{base::socketConnection()}} for details. (defaults to \code{"no-delay"})}
+\item{\code{parallelly.makeNodePSOCK.socketOptions}:}{(character string) If set to another value than \code{"NULL"}, then option \code{socketOptions} is set to this value on the workers during startup. See \code{\link[base:connections]{base::socketConnection()}} for details. (defaults to \code{"no-delay"})}
 
 \item{\code{parallelly.makeNodePSOCK.rscript_call}:}{(character string or R expression) The R expression that is used to start the R worker event loop on the worker node. (defaults to \code{"workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"}) }
 

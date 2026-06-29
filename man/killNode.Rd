@@ -47,7 +47,7 @@ Terminate one or more cluster nodes using process signaling
 }
 \details{
 Note that the preferred way to terminate a cluster is via
-\code{\link[parallel:stopCluster]{parallel::stopCluster()}}, because it terminates the cluster nodes
+\code{\link[parallel:makeCluster]{parallel::stopCluster()}}, because it terminates the cluster nodes
 by kindly asking each of them to nicely shut themselves down.
 Using \code{killNode()} is a much more severe approach. It abruptly
 terminates the underlying R process, possibly without giving the
