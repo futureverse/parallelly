@@ -9,6 +9,11 @@
  * Add internal worker loop `parallelly:::workRPSOCK()` that takes
    optional argument `workCommand` to customize the default
    `parallel:::workCommand()`.
+   
+ * Analogusly to `availableCores()`, `availableWorkers()` queries also
+   Linux CGroups v2 CPU affinity values `cpuset.cpus` and
+   `cpuset.cpus.effective`.
+   
 
 ## Bug Fixes
 
