@@ -1,51 +1,90 @@
-# ctsem (3.10.6)
+# caretSDM (1.8.3)
 
-* GitHub: <https://github.com/cdriveraus/ctsem>
-* Email: <mailto:charles.driver2@uzh.ch>
-* GitHub mirror: <https://github.com/cran/ctsem>
+* GitHub: <https://github.com/luizesser/caretSDM>
+* Email: <mailto:luizesser@gmail.com>
+* GitHub mirror: <https://github.com/cran/caretSDM>
 
-Run `revdepcheck::revdep_details(, "ctsem")` for more info
+Run `revdepcheck::revdep_details(, "caretSDM")` for more info
 
 ## In both
 
-*   checking whether package ‘ctsem’ can be installed ... WARNING
-     ```
-     Found the following significant warnings:
-       Warning: namespace ‘colorspace’ is not available and has been replaced
-     See ‘/scratch/henrik/revdep/parallelly/checks/ctsem/new/ctsem.Rcheck/00install.out’ for details.
-     ```
-
-*   checking re-building of vignette outputs ... WARNING
+*   checking examples ... ERROR
      ```
      ...
-       ...
-     --- re-building ‘hierarchicalmanual.rnw’ using knitr_notangle
-     Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
-       texi2dvi script/program not available, using emulation
-     Error: processing vignette 'hierarchicalmanual.rnw' failed with diagnostics:
-     unable to run pdflatex on 'hierarchicalmanual.tex'
-     LaTeX errors:
-     ! LaTeX Error: File `apacite.sty' not found.
-     
-     Type X to quit or <RETURN> to proceed,
-     or enter new name. (Default extension: sty)
-     
-     ! Emergency stop.
-     <read *> 
-              
-     l.62 \bibliographystyle
-                            {apacite}     % Set bibliography style^^M
-     !  ==> Fatal error occurred, no output PDF file produced!
-     --- failed re-building ‘hierarchicalmanual.rnw’
-     
-     SUMMARY: processing the following file failed:
-       ‘hierarchicalmanual.rnw’
-     
-     Error: Vignette re-building failed.
+     Warning in CPL_write_gdal(mat, file, driver, options, type, dims, from,  :
+       GDAL Error 1: PROJ: proj_as_wkt: DatumEnsemble can only be exported to WKT2:2019
+     Warning in CPL_write_gdal(mat, file, driver, options, type, dims, from,  :
+       GDAL Error 1: PROJ: proj_as_wkt: DatumEnsemble can only be exported to WKT2:2019
+     Warning in CPL_gdalwarp(source, destination, options, oo, doo, config_options,  :
+       GDAL Error 1: Cannot compute bounding box of cutline. Cannot find source SRS
+     Error in `value[[3L]]()`:
+     ✖ GDAL warp failed.
+     In index: 1.
+     Backtrace:
+          ▆
+       1. ├─caretSDM::add_predictors(sa, bioc)
+       2. └─caretSDM:::add_predictors.stars(sa, bioc) at caretSDM/R/add_predictors.R:83:3
+       3.   └─caretSDM:::.add_predictors(...) at caretSDM/R/add_predictors.R:109:3
+       4.     ├─caretSDM::sdm_area(...) at caretSDM/R/add_predictors.R:123:3
+       5.     └─caretSDM:::sdm_area.stars(...) at caretSDM/R/sdm_area.R:126:3
+       6.       ├─dplyr::select(...) at caretSDM/R/sdm_area.R:288:5
+       7.       └─caretSDM:::.sdm_area_from_stars_using_gdal(...) at caretSDM/R/sdm_area.R:288:5
+       8.         └─base::tryCatch(...) at caretSDM/R/sdm_area.R:530:3
+       9.           └─base (local) tryCatchList(expr, classes, parentenv, handlers)
+      10.             └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
+      11.               └─value[[3L]](cond)
+      12.                 └─cli::cli_abort(c(x = "GDAL warp failed.", i = e$message)) at caretSDM/R/sdm_area.R:579:7
+      13.                   └─rlang::abort(...)
      Execution halted
      ```
 
-# decoupleR (2.16.0)
+*   checking tests ...
+     ```
+     ...
+         9.             └─cli::cli_abort(c(x = "GDAL warp failed.", i = e$message)) at caretSDM/R/sdm_area.R:579:7
+        10.               └─rlang::abort(...)
+       ── Error ('test-train_sdm.R:4:3'): (code run outside of `test_that()`) ─────────
+       Error in `value[[3L]](cond)`: x GDAL warp failed.
+       In index: 1.
+       Backtrace:
+            ▆
+         1. ├─caretSDM::add_predictors(sa, bioc) at test-train_sdm.R:4:3
+         2. └─caretSDM:::add_predictors.stars(sa, bioc) at caretSDM/R/add_predictors.R:83:3
+         3.   └─caretSDM:::.add_predictors(...) at caretSDM/R/add_predictors.R:109:3
+         4.     ├─caretSDM::sdm_area(...) at caretSDM/R/add_predictors.R:123:3
+         5.     └─caretSDM:::sdm_area.stars(...) at caretSDM/R/sdm_area.R:126:3
+         6.       ├─dplyr::select(...) at caretSDM/R/sdm_area.R:288:5
+         7.       └─caretSDM:::.sdm_area_from_stars_using_gdal(...) at caretSDM/R/sdm_area.R:288:5
+         8.         └─base::tryCatch(...) at caretSDM/R/sdm_area.R:530:3
+         9.           └─base (local) tryCatchList(expr, classes, parentenv, handlers)
+        10.             └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
+        11.               └─value[[3L]](cond)
+        12.                 └─cli::cli_abort(c(x = "GDAL warp failed.", i = e$message)) at caretSDM/R/sdm_area.R:579:7
+        13.                   └─rlang::abort(...)
+       
+       [ FAIL 18 | WARN 68 | SKIP 74 | PASS 305 ]
+       Error:
+       ! Test failures.
+       Execution halted
+     ```
+
+# COTAN (2.12.1)
+
+* GitHub: <https://github.com/seriph78/COTAN>
+* Email: <mailto:silvia.galfre@di.unipi.it>
+
+Run `revdepcheck::revdep_details(, "COTAN")` for more info
+
+## In both
+
+*   checking dependencies in R code ... NOTE
+     ```
+     Namespaces in Imports field not imported from:
+       ‘BiocStyle’ ‘GEOquery’ ‘R.utils’ ‘conflicted’
+       All declared Imports should be used.
+     ```
+
+# decoupleR (2.17.0)
 
 * GitHub: <https://github.com/saezlab/decoupleR>
 * Email: <mailto:pau.badia@uni-heidelberg.de>
@@ -70,7 +109,7 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
      > ### ** Examples
      > 
      > collectri <- get_collectri(organism='human', split_complexes=FALSE)
-     [2026-04-16 10:46:29] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+     [2026-06-29 02:50:15] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
      Error in if (.keep) . else select(., -!!evs_col) : 
        argument is of length zero
      Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
@@ -80,28 +119,28 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
 *   checking tests ...
      ```
      ...
-        11. │ └─... %>% ...
-        12. ├─dplyr::filter(., if_any(EVIDENCES_KEYS, ~not(map_lgl(.x, is.null))))
-        13. ├─OmnipathR::from_evidences(., .keep = .keep)
-        14. │ └─OmnipathR:::must_have_evidences(data, wide_ok = TRUE)
-        15. │   └─OmnipathR:::has_evidences(data, wide_ok = wide_ok)
-        16. │     └─data %>% has_column("evidences") %>% ...
-        17. ├─OmnipathR:::has_column(., "evidences")
-        18. │ ├─col %in% colnames(data)
-        19. │ └─base::colnames(data)
-        20. │   └─base::is.data.frame(x)
-        21. ├─OmnipathR::filter_evidences(...)
-        22. │ └─expr(...) %>% eval_select(data) %>% names %>% ...
-        23. ├─OmnipathR:::if_null_len0(...)
-        24. │ └─value1 %>% is_empty_2 %>% if (value2) value1
-        25. ├─OmnipathR:::is_empty_2(.)
-        26. │ └─value %>% ...
-        27. ├─tidyselect::eval_select(., data)
-        28. │ └─tidyselect::tidyselect_data_has_predicates(data)
-        29. └─OmnipathR::unnest_evidences(., .keep = .keep)
-        30.   └─... %>% ...
+       + expected[8, ]   0.076411558
+       - actual[9, ]     1.000000000
+       + expected[9, ]   0.976649086
+       - actual[10, ]    1.000000000
+       + expected[10, ]  0.976649086
+       and 134 more ...
        
-       [ FAIL 5 | WARN 7 | SKIP 0 | PASS 29 ]
+            actual$p_value | expected$p_value                 
+        [1] 0.105          - 0.075            [1]             
+        [2] 0.105          - 0.075            [2]             
+        [3] 0.519          - 0.548            [3]             
+        [4] 0.519          - 0.548            [4]             
+        [5] 0.010          | 0.010            [5]             
+        [6] 0.010          | 0.010            [6]             
+        [7] 0.087          - 0.076            [7]             
+        [8] 0.087          - 0.076            [8]             
+        [9] 1.000          - 0.977            [9]             
+       [10] 1.000          - 0.977            [10]            
+        ... ...              ...              and 134 more ...
+       
+       
+       [ FAIL 7 | WARN 7 | SKIP 0 | PASS 27 ]
        Error:
        ! Test failures.
        Execution halted
@@ -145,47 +184,86 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
      See section 'Cross-references' in the 'Writing R Extensions' manual.
      ```
 
-# fmeffects (0.1.4)
+*   checking for non-standard things in the check directory ... NOTE
+     ```
+     Found the following files/directories:
+       ‘omnipathr-log’
+     ```
 
-* GitHub: <https://github.com/holgstr/fmeffects>
-* Email: <mailto:hbj.loewe@gmail.com>
-* GitHub mirror: <https://github.com/cran/fmeffects>
+# future.batchtools (0.22.0)
 
-Run `revdepcheck::revdep_details(, "fmeffects")` for more info
+* GitHub: <https://github.com/futureverse/future.batchtools>
+* Email: <mailto:henrikb@braju.com>
+* GitHub mirror: <https://github.com/cran/future.batchtools>
+
+Run `revdepcheck::revdep_details(, "future.batchtools")` for more info
 
 ## In both
 
-*   checking re-building of vignette outputs ... ERROR
+*   checking for non-standard things in the check directory ... NOTE
      ```
-     ...
-          ▆
-       1. └─fmeffects::fme(...)
-       2.   └─ForwardMarginalEffect$new(makePredictor(model, data), features = features, ...
-       3.     └─private$fme(...)
-       4.       └─furrr::future_map_dbl(...)
-       5.         └─furrr:::furrr_map_template(...)
-       6.           └─furrr:::furrr_template(...)
-       7.             └─furrr:::furrr_try_catch(...)
-       8.               └─base::tryCatch(expr = expr, purrr_error_indexed = rethrow_purrr_error_indexed)
-       9.                 └─base (local) tryCatchList(expr, classes, parentenv, handlers)
-      10.                   └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-      11.                     └─value[[3L]](cond)
-      12.                       └─rlang::cnd_signal(cnd)
-      13.                         └─rlang:::signal_abort(cnd)
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Error: processing vignette 'fmeffects.Rmd' failed with diagnostics:
-     Assertion on 'names(rhs)' failed: Names must be a permutation of set {'feature','target','name','order','stratum','group','offset','weights_learner','weights_measure'}, but has extra elements {'always_included'}.
-     --- failed re-building ‘fmeffects.Rmd’
-     
-     SUMMARY: processing the following file failed:
-       ‘fmeffects.Rmd’
-     
-     Error: Vignette re-building failed.
-     Execution halted
+     Found the following files/directories:
+       ‘.future-set-during-startup’
      ```
 
-# InPAS (2.18.1)
+# gtfs2gps (2.1-4)
+
+* GitHub: <https://github.com/ipeaGIT/gtfs2gps>
+* Email: <mailto:pedro.andrade@inpe.br>
+* GitHub mirror: <https://github.com/cran/gtfs2gps>
+
+Run `revdepcheck::revdep_details(, "gtfs2gps")` for more info
+
+## In both
+
+*   checking tests ...
+     ```
+     ...
+       
+       > 
+       > test_check("gtfs2gps")
+       Saving _problems/test_simplify_shapes-7.R
+       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 119 ]
+       
+       ══ Failed tests ════════════════════════════════════════════════════════════════
+       ── Error ('test_simplify_shapes.R:7:5'): simplify_shapes ───────────────────────
+       Error: [] make_valid is not available for GEOS < 3.8
+       Backtrace:
+           ▆
+        1. └─gtfs2gps:::simplify_shapes(poa, 1e-05) at test_simplify_shapes.R:7:5
+        2.   ├─terra::simplifyGeom(x = gtfs_st_simpl, tolerance = tol) at gtfs2gps/R/simplify_shapes.R:20:3
+        3.   └─terra::simplifyGeom(x = gtfs_st_simpl, tolerance = tol)
+        4.     └─terra (local) .local(x, ...)
+        5.       ├─terra::makeValid(x)
+        6.       └─terra::makeValid(x)
+        7.         └─terra (local) .local(x, ...)
+        8.           └─terra:::messages(x)
+        9.             └─terra:::error(f, x@pntr$getError())
+       
+       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 119 ]
+       Error:
+       ! Test failures.
+       Execution halted
+     ```
+
+# IFAA (1.14.0)
+
+* GitHub: <https://github.com/quranwu/IFAA>
+* Email: <mailto:lzg2151@gmail.com>
+
+Run `revdepcheck::revdep_details(, "IFAA")` for more info
+
+## In both
+
+*   checking package dependencies ... ERROR
+     ```
+     Package required but not available: ‘HDCI’
+     
+     See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
+     manual.
+     ```
+
+# InPAS (2.20.0)
 
 * Email: <mailto:jou@morgridge.org>
 
@@ -221,29 +299,6 @@ Run `revdepcheck::revdep_details(, "InPAS")` for more info
      Extensions’ manual.
      ```
 
-# lidR (4.3.1)
-
-* GitHub: <https://github.com/r-lidar/lidR>
-* Email: <mailto:info@r-lidar.com>
-* GitHub mirror: <https://github.com/cran/lidR>
-
-Run `revdepcheck::revdep_details(, "lidR")` for more info
-
-## In both
-
-*   checking compiled code ... NOTE
-     ```
-     File ‘lidR/libs/lidR.so’:
-       Found non-API calls to R: ‘LEVELS’, ‘R_curErrorBuf’, ‘SETLENGTH’,
-         ‘SET_GROWABLE_BIT’, ‘SET_TRUELENGTH’, ‘TRUELENGTH’, ‘XTRUELENGTH’
-     
-     Compiled code should not call non-API entry points in R.
-     
-     See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual,
-     and section ‘Moving into C API compliance’ for issues with the use of
-     non-API entry points.
-     ```
-
 # mappp (1.0.0)
 
 * GitHub: <https://github.com/cole-brokamp/mappp>
@@ -276,46 +331,47 @@ Run `revdepcheck::revdep_details(, "NCC")` for more info
        All declared Imports should be used.
      ```
 
-# QDNAseq (1.46.0)
+# reproducible (3.1.1)
 
-* GitHub: <https://github.com/ccagc/QDNAseq>
-* Email: <mailto:d.sie@vumc.nl>
+* GitHub: <https://github.com/PredictiveEcology/reproducible>
+* Email: <mailto:eliot.mcintire@canada.ca>
+* GitHub mirror: <https://github.com/cran/reproducible>
 
-Run `revdepcheck::revdep_details(, "QDNAseq")` for more info
+Run `revdepcheck::revdep_details(, "reproducible")` for more info
 
 ## In both
 
-*   checking re-building of vignette outputs ... WARNING
+*   checking tests ...
      ```
      ...
-     Total time:0minutes
-     
-     Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
-       texi2dvi script/program not available, using emulation
-     Error: processing vignette 'QDNAseq.Rnw' failed with diagnostics:
-     unable to run pdflatex on 'QDNAseq.tex'
-     LaTeX errors:
-     ! LaTeX Error: File `nowidow.sty' not found.
-     
-     Type X to quit or <RETURN> to proceed,
-     or enter new name. (Default extension: sty)
-     
-     ! Emergency stop.
-     <read *> 
-              
-     l.197 \RequirePackage
-                          {parnotes}^^M
-     !  ==> Fatal error occurred, no output PDF file produced!
-     --- failed re-building ‘QDNAseq.Rnw’
-     
-     SUMMARY: processing the following file failed:
-       ‘QDNAseq.Rnw’
-     
-     Error: Vignette re-building failed.
-     Execution halted
+        2. └─sf:::st_make_valid.sfc(p1)
+       ── Failure ('test-postProcessTerra.R:85:3'): testing terra ─────────────────────
+       Expected `sum(is.na(t1[]) != is.na(y[])) == 0` to be TRUE.
+       Differences:
+       `actual`:   FALSE
+       `expected`: TRUE 
+       
+       ── Error ('test-postProcessTerra.R:132:3'): testing terra ──────────────────────
+       Error: [] make_valid is not available for GEOS < 3.8
+       Backtrace:
+           ▆
+        1. └─reproducible::postProcessTo(xVect, v) at test-postProcessTerra.R:132:3
+        2.   └─reproducible::projectTo(...) at reproducible/R/postProcessTo.R:296:7
+        3.     └─reproducible::fixErrorsIn(from) at reproducible/R/postProcessTo.R:798:9
+        4.       └─reproducible:::makeVal(x) at reproducible/R/postProcessTo.R:440:9
+        5.         ├─terra::makeValid(x) at reproducible/R/postProcessTo.R:455:5
+        6.         └─terra::makeValid(x)
+        7.           └─terra (local) .local(x, ...)
+        8.             └─terra:::messages(x)
+        9.               └─terra:::error(f, x@pntr$getError())
+       
+       [ FAIL 3 | WARN 0 | SKIP 104 | PASS 624 ]
+       Error:
+       ! Test failures.
+       Execution halted
      ```
 
-# scruff (1.28.0)
+# scruff (1.30.0)
 
 * GitHub: <https://github.com/campbio/scruff>
 * Email: <mailto:zhe@bu.edu>
@@ -349,11 +405,21 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
      ```
      .plotFracProteinCodingGenes: no visible binding for global variable
        'genes'
+       (/scratch/hb/revdep/parallelly/checks/scruff/new/scruff.Rcheck/00_pkg_src/scruff/R/qcplots.R:333-350)
      .plotGenes: no visible binding for global variable 'genes'
+       (/scratch/hb/revdep/parallelly/checks/scruff/new/scruff.Rcheck/00_pkg_src/scruff/R/qcplots.R:303-322)
      .plotGenesPerMillionReads: no visible binding for global variable
        'genes'
+       (/scratch/hb/revdep/parallelly/checks/scruff/new/scruff.Rcheck/00_pkg_src/scruff/R/qcplots.R:388-411)
      Undefined global functions or variables:
        genes
+     ```
+
+*   checking for non-standard things in the check directory ... NOTE
+     ```
+     Found the following files/directories:
+       ‘20260628_095522_10X_QC_sce.rda’
+       ‘20260628_095522__10x_bamqc_filtered.tsv’ ‘Demultiplex’
      ```
 
 # streetscape (1.0.5)
@@ -423,82 +489,5 @@ Run `revdepcheck::revdep_details(, "streetscape")` for more info
      
      It looks like this package (or a package it requires) has a startup
      message which cannot be suppressed: see ?packageStartupMessage.
-     ```
-
-# targets (1.12.0)
-
-* GitHub: <https://github.com/ropensci/targets>
-* Email: <mailto:will.landau.oss@gmail.com>
-* GitHub mirror: <https://github.com/cran/targets>
-
-Run `revdepcheck::revdep_details(, "targets")` for more info
-
-## In both
-
-*   checking examples ... ERROR
-     ```
-     Running examples in ‘targets-Ex.R’ failed
-     The error most likely occurred in:
-     
-     > ### Name: tar_renv
-     > ### Title: Set up package dependencies for compatibility with 'renv'
-     > ### Aliases: tar_renv
-     > 
-     > ### ** Examples
-     > 
-     > tar_dir({ # tar_dir() runs code from a temp dir for CRAN.
-     +   tar_script({
-     +     library(targets)
-     +     library(tarchetypes)
-     +     tar_option_set(packages = c("tibble", "qs"))
-     +     list()
-     +   }, ask = FALSE)
-     +   tar_renv()
-     +   writeLines(readLines("_targets_packages.R"))
-     + })
-     Error:
-     ! Error in tar_renv():
-       there is no package called ‘tarchetypes’
-       See https://books.ropensci.org/targets/debugging.html
-     Execution halted
-     ```
-
-# WeightedCluster (2.0)
-
-* Email: <mailto:matthias.studer@unige.ch>
-* GitHub mirror: <https://github.com/cran/WeightedCluster>
-
-Run `revdepcheck::revdep_details(, "WeightedCluster")` for more info
-
-## In both
-
-*   checking re-building of vignette outputs ... WARNING
-     ```
-     ...
-     
-     --- re-building ‘WeightedClusterPreview.Rnw’ using knitr
-     Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
-       texi2dvi script/program not available, using emulation
-     Error: processing vignette 'WeightedClusterPreview.Rnw' failed with diagnostics:
-     unable to run pdflatex on 'WeightedClusterPreview.tex'
-     LaTeX errors:
-     ! LaTeX Error: File `textpos.sty' not found.
-     
-     Type X to quit or <RETURN> to proceed,
-     or enter new name. (Default extension: sty)
-     
-     ! Emergency stop.
-     <read *> 
-              
-     l.85 \usepackage
-                     {tikz}^^M
-     !  ==> Fatal error occurred, no output PDF file produced!
-     --- failed re-building ‘WeightedClusterPreview.Rnw’
-     
-     SUMMARY: processing the following files failed:
-       ‘WeightedClusterFR.Rnw’ ‘WeightedClusterPreview.Rnw’
-     
-     Error: Vignette re-building failed.
-     Execution halted
      ```
 
