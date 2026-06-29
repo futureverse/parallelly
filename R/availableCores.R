@@ -298,6 +298,15 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
 
+  excludes <- getOption2("parallelly.availableCores.methods.excludes", NULL)
+  if (length(excludes) > 0) {
+    excludes <- as.character(excludes)
+    excludes <- unlist(strsplit(excludes, split = ",", fixed = TRUE))
+    excludes <- trim(excludes)
+    excludes <- excludes[nzchar(excludes)]
+    methods <- setdiff(methods, excludes)
+  }
+
   pattern_connections <- "^connections(|-[[:digit:]]+)$"
   idxs <- grep(pattern_connections, constraints)
   if (length(idxs) > 0) {

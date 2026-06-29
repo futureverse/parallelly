@@ -16,6 +16,8 @@
 #'
 #'  \item{`parallelly.availableCores.methods`:}{(character vector) Default lookup methods for [availableCores()]. (Default: `c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")`)}
 #'
+#'  \item{`parallelly.availableCores.methods.excludes`:}{(character vector) Default lookup methods for [availableCores()] to be excluded. (Default: `NULL`)}
+#'
 #'  \item{`parallelly.availableCores.custom`:}{(function) If set and a function, then this function will be called (without arguments) by [availableCores()] where its value, coerced to an integer, is interpreted as a number of cores.}
 #'
 #'  \item{`parallelly.availableCores.fallback`:}{(integer) The default number of cores to use when no core-specifying settings are detected other than `"system"` and `"nproc"`.  This options makes it possible to set the default number of cores returned by `availableCores()` / `availableWorkers()` yet allow users and schedulers to override it.  In multi-tenant environment, such as HPC clusters, it is useful to set environment variable \env{R_PARALLELLY_AVAILABLECORES_FALLBACK} to `1`, which will set this option when the package is loaded.}
@@ -31,6 +33,8 @@
 #'  \item{`parallelly.availableCores.max`:}{(integer; positive) The default maximum number of cores to return.}
 #'
 #'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")`)}
+#'
+#'  \item{`parallelly.availableWorkers.methods.excludes`:}{(character vector) Default lookup methods for [availableWorkers()] to be excluded. (Default: `NULL`)}
 #'
 #'  \item{`parallelly.availableWorkers.custom`:}{(function) If set and a function, then this function will be called (without arguments) by [availableWorkers()] where its value, coerced to a character vector, is interpreted as hostnames of available workers.}
 #' }
@@ -151,11 +155,13 @@
 #' @aliases parallelly.availableCores.logical
 #' @aliases parallelly.availableCores.max
 #' @aliases parallelly.availableCores.methods
+#' @aliases parallelly.availableCores.methods.excludes
 #' @aliases parallelly.availableCores.min
 #' @aliases parallelly.availableCores.omit
 #' @aliases parallelly.availableCores.system
 #' @aliases parallelly.availableWorkers.custom
 #' @aliases parallelly.availableWorkers.methods
+#' @aliases parallelly.availableWorkers.methods.excludes
 #' @aliases parallelly.fork.enable
 #' @aliases parallelly.maxWorkers.localhost
 #' @aliases parallelly.maxWorkers.localhost.ignore
@@ -166,10 +172,12 @@
 #' @aliases R_PARALLELLY_AVAILABLECORES_LOGICAL
 #' @aliases R_PARALLELLY_AVAILABLECORES_MAX
 #' @aliases R_PARALLELLY_AVAILABLECORES_METHODS
+#' @aliases R_PARALLELLY_AVAILABLECORES_METHODS_EXCLUDES
 #' @aliases R_PARALLELLY_AVAILABLECORES_MIN
 #' @aliases R_PARALLELLY_AVAILABLECORES_OMIT
 #' @aliases R_PARALLELLY_AVAILABLECORES_SYSTEM
 #' @aliases R_PARALLELLY_AVAILABLEWORKERS_METHODS
+#' @aliases R_PARALLELLY_AVAILABLEWORKERS_METHODS_EXCLUDES
 #' @aliases R_PARALLELLY_FORK_ENABLE
 #' @aliases R_PARALLELLY_MAXWORKERS_LOCALHOST
 #' @aliases R_PARALLELLY_MAXWORKERS_LOCALHOST_IGNORE
@@ -340,6 +348,7 @@ update_package_options <- function(debug = FALSE) {
   }
 
   update_package_option("availableCores.methods", mode = "character", split = ",", debug = debug)
+  update_package_option("availableCores.methods.excludes", mode = "character", split = ",", debug = debug)
   update_package_option("availableCores.fallback", mode = "integer", disallow = NULL, debug = debug)
   update_package_option("availableCores.min", mode = "integer", disallow = "NA", debug = debug)
   update_package_option("availableCores.system", mode = "integer", disallow = NULL, debug = debug)
@@ -349,6 +358,7 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("availableCores.max", mode = "numeric", disallow = "NA", debug = debug)
 
   update_package_option("availableWorkers.methods", mode = "character", split = ",", debug = debug)
+  update_package_option("availableWorkers.methods.excludes", mode = "character", split = ",", debug = debug)
 
   update_package_option("maxWorkers.localhost", mode = "double", split = ",", debug = debug)
   update_package_option("maxWorkers.localhost.ignore", mode = "character", split = ",", debug = debug)

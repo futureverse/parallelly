@@ -10,11 +10,13 @@
 \alias{parallelly.availableCores.logical}
 \alias{parallelly.availableCores.max}
 \alias{parallelly.availableCores.methods}
+\alias{parallelly.availableCores.methods.excludes}
 \alias{parallelly.availableCores.min}
 \alias{parallelly.availableCores.omit}
 \alias{parallelly.availableCores.system}
 \alias{parallelly.availableWorkers.custom}
 \alias{parallelly.availableWorkers.methods}
+\alias{parallelly.availableWorkers.methods.excludes}
 \alias{parallelly.fork.enable}
 \alias{parallelly.maxWorkers.localhost}
 \alias{parallelly.maxWorkers.localhost.ignore}
@@ -25,10 +27,12 @@
 \alias{R_PARALLELLY_AVAILABLECORES_LOGICAL}
 \alias{R_PARALLELLY_AVAILABLECORES_MAX}
 \alias{R_PARALLELLY_AVAILABLECORES_METHODS}
+\alias{R_PARALLELLY_AVAILABLECORES_METHODS_EXCLUDES}
 \alias{R_PARALLELLY_AVAILABLECORES_MIN}
 \alias{R_PARALLELLY_AVAILABLECORES_OMIT}
 \alias{R_PARALLELLY_AVAILABLECORES_SYSTEM}
 \alias{R_PARALLELLY_AVAILABLEWORKERS_METHODS}
+\alias{R_PARALLELLY_AVAILABLEWORKERS_METHODS_EXCLUDES}
 \alias{R_PARALLELLY_FORK_ENABLE}
 \alias{R_PARALLELLY_MAXWORKERS_LOCALHOST}
 \alias{R_PARALLELLY_MAXWORKERS_LOCALHOST_IGNORE}
@@ -89,6 +93,8 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.availableCores.methods}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}}. (Default: \code{c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")})}
 
+\item{\code{parallelly.availableCores.methods.excludes}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}} to be excluded. (Default: \code{NULL})}
+
 \item{\code{parallelly.availableCores.custom}:}{(function) If set and a function, then this function will be called (without arguments) by \code{\link[=availableCores]{availableCores()}} where its value, coerced to an integer, is interpreted as a number of cores.}
 
 \item{\code{parallelly.availableCores.fallback}:}{(integer) The default number of cores to use when no core-specifying settings are detected other than \code{"system"} and \code{"nproc"}.  This options makes it possible to set the default number of cores returned by \code{availableCores()} / \code{availableWorkers()} yet allow users and schedulers to override it.  In multi-tenant environment, such as HPC clusters, it is useful to set environment variable \env{R_PARALLELLY_AVAILABLECORES_FALLBACK} to \code{1}, which will set this option when the package is loaded.}
@@ -104,6 +110,8 @@ The below \R options and environment variables control the default results of \c
 \item{\code{parallelly.availableCores.max}:}{(integer; positive) The default maximum number of cores to return.}
 
 \item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")})}
+
+\item{\code{parallelly.availableWorkers.methods.excludes}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}} to be excluded. (Default: \code{NULL})}
 
 \item{\code{parallelly.availableWorkers.custom}:}{(function) If set and a function, then this function will be called (without arguments) by \code{\link[=availableWorkers]{availableWorkers()}} where its value, coerced to a character vector, is interpreted as hostnames of available workers.}
 }

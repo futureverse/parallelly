@@ -2,6 +2,12 @@
 
 ## New Features
 
+ * `availableCores()` and `availableWorkers()` gained support for R
+   options `parallelly.availableCores.methods.excludes` and
+   `parallelly.availableWorkers.methods.excludes` (with corresponding
+   environment variables) to specify lookup methods to be excluded by
+   default.
+
  * `makeClusterPSOCK()` and `makeNodePSOCK()` gained argument
    `rscript_call` to customize the parallel worker loop, which
    defaults to `parallel:::.workRSOCK()`.

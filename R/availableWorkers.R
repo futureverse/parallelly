@@ -151,6 +151,15 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
 
+  excludes <- getOption2("parallelly.availableWorkers.methods.excludes", NULL)
+  if (length(excludes) > 0) {
+    excludes <- as.character(excludes)
+    excludes <- unlist(strsplit(excludes, split = ",", fixed = TRUE))
+    excludes <- trim(excludes)
+    excludes <- excludes[nzchar(excludes)]
+    methods <- setdiff(methods, excludes)
+  }
+
   which <- match.arg(which, choices = c("auto", "min", "max", "all"))
   stop_if_not(is.character(default), length(default) >= 1, !anyNA(default))
 
