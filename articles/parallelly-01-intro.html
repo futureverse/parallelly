@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="An Introduction to 'parallelly'">
 <!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-SB3EQSD9FR"></script><script>
@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.0-9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -134,19 +134,19 @@ enhance the <strong>parallel</strong> packages. For example,
 <code><a href="../reference/availableCores.html">availableCores()</a></code> gives the number of CPU cores available to
 your R process as given by R options and environment variables,
 including those set by job schedulers on high-performance compute (HPC)
-clusters. If R runs under ‘cgroups’ or in a Linux container, then their
+clusters. If R runs under CGroups or in a Linux container, then their
 settings are acknowledged too. If nothing else is set, then it will fall
 back to <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code>. Another example is
-<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code>, which is backward compatible with
-<code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">parallel::makePSOCKcluster()</a></code> while doing a better job in
-setting up remote cluster workers without having to know your local
-public IP address and configuring the firewall to do port-forwarding to
-your local computer. The functions and features added to this package
-are written to be backward compatible with the <strong>parallel</strong>
-package, such that they may be incorporated there later. The
-<strong>parallelly</strong> package comes with an open invitation for
-the R Core Team to adopt all or parts of its code into the
-<strong>parallel</strong> package.</p>
+<code>parallel::makeCluster(2, type = "RPSOCK")</code>, which is
+backward compatible with <code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">parallel::makeCluster()</a></code> while
+doing a better job in setting up remote cluster workers without having
+to know your local public IP address and configuring the firewall to do
+port-forwarding to your local computer. The functions and features added
+to this package are written to be backward compatible with the
+<strong>parallel</strong> package, such that they may be incorporated
+there later. The <strong>parallelly</strong> package comes with an open
+invitation for the R Core Team to adopt all or parts of its code into
+the <strong>parallel</strong> package.</p>
 <div class="section level2">
 <h2 id="feature-comparison-parallelly-vs-parallel">Feature Comparison ‘parallelly’ vs ‘parallel’<a class="anchor" aria-label="anchor" href="#feature-comparison-parallelly-vs-parallel"></a>
 </h2>
@@ -263,7 +263,7 @@ the R Core Team to adopt all or parts of its code into the
 <td align="center">N/A</td>
 </tr>
 <tr class="odd">
-<td>respecting CPU resources allocated by cgroups, Linux containers, and
+<td>respecting CPU resources allocated by CGroups, Linux containers, and
 HPC schedulers</td>
 <td align="center">✓</td>
 <td align="center">N/A</td>
@@ -290,9 +290,8 @@ fully compatible with the clusters created by the
 <strong>parallel</strong>’s functions for cluster processing,
 e.g. <code><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">parallel::clusterEvalQ()</a></code> and
 <code><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">parallel::parLapply()</a></code>. The
-<code><a href="../reference/makeClusterPSOCK.html">parallelly::makeClusterPSOCK()</a></code> function can be used as a
-stand-in replacement of the <code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">parallel::makePSOCKcluster()</a></code>,
-or equivalently,
+<code>parallel::makeCluster(..., type = "RPSOCK")</code> is a more
+powerful and stand-in replacement of the default
 <code>parallel::makeCluster(..., type = "PSOCK")</code>.</p>
 <p>Most of <strong>parallelly</strong> functions apply also to clusters
 created by the <strong>parallel</strong> package. For example,</p>
@@ -305,7 +304,14 @@ This lowers the risk for leaving stray R worker processes running in the
 background by mistake. Another way to achieve the above in a single call
 is to use:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="fl">2</span>, autoStop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2</span>, type <span class="op">=</span> <span class="st">"RPSOCK"</span>, autoStop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>For older versions of R, use:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># R (&gt;= 4.5 &amp;&amp; &lt;= 4.6):</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="fl">2</span>, type <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="va"><a href="../reference/makeClusterPSOCK.html">RPSOCK</a></span>, autoStop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># R (&lt; 4.5):</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="fl">2</span>, autoStop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="availablecores-vs-paralleldetectcores">availableCores() vs parallel::detectCores()<a class="anchor" aria-label="anchor" href="#availablecores-vs-paralleldetectcores"></a>
 </h3>
@@ -341,7 +347,7 @@ each process gets to, say, two (2), by setting the environment variable
 Make parallel::detectCores() agile to new env var
 R_DEFAULT_CORES</a>.</p>
 <p>Similarly, <code><a href="../reference/availableCores.html">availableCores()</a></code> is also agile to CPU
-limitations set by Unix control groups (cgroups), which is often used by
+limitations set by Unix control groups (CGroups), which is often used by
 Linux containers (e.g. Docker, Apptainer / Singularity, and Podman) and
 Kubernetes (K8s) environments. For example,
 <code>docker run --cpuset-cpus=0-2,8 ...</code> sets the CPU affinity so
@@ -352,11 +358,11 @@ returns four (4). Another example is
 on average 3.4 CPUs on the host system. In this case
 <code><a href="../reference/availableCores.html">availableCores()</a></code> detects this and returns three (3),
 because it rounds to the nearest integer. In contrast,
-<code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> completely ignores such cgroups
+<code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> completely ignores such CGroups
 settings and returns the number of CPUs on the host system, which
 results in CPU overuse and degraded performance. Continuous Integration
 (CI) services (e.g. GitHub Actions, Travis CI, and AppVeyor CI) and
-cloud services (e.g. RStudio Cloud) use these types of cgroups settings
+cloud services (e.g. Posit Cloud) use these types of CGroups settings
 under the hood, which means <code><a href="../reference/availableCores.html">availableCores()</a></code> respects their
 CPU allocations.</p>
 <p>If running on an HPC cluster with a job scheduler, a script that uses
@@ -371,8 +377,9 @@ submitting using <code>qsub -pe smp 8 ...</code> and
 <code><a href="../reference/availableCores.html">help("availableCores", package = "parallelly")</a></code> for
 currently supported job schedulers, which includes ‘Fujitsu Technical
 Computing Suite’, ‘Load Sharing Facility’ (LSF), Simple Linux Utility
-for Resource Management (Slurm), Sun/Oracle/Univa/Altair/Son of Grid
-Engine (AGE, SGE, UGE), and TORQUE/PBS.</p>
+for Resource Management (Slurm), Sun Grid Engine/Oracle Grid Engine/Son
+of Grid Engine/Univa Grid Engine/Altair Grid Engine (AGE, SGE, UGE), and
+TORQUE/PBS.</p>
 <p>Of course, <code><a href="../reference/availableCores.html">availableCores()</a></code> respects also R options and
 environment variables commonly used to specify the number of parallel
 workers, e.g. R option <code>mc.cores</code> and Bioconductor
@@ -415,7 +422,7 @@ package will always play by the rules on CRAN and Bioconductor.</p>
 <td align="center">no</td>
 </tr>
 <tr class="even">
-<td>Respects cgroups and Linux containers</td>
+<td>Respects CGroups and Linux containers</td>
 <td align="center">✓</td>
 <td align="center">no</td>
 </tr>

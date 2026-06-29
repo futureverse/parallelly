@@ -4,6 +4,15 @@
 
 ### New Features
 
+- [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+  and
+  [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+  gained support for R options
+  `parallelly.availableCores.methods.excludes` and
+  `parallelly.availableWorkers.methods.excludes` (with corresponding
+  environment variables) to specify lookup methods to be excluded by
+  default.
+
 - [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
   and
   [`makeNodePSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
@@ -13,6 +22,12 @@
 - Add internal worker loop `parallelly:::workRPSOCK()` that takes
   optional argument `workCommand` to customize the default
   `parallel:::workCommand()`.
+
+- Analogusly to
+  [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md),
+  [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+  queries also Linux CGroups v2 CPU affinity values `cpuset.cpus` and
+  `cpuset.cpus.effective`.
 
 ### Bug Fixes
 

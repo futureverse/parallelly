@@ -5,14 +5,13 @@ The **parallelly** package provides functions that enhance the
 [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
 gives the number of CPU cores available to your R process as given by R
 options and environment variables, including those set by job schedulers
-on high-performance compute (HPC) clusters. If R runs under ‘cgroups’ or
+on high-performance compute (HPC) clusters. If R runs under CGroups or
 in a Linux container, then their settings are acknowledged too. If
 nothing else is set, then it will fall back to
 [`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html).
-Another example is
-[`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md),
-which is backward compatible with
-[`parallel::makePSOCKcluster()`](https://rdrr.io/r/parallel/makeCluster.html)
+Another example is `parallel::makeCluster(2, type = "RPSOCK")`, which is
+backward compatible with
+[`parallel::makeCluster()`](https://rdrr.io/r/parallel/makeCluster.html)
 while doing a better job in setting up remote cluster workers without
 having to know your local public IP address and configuring the firewall
 to do port-forwarding to your local computer. The functions and features
@@ -45,7 +44,7 @@ Team to adopt all or parts of its code into the **parallel** package.
 | check if local and remote workers are alive | ✓ | N/A |
 | restart local and remote workers | ✓ | N/A |
 | defaults via options & environment variables | ✓ | N/A |
-| respecting CPU resources allocated by cgroups, Linux containers, and HPC schedulers | ✓ | N/A |
+| respecting CPU resources allocated by CGroups, Linux containers, and HPC schedulers | ✓ | N/A |
 | early error if requesting more workers than possible | ✓ | N/A |
 | informative error messages | ✓ | N/A |
 
@@ -57,11 +56,9 @@ all of **parallel**’s functions for cluster processing,
 e.g. [`parallel::clusterEvalQ()`](https://rdrr.io/r/parallel/clusterApply.html)
 and
 [`parallel::parLapply()`](https://rdrr.io/r/parallel/clusterApply.html).
-The
-[`parallelly::makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
-function can be used as a stand-in replacement of the
-[`parallel::makePSOCKcluster()`](https://rdrr.io/r/parallel/makeCluster.html),
-or equivalently, `parallel::makeCluster(..., type = "PSOCK")`.
+The `parallel::makeCluster(..., type = "RPSOCK")` is a more powerful and
+stand-in replacement of the default
+`parallel::makeCluster(..., type = "PSOCK")`.
 
 Most of **parallelly** functions apply also to clusters created by the
 **parallel** package. For example,
@@ -79,6 +76,17 @@ mistake. Another way to achieve the above in a single call is to use:
 
 ``` r
 
+cl <- parallel::makeCluster(2, type = "RPSOCK", autoStop = TRUE)
+```
+
+For older versions of R, use:
+
+``` r
+
+# R (>= 4.5 && <= 4.6):
+cl <- parallel::makeCluster(2, type = parallelly::RPSOCK, autoStop = TRUE)
+
+# R (< 4.5):
 cl <- parallelly::makeClusterPSOCK(2, autoStop = TRUE)
 ```
 
@@ -127,7 +135,7 @@ R_DEFAULT_CORES](https://bugs.r-project.org/show_bug.cgi?id=17641).
 
 Similarly,
 [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
-is also agile to CPU limitations set by Unix control groups (cgroups),
+is also agile to CPU limitations set by Unix control groups (CGroups),
 which is often used by Linux containers (e.g. Docker, Apptainer /
 Singularity, and Podman) and Kubernetes (K8s) environments. For example,
 `docker run --cpuset-cpus=0-2,8 ...` sets the CPU affinity so that the
@@ -141,11 +149,11 @@ detects this and returns four (4). Another example is
 detects this and returns three (3), because it rounds to the nearest
 integer. In contrast,
 [`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html)
-completely ignores such cgroups settings and returns the number of CPUs
+completely ignores such CGroups settings and returns the number of CPUs
 on the host system, which results in CPU overuse and degraded
 performance. Continuous Integration (CI) services (e.g. GitHub Actions,
-Travis CI, and AppVeyor CI) and cloud services (e.g. RStudio Cloud) use
-these types of cgroups settings under the hood, which means
+Travis CI, and AppVeyor CI) and cloud services (e.g. Posit Cloud) use
+these types of CGroups settings under the hood, which means
 [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
 respects their CPU allocations.
 
@@ -163,8 +171,9 @@ returns eight (8). See
 [`help("availableCores", package = "parallelly")`](https://parallelly.futureverse.org/reference/availableCores.md)
 for currently supported job schedulers, which includes ‘Fujitsu
 Technical Computing Suite’, ‘Load Sharing Facility’ (LSF), Simple Linux
-Utility for Resource Management (Slurm), Sun/Oracle/Univa/Altair/Son of
-Grid Engine (AGE, SGE, UGE), and TORQUE/PBS.
+Utility for Resource Management (Slurm), Sun Grid Engine/Oracle Grid
+Engine/Son of Grid Engine/Univa Grid Engine/Altair Grid Engine (AGE,
+SGE, UGE), and TORQUE/PBS.
 
 Of course,
 [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
@@ -191,7 +200,7 @@ The below table summarizes the benefits:
 | Guaranteed to return a positive integer | ✓ | no (may return `NA_integer_`) |
 | Safely use all but some cores | ✓ | no (may return zero or less) |
 | Can be overridden, e.g. by a sysadm | ✓ | no |
-| Respects cgroups and Linux containers | ✓ | no |
+| Respects CGroups and Linux containers | ✓ | no |
 | Respects job scheduler allocations | ✓ | no |
 | Respects CRAN policies | ✓ | no |
 | Respects Bioconductor policies | ✓ | no |

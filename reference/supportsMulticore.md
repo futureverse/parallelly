@@ -2,19 +2,17 @@
 
 Certain parallelization methods in R rely on *forked* processing, e.g.
 [`parallel::mclapply()`](https://rdrr.io/r/parallel/mclapply.html),
-`parallel::makeCluster(n, type = "FORK")`,
-[`doMC::registerDoMC()`](https://rdrr.io/pkg/doMC/man/registerDoMC.html),
-and `future::plan("multicore")`. Process forking is done by the
-operating system and support for it in R is restricted to Unix-like
-operating systems such as Linux, Solaris, and macOS. R running on
-Microsoft Windows does not support forked processing. In R, forked
-processing is often referred to as "multicore" processing, which stems
-from the 'mc' of the
-[`mclapply()`](https://rdrr.io/r/parallel/mclapply.html) family of
-functions, which originally was in a package named multicore which later
-was incorporated into the parallel package. This function checks whether
-or not forked (aka "multicore") processing is supported in the current R
-session.
+`parallel::makeCluster(n, type = "FORK")`, `doMC::registerDoMC()`, and
+`future::plan("multicore")`. Process forking is done by the operating
+system and support for it in R is restricted to Unix-like operating
+systems such as Linux, Solaris, and macOS. R running on Microsoft
+Windows does not support forked processing. In R, forked processing is
+often referred to as "multicore" processing, which stems from the 'mc'
+of the [`mclapply()`](https://rdrr.io/r/parallel/mclapply.html) family
+of functions, which originally was in a package named multicore which
+later was incorporated into the parallel package. This function checks
+whether or not forked (aka "multicore") processing is supported in the
+current R session.
 
 ## Usage
 
