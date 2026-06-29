@@ -670,4 +670,51 @@ stopifnot(inherits(res, "error"))
 message("*** fraction parameter ... done")
 
 
+message("*** availableCores(methods.excludes) ...")
+# Save original option
+oopts <- options(parallelly.availableCores.methods.excludes = NULL)
+
+methods0 <- names(availableCores(na.rm = FALSE, which = "all"))
+
+# Exclude one method via option
+options(parallelly.availableCores.methods.excludes = "system")
+methods1 <- names(availableCores(na.rm = FALSE, which = "all"))
+stopifnot(
+  !"system" %in% methods1,
+  all(setdiff(methods0, "system") %in% methods1)
+)
+
+# Exclude multiple methods via option (vector)
+options(parallelly.availableCores.methods.excludes = c("system", "nproc"))
+methods2 <- names(availableCores(na.rm = FALSE, which = "all"))
+stopifnot(
+  !any(c("system", "nproc") %in% methods2),
+  all(setdiff(methods0, c("system", "nproc")) %in% methods2)
+)
+
+# Exclude multiple methods via option (comma-separated string)
+options(parallelly.availableCores.methods.excludes = "system, nproc")
+methods2b <- names(availableCores(na.rm = FALSE, which = "all"))
+stopifnot(
+  !any(c("system", "nproc") %in% methods2b),
+  all(setdiff(methods0, c("system", "nproc")) %in% methods2b)
+)
+
+# Exclude via environment variable
+options(parallelly.availableCores.methods.excludes = NULL)
+Sys.setenv(R_PARALLELLY_AVAILABLECORES_METHODS_EXCLUDES = "system,nproc")
+parallelly:::update_package_options()
+methods3 <- names(availableCores(na.rm = FALSE, which = "all"))
+stopifnot(
+  !any(c("system", "nproc") %in% methods3),
+  all(setdiff(methods0, c("system", "nproc")) %in% methods3)
+)
+Sys.unsetenv("R_PARALLELLY_AVAILABLECORES_METHODS_EXCLUDES")
+parallelly:::update_package_options()
+
+# Restore options
+options(oopts)
+message("*** availableCores(methods.excludes) ... done")
+
+
 message("*** availableCores() ... DONE")

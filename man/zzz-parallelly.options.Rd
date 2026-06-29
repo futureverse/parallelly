@@ -10,11 +10,13 @@
 \alias{parallelly.availableCores.logical}
 \alias{parallelly.availableCores.max}
 \alias{parallelly.availableCores.methods}
+\alias{parallelly.availableCores.methods.excludes}
 \alias{parallelly.availableCores.min}
 \alias{parallelly.availableCores.omit}
 \alias{parallelly.availableCores.system}
 \alias{parallelly.availableWorkers.custom}
 \alias{parallelly.availableWorkers.methods}
+\alias{parallelly.availableWorkers.methods.excludes}
 \alias{parallelly.fork.enable}
 \alias{parallelly.maxWorkers.localhost}
 \alias{parallelly.maxWorkers.localhost.ignore}
@@ -25,10 +27,12 @@
 \alias{R_PARALLELLY_AVAILABLECORES_LOGICAL}
 \alias{R_PARALLELLY_AVAILABLECORES_MAX}
 \alias{R_PARALLELLY_AVAILABLECORES_METHODS}
+\alias{R_PARALLELLY_AVAILABLECORES_METHODS_EXCLUDES}
 \alias{R_PARALLELLY_AVAILABLECORES_MIN}
 \alias{R_PARALLELLY_AVAILABLECORES_OMIT}
 \alias{R_PARALLELLY_AVAILABLECORES_SYSTEM}
 \alias{R_PARALLELLY_AVAILABLEWORKERS_METHODS}
+\alias{R_PARALLELLY_AVAILABLEWORKERS_METHODS_EXCLUDES}
 \alias{R_PARALLELLY_FORK_ENABLE}
 \alias{R_PARALLELLY_MAXWORKERS_LOCALHOST}
 \alias{R_PARALLELLY_MAXWORKERS_LOCALHOST_IGNORE}
@@ -87,7 +91,9 @@ The below \R options and environment variables control the default results of \c
 \describe{
 \item{\code{parallelly.availableCores.logical}:}{(logical) The default value of argument \code{logical} as used by \code{availableCores()}, \code{availableWorkers()}, and \code{availableCores()} for querying \code{parallel::detectCores(logical = logical)}.  The default is \code{TRUE} just like it is for \code{\link[parallel:detectCores]{parallel::detectCores()}}.}
 
-\item{\code{parallelly.availableCores.methods}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}}. (Default: \code{c("system", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")})}
+\item{\code{parallelly.availableCores.methods}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}}. (Default: \code{c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")})}
+
+\item{\code{parallelly.availableCores.methods.excludes}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}} to be excluded. (Default: \code{NULL})}
 
 \item{\code{parallelly.availableCores.custom}:}{(function) If set and a function, then this function will be called (without arguments) by \code{\link[=availableCores]{availableCores()}} where its value, coerced to an integer, is interpreted as a number of cores.}
 
@@ -103,7 +109,9 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.availableCores.max}:}{(integer; positive) The default maximum number of cores to return.}
 
-\item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system", "fallback")})}
+\item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")})}
+
+\item{\code{parallelly.availableWorkers.methods.excludes}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}} to be excluded. (Default: \code{NULL})}
 
 \item{\code{parallelly.availableWorkers.custom}:}{(function) If set and a function, then this function will be called (without arguments) by \code{\link[=availableWorkers]{availableWorkers()}} where its value, coerced to a character vector, is interpreted as hostnames of available workers.}
 }
@@ -149,7 +157,7 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.makeNodePSOCK.useXDR}:}{(logical) If FALSE (default), the communication between master and workers, which is binary, will use small-endian (faster), otherwise big-endian ("XDR"; slower).}
 
-\item{\code{parallelly.makeNodePSOCK.socketOptions}:}{(character string) If set to another value than \code{"NULL"}, then option \code{socketOptions} is set to this value on the workers during startup. See \code{\link[base:socketConnection]{base::socketConnection()}} for details. (defaults to \code{"no-delay"})}
+\item{\code{parallelly.makeNodePSOCK.socketOptions}:}{(character string) If set to another value than \code{"NULL"}, then option \code{socketOptions} is set to this value on the workers during startup. See \code{\link[base:connections]{base::socketConnection()}} for details. (defaults to \code{"no-delay"})}
 
 \item{\code{parallelly.makeNodePSOCK.rscript_call}:}{(character string or R expression) The R expression that is used to start the R worker event loop on the worker node. (defaults to \code{"workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"}) }
 

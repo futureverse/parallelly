@@ -389,4 +389,52 @@ Sys.setenv("FOO_BAR_ENV" = "0")
 res <- tryCatch(availableWorkers(methods = "FOO_BAR_ENV"), error = identity)
 stopifnot(inherits(res, "error"))
 
+
+message("*** availableWorkers(methods.excludes) ...")
+# Save original option
+oopts <- options(parallelly.availableWorkers.methods.excludes = NULL)
+
+methods0 <- names(availableWorkers(na.rm = FALSE, which = "all"))
+
+# Exclude one method via option
+options(parallelly.availableWorkers.methods.excludes = "system")
+methods1 <- names(availableWorkers(na.rm = FALSE, which = "all"))
+stopifnot(
+  !"system" %in% methods1,
+  all(setdiff(methods0, "system") %in% methods1)
+)
+
+# Exclude multiple methods via option (vector)
+options(parallelly.availableWorkers.methods.excludes = c("system", "nproc"))
+methods2 <- names(availableWorkers(na.rm = FALSE, which = "all"))
+stopifnot(
+  !any(c("system", "nproc") %in% methods2),
+  all(setdiff(methods0, c("system", "nproc")) %in% methods2)
+)
+
+# Exclude multiple methods via option (comma-separated string)
+options(parallelly.availableWorkers.methods.excludes = "system, nproc")
+methods2b <- names(availableWorkers(na.rm = FALSE, which = "all"))
+stopifnot(
+  !any(c("system", "nproc") %in% methods2b),
+  all(setdiff(methods0, c("system", "nproc")) %in% methods2b)
+)
+
+# Exclude via environment variable
+options(parallelly.availableWorkers.methods.excludes = NULL)
+Sys.setenv(R_PARALLELLY_AVAILABLEWORKERS_METHODS_EXCLUDES = "system,nproc")
+parallelly:::update_package_options()
+methods3 <- names(availableWorkers(na.rm = FALSE, which = "all"))
+stopifnot(
+  !any(c("system", "nproc") %in% methods3),
+  all(setdiff(methods0, c("system", "nproc")) %in% methods3)
+)
+Sys.unsetenv("R_PARALLELLY_AVAILABLEWORKERS_METHODS_EXCLUDES")
+parallelly:::update_package_options()
+
+# Restore options
+options(oopts)
+message("*** availableWorkers(methods.excludes) ... done")
+
+
 message("*** availableWorkers() ... DONE")
