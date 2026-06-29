@@ -5,8 +5,14 @@ false && R --quiet --no-save <<EOF
     tinytex::install_tinytex(force = TRUE)
     message("TeX root: ", tinytex::tinytex_root())
     tinytex::tlmgr_update()
-    tinytex::tlmgr_install("apacite")  # ctsem
-    tinytex::tlmgr_install("textpos")  # WeightedCluster
+    tinytex::tlmgr_install("apacite")       # ctsem
+    tinytex::tlmgr_install("babel-english") # ctsem
+    tinytex::tlmgr_install("caption")       # ctsem
+    tinytex::tlmgr_install("csquotes")      # ctsem
+    tinytex::tlmgr_install("mathtools")     # ctsem
+    tinytex::tlmgr_install("preprint")      # ctsem
+    tinytex::tlmgr_install("preview")       # ctsem
+    tinytex::tlmgr_install("textpos")       # WeightedCluster
 EOF
 
 ## Non-default system dependencies
