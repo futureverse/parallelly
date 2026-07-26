@@ -9,8 +9,8 @@ availableCores(
   methods = getOption2("parallelly.availableCores.methods", c("system",
     "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus",
     "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores",
-    "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE",
-    "Slurm", "fallback", "custom")),
+    "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "HTCondor", "LSF", "PJM",
+    "PBS", "SGE", "Slurm", "fallback", "custom")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
@@ -150,6 +150,14 @@ of 2 cores is considered.
 Query environment variable \env{IS_BIOC_BUILD_MACHINE} (logical)
 used by the Bioconductor (>= 3.16) build and check system. If set to
 true, then a maximum of 4 cores is considered.
+
+\item \code{"HTCondor"} -
+Query CPU resources provisioned by the HTCondor scheduler.
+The number of cores is read from \env{CpusProvisioned} in the job
+ClassAd given by \env{_CONDOR_JOB_AD}, or from \env{Cpus} in the
+machine ClassAd given by \env{_CONDOR_MACHINE_AD}.  If neither
+attribute is available, then \env{OMP_NUM_THREADS} is used when
+\env{BATCH_SYSTEM} identifies an HTCondor job.
 
 \item \code{"LSF"} -
 Query Platform Load Sharing Facility (LSF)/OpenLava environment variable
