@@ -128,6 +128,14 @@
 #'    used by the Bioconductor (>= 3.16) build and check system. If set to
 #'    true, then a maximum of 4 cores is considered.
 #'
+#'  \item `"HTCondor"` -
+#'    Query CPU resources provisioned by the HTCondor scheduler.
+#'    The number of cores is read from \env{CpusProvisioned} in the job
+#'    ClassAd given by \env{_CONDOR_JOB_AD}, or from \env{Cpus} in the
+#'    machine ClassAd given by \env{_CONDOR_MACHINE_AD}.  If neither
+#'    attribute is available, then \env{OMP_NUM_THREADS} is used when
+#'    \env{BATCH_SYSTEM} identifies an HTCondor job.
+#'
 #'  \item `"LSF"` - 
 #'    Query Platform Load Sharing Facility (LSF)/OpenLava environment variable
 #'    \env{LSB_DJOB_NUMPROC}.
@@ -293,7 +301,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @export
-availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
+availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "HTCondor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
@@ -329,7 +337,9 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
   names(ncores) <- methods
   for (kk in seq_along(methods)) {
     method <- methods[kk]
-    if (method == "Slurm") {
+    if (method == "HTCondor") {
+      n <- availableCoresHTCondor()
+    } else if (method == "Slurm") {
       ## Number of cores assigned by Slurm
       n <- availableCoresSlurm()
     } else if (method == "PBS") {
@@ -688,6 +698,48 @@ getopt_int <- function(name, mode = "integer") {
 # --------------------------------------------------------------------------
 # High-Performance Compute (HPC) Schedulers
 # --------------------------------------------------------------------------
+read_htcondor_classad_int <- function(pathname, attribute) {
+  if (is.na(pathname) || !file_test("-f", pathname)) return(NA_integer_)
+
+  pattern <- sprintf(
+    "^[[:space:]]*%s[[:space:]]*=[[:space:]]*([[:digit:]]+)[[:space:]]*$",
+    attribute
+  )
+  lines <- readLines(pathname, warn = FALSE)
+  lines <- grep(pattern, lines, value = TRUE, ignore.case = TRUE)
+  if (length(lines) != 1L) return(NA_integer_)
+
+  value <- sub(pattern, "\\1", lines, ignore.case = TRUE)
+  suppressWarnings(as.integer(value))
+}
+
+
+## Number of cores provisioned by HTCondor
+availableCoresHTCondor <- local({
+  n <- NULL
+  function() {
+    if (!is.null(n)) return(n)
+
+    job_ad <- trim(getEnvVar2("_CONDOR_JOB_AD", default = NA_character_))
+    n <<- read_htcondor_classad_int(job_ad, "CpusProvisioned")
+    if (!is.na(n)) return(n)
+
+    machine_ad <- trim(
+      getEnvVar2("_CONDOR_MACHINE_AD", default = NA_character_)
+    )
+    n <<- read_htcondor_classad_int(machine_ad, "Cpus")
+    if (!is.na(n)) return(n)
+
+    batch_system <- trim(getEnvVar2("BATCH_SYSTEM", default = NA_character_))
+    if (identical(tolower(batch_system), "htcondor")) {
+      n <<- getenv_int("OMP_NUM_THREADS")
+    }
+
+    n
+  }
+})
+
+
 ## Number of slots assigned by LSF
 availableCoresLSF <- local({
   n <- NULL

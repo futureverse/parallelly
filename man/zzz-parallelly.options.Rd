@@ -91,7 +91,7 @@ The below \R options and environment variables control the default results of \c
 \describe{
 \item{\code{parallelly.availableCores.logical}:}{(logical) The default value of argument \code{logical} as used by \code{availableCores()}, \code{availableWorkers()}, and \code{availableCores()} for querying \code{parallel::detectCores(logical = logical)}.  The default is \code{TRUE} just like it is for \code{\link[parallel:detectCores]{parallel::detectCores()}}.}
 
-\item{\code{parallelly.availableCores.methods}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}}. (Default: \code{c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")})}
+\item{\code{parallelly.availableCores.methods}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}}. (Default: \code{c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "HTCondor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")})}
 
 \item{\code{parallelly.availableCores.methods.excludes}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}} to be excluded. (Default: \code{NULL})}
 
