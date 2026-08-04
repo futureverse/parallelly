@@ -13,3 +13,4 @@ revdep/
 .Rhistory
 *.tar.gz
 *.Rcheck/
+.osgrep

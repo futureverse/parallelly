@@ -32,16 +32,16 @@ win11
 Then, install [R for Windows] in Wine, by:
 
 ```sh
-$ wget https://cran.r-project.org/bin/windows/base/R-4.6.0-win.exe
-$ wine R-4.6.0-win.exe /SILENT
+$ wget https://cran.r-project.org/bin/windows/base/R-4.6.1-win.exe
+$ wine R-4.6.1-win.exe /SILENT
 ```
 
 Finally, verify that R is available in Wine;
 
 ```sh
-$ wine "C:/Program Files/R/R-4.6.0/bin/x64/Rscript.exe" --version
+$ wine "C:/Program Files/R/R-4.6.1/bin/x64/Rscript.exe" --version
 ...
-Rscript (R) version 4.6.0 (2026-04-24)
+Rscript (R) version 4.6.1 (2026-06-24)
 ```
 
 
@@ -62,12 +62,12 @@ cl <- makeClusterPSOCK(
     ## Don't pass LC_* and R_LIBS* environments from host to Wine
     sprintf("%s=", grep("^(LC_|R_LIBS)", names(Sys.getenv()), value = TRUE)),
     "wine",
-    "C:/Program Files/R/R-4.6.0/bin/x64/Rscript.exe"
+    "C:/Program Files/R/R-4.6.1/bin/x64/Rscript.exe"
   )
 )
 print(cl)
 #> Socket cluster with 1 node on host 'localhost'
-#> (R version 4.6.0 (2026-04-24 ucrt), platform x86_64-w64-mingw32)
+#> (R version 4.6.1 (2026-06-24 ucrt), platform x86_64-w64-mingw32)
 ```
 
 
@@ -108,7 +108,7 @@ cluster_. Then call:
 ```r
 parallel::clusterEvalQ(cl[1], { .libPaths() })
 [1] "C:/users/alice/AppData/Local/R/win-library/4.6"
-[2] "C:/PROG~FBU/R/R-46~UP1.0/library"
+[2] "C:/PROG~FBU/R/R-46~WPS.1/library"
 ```
 
 The first directory is the personal package library.
