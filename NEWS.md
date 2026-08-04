@@ -1,6 +1,7 @@
 # Version (development version)
 
- * ...
+ * `availableCores()` gained support for CPU resources provisioned by
+   HTCondor jobs.
 
 
 # Version 1.48.0 [2026-06-29]

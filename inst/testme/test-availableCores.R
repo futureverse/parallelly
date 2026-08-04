@@ -73,6 +73,7 @@ stopifnot(length(n) == 1, is.integer(n), n == 1L)
 options(opts)
 
 ## Predefined ones for known cluster schedulers
+print(availableCores(methods = "HTCondor"))
 print(availableCores(methods = "PBS"))
 print(availableCores(methods = "SGE"))
 print(availableCores(methods = "Slurm"))
@@ -89,6 +90,68 @@ stopifnot(inherits(res, "try-error"))
 
 
 ncores0 <- 42L
+
+message("*** HTCondor ...")
+env <- environment(parallelly:::availableCoresHTCondor)
+htcondor_envvars <- c(
+  "_CONDOR_JOB_AD", "_CONDOR_MACHINE_AD", "BATCH_SYSTEM", "OMP_NUM_THREADS"
+)
+old_htcondor_env <- Sys.getenv(htcondor_envvars, unset = NA, names = TRUE)
+job_ad <- tempfile("htcondor-job-ad-")
+machine_ad <- tempfile("htcondor-machine-ad-")
+writeLines(c(
+  "RequestCpus = 2",
+  "CpusProvisioned = 12"
+), job_ad)
+writeLines(c(
+  "Memory = 32768",
+  "Cpus = 18"
+), machine_ad)
+Sys.setenv(
+  `_CONDOR_JOB_AD` = job_ad,
+  `_CONDOR_MACHINE_AD` = machine_ad,
+  BATCH_SYSTEM = "HTCondor",
+  OMP_NUM_THREADS = "24"
+)
+
+## Prefer the provisioned count from the job ClassAd
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+print(ncores)
+stopifnot(ncores == 12L)
+
+## Fall back to the machine ClassAd
+Sys.unsetenv("_CONDOR_JOB_AD")
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+print(ncores)
+stopifnot(ncores == 18L)
+
+## Fall back to HTCondor's thread-count environment variable
+Sys.unsetenv("_CONDOR_MACHINE_AD")
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+print(ncores)
+stopifnot(ncores == 24L)
+
+## Do not treat a user-defined OMP_NUM_THREADS as an HTCondor allocation
+Sys.unsetenv("BATCH_SYSTEM")
+env$n <- NULL
+ncores <- availableCores(
+  methods = "HTCondor", na.rm = FALSE, which = "all"
+)
+print(ncores)
+stopifnot(is.na(ncores))
+
+Sys.unsetenv(htcondor_envvars)
+old_htcondor_env <- old_htcondor_env[!is.na(old_htcondor_env)]
+if (length(old_htcondor_env) > 0L) {
+  do.call(Sys.setenv, as.list(old_htcondor_env))
+}
+unlink(c(job_ad, machine_ad))
+env$n <- NULL
+message("*** HTCondor ... done")
+
 
 message("*** LSF ...")
 message(" - LSB_DJOB_NUMPROC")
