@@ -137,7 +137,7 @@ win_only <- subset(db, OS_type == "windows")
 print(win_only$Package)
 ```
 
-As of 2026-05-22, this outputs:
+As of 2026-08-04, this outputs:
 
 ``` r
  [1] "BiplotGUI"         "blatr"             "excel.link" 
