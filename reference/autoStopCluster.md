@@ -43,19 +43,19 @@ cl <- makeClusterPSOCK(2, dryrun = TRUE)
 #> ----------------------------------------------------------------------
 #> Manually, start worker #1 on local machine ‘localhost’ with:
 #> 
-#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11277 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
+#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11606 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
 #> 
 #> ----------------------------------------------------------------------
 #> Manually, start worker #2 on local machine ‘localhost’ with:
 #> 
-#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11277 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
+#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11606 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
 #> 
 cl <- autoStopCluster(cl)
 print(cl)
 #> Socket cluster with 2 nodes on host ‘NA’ (R version and platform not queried). This cluster is registered to be automatically stopped by the garbage collector
 rm(list = "cl")
 gc()
-#>           used (Mb) gc trigger (Mb) max used  (Mb)
-#> Ncells 1039520 55.6    2039791  109  2039791 109.0
-#> Vcells 1902886 14.6    8388608   64  6454001  49.3
+#>           used (Mb) gc trigger  (Mb) max used  (Mb)
+#> Ncells 1037994 55.5    2035321 108.7  2035321 108.7
+#> Vcells 1899626 14.5    8388608  64.0  6452130  49.3
 ```

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -142,14 +142,14 @@ and udocker (<a href="https://indigo-dc.github.io/udocker/" class="external-link
 <h3 id="example-two-parallel-workers-running-in-docker">Example: Two parallel workers running in Docker<a class="anchor" aria-label="anchor" href="#example-two-parallel-workers-running-in-docker"></a>
 </h3>
 <p>This example sets up two parallel workers running Docker image
-‘rocker/r-parallel’ (<a href="https://hub.docker.com/r/rocker/r-parallel" class="external-link uri">https://hub.docker.com/r/rocker/r-parallel</a>).</p>
+‘rocker/r-ver:4.6.1’ (<a href="https://hub.docker.com/r/rocker/r-ver" class="external-link uri">https://hub.docker.com/r/rocker/r-ver</a>).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"localhost"</span>, times <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span>,</span>
 <span>  <span class="co">## Launch Rscript inside Linux container via Docker</span></span>
 <span>  rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"docker"</span>, <span class="st">"run"</span>, <span class="st">"--net=host"</span>, <span class="st">"rocker/r-parallel"</span>,</span>
+<span>    <span class="st">"docker"</span>, <span class="st">"run"</span>, <span class="st">"--net=host"</span>, <span class="st">"rocker/r-ver:4.6.1"</span>,</span>
 <span>    <span class="st">"Rscript"</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  <span class="co">## IMPORTANT: Because Docker runs inside a virtual machine (VM) on macOS</span></span>
@@ -160,48 +160,46 @@ and udocker (<a href="https://indigo-dc.github.io/udocker/" class="external-link
 <span>  master <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">.Platform</span><span class="op">$</span><span class="va">OS.type</span> <span class="op">==</span> <span class="st">"unix"</span><span class="op">)</span> <span class="cn">NULL</span> <span class="kw">else</span> <span class="st">"host.docker.internal"</span>,</span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Socket cluster with 2 nodes on host 'localhost' (R version 4.3.3</span></span>
-<span><span class="co">#&gt; (2024-02-29), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
+<span><span class="co">#&gt; Socket cluster with 2 nodes on host 'localhost' (R version 4.6.1</span></span>
+<span><span class="co">#&gt; (2026-06-24), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-two-parallel-workers-running-in-apptainer">Example: Two parallel workers running in Apptainer<a class="anchor" aria-label="anchor" href="#example-two-parallel-workers-running-in-apptainer"></a>
 </h3>
 <p>This example shows how to set up two parallel workers running Docker
-image ‘rocker/r-parallel’ (<a href="https://hub.docker.com/r/rocker/r-parallel" class="external-link uri">https://hub.docker.com/r/rocker/r-parallel</a>) via
-Apptainer (<a href="https://apptainer.org/" class="external-link uri">https://apptainer.org/</a>).</p>
+image ‘rocker/r-ver:4.6.1’ (<a href="https://hub.docker.com/r/rocker/r-ver" class="external-link uri">https://hub.docker.com/r/rocker/r-ver</a>) via Apptainer (<a href="https://apptainer.org/" class="external-link uri">https://apptainer.org/</a>).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"localhost"</span>, times <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span>,</span>
 <span>  <span class="co">## Launch Rscript inside Linux container via Apptainer</span></span>
 <span>  rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"apptainer"</span>, <span class="st">"exec"</span>, <span class="st">"docker://rocker/r-parallel"</span>,</span>
+<span>    <span class="st">"apptainer"</span>, <span class="st">"exec"</span>, <span class="st">"docker://rocker/r-ver:4.6.1"</span>,</span>
 <span>    <span class="st">"Rscript"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Socket cluster with 2 nodes on host 'localhost' (R version 3.6.1</span></span>
-<span><span class="co">#&gt; (2019-07-05), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
+<span><span class="co">#&gt; Socket cluster with 2 nodes on host 'localhost' (R version 4.6.1</span></span>
+<span><span class="co">#&gt; (2026-06-24), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-two-parallel-workers-running-in-udocker">Example: Two parallel workers running in udocker<a class="anchor" aria-label="anchor" href="#example-two-parallel-workers-running-in-udocker"></a>
 </h3>
 <p>This example shows how to set up two parallel workers running Docker
-image ‘rocker/r-parallel’ (<a href="https://hub.docker.com/r/rocker/r-parallel" class="external-link uri">https://hub.docker.com/r/rocker/r-parallel</a>) via udocker
-(<a href="https://indigo-dc.github.io/udocker/" class="external-link uri">https://indigo-dc.github.io/udocker/</a>).</p>
+image ‘rocker/r-ver:4.6.1’ (<a href="https://hub.docker.com/r/rocker/r-ver" class="external-link uri">https://hub.docker.com/r/rocker/r-ver</a>) via udocker (<a href="https://indigo-dc.github.io/udocker/" class="external-link uri">https://indigo-dc.github.io/udocker/</a>).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"localhost"</span>, times <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span>,</span>
 <span>  <span class="co">## Launch Rscript inside Linux container via Docker</span></span>
 <span>  rscript <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"udocker"</span>, <span class="st">"--quiet"</span>, <span class="st">"run"</span>, <span class="st">"rocker/r-parallel"</span>,</span>
+<span>    <span class="st">"udocker"</span>, <span class="st">"--quiet"</span>, <span class="st">"run"</span>, <span class="st">"rocker/r-ver:4.6.1"</span>,</span>
 <span>    <span class="st">"Rscript"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Socket cluster with 2 nodes on host 'localhost' (R version 3.6.1</span></span>
-<span><span class="co">#&gt; (2019-07-05), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
+<span><span class="co">#&gt; Socket cluster with 2 nodes on host 'localhost' (R version 4.6.1</span></span>
+<span><span class="co">#&gt; (2026-06-24), platform x86_64-pc-linux-gnu)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -215,7 +213,7 @@ image ‘rocker/r-parallel’ (<a href="https://hub.docker.com/r/rocker/r-parall
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0</p> and <a href="https://github.com/HenrikBengtsson/pkgdown.extras/">pkgdown.extras</a> 0.0.0.9007.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1</p> and <a href="https://github.com/HenrikBengtsson/pkgdown.extras/">pkgdown.extras</a> 0.0.0.9008.</p>
 </div>
 
     </footer>

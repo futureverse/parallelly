@@ -12,7 +12,7 @@ containers, e.g. Docker (<https://www.docker.com/>), Apptainer
 ### Example: Two parallel workers running in Docker
 
 This example sets up two parallel workers running Docker image
-‘rocker/r-parallel’ (<https://hub.docker.com/r/rocker/r-parallel>).
+‘rocker/r-ver:4.6.1’ (<https://hub.docker.com/r/rocker/r-ver>).
 
 ``` r
 
@@ -21,7 +21,7 @@ cl <- makeClusterPSOCK(
   rep("localhost", times = 2L),
   ## Launch Rscript inside Linux container via Docker
   rscript = c(
-    "docker", "run", "--net=host", "rocker/r-parallel",
+    "docker", "run", "--net=host", "rocker/r-ver:4.6.1",
     "Rscript"
   ),
   ## IMPORTANT: Because Docker runs inside a virtual machine (VM) on macOS
@@ -32,15 +32,15 @@ cl <- makeClusterPSOCK(
   master = if (.Platform$OS.type == "unix") NULL else "host.docker.internal",
 )
 print(cl)
-#> Socket cluster with 2 nodes on host 'localhost' (R version 4.3.3
-#> (2024-02-29), platform x86_64-pc-linux-gnu)
+#> Socket cluster with 2 nodes on host 'localhost' (R version 4.6.1
+#> (2026-06-24), platform x86_64-pc-linux-gnu)
 ```
 
 ### Example: Two parallel workers running in Apptainer
 
 This example shows how to set up two parallel workers running Docker
-image ‘rocker/r-parallel’ (<https://hub.docker.com/r/rocker/r-parallel>)
-via Apptainer (<https://apptainer.org/>).
+image ‘rocker/r-ver:4.6.1’ (<https://hub.docker.com/r/rocker/r-ver>) via
+Apptainer (<https://apptainer.org/>).
 
 ``` r
 
@@ -49,20 +49,20 @@ cl <- makeClusterPSOCK(
   rep("localhost", times = 2L),
   ## Launch Rscript inside Linux container via Apptainer
   rscript = c(
-    "apptainer", "exec", "docker://rocker/r-parallel",
+    "apptainer", "exec", "docker://rocker/r-ver:4.6.1",
     "Rscript"
   )
 )
 print(cl)
-#> Socket cluster with 2 nodes on host 'localhost' (R version 3.6.1
-#> (2019-07-05), platform x86_64-pc-linux-gnu)
+#> Socket cluster with 2 nodes on host 'localhost' (R version 4.6.1
+#> (2026-06-24), platform x86_64-pc-linux-gnu)
 ```
 
 ### Example: Two parallel workers running in udocker
 
 This example shows how to set up two parallel workers running Docker
-image ‘rocker/r-parallel’ (<https://hub.docker.com/r/rocker/r-parallel>)
-via udocker (<https://indigo-dc.github.io/udocker/>).
+image ‘rocker/r-ver:4.6.1’ (<https://hub.docker.com/r/rocker/r-ver>) via
+udocker (<https://indigo-dc.github.io/udocker/>).
 
 ``` r
 
@@ -71,11 +71,11 @@ cl <- makeClusterPSOCK(
   rep("localhost", times = 2L),
   ## Launch Rscript inside Linux container via Docker
   rscript = c(
-    "udocker", "--quiet", "run", "rocker/r-parallel",
+    "udocker", "--quiet", "run", "rocker/r-ver:4.6.1",
     "Rscript"
   )
 )
 print(cl)
-#> Socket cluster with 2 nodes on host 'localhost' (R version 3.6.1
-#> (2019-07-05), platform x86_64-pc-linux-gnu)
+#> Socket cluster with 2 nodes on host 'localhost' (R version 4.6.1
+#> (2026-06-24), platform x86_64-pc-linux-gnu)
 ```
