@@ -11,11 +11,84 @@
 
 # Introduction
 
-This vignette illustrates how to launch parallel workers via job
-schedulers running in high-performance compute (HPC) environments.
+This vignette illustrates how to launch parallel workers in high-performance compute (HPC) environments. The examples show how to launch multi-node workers as allotted by the job schedulers and reflected by `parallelly::availableWorkers()`.
 
 
 # Examples
+
+## Example: Launch parallel workers via the Slurm job scheduler
+
+'Slurm' is a high-performance compute (HPC) job scheduler where one can request compute resources on multiple nodes, each running multiple cores.
+
+Consider the following two files: `script.sh` and `script.R`.
+
+script.sh:
+
+```sh
+#! /usr/bin/env bash
+#SBATCH --mem-per-cpu=100M    ## 100 MiB RAM per worker
+#SBATCH --time=00:10:00       ## 10 minutes runtime 
+#SBATCH --nodes=4             ## 4 compute nodes
+#SBATCH --ntasks=16           ## 16 compute tasks
+#SBATCH --cpus-per-task=1     ## 1 CPU per task (=> 16 workers)
+
+echo "Information on R:"
+Rscript --version
+
+echo "Running R script:"
+Rscript script.R
+```
+
+script.R:
+
+```r
+library(parallelly)
+library(parallel)
+
+cl <- makeClusterPSOCK(
+  availableWorkers(),
+  rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "-w"),
+  rscript_sh = c("auto", "none")
+)
+print(cl)
+
+# Perform calculations in parallel
+X <- 1:100
+y <- parLapply(cl = cl, X, fun = sqrt)
+y <- unlist(y)
+z <- sum(y)
+print(z)
+
+stopCluster(cl)
+```
+
+The `script.sh` file is a job script that we submit to the scheduler that runs the R script `script.R` when launched. We can submit `script.sh` as:
+
+```sh
+$ sbatch script.sh
+```
+
+This will request 16 tasks (CPU slots) across 4 compute nodes.
+
+Each parallel worker is launched via Slurm's `srun` command from the main R session that runs.
+
+Here is the output from one such run, where the scheduler happened to
+allot the slots across three machines:
+
+```sh
+Information on R:
+Rscript (R) version 4.6.1 (2026-06-24)
+Running R script:
+Socket cluster with 16 nodes where 10 nodes are on host 'localhost'
+(R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu), 2 
+nodes are on host 'gcpu2-14' (R version 4.6.1 (2026-06-24), 
+platform x86_64-pc-linux-gnu), 2 nodes are on host 'gcpu2-15' (R
+version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu), 2 nodes
+are on host 'gcpu2-16' (R version 4.6.1 (2026-06-24), platform 
+x86_64-pc-linux-gnu)
+[1] 671.4629
+```
+
 
 ## Example: Launch parallel workers via the Grid Engine job scheduler
 

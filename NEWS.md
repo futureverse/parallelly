@@ -1,5 +1,10 @@
 # Version (development version)
 
+## Documentation
+
+ * Add example to HPC vignette on how to launch parallel workers in a
+   multi-node Slurm job.
+
 ## Bug Fixes
 
  * `availableWorkers(method = "Slurm")` incorrectly returned exactly
