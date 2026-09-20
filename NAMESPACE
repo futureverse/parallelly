@@ -69,7 +69,11 @@ importFrom(parallel,
   makeCluster,
   stopCluster
 )
-importFrom(tools,pskill)
+importFrom(tools,
+  SIGKILL,
+  SIGTERM,
+  pskill
+)
 importFrom(utils,
   capture.output,
   file_test,

@@ -74,6 +74,7 @@
 #' @seealso
 #' Use [isNodeAlive()] to check whether one or more cluster nodes are alive.
 #'
+#' @importFrom tools SIGTERM
 #' @export
 killNode <- function(x, signal = tools::SIGTERM, ...) {
   stop_if_not(
@@ -86,13 +87,14 @@ killNode <- function(x, signal = tools::SIGTERM, ...) {
   UseMethod("killNode")
 }
 
+#' @importFrom tools SIGTERM
 #' @export
 killNode.default <- function(x, signal = tools::SIGTERM, ...) {
   warning(sprintf("killNode() is not supported for this %s. Signal %d was not sent", sQuote(class(x)[1]), signal))
   NA
 }
 
-#' @importFrom tools pskill
+#' @importFrom tools pskill SIGKILL SIGTERM
 #' @importFrom utils file_test
 #' @export
 killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...) {
@@ -299,6 +301,7 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
   success
 }
 
+#' @importFrom tools SIGTERM
 #' @export
 killNode.cluster <- function(x, signal = tools::SIGTERM, ...) {
   vapply(x, FUN = killNode, signal = signal, ..., FUN.VALUE = NA)
