@@ -2,6 +2,22 @@
 
 ## Version (development version)
 
+### Documentation
+
+- Add example to HPC vignette on how to launch parallel workers in a
+  multi-node Slurm job.
+
+### Bug Fixes
+
+- `availableWorkers(method = "Slurm")` incorrectly returned exactly
+  `SLURM_CPUS_PER_TASK` workers per node when that environment variable
+  was set, while completely ignoring the total number of allocated CPUs
+  on the node. This would underestimate the number of workers available.
+  Now it returns the number of Slurm tasks per node, calculated as the
+  total Slurm CPUs divided by `SLURM_CPUS_PER_TASK`. This update also
+  fixed a problem where it for some Slurm resource requests could
+  overestimate the number of workers available.
+
 ### Deprecated and Defunct
 
 - Calling `future::availableCores()`, `future::availableWorkers()`,

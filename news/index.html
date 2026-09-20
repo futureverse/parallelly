@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,6 +79,15 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
+<div class="section level3">
+<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<ul><li>Add example to HPC vignette on how to launch parallel workers in a multi-node Slurm job.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>
+<code>availableWorkers(method = "Slurm")</code> incorrectly returned exactly <code>SLURM_CPUS_PER_TASK</code> workers per node when that environment variable was set, while completely ignoring the total number of allocated CPUs on the node. This would underestimate the number of workers available. Now it returns the number of Slurm tasks per node, calculated as the total Slurm CPUs divided by <code>SLURM_CPUS_PER_TASK</code>. This update also fixed a problem where it for some Slurm resource requests could overestimate the number of workers available.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="deprecated-and-defunct-development-version">Deprecated and Defunct<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-development-version"></a></h3>
 <ul><li>Calling <code>future::availableCores()</code>, <code>future::availableWorkers()</code>, <code>future::makeClusterPSOCK()</code>, and <code>future::supportsMulticore()</code> now produces a deprecation warning alerting the user to use the corresponding and identical <code>parallelly::*()</code> functions instead.</li>
