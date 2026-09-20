@@ -758,12 +758,16 @@ availableWorkersSlurm <- function() {
 
     ## Always respect 'SLURM_CPUS_PER_TASK' (always a scalar), if that exists
     n <- getenv_int("SLURM_CPUS_PER_TASK")
-    if (!is.na(n)) {
+    if (!is.na(n) && n > 0L) {
       c0 <- c
-      c <- rep(n, times = length(w))
-      ## Is our assumption that SLURM_CPUS_PER_TASK <= SLURM_JOB_NODELIST, correct?
+      ## The number of usable CPUs per node is the number of tasks per node (c0 %/% n) 
+      ## multiplied by the CPUs per task (n). This fixes the bug where multiple tasks
+      ## per node were ignored.
+      c <- (c0 %/% n) * n
+      
+      ## Is our assumption that SLURM_CPUS_PER_TASK <= SLURM_JOB_CPUS_PER_NODE, correct?
       if (any(c0 < n)) {
-        c <- pmin(c0, n)
+        c[c0 < n] <- c0[c0 < n]
         warnf("Unexpected values of Slurm environment variable. The Slurm environment variables specify CPU counts on one or more nodes that is strictly less than what 'SLURM_CPUS_PER_TASK' specifies. Will use the minimum of the two for each node: %s < %s", sQuote(nodecounts), n)
       }
     }
