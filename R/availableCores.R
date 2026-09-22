@@ -547,8 +547,8 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
 
   ## Upper limit?
   if (is.finite(max)) {
-    ncores <- min(max, ncores, na.rm = TRUE)
-    ncores <- as.integer(ncores)
+    ncores <- pmin(ncores, max, na.rm = TRUE)
+    storage.mode(ncores) <- "integer"
   }
 
   ## Sanity check

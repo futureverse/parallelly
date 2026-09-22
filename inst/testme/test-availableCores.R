@@ -717,4 +717,25 @@ options(oopts)
 message("*** availableCores(methods.excludes) ... done")
 
 
+message("*** availableCores(max, which = 'all') ...")
+
+## When 'which = "all"' and methods disagree, 'max' should clamp each
+## method's value independently, preserving names and length [#XXX]
+Sys.setenv(NSLOTS = "3")
+ns0 <- availableCores(methods = c("system", "NSLOTS"), which = "all")
+stopifnot(length(ns0) == 2, identical(names(ns0), c("system", "NSLOTS")))
+
+ns <- availableCores(methods = c("system", "NSLOTS"), which = "all", max = 6L)
+print(ns)
+stopifnot(
+  length(ns) == length(ns0),
+  identical(names(ns), names(ns0)),
+  all(ns <= 6L),
+  ns[["NSLOTS"]] == 3L  ## unaffected, since already <= max
+)
+Sys.unsetenv("NSLOTS")
+
+message("*** availableCores(max, which = 'all') ... DONE")
+
+
 message("*** availableCores() ... DONE")

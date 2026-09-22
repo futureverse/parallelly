@@ -16,6 +16,9 @@
    `SLURM_CPUS_PER_TASK`. This update also fixed a problem where it
    for some Slurm resource requests could overestimate the number of
    workers available.
+
+ * `availableCores(which = "all", max = n)` would returned only the
+   smallest value among all and unnamed.
   
 ## Deprecated and Defunct
 
