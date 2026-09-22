@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,12 +85,14 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>
-<code>availableWorkers(method = "Slurm")</code> incorrectly returned exactly <code>SLURM_CPUS_PER_TASK</code> workers per node when that environment variable was set, while completely ignoring the total number of allocated CPUs on the node. This would underestimate the number of workers available. Now it returns the number of Slurm tasks per node, calculated as the total Slurm CPUs divided by <code>SLURM_CPUS_PER_TASK</code>. This update also fixed a problem where it for some Slurm resource requests could overestimate the number of workers available.</li>
+<ul><li><p><code>availableWorkers(method = "Slurm")</code> incorrectly returned exactly <code>SLURM_CPUS_PER_TASK</code> workers per node when that environment variable was set, while completely ignoring the total number of allocated CPUs on the node. This would underestimate the number of workers available. Now it returns the number of Slurm tasks per node, calculated as the total Slurm CPUs divided by <code>SLURM_CPUS_PER_TASK</code>. This update also fixed a problem where it for some Slurm resource requests could overestimate the number of workers available.</p></li>
+<li><p><code>availableCores(which = "all", max = n)</code> would return only the smallest value among all and unnamed.</p></li>
+<li><p><code>makeNodePSOCK(..., manual = TRUE)</code> would unexpectedly run the pre-launch self-test on localhost.</p></li>
+<li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> would still record the call stack for each node, even if argument <code>calls = FALSE</code> (default).</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="deprecated-and-defunct-development-version">Deprecated and Defunct<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-development-version"></a></h3>
-<ul><li>Calling <code>future::availableCores()</code>, <code>future::availableWorkers()</code>, <code>future::makeClusterPSOCK()</code>, and <code>future::supportsMulticore()</code> now produces a deprecation warning alerting the user to use the corresponding and identical <code>parallelly::*()</code> functions instead.</li>
+<ul><li>Calling <code><a href="https://parallelly.futureverse.org/reference/availableCores.html">future::availableCores()</a></code>, <code><a href="https://parallelly.futureverse.org/reference/availableWorkers.html">future::availableWorkers()</a></code>, <code><a href="https://parallelly.futureverse.org/reference/makeClusterPSOCK.html">future::makeClusterPSOCK()</a></code>, and <code><a href="https://parallelly.futureverse.org/reference/supportsMulticore.html">future::supportsMulticore()</a></code> now produces a deprecation warning alerting the user to use the corresponding and identical <code>parallelly::*()</code> functions instead.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -716,7 +718,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="miscellaneous-1-17-0">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous-1-17-0"></a></h3>
-<ul><li>Not all CRAN servers have <code>_R_CHECK_LIMIT_CORES_</code> set. To better emulate CRAN submission checks, the <strong>future</strong> package will, when loaded, set this environment variable to TRUE if unset and if <code>R CMD check</code> is running. Note that <code>future::availableCores()</code> respects <code>_R_CHECK_LIMIT_CORES_</code> and returns at most <code>2L</code> (two cores) if detected.</li>
+<ul><li>Not all CRAN servers have <code>_R_CHECK_LIMIT_CORES_</code> set. To better emulate CRAN submission checks, the <strong>future</strong> package will, when loaded, set this environment variable to TRUE if unset and if <code>R CMD check</code> is running. Note that <code><a href="https://parallelly.futureverse.org/reference/availableCores.html">future::availableCores()</a></code> respects <code>_R_CHECK_LIMIT_CORES_</code> and returns at most <code>2L</code> (two cores) if detected.</li>
 </ul></div>
 </div>
     <div class="section level2">

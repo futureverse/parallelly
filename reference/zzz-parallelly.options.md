@@ -273,11 +273,15 @@ variable `R_FUTURE_AVAILABLECORES_FALLBACK=1` is the same as setting
 - `parallelly.future.reexports`::
 
   (character string) Controls whether a deprecation warning should be
-  produced when `future::availableCores()`,
-  `future::availableWorkers()`, `future::makeClusterPSOCK()`, or
-  `future::supportsMulticore()` are called. If `"deprecated"` (default),
-  a warning is produced. If `"defunct"`, an error is produced. If
-  `"ignore"`, no warning or error is produced.
+  produced when
+  [`future::availableCores()`](https://parallelly.futureverse.org/reference/availableCores.html),
+  [`future::availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.html),
+  [`future::makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.html),
+  or
+  [`future::supportsMulticore()`](https://parallelly.futureverse.org/reference/supportsMulticore.html)
+  are called. If `"deprecated"` (default), a warning is produced. If
+  `"defunct"`, an error is produced. If `"ignore"`, no warning or error
+  is produced.
 
 ## See also
 
