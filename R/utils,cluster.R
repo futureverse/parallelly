@@ -50,6 +50,9 @@ is_localhost <- local({
     ## Search for (hostname, worker) and (worker, hostname)
     ## occuring on the same line and are separates by one or
     ## more whitespace symbols (but nothing else).
+    ## (i) Escape dots, so they are matched literally, not as wildcards
+    hostname <- gsub(".", "[.]", hostname, fixed = TRUE)
+    worker <- gsub(".", "[.]", worker, fixed = TRUE)
     pattern <- sprintf("^((|.*[[:space:]])%s[[:space:]]+%s([[:space:]]+|)|(|.*[[:space:]])%s[[:space:]]+%s([[:space:]]+|))$", hostname, worker, worker, hostname)
     
     for (pathname in pathnames) {
