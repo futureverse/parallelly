@@ -431,6 +431,10 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
       mdebugf("%s%d workers out of %d ready", verbose_prefix, ready, length(cl))
       mdebugf_pop("%sWaiting for workers to connect back ... done", verbose_prefix)
     }
+
+    ## Cleanup
+    try(close(socket), silent = TRUE)
+    socket <- NULL
   } else if (setup_strategy == "sequential") {
     retryPort <- getOption2("parallelly.makeNodePSOCK.tries.port", "same")
     for (ii in seq_along(cl)) {
@@ -495,10 +499,6 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     mdebugf("%sLaunching of %d workers completed", verbose_prefix, n)
     mdebugf("%sNumber of nodes in cluster: %d", verbose_prefix, length(cl))
   }
-
-  ## Cleanup
-  try(close(socket), silent = TRUE)
-  socket <- NULL
 
   ## Sanity check
   stopifnot(length(cl) == n)
