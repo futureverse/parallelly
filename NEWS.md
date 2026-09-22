@@ -17,6 +17,11 @@
    for some Slurm resource requests could overestimate the number of
    workers available.
 
+ * `isNodeAlive()` and `killNode()` would give an error, e.g.
+   "Error in as.character(x) : cannot coerce type 'closure' to
+   vector of type 'character'", on a node created by
+   `makeClusterPSOCK(..., rshcmd)` where `rshcmd` was a function.
+
  * `availableCores(which = "all", max = n)` would return only the
    smallest value among all and unnamed.
 
@@ -25,11 +30,6 @@
 
  * `makeClusterPSOCK()` would still record the call stack for each
    node, even if argument `calls = FALSE` (default).
-
- * `isNodeAlive()` and `killNode()` would give an error, e.g.
-   "Error in as.character(x) : cannot coerce type 'closure' to
-   vector of type 'character'", on a node created by
-   `makeClusterPSOCK(..., rshcmd)` where `rshcmd` was a function.
 
 ## Deprecated and Defunct
 
