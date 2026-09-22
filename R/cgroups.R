@@ -575,8 +575,9 @@ getCGroupsPath <- local({
     if (!file_test("-d", path)) {
       res <- NA_character_
       .cache[[controller]] <<- res
+      return(res)
     }
-    
+
     res <- normalizePath(path, mustWork = FALSE)
     .cache[[controller]] <<- res
     res
