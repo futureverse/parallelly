@@ -141,6 +141,20 @@ for (setup_strategy in c("sequential", "parallel")) {
 }
 
 
+message("- makeClusterPSOCK() - only collect sys.calls() if calls = TRUE")
+
+## Assert that sys.calls() is only collected if calls = TRUE
+for (setup_strategy in c("sequential", "parallel")) {
+  cl <- makeClusterPSOCK(1L, setup_strategy = setup_strategy, calls = FALSE)
+  stopifnot(is.null(attr(cl[[1]], "calls")))
+  parallel::stopCluster(cl)
+
+  cl <- makeClusterPSOCK(1L, setup_strategy = setup_strategy, calls = TRUE)
+  stopifnot(!is.null(attr(cl[[1]], "calls")))
+  parallel::stopCluster(cl)
+}
+
+
 message("- makeClusterPSOCK() - with and w/out validation")
 
 cl <- makeClusterPSOCK(1L, validate = TRUE) ## default

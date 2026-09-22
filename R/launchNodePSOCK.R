@@ -22,6 +22,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
   rshcmd <- options[["rshcmd"]]
   revtunnel <- options[["revtunnel"]]
   setup_strategy <- options[["setup_strategy"]]
+  calls <- options[["arguments"]][["calls"]]
 
   if (setup_strategy == "parallel") {
     stop("INTERNAL ERROR: launchNodePSOCK() called with setup_strategy='parallel', which should never occur")
@@ -221,7 +222,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
   structure(
     list(con = con, host = worker, rank = rank, rshlogfile = rshlogfile),
     options = options,
-    calls = sys.calls(),
+    calls = if (isTRUE(calls)) sys.calls() else NULL,
     class = c("RichSOCKnode", if (useXDR) "SOCKnode" else "SOCK0node")
   )
 } ## launchNodePSOCK()

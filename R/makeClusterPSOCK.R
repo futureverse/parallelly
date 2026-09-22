@@ -405,7 +405,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
         scon <- structure(
           list(con = con, host = localhostHostname, rank = ready),
           options = options,
-          calls = sys.calls(),
+          calls = if (isTRUE(options[["arguments"]][["calls"]])) sys.calls() else NULL,
           class = nodeClass
         )
         res <- tryCatch({

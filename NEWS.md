@@ -22,6 +22,9 @@
 
  * `makeNodePSOCK(..., manual = TRUE)` would unexpectedly run the
    pre-launch self-test on localhost.
+
+ * `makeClusterPSOCK()` would still record the call stack for each
+   node, even if argument `calls = FALSE` (default).
   
 ## Deprecated and Defunct
 
