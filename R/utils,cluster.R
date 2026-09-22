@@ -368,7 +368,7 @@ readWorkerPID <- function(pidfile, wait = 0.5, maxTries = 8L, verbose = FALSE) {
   
   ## Wait for PID file
   tries <- 0L
-  while (!file.exists(pidfile) && tries <= maxTries) {
+  while (!file.exists(pidfile) && tries < maxTries) {
     Sys.sleep(wait)
     tries <- tries + 1L
   }
