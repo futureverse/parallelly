@@ -740,7 +740,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
   rscript_args_internal <- character(0L)
 
   ## Can we get the worker's PID during launch?
-  if (localMachine && !dryrun) {
+  if (localMachine && !dryrun && !manual) {
     res <- useWorkerPID(rscript, rank = rank, rscript_sh = rscript_sh[1], verbose = verbose)
     pidfile <- res$pidfile
     rscript_args_internal <- c(res$rscript_pid_args, rscript_args_internal)

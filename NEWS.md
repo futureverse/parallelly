@@ -17,8 +17,11 @@
    for some Slurm resource requests could overestimate the number of
    workers available.
 
- * `availableCores(which = "all", max = n)` would returned only the
+ * `availableCores(which = "all", max = n)` would return only the
    smallest value among all and unnamed.
+
+ * `makeNodePSOCK(..., manual = TRUE)` would unexpectedly run the
+   pre-launch self-test on localhost.
   
 ## Deprecated and Defunct
 

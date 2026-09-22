@@ -248,4 +248,13 @@ stopifnot(grepl("message\\([\"']opt_hello[\"']\\)", options$cmd))
 options(parallelly.makeNodePSOCK.rscript_call = NULL)
 
 
+## Assert that manual = TRUE skips localhost PID self-test
+message("- manual = TRUE must not run the PID self-test ...")
+options <- makeNodePSOCK(port = 12345L, manual = TRUE, quiet = TRUE, action = "options")
+stopifnot(inherits(options, "makeNodePSOCKOptions"), is.null(options[["pidfile"]]))
+
+options <- makeNodePSOCK(port = 12345L, manual = TRUE, dryrun = TRUE, quiet = TRUE, action = "options")
+stopifnot(inherits(options, "makeNodePSOCKOptions"), is.null(options[["pidfile"]]))
+
+
 message("*** makeNodePSOCK() ... DONE")
