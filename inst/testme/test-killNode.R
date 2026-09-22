@@ -109,6 +109,29 @@ if (on_windows) {
 
 cl <- NULL
 
+if (!on_windows) {
+  ## Assert remote kill also work when 'rshcmd' is a function
+  message("- killNode.RichSOCKnode (remote host with function rshcmd) ...")
+  cl <- makeClusterPSOCK(1L, autoStop = FALSE)
+  node <- cl[[1]]
+  node$session_info$system$nodename <- "fake-remote-host.invalid"
+  options <- attr(node, "options")
+  options$rshcmd <- function(rshopts, worker) "echo"
+  options$rscript_sh <- c("sh", "sh")
+  attr(node, "options") <- options
+  res <- tryCatch({
+    suppressWarnings(killNode(node))
+  }, warning = function(w) NA, error = function(e) {
+    message("  Unexpected error: ", conditionMessage(e))
+    e
+  })
+  print(res)
+  stopifnot(!inherits(res, "error"))
+  parallel::stopCluster(cl)
+  cl <- NULL
+  message("- killNode.RichSOCKnode (remote host with function rshcmd) ... DONE")
+}
+
 message("- Exceptions")
 res <- killNode(NULL)
 print(res)

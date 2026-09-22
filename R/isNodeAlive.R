@@ -107,7 +107,11 @@ isNodeAlive.RichSOCKnode <- function(x, timeout = 0.0, ...) {
   rshopts <- args_org$rshopts
   if (length(args_org$user) == 1L) rshopts <- c("-l", args_org$user, rshopts)
   rshopts <- paste(rshopts, collapse = " ")
-  rsh_call <- paste(paste(shQuote(rshcmd), collapse = " "), rshopts, worker)
+  if (is.function(rshcmd)) {
+    rsh_call <- rshcmd(rshopts = rshopts, worker = worker)
+  } else {
+    rsh_call <- paste(paste(shQuote(rshcmd), collapse = " "), rshopts, worker)
+  }
   if (debug) mdebugf("Command to connect to the other host: %s", rsh_call)
   stop_if_not(length(rsh_call) == 1L)
 

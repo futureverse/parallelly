@@ -146,6 +146,26 @@ if (.Platform[["OS.type"]] != "windows") {
   parallel::stopCluster(cl)
   message("- isNodeAlive.RichSOCKnode (remote host with debug) ... DONE")
 
+  ## Assert remote checks also work when 'rshcmd' is a function
+  message("- isNodeAlive.RichSOCKnode (remote host with function rshcmd) ...")
+  cl <- makeClusterPSOCK(1L)
+  node <- cl[[1]]
+  node$session_info$system$nodename <- "fake-remote-host.invalid"
+  options <- attr(node, "options")
+  options$rshcmd <- function(rshopts, worker) "echo"
+  options$rscript_sh <- c("sh", "sh")
+  attr(node, "options") <- options
+  res <- tryCatch({
+    suppressWarnings(isNodeAlive(node, timeout = 1.0))
+  }, warning = function(w) NA, error = function(e) {
+    message("  Unexpected error: ", conditionMessage(e))
+    e
+  })
+  print(res)
+  stopifnot(!inherits(res, "error"), is.na(res))
+  parallel::stopCluster(cl)
+  message("- isNodeAlive.RichSOCKnode (remote host with function rshcmd) ... DONE")
+
 } ## if (.Platform[["OS.type"]] != "windows")
 
 
