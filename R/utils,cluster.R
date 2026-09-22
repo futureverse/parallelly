@@ -198,6 +198,77 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
 }
 
 
+## Runs R code on the remote host of 'node' per 'rshcmd'
+run_remote_rscript <- function(node, code, timeout, debug, what, msg) {
+  options <- attr(node, "options")
+  args_org <- options$arguments
+  worker <- options$worker
+  rshcmd <- options$rshcmd
+  rscript <- options$rscript
+  rscript_sh <- options$rscript_sh
+
+  ## Command to call Rscript -e
+  rscript_args <- paste(c("-e", shQuote(code, type = rscript_sh[1])), collapse = " ")
+  cmd <- paste(rscript, rscript_args)
+  if (debug) mdebugf("Rscript command to be called on the other host: %s", cmd)
+  stop_if_not(length(cmd) == 1L)
+
+  rshopts <- args_org$rshopts
+  if (length(args_org$user) == 1L) rshopts <- c("-l", args_org$user, rshopts)
+  rshopts <- paste(rshopts, collapse = " ")
+  if (is.function(rshcmd)) {
+    rsh_call <- rshcmd(rshopts = rshopts, worker = worker)
+  } else {
+    rsh_call <- paste(paste(shQuote(rshcmd), collapse = " "), rshopts, worker)
+  }
+  if (debug) mdebugf("Command to connect to the other host: %s", rsh_call)
+  stop_if_not(length(rsh_call) == 1L)
+
+  local_cmd <- paste(rsh_call, shQuote(cmd, type = rscript_sh[2]))
+  if (debug) mdebugf("System call: %s", local_cmd)
+  stop_if_not(length(local_cmd) == 1L)
+
+  ## system() ignores fractions of seconds, so need to be at least 1 second
+  if (timeout > 0 && timeout < 1) timeout <- 1.0
+  if (debug) mdebugf("Timeout: %g seconds", timeout)
+
+  ## system() does not support argument 'timeout' in R (<= 3.4.0)
+  if (getRversion() < "3.5.0") {
+    if (timeout > 0) warning(sprintf("%s does not support argument 'timeout' in R (< 3.5.0) for cluster nodes running on a remote machine", what))
+    system <- function(..., timeout) base::system(...)
+  }
+
+  reason <- NULL
+  res <- withCallingHandlers({
+    system(local_cmd, intern = TRUE, ignore.stderr = TRUE, timeout = timeout)
+  }, condition = function(w) {
+    reason <<- conditionMessage(w)
+    if (debug) mdebugf("Caught condition: %s", reason)
+  })
+  if (debug) mdebugf("Results: %s", res)
+  status <- attr(res, "status")
+  res <- as.logical(res)
+  if (length(res) != 1L || is.na(res)) {
+    res <- NA
+    attr(res, "status") <- status
+
+    if (!is.null(reason)) {
+      if (debug) mdebugf("Reason: %s", reason)
+      msg <- sprintf("%s. Reason reported: %s", msg, reason)
+    }
+
+    if (!is.null(status)) {
+      if (debug) mdebugf("Status: %s", status)
+      msg <- sprintf("%s [exit code: %d]", msg, status)
+    }
+
+    warning(msg)
+  }
+
+  res
+} ## run_remote_rscript()
+
+
 #' @importFrom utils installed.packages
 session_info <- function(pkgs = getOption2("parallelly.makeNodePSOCK.sessionInfo.pkgs", FALSE)) {
   libs <- .libPaths()
