@@ -195,9 +195,10 @@ cloneCGroups <- function(tarfile = "cgroups.tar.gz") {
         cgroups_tt <- cgroups_tt[1, ]
       }
     } else {
-      mounts_tt <- mounts
-      cgroups_tt <- cgroups
-      
+      ## CGroups v2
+      mounts_tt <- mounts[mounts$type == "cgroup2", ]
+      cgroups_tt <- cgroups[cgroups$controller == "", ]
+
       if (nrow(mounts_tt) == 0) {
         ## No CGroups v2 mountpoint for specified controller
 	next
