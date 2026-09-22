@@ -30,7 +30,7 @@
    "Error in as.character(x) : cannot coerce type 'closure' to
    vector of type 'character'", on a node created by
    `makeClusterPSOCK(..., rshcmd)` where `rshcmd` was a function.
-  
+
 ## Deprecated and Defunct
 
  * Calling `future::availableCores()`, `future::availableWorkers()`,

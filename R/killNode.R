@@ -104,10 +104,10 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
   }
 
   ## If successfully killed, and node has a socket connection, close it
-  success <- NA
+  signaled <- NA  # was signal sent?
   on.exit({
     ## Epilogue cleanups, if successfully signaled
-    if (isTRUE(success)) local({
+    if (isTRUE(signaled)) local({
       if (debug) {
         mdebug_push("Post-kill cleanup ...")
         mdebugf("Signal: %d", signal)
@@ -179,8 +179,11 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
       } else {
         if (debug) mdebugf("Skipping, because signal was %d", signal)
       } ## if (signal %in% ...)
-    }) ## if (isTRUE(success)) local({ ... })
+    }) ## if (isTRUE(signaled)) local({ ... })
   }) ## on.exit()
+
+  # Return value in {FALSE, TRUE} or NA for R (< 3.5.0)
+  success <- NA
 
   if (debug) {
     on.exit({
@@ -221,7 +224,8 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
       mdebugf("pskill(pid = %d, signal = %d)", pid, signal)
     }
     ## Try to signal the process
-    success <- pskill(pid, signal = signal)
+    signaled <- pskill(pid, signal = signal)
+    success <- signaled
     if (getRversion() < "3.5.0") success <- NA
     return(success)
   }
@@ -301,6 +305,7 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
   } else if (isTRUE(res)) {
     success <- TRUE
   }
+  signaled <- success
 
   success
 }
