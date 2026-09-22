@@ -332,6 +332,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     useXDR <- options[["useXDR"]]
     nodeClass <- c("RichSOCKnode", if(useXDR) "SOCKnode" else "SOCK0node")
     cmd <- options[["cmd"]]
+    pidfile <- options[["pidfile"]]
 
     if (verbose) {
       mdebugf("%sSystem call to launch all workers:", verbose_prefix)
@@ -435,6 +436,9 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     ## Cleanup
     try(close(socket), silent = TRUE)
     socket <- NULL
+
+    ## Workers successfully connected: remove the temporary PID file
+    readWorkerPID(pidfile)
   } else if (setup_strategy == "sequential") {
     retryPort <- getOption2("parallelly.makeNodePSOCK.tries.port", "same")
     for (ii in seq_along(cl)) {
