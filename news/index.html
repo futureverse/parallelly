@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9012</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,6 +89,7 @@
 <li><p><code>availableCores(which = "all", max = n)</code> would return only the smallest value among all and unnamed.</p></li>
 <li><p><code>makeNodePSOCK(..., manual = TRUE)</code> would unexpectedly run the pre-launch self-test on localhost.</p></li>
 <li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> would still record the call stack for each node, even if argument <code>calls = FALSE</code> (default).</p></li>
+<li><p><code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> would give an error, e.g. “Error in as.character(x) : cannot coerce type ‘closure’ to vector of type ‘character’”, on a node created by <code>makeClusterPSOCK(..., rshcmd)</code> where <code>rshcmd</code> was a function.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="deprecated-and-defunct-development-version">Deprecated and Defunct<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-development-version"></a></h3>

@@ -28,6 +28,13 @@
   would still record the call stack for each node, even if argument
   `calls = FALSE` (default).
 
+- [`isNodeAlive()`](https://parallelly.futureverse.org/reference/isNodeAlive.md)
+  and
+  [`killNode()`](https://parallelly.futureverse.org/reference/killNode.md)
+  would give an error, e.g. “Error in as.character(x) : cannot coerce
+  type ‘closure’ to vector of type ‘character’”, on a node created by
+  `makeClusterPSOCK(..., rshcmd)` where `rshcmd` was a function.
+
 ### Deprecated and Defunct
 
 - Calling
