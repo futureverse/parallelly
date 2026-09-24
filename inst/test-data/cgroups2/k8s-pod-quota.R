@@ -1,5 +1,5 @@
-## Kubernetes pod with a CPU limit of 2.0 set at the pod level,
-## with the container's own CGroup is unrestricted ("max")
+## Kubernetes pod with a CPU limit of 2 set at the pod level,
+## with the container's own cgroup is unrestricted (-1)
 value <- parallelly:::getCGroups2CpuMax()
 print(value)
 stopifnot(identical(value, 2.0))

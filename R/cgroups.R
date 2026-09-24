@@ -921,14 +921,40 @@ getCGroups1CpuQuota <- local({
     quota <- get_package_option("cgroups.cpuquota", NULL)
     if (!is.null(quota)) return(quota)
 
-    ms <- getCGroups1CpuQuotaMicroseconds()
-    if (!is.na(ms) && ms < 0) ms <- NA_integer_
-    
-    total <- getCGroups1CpuPeriodMicroseconds()
-    if (!is.na(total) && total < 0) total <- NA_integer_
-    
-    value <- ms / total
-  
+    quotas <- suppressWarnings({
+      ## e.g. /sys/fs/cgroup/cpu/cpu.cfs_quota_us, or hierarchically at
+      ## /sys/fs/cgroup/cpu/cpu.cfs_quota_us and
+      ## /sys/fs/cgroup/cpu/subpath/cpu.cfs_quota_us
+      getCGroupsValues("cpu", "cpu.cfs_quota_us")
+    })
+
+    periods <- suppressWarnings({
+      ## e.g. /sys/fs/cgroup/cpu/cpu.cfs_period_us, or hierarchically at
+      ## /sys/fs/cgroup/cpu/cpu.cfs_period_us and
+      ## /sys/fs/cgroup/cpu/subpath/cpu.cfs_period_us
+      getCGroupsValues("cpu", "cpu.cfs_period_us")
+    })
+    names(periods) <- vapply(periods, FUN = attr, "path", FUN.VALUE = NA_character_)
+
+    ## Parse each '<quota>' and '<period>' pair of the same cgroup
+    ## into a ratio
+    ratios <- vapply(quotas, FUN = function(quota) {
+      period <- periods[[attr(quota, "path")]]
+      if (is.null(period)) return(NA_real_)
+      ms <- suppressWarnings(as.integer(quota))
+      total <- suppressWarnings(as.integer(period))
+      if (is.na(ms) || ms < 0) return(NA_real_)
+      if (is.na(total) || total <= 0) return(NA_real_)
+      ms / total
+    }, FUN.VALUE = NA_real_, USE.NAMES = FALSE)
+
+    ratios <- ratios[!is.na(ratios)]
+    if (length(ratios) == 0L) {
+      .cache <<- NA_real_
+      return(.cache)
+    }
+
+    value <- min(ratios)
     if (!is.na(value)) {
       max_cores <- maxCores()
       if (is.na(max_cores)) {

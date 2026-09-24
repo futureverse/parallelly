@@ -7,9 +7,9 @@
 
 ## Bug Fixes
 
- * `availableCores()` did not respect CGroups v2 CPU quotas
-   (`cpu.max`) set on a parent CGroup when a less restricted one was
-   set on the process itself.
+ * `availableCores()` did not respect CGroups v1 and v2 CPU quotas
+   (`cpu.cfs_quota_us` and `cpu.max`) set on a parent CGroup when a
+   less restricted one was set on the process itself.
 
  * `availableWorkers(method = "Slurm")` incorrectly returned exactly
    `SLURM_CPUS_PER_TASK` workers per node when that environment
