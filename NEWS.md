@@ -7,6 +7,10 @@
 
 ## Bug Fixes
 
+ * `availableCores()` did not respect CGroups v2 CPU quotas
+   (`cpu.max`) set on a parent CGroup when a less restricted one was
+   set on the process itself.
+
  * `availableWorkers(method = "Slurm")` incorrectly returned exactly
    `SLURM_CPUS_PER_TASK` workers per node when that environment
    variable was set, while completely ignoring the total number of
@@ -17,13 +21,13 @@
    for some Slurm resource requests could overestimate the number of
    workers available.
 
+ * `availableCores(which = "all", max = n)` would return only the
+   smallest value among all and unnamed.
+
  * `isNodeAlive()` and `killNode()` would give an error, e.g.
    "Error in as.character(x) : cannot coerce type 'closure' to
    vector of type 'character'", on a node created by
    `makeClusterPSOCK(..., rshcmd)` where `rshcmd` was a function.
-
- * `availableCores(which = "all", max = n)` would return only the
-   smallest value among all and unnamed.
 
  * `makeNodePSOCK(..., manual = TRUE)` would unexpectedly run the
    pre-launch self-test on localhost.

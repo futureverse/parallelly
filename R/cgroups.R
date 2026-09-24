@@ -295,7 +295,7 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    for (fcn in fcns) {
      environment(fcn)$.cache <- NULL
    }
-   fcns <- list(getCGroupsRoot, getCGroupsPath, getCGroupsValue)
+   fcns <- list(getCGroupsRoot, getCGroupsPath, getCGroupsValue, getCGroupsValues)
    for (fcn in fcns) {
      environment(fcn)$.cache <- list()
    }
@@ -648,6 +648,68 @@ getCGroupsValue <- local({
 })
 
 
+#  Get all values of specific cgroups controller and field
+#
+#  `getCGroupsValue()` returns the value of the _first_ cgroup that has
+#  the specified field set.
+#  `getCGroupsValues()` walks all cgroup settings from the current process
+#  up towards the root and returns the matching values.
+#
+#  @param controller (character) A cgroups v1 set, or `""` for cgroups v2.
+#
+#  @param field (character) A cgroups field.
+#
+#  @return A list of character strings, ordered from the cgroup of the
+#  current process up toward the root, where each element has attribute
+#  `path`. If the requested cgroups controller and field is not found,
+#  an empty list is returned.
+#
+#' @importFrom utils file_test
+getCGroupsValues <- local({
+  .cache <- list()
+
+  function(controller, field) {
+    cache_controller <- .cache[[controller]]
+    if (!is.null(cache_controller)) {
+      res <- cache_controller[[field]]
+      if (!is.null(res)) return(res)
+    }
+
+    if (is.null(cache_controller)) {
+      cache_controller <- list()
+    }
+
+    res <- list()
+    path <- getCGroupsPath(controller = controller)
+    if (!is.na(path)) {
+      path_prev <- ""
+      while (path != path_prev) {
+        file <- file.path(path, field)
+        if (file_test("-f", file)) {
+          value <- readLines(file, warn = FALSE)
+          if (length(value) == 0L) {
+            ## Empty file
+            value <- NA_character_
+          } else if (length(value) == 1L && nchar(value) == 0L) {
+            ## Empty line
+            value <- NA_character_
+          }
+          value <- paste(value, collapse = "\n")
+          attr(value, "path") <- path
+          res <- c(res, list(value))
+        }
+        path_prev <- path
+        path <- dirname(path)
+      }
+    }
+
+    cache_controller[[field]] <- res
+    .cache[[controller]] <<- cache_controller
+    res
+  }
+})
+
+
 #  Get the value of specific cgroups v1 field
 #
 #  @param controller (character) A cgroups v1 set.
@@ -670,6 +732,16 @@ getCGroups1Value <- function(controller, field) {
 #  queried, NA_character_ is returned.
 getCGroups2Value <- function(field) {
   getCGroupsValue("", field = field)
+}
+
+
+#  Get all values of specific cgroups v2 field
+#
+#  @param field (character) A cgroups v2 field.
+# 
+#  @return A list of character strings; see getCGroupsValues().
+getCGroups2Values <- function(field) {
+  getCGroupsValues("", field = field)
 }
 
 
@@ -994,36 +1066,32 @@ getCGroups2CpuMax <- local({
     quota <- get_package_option("cgroups2.cpu.max", NULL)
     if (!is.null(quota)) return(quota)
   
-    raw <- suppressWarnings({
-      ## e.g. /sys/fs/cgroup/cpu.max
-      getCGroups2Value("cpu.max")
+    raws <- suppressWarnings({
+      ## e.g. /sys/fs/cgroup/cpu.max, or hierarchically at
+      ## /sys/fs/cgroup/cpu.max and /sys/fs/cgroup/subpath/cpu.max
+      getCGroups2Values("cpu.max")
     })
-  
-    if (is.na(raw)) {
+
+    ## Parse each '<max> <period>' into a ratio
+    ratios <- vapply(raws, FUN = function(raw) {
+      if (is.na(raw)) return(NA_real_)
+      values <- strsplit(raw, split = "[[:space:]]+")[[1]]
+      if (length(values) != 2L) return(NA_real_)
+      period <- suppressWarnings(as.integer(values[2]))
+      if (is.na(period) || period <= 0L) return(NA_real_)
+      max <- values[1]
+      if (max == "max") return(Inf)
+      max <- suppressWarnings(as.integer(max))
+      max / period
+    }, FUN.VALUE = NA_real_, USE.NAMES = FALSE)
+
+    ratios <- ratios[is.finite(ratios)]
+    if (length(ratios) == 0L) {
       .cache <<- NA_real_
       return(.cache)
     }
-    
-    values <- strsplit(raw, split = "[[:space:]]+")[[1]]
-    if (length(values) != 2L) {
-      .cache <<- NA_real_
-      return(.cache)
-    }
-  
-    period <- as.integer(values[2])
-    if (is.na(period) || period <= 0L) {
-      .cache <<- NA_real_
-      return(.cache)
-    }
-    
-    max <- values[1]
-    if (max == "max") {
-      .cache <<- NA_real_
-      return(.cache)
-    }
-    
-    max <- as.integer(max)
-    value <- max / period
+
+    value <- min(ratios)
     if (!is.na(value)) {
       max_cores <- maxCores()
       if (is.na(max_cores)) {
