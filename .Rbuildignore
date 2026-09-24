@@ -2,8 +2,6 @@
 ^README[.]md$
 ^INSTALL[.]md$
 ^OVERVIEW[.]md$
-^CONDUCT[.]md$
-^CONTRIBUTING[.]md$
 ^docs
 ^pkgdown
 ^revdep
