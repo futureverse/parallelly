@@ -12,3 +12,4 @@ Rplots.pdf$
 ^vignettes/[.]install_extras$
 ^Makefile$
 ^incl
+^CITATION\.cff$
