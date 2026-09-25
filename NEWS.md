@@ -10,6 +10,10 @@
    before been attempted by **parallelly**. See below bug fixes for
    details.
 
+ * `availableCores(method = "SGE")` is now agile to multi-node
+   jobs. It was already agile to using `qrsh` for multi-node
+   tasks. See below bug fixes for details.
+   
 ## Documentation
 
  * Add example to HPC vignette on how to launch parallel workers in a
@@ -21,22 +25,24 @@
 
 ## Bug Fixes
 
- * `serializedSize()` gave an error "version 3 not supported" in R
-   (< 3.5.0). Now it uses the same serialization version as
-   `serialize()` does by default, i.e. version 2 in R (< 3.6.0) and
-   version 3 in R (>= 3.6.0).
-
- * `print()` for `RichSOCKcluster` objects failed to report on broken
-   connections in R (< 4.0.0), if the connection index had been
-   reused by another connection, e.g. when called via
-   `capture.output()`.
-
  * `availableCores()` did not respect CGroups v1 and v2 CPU quotas
    (`cpu.cfs_quota_us` and `cpu.max`) set on a parent CGroup when a
    less restricted one was set on the process itself.
 
  * `availableCores(which = "all", max = n)` would return only the
    smallest value among all and unnamed.
+
+ * `availableCores()` on SGE:
+ 
+   - `availableCores(method = "SGE")` in a Grid Engine job script
+     would overestimate the number of CPU cores available for a
+     multi-node job, because it returned `NSLOTS`, which is the total
+     number of slots on all machines, e.g. `qsub -pe mpi-2 16` would
+     result in 16 cores on each machine, although only two slots were
+     allotted per machine.  Now it returns the number of slots
+     allotted to the current machine according to `PE_HOSTFILE`, in
+     agreement with `availableWorkers()`. It only uses `NSLOTS` as a
+     fallback if `PE_HOSTFILE` is not set.
 
  * `availableCores()` and `availableWorkers()` on Slurm:
  
@@ -81,6 +87,16 @@
 
  * `makeClusterPSOCK()` would still record the call stack for each
    node, even if argument `calls = FALSE` (default).
+   
+ * `serializedSize()` gave an error "version 3 not supported" in R
+   (< 3.5.0). Now it uses the same serialization version as
+   `serialize()` does by default, i.e. version 2 in R (< 3.6.0) and
+   version 3 in R (>= 3.6.0).
+
+ * `print()` for `RichSOCKcluster` objects failed to report on broken
+   connections in R (< 4.0.0), if the connection index had been
+   reused by another connection, e.g. when called via
+   `capture.output()`.
 
 ## Deprecated and Defunct
 

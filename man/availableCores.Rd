@@ -175,6 +175,11 @@ Query the "Grid Engine" scheduler environment variable \env{NSLOTS}.
 An example of a job submission that results in this is
 \verb{qsub -pe smp 2} (or \verb{qsub -pe by_node 2}), which
 requests two cores on a single machine.
+If the job spans multiple machines, e.g. \verb{qsub -pe mpi 16},
+\env{NSLOTS} is the total number of slots on all machines.
+Because of this, the number of slots allotted to the current
+machine according to the file that \env{PE_HOSTFILE} specifies
+is used instead, if available.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),

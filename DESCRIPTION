@@ -1,5 +1,5 @@
 Package: parallelly
-Version: 1.48.0-9022
+Version: 1.48.0-9023
 Title: Enhancing the 'parallel' Package
 Depends:
     R (>= 3.3.0)

@@ -560,6 +560,49 @@ env$n <- NULL
 message("*** SGE method ... done")
 
 
+message("*** SGE scenarios observed on real clusters ...")
+
+## Grid Engine environment variables recorded on a real SGE cluster using
+## incl/sge-sweep/, for the job script (context 'job') and for processes
+## launched by 'qrsh -inherit' (context 'inherit'). Column
+## 'PE_HOSTFILE_content' holds the lines of the PE_HOSTFILE file,
+## separated by semicolons. Empty cells correspond to environment
+## variables that are not set
+file <- system.file(package = "parallelly", "test-data", "sge", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+sge_vars <- c("HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE")
+ohostname <- Sys.getenv("HOSTNAME", NA_character_)
+
+env <- environment(parallelly:::availableCoresSGE)
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, if (is.na(scenario$qsub)) "(no PE)" else scenario$qsub, scenario$cluster))
+  envs <- unlist(scenario[intersect(sge_vars, colnames(scenario))])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(sge_vars)
+  do.call(Sys.setenv, as.list(envs))
+  if (!is.na(scenario$PE_HOSTFILE_content)) {
+    pathname <- tempfile(fileext = ".pe_hostfile")
+    writeLines(strsplit(scenario$PE_HOSTFILE_content, split = "; ", fixed = TRUE)[[1]], con = pathname)
+    Sys.setenv(PE_HOSTFILE = pathname)
+  }
+  print(envs)
+  env$n <- NULL
+  truth <- as.integer(scenario$expected_cores)
+  ncores <- availableCores(methods = "SGE")
+  message(sprintf("availableCores(methods = \"SGE\") = %d (truth = %d)", ncores, truth))
+  stopifnot(ncores == truth)
+  if (!is.na(scenario$PE_HOSTFILE_content)) file.remove(pathname)
+}
+
+## Cleanup
+Sys.unsetenv(sge_vars)
+if (!is.na(ohostname)) Sys.setenv(HOSTNAME = ohostname)
+env$n <- NULL
+
+message("*** SGE scenarios observed on real clusters ... done")
+
+
 message("*** _R_CHECK_LIMIT_CORES_ method ...")
 
 ## When set to true-ish value, should return 2

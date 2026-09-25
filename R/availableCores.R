@@ -152,6 +152,11 @@
 #'    An example of a job submission that results in this is
 #'    `qsub -pe smp 2` (or `qsub -pe by_node 2`), which
 #'    requests two cores on a single machine.
+#'    If the job spans multiple machines, e.g. `qsub -pe mpi 16`,
+#'    \env{NSLOTS} is the total number of slots on all machines.
+#'    Because of this, the number of slots allotted to the current
+#'    machine according to the file that \env{PE_HOSTFILE} specifies
+#'    is used instead, if available.
 #'    Known Grid Engine schedulers are
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
@@ -747,10 +752,35 @@ availableCoresSGE <- local({
   n <- NULL
   function() {
     if (!is.null(n)) return(n)
-    n <<- getenv_int("NSLOTS")
+    ## In the job script of a job spanning multiple hosts, NSLOTS is the
+    ## total number of slots on all hosts, whereas PE_HOSTFILE gives the
+    ## number of slots per host. In processes launched on other hosts
+    ## by 'qrsh -inherit', PE_HOSTFILE is not set, and NSLOTS is the
+    ## number of slots on that host
+    n <<- sge_slots_on_host()
+    if (is.na(n)) n <<- getenv_int("NSLOTS")
     n
   }
 })
+
+
+## Number of slots on the current host according to PE_HOSTFILE
+sge_slots_on_host <- function() {
+  pathname <- getenv_chr("PE_HOSTFILE")
+  if (is.na(pathname) || !file_test("-f", pathname)) return(NA_integer_)
+  data <- tryCatch(read_pe_hostfile(pathname, sort = FALSE), error = function(ex) NULL)
+  if (is.null(data)) return(NA_integer_)
+
+  ## The hostnames in PE_HOSTFILE may or may not be fully qualified
+  hostname <- getenv_chr("HOSTNAME")
+  if (is.na(hostname)) hostname <- Sys.info()[["nodename"]]
+  short <- function(x) sub("[.].*", "", x)
+  is_local <- (short(data$node) == short(hostname))
+  if (!any(is_local)) return(NA_integer_)
+
+  ## A host may be listed more than once, e.g. once per queue
+  sum(data$count[is_local])
+} ## sge_slots_on_host()
 
 
 ## Number of cores assigned by Slurm

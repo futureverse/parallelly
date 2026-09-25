@@ -417,6 +417,53 @@ Sys.unsetenv(slurm_vars)
 
 message("*** Slurm scenarios observed on real clusters ... DONE")
 
+
+message("*** SGE scenarios observed on real clusters ...")
+
+## Grid Engine environment variables recorded on a real SGE cluster using
+## incl/sge-sweep/. Column 'PE_HOSTFILE_content' holds the lines of the
+## PE_HOSTFILE file, separated by semicolons
+file <- system.file(package = "parallelly", "test-data", "sge", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+scenarios <- subset(scenarios, !is.na(expected_workers))
+sge_vars <- c("HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE")
+ohostname <- Sys.getenv("HOSTNAME", NA_character_)
+
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, if (is.na(scenario$qsub)) "(no PE)" else scenario$qsub, scenario$cluster))
+  envs <- unlist(scenario[intersect(sge_vars, colnames(scenario))])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(sge_vars)
+  do.call(Sys.setenv, as.list(envs))
+  pathname <- tempfile(fileext = ".pe_hostfile")
+  writeLines(strsplit(scenario$PE_HOSTFILE_content, split = "; ", fixed = TRUE)[[1]], con = pathname)
+  Sys.setenv(PE_HOSTFILE = pathname)
+  print(envs)
+
+  ## Expected workers, e.g. "n1*4,n2*2"
+  truth <- strsplit(scenario$expected_workers, split = ",", fixed = TRUE)[[1]]
+  truth <- structure(as.integer(sub(".*[*]", "", truth)), names = sub("[*].*", "", truth))
+
+  ## Some parallel environments give fewer slots than NSLOTS, which
+  ## availableWorkers() warns about
+  w <- suppressWarnings(availableWorkers(methods = "SGE"))
+  counts <- table(w)[names(truth)]
+  print(counts)
+  stopifnot(
+    length(w) == sum(truth),
+    identical(unique(w), names(truth)),
+    all(counts == truth)
+  )
+  file.remove(pathname)
+}
+
+## Cleanup
+Sys.unsetenv(sge_vars)
+if (!is.na(ohostname)) Sys.setenv(HOSTNAME = ohostname)
+
+message("*** SGE scenarios observed on real clusters ... DONE")
+
 message("*** HPC related ... DONE")
 
 
