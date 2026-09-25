@@ -72,9 +72,12 @@ $ sbatch script.sh
 
 This will request 16 tasks (CPU slots) across 4 compute nodes.
 
-Parallel workers on other machines are launched via Slurm's `srun`
-command from the main R session, whereas workers on the machine
-running the main R session are launched directly. 
+Now how the parallel workers are launched via Slurm's `srun` command
+from the main R session. This is what makes it work regardless whether
+the workers are on the current or other machines. Note also that the
+default, built-in approach to connect to other machines via SSH does
+not work on HPC clusters where SSH to compute nodes is disabled. In
+contrast, `srun` establishes the connection for us.
 
 The `--cpus-per-task=1` Slurm option makes sure each worker launched
 via `srun` is allotted a single CPU. The `--overcommit` option is
@@ -91,10 +94,10 @@ Rscript (R) version 4.6.1 (2026-06-24)
 Running R script:
 Socket cluster with 16 nodes where 10 nodes are on host 'localhost'
 (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu), 2 
-nodes are on host 'gcpu2-14' (R version 4.6.1 (2026-06-24), 
-platform x86_64-pc-linux-gnu), 2 nodes are on host 'gcpu2-15' (R
+nodes are on host 'node14' (R version 4.6.1 (2026-06-24), 
+platform x86_64-pc-linux-gnu), 2 nodes are on host 'node15' (R
 version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu), 2 nodes
-are on host 'gcpu2-16' (R version 4.6.1 (2026-06-24), platform 
+are on host 'node16' (R version 4.6.1 (2026-06-24), platform 
 x86_64-pc-linux-gnu)
 [1] 671.4629
 ```
@@ -180,10 +183,17 @@ that runs the R script `script.R` when launched. If we submit
 $ qsub script.sh
 ```
 
-it will by default request eight slots - on one or more machines,
+it will by default request 8 slots - on one or more machines,
 which then R and **parallelly** will set up a parallel cluster
 on. Exactly on which machines depends on where the job scheduler finds
 these requested slots.
+
+Now how the parallel workers are launched via SGE's `qrsh` command
+from the main R session. This is what makes it work regardless whether
+the workers are on the current or other machines. Note also that the
+default, built-in approach to connect to other machines via SSH does
+not work on HPC clusters where SSH to compute nodes is disabled. In
+contrast, `qrsh` establishes the connection for us.
 
 Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:
@@ -194,8 +204,8 @@ Rscript (R) version 4.6.1 (2026-06-24)
 Running R script:
 Socket cluster with 8 nodes where 4 nodes are on host ‘localhost’
 (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu), 3
-nodes are on host ‘qb3-id130’ (R version 4.6.1 (2026-06-24), 
-platform x86_64-pc-linux-gnu), 1 node is on host ‘qb3-as16’ (R 
+nodes are on host ‘node130’ (R version 4.6.1 (2026-06-24), 
+platform x86_64-pc-linux-gnu), 1 node is on host ‘node16’ (R 
 version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)
 [1] 671.4629
 ```
@@ -287,9 +297,9 @@ report a single CPU core when called in a worker.
 This matters for workers running on the same machine as the main R
 session. They are launched directly, rather than via the job
 scheduler, which means they inherit the settings of the main R
-session. For example, if the job scheduler allotted eight CPU cores
-on that machine, `availableCores()` would report eight cores in each
-of the eight workers there. If the code evaluated by the workers
+session. For example, if the job scheduler allotted 8 CPU cores
+on that machine, `availableCores()` would report 8 cores in each
+of the 8 workers there. If the code evaluated by the workers
 parallelizes further based on `availableCores()`, e.g.
 
 ```r
@@ -298,7 +308,7 @@ y <- parLapply(cl = cl, X, fun = function(x) {
 })
 ```
 
-then there could be up to 64 R processes competing for eight CPU
+then there could be up to 64 R processes competing for 8 CPU
 cores.
 With `mc.cores = 1L`, `mclapply()` runs sequentially in each worker,
 which avoids overusing the CPUs.
