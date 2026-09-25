@@ -341,6 +341,38 @@ worker is very low. This might be safe to do so when the parallel
 tasks are mostly in a waiting state, e.g. polling a webserver.
 }
 
+\section{Protection against CPU overuse via nested parallelism}{
+
+Parallel workers on the current machine inherit the settings of the
+main \R session. This means that \code{\link[=availableCores]{availableCores()}} reports the same
+number of CPU cores in each worker as in the main \R session. For
+example, on an eight-core machine, each of the eight workers in
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cl <- makeClusterPSOCK(8)
+}\if{html}{\out{</div>}}
+
+reports eight CPU cores. If the code evaluated by the workers
+parallelizes further based on \code{availableCores()}, e.g.
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{y <- parallel::parLapply(cl, X, function(x) \{
+  parallel::mclapply(x, FUN = slow_fcn, mc.cores = parallelly::availableCores())
+\})
+}\if{html}{\out{</div>}}
+
+then there could be up to 64 \R processes competing for eight CPU
+cores. To protect against this, set \R option \code{mc.cores} to one in
+each worker using:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cl <- makeClusterPSOCK(8, rscript_startup = quote(options(mc.cores = 1L)))
+}\if{html}{\out{</div>}}
+
+This makes \code{availableCores()} report a single CPU core in each
+worker, and \code{parallel::mclapply()} run sequentially. This is not
+needed when using the cluster via the \pkg{future} framework,
+e.g. \code{plan(cluster, workers = cl)}, because futures are evaluated
+with \code{mc.cores} set to one on parallel workers.
+}
+
 \section{Definition of \emph{localhost}}{
 
 A hostname is considered to be \emph{localhost} if it equals:

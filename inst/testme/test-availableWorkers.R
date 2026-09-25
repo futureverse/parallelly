@@ -445,9 +445,7 @@ for (kk in seq_len(nrow(scenarios))) {
   truth <- strsplit(scenario$expected_workers, split = ",", fixed = TRUE)[[1]]
   truth <- structure(as.integer(sub(".*[*]", "", truth)), names = sub("[*].*", "", truth))
 
-  ## Some parallel environments give fewer slots than NSLOTS, which
-  ## availableWorkers() warns about
-  w <- suppressWarnings(availableWorkers(methods = "SGE"))
+  w <- availableWorkers(methods = "SGE")
   counts <- table(w)[names(truth)]
   print(counts)
   stopifnot(

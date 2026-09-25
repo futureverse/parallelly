@@ -139,6 +139,39 @@
 #' worker is very low. This might be safe to do so when the parallel
 #' tasks are mostly in a waiting state, e.g. polling a webserver.
 #'
+#' @section Protection against CPU overuse via nested parallelism:
+#' Parallel workers on the current machine inherit the settings of the
+#' main \R session. This means that [availableCores()] reports the same
+#' number of CPU cores in each worker as in the main \R session. For
+#' example, on an eight-core machine, each of the eight workers in
+#'
+#' ```r
+#' cl <- makeClusterPSOCK(8)
+#' ```
+#'
+#' reports eight CPU cores. If the code evaluated by the workers
+#' parallelizes further based on `availableCores()`, e.g.
+#'
+#' ```r
+#' y <- parallel::parLapply(cl, X, function(x) {
+#'   parallel::mclapply(x, FUN = slow_fcn, mc.cores = parallelly::availableCores())
+#' })
+#' ```
+#'
+#' then there could be up to 64 \R processes competing for eight CPU
+#' cores. To protect against this, set \R option `mc.cores` to one in
+#' each worker using:
+#'
+#' ```r
+#' cl <- makeClusterPSOCK(8, rscript_startup = quote(options(mc.cores = 1L)))
+#' ```
+#'
+#' This makes `availableCores()` report a single CPU core in each
+#' worker, and `parallel::mclapply()` run sequentially. This is not
+#' needed when using the cluster via the \pkg{future} framework,
+#' e.g. `plan(cluster, workers = cl)`, because futures are evaluated
+#' with `mc.cores` set to one on parallel workers.
+#'
 #' @example incl/makeClusterPSOCK.R
 #'
 #' @aliases RPSOCK
