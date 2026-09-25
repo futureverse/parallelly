@@ -99,6 +99,26 @@ x86_64-pc-linux-gnu)
 [1] 671.4629
 ```
 
+What `availableCores()` and `availableWorkers()` return depends on
+what we request from Slurm. Here are a few examples of what they
+return in the job script, where `n1` is the machine running the job
+script:
+
+| Slurm options | `availableCores()` | `availableWorkers()` |
+| --- | --- | --- |
+| `--nodes=1 --ntasks=4` | 4 | 4 × `n1` |
+| `--nodes=1 --ntasks=4 --cpus-per-task=2` | 8 | 8 × `n1` |
+| `--nodes=2 --ntasks-per-node=2` | 2 | 2 × `n1`, 2 × `n2` |
+| `--nodes=2 --ntasks=4 --cpus-per-task=2` | 6 | 6 × `n1`, 2 × `n2` |
+
+Note how `availableWorkers()` returns one worker per CPU allotted,
+not one per task, and how `availableCores()` returns the number of
+CPUs allotted on the current machine. The last example shows that
+Slurm does not necessarily spread the tasks evenly across machines.
+Also, on machines with hyperthreading, Slurm allots whole CPU cores,
+meaning that, for instance, `--cpus-per-task=3` may result in four
+CPUs.
+
 
 ## Example: Launch parallel workers via the Grid Engine job scheduler
 
@@ -179,6 +199,26 @@ platform x86_64-pc-linux-gnu), 1 node is on host ‘qb3-as16’ (R
 version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)
 [1] 671.4629
 ```
+
+How SGE distributes the requested slots across machines depends on
+the `allocation_rule` setting of the parallel environment (PE), which
+we can inspect using `qconf -sp <pe>`. Here are a few examples of
+what `availableCores()` and `availableWorkers()` return in the job
+script, where `n1` is the machine running the job script:
+
+| SGE options | Allocation rule | `availableCores()` | `availableWorkers()` |
+| --- | --- | --- | --- |
+| (none) | - | 1 | `localhost` |
+| `-pe smp 4` | `$pe_slots` | 4 | 4 × `n1` |
+| `-pe mpi 8` | `$fill_up` | 4 | 4 × `n1`, 3 × `n2`, 1 × `n3` |
+| `-pe mpi-2 8` | `2` | 2 | 2 × `n1`, 2 × `n2`, 2 × `n3`, 2 × `n4` |
+
+The `$pe_slots` rule places all slots on a single machine, `$fill_up`
+fills up one machine before moving on to the next one, as in the
+above example run, and a fixed number, here two, places that many
+slots on each machine. In all cases, `availableCores()` returns the
+number of slots on the current machine. This is also true for
+workers launched on the other machines via `qrsh -inherit`.
 
 
 
