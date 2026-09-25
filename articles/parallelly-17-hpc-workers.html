@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9028</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9029</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -208,6 +208,50 @@ allot the slots across three machines:</p>
 <span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="ex">are</span> on host <span class="st">'gcpu2-16'</span> <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform </span>
 <span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="ex">x86_64-pc-linux-gnu</span><span class="kw">)</span></span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="ex">[1]</span> 671.4629</span></code></pre></div>
+<p>What <code><a href="../reference/availableCores.html">availableCores()</a></code> and
+<code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> return depends on what we request from
+Slurm. Here are a few examples of what they return in the job script,
+where <code>n1</code> is the machine running the job script:</p>
+<table class="table">
+<thead><tr class="header">
+<th>Slurm options</th>
+<th><code><a href="../reference/availableCores.html">availableCores()</a></code></th>
+<th><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>--nodes=1 --ntasks=4</code></td>
+<td>4</td>
+<td>4 × <code>n1</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>--nodes=1 --ntasks=4 --cpus-per-task=2</code></td>
+<td>8</td>
+<td>8 × <code>n1</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>--nodes=2 --ntasks-per-node=2</code></td>
+<td>2</td>
+<td>2 × <code>n1</code>, 2 × <code>n2</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>--nodes=2 --ntasks=4 --cpus-per-task=2</code></td>
+<td>6</td>
+<td>6 × <code>n1</code>, 2 × <code>n2</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note how <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> returns one worker per CPU
+allotted, not one per task, and how <code><a href="../reference/availableCores.html">availableCores()</a></code>
+returns the number of CPUs allotted on the current machine. The last
+example shows that Slurm does not necessarily spread the tasks evenly
+across machines. Also, on machines with hyperthreading, Slurm allots
+whole CPU cores, meaning that, for instance,
+<code>--cpus-per-task=3</code> may result in four CPUs.</p>
 </div>
 <div class="section level3">
 <h3 id="example-launch-parallel-workers-via-the-grid-engine-job-scheduler">Example: Launch parallel workers via the Grid Engine job
@@ -274,6 +318,63 @@ allot the slots across three machines:</p>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="ex">platform</span> x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 1 node is on host ‘qb3-as16’ <span class="er">(</span><span class="ex">R</span> </span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span></span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="ex">[1]</span> 671.4629</span></code></pre></div>
+<p>How SGE distributes the requested slots across machines depends on
+the <code>allocation_rule</code> setting of the parallel environment
+(PE), which we can inspect using <code>qconf -sp &lt;pe&gt;</code>. Here
+are a few examples of what <code><a href="../reference/availableCores.html">availableCores()</a></code> and
+<code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> return in the job script, where
+<code>n1</code> is the machine running the job script:</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th>SGE options</th>
+<th>Allocation rule</th>
+<th><code><a href="../reference/availableCores.html">availableCores()</a></code></th>
+<th><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>(none)</td>
+<td>-</td>
+<td>1</td>
+<td><code>localhost</code></td>
+</tr>
+<tr class="even">
+<td><code>-pe smp 4</code></td>
+<td><code>$pe_slots</code></td>
+<td>4</td>
+<td>4 × <code>n1</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>-pe mpi 8</code></td>
+<td><code>$fill_up</code></td>
+<td>4</td>
+<td>4 × <code>n1</code>, 3 × <code>n2</code>, 1 × <code>n3</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>-pe mpi-2 8</code></td>
+<td><code>2</code></td>
+<td>2</td>
+<td>2 × <code>n1</code>, 2 × <code>n2</code>, 2 × <code>n3</code>, 2 ×
+<code>n4</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>$pe_slots</code> rule places all slots on a single machine,
+<code>$fill_up</code> fills up one machine before moving on to the next
+one, as in the above example run, and a fixed number, here two, places
+that many slots on each machine. In all cases,
+<code><a href="../reference/availableCores.html">availableCores()</a></code> returns the number of slots on the current
+machine. This is also true for workers launched on the other machines
+via <code>qrsh -inherit</code>.</p>
 </div>
 <div class="section level3">
 <h3 id="example-launch-parallel-workers-via-the-fujitsu-technical-computing-suite-job-scheduler">Example: Launch parallel workers via the Fujitsu Technical Computing

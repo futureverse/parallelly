@@ -56,39 +56,39 @@ cl1 <- makeClusterPSOCK(2, dryrun = TRUE)
 #> ----------------------------------------------------------------------
 #> Manually, start worker #1 on local machine ‘localhost’ with:
 #> 
-#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11418 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
+#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11704 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
 #> 
 #> ----------------------------------------------------------------------
 #> Manually, start worker #2 on local machine ‘localhost’ with:
 #> 
-#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11418 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
+#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11704 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
 #> 
 cl2 <- makeClusterPSOCK(c("n1", "server.remote.org"), dryrun = TRUE)
 #> ----------------------------------------------------------------------
 #> Manually, (i) login into external machine ‘n1’:
 #> 
-#>   '/usr/bin/ssh' -R 11651:localhost:11651 n1
+#>   '/usr/bin/ssh' -R 11868:localhost:11868 n1
 #> 
 #> and (ii) start worker #1 from there:
 #> 
-#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11651 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
+#>   '/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11868 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
 #> 
 #> Alternatively, start worker #1 from the local machine by combining both steps in a single call:
 #> 
-#>   '/usr/bin/ssh' -R 11651:localhost:11651 n1 "'/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions=\"no-delay\")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11651 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential"
+#>   '/usr/bin/ssh' -R 11868:localhost:11868 n1 "'/home/hb/shared/software/CBI/_ubuntu24_04/R-4.6.1-gcc13/lib/R/bin/Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions=\"no-delay\")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11868 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential"
 #> 
 #> ----------------------------------------------------------------------
 #> Manually, (i) login into external machine ‘server.remote.org’:
 #> 
-#>   '/usr/bin/ssh' -R 11652:localhost:11651 server.remote.org
+#>   '/usr/bin/ssh' -R 11869:localhost:11868 server.remote.org
 #> 
 #> and (ii) start worker #2 from there:
 #> 
-#>   'Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11652 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
+#>   'Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions="no-delay")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11869 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential
 #> 
 #> Alternatively, start worker #2 from the local machine by combining both steps in a single call:
 #> 
-#>   '/usr/bin/ssh' -R 11652:localhost:11651 server.remote.org "'Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions=\"no-delay\")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11652 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential"
+#>   '/usr/bin/ssh' -R 11869:localhost:11868 server.remote.org "'Rscript' --default-packages=datasets,utils,grDevices,graphics,stats,methods -e 'options(socketOptions=\"no-delay\")' -e 'workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()' MASTER=localhost PORT=11869 OUT=/dev/null TIMEOUT=2592000 XDR=FALSE SETUPTIMEOUT=120 SETUPSTRATEGY=sequential"
 #> 
 cl <- c(cl1, cl2)
 #> Warning: The combined cluster contains 3 duplicated nodes
