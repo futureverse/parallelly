@@ -31,13 +31,6 @@
  * Add example to HPC vignette on how to launch parallel workers in a
    multi-node Slurm job.
 
- * Add section 'Protection against CPU overuse via nested
-   parallelism' to `help("makeClusterPSOCK")`, and a corresponding
-   section to the HPC vignette, on how to use `rscript_startup =
-   quote(options(mc.cores = 1L))` to make `availableCores()` report a
-   single CPU core in each parallel worker. The HPC vignette examples
-   now use this.
-
 ## Miscellaneous
 
  * The package now declares that it requires R (>= 3.3.0).

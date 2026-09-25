@@ -5,14 +5,26 @@ false && R --quiet --no-save <<EOF
     tinytex::install_tinytex(force = TRUE)
     message("TeX root: ", tinytex::tinytex_root())
     tinytex::tlmgr_update()
-    tinytex::tlmgr_install("apacite")       # ctsem
-    tinytex::tlmgr_install("babel-english") # ctsem
-    tinytex::tlmgr_install("caption")       # ctsem
-    tinytex::tlmgr_install("csquotes")      # ctsem
-    tinytex::tlmgr_install("mathtools")     # ctsem
-    tinytex::tlmgr_install("preprint")      # ctsem
-    tinytex::tlmgr_install("preview")       # ctsem
-    tinytex::tlmgr_install("textpos")       # WeightedCluster
+
+    # R package ctsem
+    tinytex::tlmgr_install(c(
+      "apacite",
+      "babel-english",
+      "caption",
+      "csquotes",
+      "mathtools",
+      "preprint",
+      "preview"
+    ))
+
+    # R package WeightedCluster
+    tinytex::tlmgr_install(c(
+      "ae",
+      "babel-french",
+      "ntgclass",
+      "pgf",
+      "textpos"
+    ))
 EOF
 
 ## Non-default system dependencies
@@ -34,8 +46,8 @@ revdep/run.R --add-children
 ## Drop packages no longer on CRAN (2026-03-07)
 # revdep/run.R --rm ...
 
-## Drop packages failing on Bioconductor (2026-03-07)
-# revdep/run.R --rm ...
+## Drop packages failing on Bioconductor (2026-09-24)
+revdep/run.R --rm decoupleR
 
 ## Missing tools
 revdep/run.R --rm proffer  # requires 'RProtoBuf' -> ProtoBuf library
@@ -53,11 +65,11 @@ revdep/run.R --rm "${pkgs_threads[@]}"
 
 ## Too many cores /2026-04-16
 ## FIXME: Some of these package should be moved to 'pkgs_treads'
-pkgs_cores=(gtfs2emis gtfs2gps rtemis simIDM WeightedCluster)
+pkgs_cores=(gtfs2emis gtfs2gps rtemis simIDM)
 revdep/run.R --rm "${pkgs_cores[@]}"
 
 ## Requires sequential processing due to clashes, e.g. port and cache
-pkgs_seq=(aramappings) /2026-04-16
+pkgs_seq=(aramappings TSEAL) # /2026-04-16
 revdep/run.R --rm "${pkgs_seq[@]}"
 
 ## Run revdep check
