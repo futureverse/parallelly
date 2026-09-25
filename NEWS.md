@@ -83,7 +83,8 @@
      each of 14 tasks sharing 16 CPUs.  The overall `availableCores()`
      would only be protected against this if Slurm bound each task to
      its own CPUs.  Now the CPUs on the machine are split equally
-     among the tasks there.
+     among the tasks there.  The interactive shell of `salloc`, which
+     Slurm may run as a special job step, is treated as a job script.
 
  * `isNodeAlive()` and `killNode()` would give an error, e.g.
    "Error in as.character(x) : cannot coerce type 'closure' to

@@ -193,7 +193,8 @@ of CPUs that Slurm has allotted to the job on the current machine.
 For example, \verb{sbatch --ntasks=4 --cpus-per-task=2 hello.sh}
 gives eight CPUs, when all tasks are assigned to the same machine.
 This is the number of cores available to the \file{hello.sh} job
-script.  In a task launched by \command{srun} (as indicated by
+script, and similarly to the interactive shell of \command{salloc}.
+In a task launched by \command{srun} (as indicated by
 \env{SLURM_STEP_ID} being set), the CPUs on the machine are shared
 with the other tasks on that machine.  In this case,
 \env{SLURM_CPUS_PER_TASK} is used, if set, e.g.

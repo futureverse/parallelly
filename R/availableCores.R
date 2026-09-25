@@ -172,7 +172,8 @@
 #'    For example, `sbatch --ntasks=4 --cpus-per-task=2 hello.sh`
 #'    gives eight CPUs, when all tasks are assigned to the same machine.
 #'    This is the number of cores available to the \file{hello.sh} job
-#'    script.  In a task launched by \command{srun} (as indicated by
+#'    script, and similarly to the interactive shell of \command{salloc}.
+#'    In a task launched by \command{srun} (as indicated by
 #'    \env{SLURM_STEP_ID} being set), the CPUs on the machine are shared
 #'    with the other tasks on that machine.  In this case,
 #'    \env{SLURM_CPUS_PER_TASK} is used, if set, e.g.
@@ -795,12 +796,19 @@ availableCoresSlurm <- local({
     ncpus <- getenv_int("SLURM_CPUS_ON_NODE")
 
     ## SLURM_STEP_ID (and SLURM_STEPID for backwards compatibility) is set
-    ## in tasks launched by 'srun', but not in the batch script
-    step <- getenv_int("SLURM_STEP_ID")
-    if (is.na(step)) step <- getenv_int("SLURM_STEPID")
+    ## in tasks launched by 'srun', but not in the batch script.
+    step <- getenv_int("SLURM_STEP_ID", mode = "double")
+    if (is.na(step)) step <- getenv_int("SLURM_STEPID", mode = "double")
+
+    ## Was 'salloc' used? Step IDs of 0xFFFFFFF0 and above are
+    ## special, e.g. 0xFFFFFFFA (4294967290) for the interactive shell
+    ## of 'salloc', which, like the batch script, has all CPUs
+    ## allotted on this node.
+    if (!is.na(step) && step >= 0xFFFFFFF0) step <- NA_real_
 
     if (is.na(step)) {
-      ## In the batch script, all CPUs allotted on this node are available
+      ## In the batch script, and in the interactive shell of 'salloc',
+      ## all CPUs allotted on this node are available
       n <<- ncpus
     } else {
       ## In an 'srun' task, the CPUs on this node are shared with the other
