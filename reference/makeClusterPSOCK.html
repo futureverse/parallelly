@@ -29,7 +29,7 @@ background R workers, and how to connect to external machines."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9028</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -495,6 +495,30 @@ This built-in protection can be circumvented by specifying argument
 against using this, unless you know the CPU load for each parallel
 worker is very low. This might be safe to do so when the parallel
 tasks are mostly in a waiting state, e.g. polling a webserver.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="protection-against-cpu-overuse-via-nested-parallelism">Protection against CPU overuse via nested parallelism<a class="anchor" aria-label="anchor" href="#protection-against-cpu-overuse-via-nested-parallelism"></a></h2>
+
+
+<p>Parallel workers on the current machine inherit the settings of the
+main <span style="R">R</span> session. This means that <code><a href="availableCores.html">availableCores()</a></code> reports the same
+number of CPU cores in each worker as in the main <span style="R">R</span> session. For
+example, on an eight-core machine, each of the eight workers in</p>
+<p></p><div class="sourceCode r"><pre><code><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="fl">8</span><span class="op">)</span></span></code></pre><p></p></div>
+<p>reports eight CPU cores. If the code evaluated by the workers
+parallelizes further based on <code><a href="availableCores.html">availableCores()</a></code>, e.g.</p>
+<p></p><div class="sourceCode r"><pre><code><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">parLapply</a></span><span class="op">(</span><span class="va">cl</span>, <span class="va">X</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">mclapply</a></span><span class="op">(</span><span class="va">x</span>, FUN <span class="op">=</span> <span class="va">slow_fcn</span>, mc.cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="../reference/availableCores.html">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre><p></p></div>
+<p>then there could be up to 64 <span style="R">R</span> processes competing for eight CPU
+cores. To protect against this, set <span style="R">R</span> option <code>mc.cores</code> to one in
+each worker using:</p>
+<p></p><div class="sourceCode r"><pre><code><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span><span class="fl">8</span>, rscript_startup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre><p></p></div>
+<p>This makes <code><a href="availableCores.html">availableCores()</a></code> report a single CPU core in each
+worker, and <code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">parallel::mclapply()</a></code> run sequentially. This is not
+needed when using the cluster via the <span class="pkg">future</span> framework,
+e.g. <code>plan(cluster, workers = cl)</code>, because futures are evaluated
+with <code>mc.cores</code> set to one on parallel workers.</p>
     </div>
     <div class="section level2">
     <h2 id="definition-of-localhost">Definition of <em>localhost</em><a class="anchor" aria-label="anchor" href="#definition-of-localhost"></a></h2>

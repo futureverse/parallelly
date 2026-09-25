@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9028</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -177,6 +177,9 @@ Query the "Grid Engine" scheduler environment variable <code class="env">PE_HOST
 An example of a job submission that results in this is
 <code>qsub -pe mpi 8</code> (or <code>qsub -pe ompi 8</code>), which
 requests eight cores on any number of machines.
+The workers are listed in the same order as the machines in
+<code class="env">PE_HOSTFILE</code>, where the machine running the job script comes
+first.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
@@ -187,16 +190,15 @@ Query Slurm environment variable <code class="env">SLURM_JOB_NODELIST</code> (fa
 to legacy <code class="env">SLURM_NODELIST</code>) and parse set of nodes.
 Then query Slurm environment variable <code class="env">SLURM_JOB_CPUS_PER_NODE</code>
 (fallback <code class="env">SLURM_TASKS_PER_NODE</code>) to infer how many CPU cores
-Slurm has allotted to each of the nodes.  If <code class="env">SLURM_CPUS_PER_TASK</code>
-is set, which is always a scalar, then that is respected too, i.e.
-if it is smaller, then that is used for all nodes.
+Slurm has allotted to each of the nodes.
 For example, if <code>SLURM_NODELIST="n1,n[03-05]"</code> (expands to
 <code>c("n1", "n03", "n04", "n05")</code>) and <code>SLURM_JOB_CPUS_PER_NODE="2(x2),3,2"</code>
 (expands to <code>c(2, 2, 3, 2)</code>), then
 <code>c("n1", "n1", "n03", "n03", "n04", "n04", "n04", "n05", "n05")</code> is
-returned.  If in addition, <code>SLURM_CPUS_PER_TASK=1</code>, which can happen
-depending on hyperthreading configurations on the Slurm cluster, then
-<code>c("n1", "n03", "n04", "n05")</code> is returned.</p></li>
+returned.  Note that <code class="env">SLURM_CPUS_PER_TASK</code> is not used to limit
+the number of workers per node.  This means that the number of
+workers on the current machine equals <code><a href="availableCores.html">availableCores()</a></code> in the
+Slurm job script.</p></li>
 <li><p><code>"custom"</code> -
 If option
 <code><a href="zzz-parallelly.options.html">parallelly.availableWorkers.custom</a></code>

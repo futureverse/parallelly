@@ -44,8 +44,10 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "-w"),
-  rscript_sh = c("auto", "none")
+  rshcmd = c("srun", "--exact", "--overlap", "--overcommit", "--nodes=1",
+             "--ntasks=1", "--cpus-per-task=1", "-w"),
+  rscript_sh = c("auto", "none"),
+  rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
 
@@ -69,8 +71,15 @@ $ sbatch script.sh
 
 This will request 16 tasks (CPU slots) across 4 compute nodes.
 
-Each parallel worker is launched via Slurm’s `srun` command from the
-main R session that runs.
+Parallel workers on other machines are launched via Slurm’s `srun`
+command from the main R session, whereas workers on the machine running
+the main R session are launched directly.
+
+The `--cpus-per-task=1` Slurm option makes sure each worker launched via
+`srun` is allotted a single CPU. The `--overcommit` option is needed for
+older versions of Slurm, e.g. Slurm 21.08, where otherwise a worker
+waits for the CPUs of the other workers on the same machine, despite
+`--overlap`.
 
 Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:
@@ -127,7 +136,8 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = "qrsh", rshopts = c("-inherit", "-nostdin", "-V")
+  rshcmd = "qrsh", rshopts = c("-inherit", "-nostdin", "-V"),
+  rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
 
@@ -198,7 +208,8 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = "pjrsh"
+  rshcmd = "pjrsh",
+  rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
 
@@ -222,3 +233,38 @@ $ pjsub -L vnode=3 -L vnode-core=18 script.sh
 
 to request 18 CPU cores on three compute nodes, which in total requests
 3\*18=54 compute slots.
+
+## Avoid overusing the CPUs via nested parallelism
+
+In all of the above examples, the parallel workers are set up with
+`rscript_startup = quote(options(mc.cores = 1L))`. This sets R option
+`mc.cores` to one in each worker, which makes
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+report a single CPU core when called in a worker.
+
+This matters for workers running on the same machine as the main R
+session. They are launched directly, rather than via the job scheduler,
+which means they inherit the settings of the main R session. For
+example, if the job scheduler allotted eight CPU cores on that machine,
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+would report eight cores in each of the eight workers there. If the code
+evaluated by the workers parallelizes further based on
+[`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md),
+e.g.
+
+``` r
+
+y <- parLapply(cl = cl, X, fun = function(x) {
+  parallel::mclapply(x, FUN = slow_fcn, mc.cores = parallelly::availableCores())
+})
+```
+
+then there could be up to 64 R processes competing for eight CPU cores.
+With `mc.cores = 1L`,
+[`mclapply()`](https://rdrr.io/r/parallel/mclapply.html) runs
+sequentially in each worker, which avoids overusing the CPUs.
+
+This is not needed when using the cluster via the
+**[future](https://future.futureverse.org)** framework,
+e.g. `plan(cluster, workers = cl)`, because futures are evaluated with
+`mc.cores` set to one on parallel workers.

@@ -174,22 +174,28 @@ supported:
 - `"SGE"` - Query the "Grid Engine" scheduler environment variable
   `NSLOTS`. An example of a job submission that results in this is
   `qsub -pe smp 2` (or `qsub -pe by_node 2`), which requests two cores
-  on a single machine. Known Grid Engine schedulers are Oracle Grid
+  on a single machine. If the job spans multiple machines, e.g.
+  `qsub -pe mpi 16`, `NSLOTS` is the total number of slots on all
+  machines. Because of this, the number of slots allotted to the current
+  machine according to the file that `PE_HOSTFILE` specifies is used
+  instead, if available. Known Grid Engine schedulers are Oracle Grid
   Engine (OGE; acquired Sun Microsystems in 2010), Univa Grid Engine
   (UGE; fork of open-source SGE 6.2u5), Altair Grid Engine (AGE;
   acquired Univa Corporation in 2020), Son of Grid Engine (SGE aka SoGE;
   open-source fork of SGE 6.2u5), and
 
 - `"Slurm"` - Query Simple Linux Utility for Resource Management (Slurm)
-  environment variable `SLURM_CPUS_PER_TASK`. This may or may not be
-  set. It can be set when submitting a job, e.g.
-  `sbatch --cpus-per-task=2 hello.sh` or by adding
-  `#SBATCH --cpus-per-task=2` to the `hello.sh` script. If
-  `SLURM_CPUS_PER_TASK` is not set, then it will fall back to use
-  `SLURM_CPUS_ON_NODE` if the job is a single-node job
-  (`SLURM_JOB_NUM_NODES` is 1), e.g. `sbatch --ntasks=2 hello.sh`. To
-  make sure all tasks are assigned to a single node, specify
-  `--nodes=1`, e.g. `sbatch --nodes=1 --ntasks=16 hello.sh`.
+  environment variable `SLURM_CPUS_ON_NODE`, which is the number of CPUs
+  that Slurm has allotted to the job on the current machine. For
+  example, `sbatch --ntasks=4 --cpus-per-task=2 hello.sh` gives eight
+  CPUs, when all tasks are assigned to the same machine. This is the
+  number of cores available to the `hello.sh` job script, and similarly
+  to the interactive shell of `salloc`. In a task launched by `srun` (as
+  indicated by `SLURM_STEP_ID` being set), the CPUs on the machine are
+  shared with the other tasks on that machine. In this case,
+  `SLURM_CPUS_PER_TASK` is used, if set, e.g. `--cpus-per-task=2`,
+  otherwise the CPUs are split equally among the tasks of the job step
+  on the current machine according to `SLURM_STEP_TASKS_PER_NODE`.
 
 - `"custom"` - If option
   [`parallelly.availableCores.custom`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)

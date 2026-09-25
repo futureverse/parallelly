@@ -15,7 +15,7 @@ number of cores available is always at least one."><meta property="og:image" con
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9028</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -261,6 +261,11 @@ Query the "Grid Engine" scheduler environment variable <code class="env">NSLOTS<
 An example of a job submission that results in this is
 <code>qsub -pe smp 2</code> (or <code>qsub -pe by_node 2</code>), which
 requests two cores on a single machine.
+If the job spans multiple machines, e.g. <code>qsub -pe mpi 16</code>,
+<code class="env">NSLOTS</code> is the total number of slots on all machines.
+Because of this, the number of slots allotted to the current
+machine according to the file that <code class="env">PE_HOSTFILE</code> specifies
+is used instead, if available.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
@@ -268,15 +273,19 @@ Altair Grid Engine (AGE; acquired Univa Corporation in 2020),
 Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and</p></li>
 <li><p><code>"Slurm"</code> -
 Query Simple Linux Utility for Resource Management (Slurm)
-environment variable <code class="env">SLURM_CPUS_PER_TASK</code>.
-This may or may not be set.  It can be set when submitting a job,
-e.g. <code>sbatch --cpus-per-task=2 hello.sh</code> or by adding
-<code>#SBATCH --cpus-per-task=2</code> to the <code class="file">hello.sh</code> script.
-If <code class="env">SLURM_CPUS_PER_TASK</code> is not set, then it will fall back to
-use <code class="env">SLURM_CPUS_ON_NODE</code> if the job is a single-node job
-(<code class="env">SLURM_JOB_NUM_NODES</code> is 1), e.g. <code>sbatch --ntasks=2 hello.sh</code>.
-To make sure all tasks are assigned to a single node, specify
-<code>--nodes=1</code>, e.g. <code>sbatch --nodes=1 --ntasks=16 hello.sh</code>.</p></li>
+environment variable <code class="env">SLURM_CPUS_ON_NODE</code>, which is the number
+of CPUs that Slurm has allotted to the job on the current machine.
+For example, <code>sbatch --ntasks=4 --cpus-per-task=2 hello.sh</code>
+gives eight CPUs, when all tasks are assigned to the same machine.
+This is the number of cores available to the <code class="file">hello.sh</code> job
+script, and similarly to the interactive shell of <code class="command">salloc</code>.
+In a task launched by <code class="command">srun</code> (as indicated by
+<code class="env">SLURM_STEP_ID</code> being set), the CPUs on the machine are shared
+with the other tasks on that machine.  In this case,
+<code class="env">SLURM_CPUS_PER_TASK</code> is used, if set, e.g.
+<code>--cpus-per-task=2</code>, otherwise the CPUs are split equally among the
+tasks of the job step on the current machine according to
+<code class="env">SLURM_STEP_TASKS_PER_NODE</code>.</p></li>
 <li><p><code>"custom"</code> -
 If option
 <code><a href="zzz-parallelly.options.html">parallelly.availableCores.custom</a></code>

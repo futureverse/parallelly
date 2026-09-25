@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9028</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,17 +81,39 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="version-development-version">Version (development version)<a class="anchor" aria-label="anchor" href="#version-development-version"></a></h2>
 <div class="section level3">
+<h3 id="significant-changes-development-version">Significant Changes<a class="anchor" aria-label="anchor" href="#significant-changes-development-version"></a></h3>
+<ul><li><p><code>availableCores(method = "Slurm")</code> and <code>availableWorkers(method = "Slurm")</code> have been updated to better reflect what is allotted by Slurm under different combinations of <code>--nodes=&lt;n&gt;</code>, <code>--ntasks=&lt;t&gt;</code>, and <code>--cpus-per-task=&lt;c&gt;</code>, and whether running R via Slurm’s <code>srun</code> or not. Agility to <code>srun</code> is new and has never before been attempted by <strong>parallelly</strong>. See below bug fixes for details.</p></li>
+<li><p><code>availableCores(method = "SGE")</code> is now agile to multi-node jobs. It was already agile to using <code>qrsh</code> for multi-node tasks. See below bug fixes for details.</p></li>
+</ul></div>
+<div class="section level3">
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
-<ul><li>Add example to HPC vignette on how to launch parallel workers in a multi-node Slurm job.</li>
+<ul><li><p>Add example to HPC vignette on how to launch parallel workers in a multi-node Slurm job.</p></li>
+<li><p>Add section ‘Protection against CPU overuse via nested parallelism’ to <code><a href="../reference/makeClusterPSOCK.html">help("makeClusterPSOCK")</a></code>, and a corresponding section to the HPC vignette, on how to use <code>rscript_startup = quote(options(mc.cores = 1L))</code> to make <code><a href="../reference/availableCores.html">availableCores()</a></code> report a single CPU core in each parallel worker. The HPC vignette examples now use this.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="miscellaneous-development-version">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous-development-version"></a></h3>
+<ul><li>The package now declares that it requires R (&gt;= 3.3.0).</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> did not respect CGroups v1 and v2 CPU quotas (<code>cpu.cfs_quota_us</code> and <code>cpu.max</code>) set on a parent CGroup when a less restricted one was set on the process itself.</p></li>
-<li><p><code>availableWorkers(method = "Slurm")</code> incorrectly returned exactly <code>SLURM_CPUS_PER_TASK</code> workers per node when that environment variable was set, while completely ignoring the total number of allocated CPUs on the node. This would underestimate the number of workers available. Now it returns the number of Slurm tasks per node, calculated as the total Slurm CPUs divided by <code>SLURM_CPUS_PER_TASK</code>. This update also fixed a problem where it for some Slurm resource requests could overestimate the number of workers available.</p></li>
 <li><p><code>availableCores(which = "all", max = n)</code> would return only the smallest value among all and unnamed.</p></li>
+<li>
+<p><code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> on SGE:</p>
+<ul><li><p><code>availableCores(method = "SGE")</code> in a Grid Engine job script would overestimate the number of CPU cores available for a multi-node job, because it returned <code>NSLOTS</code>, which is the total number of slots on all machines, e.g. <code>qsub -pe mpi-2 16</code> would result in 16 cores on each machine, although only two slots were allotted per machine. Now it returns the number of slots allotted to the current machine according to <code>PE_HOSTFILE</code>, in agreement with <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code>. It only uses <code>NSLOTS</code> as a fallback if <code>PE_HOSTFILE</code> is not set.</p></li>
+<li><p><code>availableWorkers(method = "SGE")</code> returned the workers sorted by hostname, which meant that the first worker was not necessarily the machine running the job script. Now the workers are listed in the same order as in <code>PE_HOSTFILE</code>, which lists the machine running the job script first. A machine that is listed more than once, e.g. once per queue, is merged into one set of workers at its first position.</p></li>
+</ul></li>
+<li>
+<p><code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> on Slurm:</p>
+<ul><li><p><code>availableWorkers(method = "Slurm")</code> incorrectly returned exactly <code>SLURM_CPUS_PER_TASK</code> workers per node when that environment variable was set, while completely ignoring the total number of allocated CPUs on the node. This would underestimate the number of workers available. Now it returns all CPUs that Slurm allotted on each node, as given by <code>SLURM_JOB_CPUS_PER_NODE</code>.</p></li>
+<li><p><code>availableCores(method = "Slurm")</code> in a Slurm job script would underestimate the number of CPU cores available when there was more than one Slurm task on the current machine, e.g. <code>sbatch --ntasks=16 --cpus-per-task=1</code> resulted in one core, although Slurm allotted 16 CPUs. Similarly, in multi-node jobs without <code>--cpus-per-task=&lt;c&gt;</code>, it returned the number of Slurm tasks on the first node rather than the number of CPUs allotted there, e.g. <code>sbatch --nodes=2 --ntasks=16</code> could result in eight instead of nine cores. Now it returns <code>SLURM_CPUS_ON_NODE</code>, which also makes it agree with the number of workers on the current machine according to <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code>.</p></li>
+<li><p><code>availableCores(method = "Slurm")</code> in a task launched by <code>srun</code> in a Slurm job without <code>--cpus-per-task=&lt;c&gt;</code> could return more cores than allotted to the task, which could result in more parallel workers than CPUs on the machine. In single-node jobs, it returned all CPUs on the machine for each task, e.g. 16 for each of 16 tasks sharing 16 CPUs. In multi-node jobs, it returned the number of Slurm tasks on the first node, e.g. 14 for each of 14 tasks sharing 16 CPUs. The overall <code><a href="../reference/availableCores.html">availableCores()</a></code> would only be protected against this if Slurm bound each task to its own CPUs. Now the CPUs on the machine are split equally among the tasks there. The interactive shell of <code>salloc</code>, which Slurm may run as a special job step, is treated as a job script.</p></li>
+</ul></li>
 <li><p><code><a href="../reference/isNodeAlive.html">isNodeAlive()</a></code> and <code><a href="../reference/killNode.html">killNode()</a></code> would give an error, e.g. “Error in as.character(x) : cannot coerce type ‘closure’ to vector of type ‘character’”, on a node created by <code>makeClusterPSOCK(..., rshcmd)</code> where <code>rshcmd</code> was a function.</p></li>
 <li><p><code>makeNodePSOCK(..., manual = TRUE)</code> would unexpectedly run the pre-launch self-test on localhost.</p></li>
 <li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> would still record the call stack for each node, even if argument <code>calls = FALSE</code> (default).</p></li>
+<li><p><code><a href="../reference/serializedSize.html">serializedSize()</a></code> gave an error “version 3 not supported” in R (&lt; 3.5.0). Now it uses the same serialization version as <code><a href="https://rdrr.io/r/base/serialize.html" class="external-link">serialize()</a></code> does by default, i.e. version 2 in R (&lt; 3.6.0) and version 3 in R (&gt;= 3.6.0).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> for <code>RichSOCKcluster</code> objects failed to report on broken connections in R (&lt; 4.0.0), if the connection index had been reused by another connection, e.g. when called via <code><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output()</a></code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="deprecated-and-defunct-development-version">Deprecated and Defunct<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-development-version"></a></h3>
