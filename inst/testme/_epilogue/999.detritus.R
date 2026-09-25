@@ -15,7 +15,7 @@ if (basename(path) == "working_dir") {
 
     msg <- sprintf("Detected 'Rscript*' files: [n=%d] %s", length(files), paste(sQuote(basename(files)), collapse = ", "))
 
-    ## Are detritus files files expected by design on MS Windows?
+    ## Are detritus files expected by design on MS Windows?
     ## If so, produce a warning, otherwise an error
     if ("detritus-files" %in% testme[["tags"]] &&
         .Platform[["OS.type"]] == "windows") {

@@ -30,7 +30,7 @@
 #' This function detects when running in such an environment and returns
 #' `FALSE`, despite the underlying operating system supports forked processing.
 #' A warning will also be produced informing the user about this the first
-#' time time this function is called in an \R session.
+#' time this function is called in an \R session.
 #' This warning can be disabled by setting R option
 #' `parallelly.supportsMulticore.unstable`, or environment variable
 #' \env{R_PARALLELLY_SUPPORTSMULTICORE_UNSTABLE} to `"quiet"`.

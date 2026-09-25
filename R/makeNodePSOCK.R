@@ -374,7 +374,7 @@
 #'
 #' If the remote machines are running on MS Windows, make sure to add argument
 #' `rscript_sh = "cmd"` when calling `makeClusterPSOCK()`, because the default
-#' is `rscript_sh = "sh"`, which assumes that that the remote machines are
+#' is `rscript_sh = "sh"`, which assumes that the remote machines are
 #' Unix-like machines.
 #' 
 #' Another reason for failing to setup remote workers could be that they are
@@ -468,7 +468,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
   ## rscript_sh[1] is for inner and rscript_sh[2] is for the outer shell
   ## quoting of the Rscript call.  Precisely, rscript_sh[1] is for Rscript
   ## arguments that need shell quoting (e.g. Rscript -e "<expr>"), and
-  ## rscript_sh[2] is for the the whole 'Rscript ...' call
+  ## rscript_sh[2] is for the whole 'Rscript ...' call
   rscript_sh <- rep(rscript_sh, length.out = 2L)
   
   manual <- as.logical(manual)

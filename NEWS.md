@@ -140,7 +140,7 @@
    optional argument `workCommand` to customize the default
    `parallel:::workCommand()`.
    
- * Analogusly to `availableCores()`, `availableWorkers()` queries also
+ * Analogously to `availableCores()`, `availableWorkers()` queries also
    Linux CGroups v2 CPU affinity values `cpuset.cpus` and
    `cpuset.cpus.effective`.
    
@@ -635,7 +635,7 @@
 ## New Features
 
  * Add support for `availableWorkers(constraints = "connections")`,
-   which limits the number of workers that can be be used to the
+   which limits the number of workers that can be used to the
    current number of free R connections according to
    `freeConnections()`.  This is the maximum number of PSOCK, SOCK,
    and MPI **parallel** cluster nodes we can open without running out
@@ -1337,7 +1337,7 @@
    3.6.3 (2020-02-29), platform x86_64-pc-linux-gnu)".
 
  * It is now possible to set environment variables on workers before
-   they are launched by `makeClusterPSOCK()` by specify them as as
+   they are launched by `makeClusterPSOCK()` by specifying them as
    `<name>=<value>` as part of the `rscript` vector argument,
    e.g. `rscript=c("ABC=123", "DEF='hello world'", "Rscript")`. This
    works because elements in `rscript` that match regular expression

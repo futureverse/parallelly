@@ -612,7 +612,7 @@ The latter will assert that you have proper startup configuration also for
 
 If the remote machines are running on MS Windows, make sure to add argument
 \code{rscript_sh = "cmd"} when calling \code{makeClusterPSOCK()}, because the default
-is \code{rscript_sh = "sh"}, which assumes that that the remote machines are
+is \code{rscript_sh = "sh"}, which assumes that the remote machines are
 Unix-like machines.
 
 Another reason for failing to setup remote workers could be that they are

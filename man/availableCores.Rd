@@ -260,7 +260,7 @@ availableCores(constraints = "connections-16")
 }\if{html}{\out{</div>}}
 
 To achieve the same from outside of R, for instance when running
-\verb{R CMD check}, set the the corresponding environment variables, e.g.
+\verb{R CMD check}, set the corresponding environment variables, e.g.
 
 \if{html}{\out{<div class="sourceCode sh">}}\preformatted{$ export R_PARALLELLY_AVAILABLECORES_SYSTEM=192
 $ export R_PARALLELLY_AVAILABLECORES_METHODS=system

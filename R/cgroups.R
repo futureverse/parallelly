@@ -268,7 +268,7 @@ withCGroups <- function(tarball, expr = NULL, envir = parent.frame(), tmpdir = N
    name <- sub("[.]tar[.]gz$", "", basename(tarball))
    message(sprintf("CGroups for system %s ...", sQuote(name)))
 
-   ## Create a temporary temporary directory?
+   ## Create a temporary directory?
    if (is.null(tmpdir)) {
        tmpdir <- tempfile()
        dir.create(tmpdir)

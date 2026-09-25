@@ -9,7 +9,7 @@ makeClusterSequential()
 }
 \value{
 Returns a \code{cluster} object of class \code{sequential_cluster} of length one.
-The element is is a cluster node of class \code{sequential_node}.
+The element is a cluster node of class \code{sequential_node}.
 }
 \description{
 The created cluster has only one node.

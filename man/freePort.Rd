@@ -34,7 +34,7 @@ Find a TCP port that can be opened
 \section{Validation of TCP port returned}{
 
 This function attempts to validate that the TCP port returned is
-available and can be be opened. Thus, it is likely that this port
+available and can be opened. Thus, it is likely that this port
 is available momentarily after \code{freePort()} returns. However, due
 to race conditions, there is always a risk that the port is taken
 by another process on the same system after \code{freePort()} returns
@@ -44,10 +44,10 @@ but before, say, \code{makeClusterPSOCK()}, opens it.
 \section{Controlling the random set of TCP ports}{
 
 For backward compatibility with the \strong{parallel} package, the default
-set of of ports \code{freePort("random")}, or \code{freePort("auto")} with
+set of ports \code{freePort("random")}, or \code{freePort("auto")} with
 environment variable \code{R_PARALLEL_PORT=random} samples from is
 \code{11000:11999}.
-The set can be overriden by setting environment variable
+The set can be overridden by setting environment variable
 \code{R_PARALLELLY_RANDOM_PORTS},  e.g.
 \code{R_PARALLELLY_RANDOM_PORTS="10001:10010,11000:54000"}.
 }

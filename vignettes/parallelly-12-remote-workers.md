@@ -330,10 +330,10 @@ launched in the background by R using something like:
 ```
 
 This tells us that there is one active SSH connection per parallel
-worker. It also reveals that that each of these connections uses a so
+worker. It also reveals that each of these connections uses a so
 called _reverse tunnel_, which is used to establish a unique
 communication channel between the main R process and the corresponding
-parallel worker. It also this use of reverse tunneling that avoids
+parallel worker. It is also this use of reverse tunneling that avoids
 having to configure dynamic DNS (DDNS) and port-forwarding in our
 local firewalls, which is cumbersome and requires administrative
 rights. When using **parallelly**, there is no need for administrative

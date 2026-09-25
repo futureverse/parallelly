@@ -19,7 +19,7 @@
 #'
 #' @section Validation of TCP port returned:
 #' This function attempts to validate that the TCP port returned is
-#' available and can be be opened. Thus, it is likely that this port
+#' available and can be opened. Thus, it is likely that this port
 #' is available momentarily after `freePort()` returns. However, due
 #' to race conditions, there is always a risk that the port is taken
 #' by another process on the same system after `freePort()` returns
@@ -27,10 +27,10 @@
 #'
 #' @section Controlling the random set of TCP ports:
 #' For backward compatibility with the **parallel** package, the default
-#' set of of ports `freePort("random")`, or `freePort("auto")` with
+#' set of ports `freePort("random")`, or `freePort("auto")` with
 #' environment variable `R_PARALLEL_PORT=random` samples from is
 #' `11000:11999`.
-#' The set can be overriden by setting environment variable
+#' The set can be overridden by setting environment variable
 #' `R_PARALLELLY_RANDOM_PORTS`,  e.g.
 #' `R_PARALLELLY_RANDOM_PORTS="10001:10010,11000:54000"`.
 #'
