@@ -162,7 +162,7 @@ stopifnot(length(n) == 1L, is.integer(n), is.na(n) || n >= 1L)
 
 message("*** cgroups ... DONE")
 
-root <- system.file(package = "parallelly", "test-data", mustWork = TRUE)
+root <- system.file(package = "parallelly", "test-data", "cgroups", mustWork = TRUE)
 for (dir in c("no-cgroups", "mixed-cgroups", "cgroups1", "cgroups2")) {
   message(sprintf("%s - real-world ...", dir))
   path <- file.path(root, dir)
