@@ -32,7 +32,7 @@
  * `availableCores(which = "all", max = n)` would return only the
    smallest value among all and unnamed.
 
- * `availableCores()` on SGE:
+ * `availableCores()` and `availableWorkers()` on SGE:
  
    - `availableCores(method = "SGE")` in a Grid Engine job script
      would overestimate the number of CPU cores available for a
@@ -43,6 +43,14 @@
      allotted to the current machine according to `PE_HOSTFILE`, in
      agreement with `availableWorkers()`. It only uses `NSLOTS` as a
      fallback if `PE_HOSTFILE` is not set.
+
+   - `availableWorkers(method = "SGE")` returned the workers sorted
+     by hostname, which meant that the first worker was not
+     necessarily the machine running the job script.  Now the
+     workers are listed in the same order as in `PE_HOSTFILE`, which
+     lists the machine running the job script first.  A machine that
+     is listed more than once, e.g. once per queue, is merged into
+     one set of workers at its first position.
 
  * `availableCores()` and `availableWorkers()` on Slurm:
  

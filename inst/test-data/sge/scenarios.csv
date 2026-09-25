@@ -2,7 +2,7 @@
 "sge1","job","",1,,"node15","1","1",,
 "sge1","job","-pe smp 16",16,"node115*16","node115","16","1","smp","node115 11 short.q@node115 UNDEFINED; node115 5 long.q@node115 UNDEFINED"
 "sge1","job","-pe mpi 16",16,"node299*16","node299","16","1","mpi","node299 2 short.q@node299 UNDEFINED; node299 14 long.q@node299 UNDEFINED"
-"sge1","job","-pe mpi-2 4",2,"msg-id25*2,node259*2","node259","4","2","mpi-2","node259 2 long.q@node259 UNDEFINED; msg-id25 2 long.q@msg-id25 UNDEFINED"
-"sge1","job","-pe mpi-2 16",2,"node111*2,node198*2,node240*2,node243*2,node247*2,node282*2,node285*2,node42*2","node240","16","8","mpi-2","node240 2 long.q@node240 UNDEFINED; node111 2 long.q@node111 UNDEFINED; node243 2 long.q@node243 UNDEFINED; node198 2 long.q@node198 UNDEFINED; node282 2 long.q@node282 UNDEFINED; node42 2 long.q@node42 UNDEFINED; node285 2 long.q@node285 UNDEFINED; node247 2 long.q@node247 UNDEFINED"
+"sge1","job","-pe mpi-2 4",2,"node259*2,node25*2","node259","4","2","mpi-2","node259 2 long.q@node259 UNDEFINED; node25 2 long.q@node25 UNDEFINED"
+"sge1","job","-pe mpi-2 16",2,"node240*2,node111*2,node243*2,node198*2,node282*2,node42*2,node285*2,node247*2","node240","16","8","mpi-2","node240 2 long.q@node240 UNDEFINED; node111 2 long.q@node111 UNDEFINED; node243 2 long.q@node243 UNDEFINED; node198 2 long.q@node198 UNDEFINED; node282 2 long.q@node282 UNDEFINED; node42 2 long.q@node42 UNDEFINED; node285 2 long.q@node285 UNDEFINED; node247 2 long.q@node247 UNDEFINED"
 "sge1","job","-pe mpi-8 16",1,"node29*1,node77*2","node29","16","2","mpi-8","node29 1 long.q@node29 UNDEFINED; node77 1 long.q@node77 UNDEFINED; node77 1 short.q@node77 UNDEFINED"
 "sge1","inherit","-pe mpi-2 16",2,,"node111","2","1","mpi-2",

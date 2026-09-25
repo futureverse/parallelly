@@ -453,10 +453,28 @@ for (kk in seq_len(nrow(scenarios))) {
   stopifnot(
     length(w) == sum(truth),
     identical(unique(w), names(truth)),
-    all(counts == truth)
+    all(counts == truth),
+    ## Workers on the same host are next to each other, in the order
+    ## of PE_HOSTFILE, which lists the host running the job script first
+    identical(w, rep(names(truth), times = truth)),
+    sub("[.].*", "", w[1]) == sub("[.].*", "", scenario$HOSTNAME)
   )
   file.remove(pathname)
 }
+
+## A host listed more than once, and not next to each other
+pathname <- tempfile(fileext = ".pe_hostfile")
+writeLines(c(
+  "n2 1 short.q@n2 UNDEFINED",
+  "n1 2 long.q@n1 UNDEFINED",
+  "n2 3 long.q@n2 UNDEFINED"
+), con = pathname)
+Sys.unsetenv(sge_vars)
+Sys.setenv(PE_HOSTFILE = pathname, NSLOTS = "6", HOSTNAME = "n2")
+w <- availableWorkers(methods = "SGE")
+print(w)
+stopifnot(identical(w, c(rep("n2", times = 4L), rep("n1", times = 2L))))
+file.remove(pathname)
 
 ## Cleanup
 Sys.unsetenv(sge_vars)

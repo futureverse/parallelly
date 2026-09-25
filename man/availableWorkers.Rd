@@ -85,6 +85,9 @@ Query the "Grid Engine" scheduler environment variable \env{PE_HOSTFILE}.
 An example of a job submission that results in this is
 \verb{qsub -pe mpi 8} (or \verb{qsub -pe ompi 8}), which
 requests eight cores on any number of machines.
+The workers are listed in the same order as the machines in
+\env{PE_HOSTFILE}, where the machine running the job script comes
+first.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),

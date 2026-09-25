@@ -63,6 +63,9 @@
 #'    An example of a job submission that results in this is
 #'    `qsub -pe mpi 8` (or `qsub -pe ompi 8`), which
 #'    requests eight cores on any number of machines.
+#'    The workers are listed in the same order as the machines in
+#'    \env{PE_HOSTFILE}, where the machine running the job script comes
+#'    first.
 #'    Known Grid Engine schedulers are
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
@@ -510,7 +513,16 @@ availableWorkersSGE <- function() {
     return(NA_character_)
   }
   
-  w <- read_pe_hostfile(pathname, expand = TRUE)
+  ## Keep the order of PE_HOSTFILE, which lists the host running the
+  ## job script first
+  data <- read_pe_hostfile(pathname, sort = FALSE)
+
+  ## A host may be listed more than once, e.g. once per queue
+  nodes <- unique(data$node)
+  counts <- vapply(nodes, FUN = function(node) {
+    sum(data$count[data$node == node])
+  }, FUN.VALUE = NA_integer_, USE.NAMES = FALSE)
+  w <- rep(nodes, times = counts)
 
   ## Sanity checks: It is not always true that length(w) == $NSLOTS, e.g.
   ## on the UCSF Wynton SGE cluster, 'qsub -pe mpi-8 16 ...' will produce
