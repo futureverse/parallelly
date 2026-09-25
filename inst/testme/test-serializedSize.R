@@ -37,5 +37,13 @@ size_df_custom <- serializedSize(obj_df_custom)
 message("size_df_custom: ", size_df_custom)
 stopifnot(is.double(size_df_custom), size_df_custom > 0)
 
+# Should be the same as the length of serialize() using the default version
+objs <- list(obj_int_vec, obj_char_vec, obj_list_mixed, obj_null, obj_df_custom)
+for (obj in objs) {
+  size <- serializedSize(obj)
+  truth <- length(serialize(obj, connection = NULL))
+  stopifnot(size == truth)
+}
+
 
 message("serializedSize() ... done")

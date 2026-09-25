@@ -15,7 +15,21 @@
  * Add example to HPC vignette on how to launch parallel workers in a
    multi-node Slurm job.
 
+## Miscellaneous
+
+ * The package now declares that it requires R (>= 3.3.0).
+
 ## Bug Fixes
+
+ * `serializedSize()` gave an error "version 3 not supported" in R
+   (< 3.5.0). Now it uses the same serialization version as
+   `serialize()` does by default, i.e. version 2 in R (< 3.6.0) and
+   version 3 in R (>= 3.6.0).
+
+ * `print()` for `RichSOCKcluster` objects failed to report on broken
+   connections in R (< 4.0.0), if the connection index had been
+   reused by another connection, e.g. when called via
+   `capture.output()`.
 
  * `availableCores()` did not respect CGroups v1 and v2 CPU quotas
    (`cpu.cfs_quota_us` and `cpu.max`) set on a parent CGroup when a
