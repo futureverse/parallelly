@@ -88,12 +88,11 @@
 <div class="section level3">
 <h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>
-<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> has an optional argument <code>rshcmd</code> for controlling how to launch the parallel workers that are other machines. It defaults to <code>rshcmd = &lt;ssh&gt;</code> (launch workers over SSH), when not specified. In this version, we add support for launching workers on other compute nodes via HPC job scheduler tools. Specifically, you can use either <code>rshcmd = "&lt;srun&gt;"</code> (Slurm), <code>rshcmd = "&lt;qrsh&gt;"</code> (Grid Engine), or <code>rshcmd = "&lt;pjrsh&gt;"</code> (Fujitsu Technical Computing Suite). These “shortcuts” expand to calls to those command with convenient defaults.</li>
+<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> has an optional argument <code>rshcmd</code> for controlling how to launch the parallel workers that are other machines. It defaults to <code>rshcmd = "&lt;ssh&gt;"</code> (launch workers over SSH), when not specified. In this version, we add support for launching workers on other compute nodes via HPC job scheduler tools. Specifically, you can use either <code>rshcmd = "&lt;srun&gt;"</code> (Slurm), <code>rshcmd = "&lt;qrsh&gt;"</code> (Grid Engine), or <code>rshcmd = "&lt;pjrsh&gt;"</code> (Fujitsu Technical Computing Suite). These “shortcuts” expand to calls to those command with convenient defaults.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
-<ul><li><p>Add example to HPC vignette on how to launch parallel workers in a multi-node Slurm job.</p></li>
-<li><p>Add section ‘Protection against CPU overuse via nested parallelism’ to <code><a href="../reference/makeClusterPSOCK.html">help("makeClusterPSOCK")</a></code>, and a corresponding section to the HPC vignette, on how to use <code>rscript_startup = quote(options(mc.cores = 1L))</code> to make <code><a href="../reference/availableCores.html">availableCores()</a></code> report a single CPU core in each parallel worker. The HPC vignette examples now use this.</p></li>
+<ul><li>Add example to HPC vignette on how to launch parallel workers in a multi-node Slurm job.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="miscellaneous-development-version">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous-development-version"></a></h3>

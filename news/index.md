@@ -21,7 +21,7 @@
 - [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
   has an optional argument `rshcmd` for controlling how to launch the
   parallel workers that are other machines. It defaults to
-  `rshcmd = <ssh>` (launch workers over SSH), when not specified. In
+  `rshcmd = "<ssh>"` (launch workers over SSH), when not specified. In
   this version, we add support for launching workers on other compute
   nodes via HPC job scheduler tools. Specifically, you can use either
   `rshcmd = "<srun>"` (Slurm), `rshcmd = "<qrsh>"` (Grid Engine), or
@@ -32,14 +32,6 @@
 
 - Add example to HPC vignette on how to launch parallel workers in a
   multi-node Slurm job.
-
-- Add section ‘Protection against CPU overuse via nested parallelism’ to
-  [`help("makeClusterPSOCK")`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md),
-  and a corresponding section to the HPC vignette, on how to use
-  `rscript_startup = quote(options(mc.cores = 1L))` to make
-  [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
-  report a single CPU core in each parallel worker. The HPC vignette
-  examples now use this.
 
 ### Miscellaneous
 
