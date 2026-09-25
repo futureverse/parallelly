@@ -152,6 +152,11 @@
 #'    An example of a job submission that results in this is
 #'    `qsub -pe smp 2` (or `qsub -pe by_node 2`), which
 #'    requests two cores on a single machine.
+#'    If the job spans multiple machines, e.g. `qsub -pe mpi 16`,
+#'    \env{NSLOTS} is the total number of slots on all machines.
+#'    Because of this, the number of slots allotted to the current
+#'    machine according to the file that \env{PE_HOSTFILE} specifies
+#'    is used instead, if available.
 #'    Known Grid Engine schedulers are
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
@@ -162,15 +167,19 @@
 #'
 #'  \item `"Slurm"` -
 #'    Query Simple Linux Utility for Resource Management (Slurm)
-#'    environment variable \env{SLURM_CPUS_PER_TASK}.
-#'    This may or may not be set.  It can be set when submitting a job,
-#'    e.g. `sbatch --cpus-per-task=2 hello.sh` or by adding
-#'    `#SBATCH --cpus-per-task=2` to the \file{hello.sh} script.
-#'    If \env{SLURM_CPUS_PER_TASK} is not set, then it will fall back to
-#'    use \env{SLURM_CPUS_ON_NODE} if the job is a single-node job
-#'    (\env{SLURM_JOB_NUM_NODES} is 1), e.g. `sbatch --ntasks=2 hello.sh`.
-#'    To make sure all tasks are assigned to a single node, specify
-#'    `--nodes=1`, e.g. `sbatch --nodes=1 --ntasks=16 hello.sh`.
+#'    environment variable \env{SLURM_CPUS_ON_NODE}, which is the number
+#'    of CPUs that Slurm has allotted to the job on the current machine.
+#'    For example, `sbatch --ntasks=4 --cpus-per-task=2 hello.sh`
+#'    gives eight CPUs, when all tasks are assigned to the same machine.
+#'    This is the number of cores available to the \file{hello.sh} job
+#'    script, and similarly to the interactive shell of \command{salloc}.
+#'    In a task launched by \command{srun} (as indicated by
+#'    \env{SLURM_STEP_ID} being set), the CPUs on the machine are shared
+#'    with the other tasks on that machine.  In this case,
+#'    \env{SLURM_CPUS_PER_TASK} is used, if set, e.g.
+#'    `--cpus-per-task=2`, otherwise the CPUs are split equally among the
+#'    tasks of the job step on the current machine according to
+#'    \env{SLURM_STEP_TASKS_PER_NODE}.
 #'
 #'  \item `"custom"` -
 #'    If option
@@ -744,10 +753,35 @@ availableCoresSGE <- local({
   n <- NULL
   function() {
     if (!is.null(n)) return(n)
-    n <<- getenv_int("NSLOTS")
+    ## In the job script of a job spanning multiple hosts, NSLOTS is the
+    ## total number of slots on all hosts, whereas PE_HOSTFILE gives the
+    ## number of slots per host. In processes launched on other hosts
+    ## by 'qrsh -inherit', PE_HOSTFILE is not set, and NSLOTS is the
+    ## number of slots on that host
+    n <<- sge_slots_on_host()
+    if (is.na(n)) n <<- getenv_int("NSLOTS")
     n
   }
 })
+
+
+## Number of slots on the current host according to PE_HOSTFILE
+sge_slots_on_host <- function() {
+  pathname <- getenv_chr("PE_HOSTFILE")
+  if (is.na(pathname) || !file_test("-f", pathname)) return(NA_integer_)
+  data <- tryCatch(read_pe_hostfile(pathname, sort = FALSE), error = function(ex) NULL)
+  if (is.null(data)) return(NA_integer_)
+
+  ## The hostnames in PE_HOSTFILE may or may not be fully qualified
+  hostname <- getenv_chr("HOSTNAME")
+  if (is.na(hostname)) hostname <- Sys.info()[["nodename"]]
+  short <- function(x) sub("[.].*", "", x)
+  is_local <- (short(data$node) == short(hostname))
+  if (!any(is_local)) return(NA_integer_)
+
+  ## A host may be listed more than once, e.g. once per queue
+  sum(data$count[is_local])
+} ## sge_slots_on_host()
 
 
 ## Number of cores assigned by Slurm
@@ -755,10 +789,42 @@ availableCoresSlurm <- local({
   n <- NULL
   function() {
     if (!is.null(n)) return(n)
-    ## The assumption is that the following works regardless of
-    ## number of nodes requested /HB 2020-09-18
-    ## Example: --cpus-per-task={n}
-    n <<- getenv_int("SLURM_CPUS_PER_TASK")
+
+    ## Number of CPUs allotted to the job on the current node. On
+    ## hyperthreaded systems, this may be greater than requested, because
+    ## Slurm allots whole cores, e.g. --cpus-per-task=3 gives four CPUs
+    ncpus <- getenv_int("SLURM_CPUS_ON_NODE")
+
+    ## SLURM_STEP_ID (and SLURM_STEPID for backwards compatibility) is set
+    ## in tasks launched by 'srun', but not in the batch script.
+    step <- getenv_int("SLURM_STEP_ID", mode = "double")
+    if (is.na(step)) step <- getenv_int("SLURM_STEPID", mode = "double")
+
+    ## Was 'salloc' used? Step IDs of 0xFFFFFFF0 and above are
+    ## special, e.g. 0xFFFFFFFA (4294967290) for the interactive shell
+    ## of 'salloc', which, like the batch script, has all CPUs
+    ## allotted on this node.
+    if (!is.na(step) && step >= 0xFFFFFFF0) step <- NA_real_
+
+    if (is.na(step)) {
+      ## In the batch script, and in the interactive shell of 'salloc',
+      ## all CPUs allotted on this node are available
+      n <<- ncpus
+    } else {
+      ## In an 'srun' task, the CPUs on this node are shared with the other
+      ## tasks of the job step on this node. Note that SLURM_CPUS_ON_NODE
+      ## is for the whole job, and the CPU affinity is not always limited
+      ## to the task's CPUs.
+      ## Example: --cpus-per-task={n}
+      n <<- getenv_int("SLURM_CPUS_PER_TASK")
+      if (is.na(n) && !is.na(ncpus)) {
+        ntasks <- slurm_step_ntasks_on_node()
+        if (!is.na(ntasks) && ntasks > 0L) n <<- max(1L, ncpus %/% ntasks)
+      }
+    }
+
+    ## Fallbacks, in case SLURM_CPUS_ON_NODE is not set
+    if (is.na(n)) n <<- getenv_int("SLURM_CPUS_PER_TASK")
     if (is.na(n)) {
       ## Example: --nodes={nnodes} (defaults to 1, short: -N {nnodes})
       ## From 'man sbatch':
@@ -770,14 +836,7 @@ availableCoresSlurm <- local({
   
       if (nnodes == 1L) {
         ## Example: --nodes=1 --ntasks={n} (short: -n {n})
-        ## IMPORTANT: 'SLURM_CPUS_ON_NODE' appears to be rounded up when nodes > 1.
-        ## Example 1: With --nodes=2 --cpus-per-task=3 we see SLURM_CPUS_ON_NODE=4
-        ## although SLURM_CPUS_PER_TASK=3. 
-        ## Example 2: With --nodes=2 --ntasks=7, we see SLURM_CPUS_ON_NODE=6,
-        ## SLURM_JOB_CPUS_PER_NODE=6,2, no SLURM_CPUS_PER_TASK, and
-        ## SLURM_TASKS_PER_NODE=5,2.
-        ## Conclusions: We can only use 'SLURM_CPUS_ON_NODE' for nnodes = 1.
-        n <<- getenv_int("SLURM_CPUS_ON_NODE")
+        n <<- ncpus
       } else {
         ## Parse `SLURM_TASKS_PER_NODE`
         nodecounts <- getenv_int("SLURM_TASKS_PER_NODE", mode = "character")
@@ -813,6 +872,29 @@ availableCoresSlurm <- local({
     n
   }
 }) ## availableCoresSlurm()
+
+
+## Number of tasks of the current 'srun' job step on the current node
+slurm_step_ntasks_on_node <- function() {
+  ## Examples:
+  ## SLURM_STEP_TASKS_PER_NODE=14,2
+  ## SLURM_STEP_TASKS_PER_NODE=2(x2)
+  counts <- getenv_chr("SLURM_STEP_TASKS_PER_NODE")
+  if (is.na(counts)) return(NA_integer_)
+  counts <- slurm_expand_nodecounts(counts)
+  if (length(counts) == 0L || anyNA(counts)) return(NA_integer_)
+
+  ## Same number of tasks on all nodes?
+  if (length(unique(counts)) == 1L) return(counts[1])
+
+  ## Otherwise, identify the current node among the step's nodes
+  nodelist <- getenv_chr("SLURM_STEP_NODELIST")
+  nodename <- getenv_chr("SLURMD_NODENAME")
+  if (is.na(nodelist) || is.na(nodename)) return(NA_integer_)
+  nodes <- slurm_expand_nodelist(nodelist)
+  if (length(nodes) != length(counts)) return(NA_integer_)
+  counts[match(nodename, nodes)]
+} ## slurm_step_ntasks_on_node()
 
 
 cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_character("default"), cli_arg_character("which"), cli_arg_integer("omit"), cli_arg_numeric("max"))

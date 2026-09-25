@@ -85,6 +85,9 @@ Query the "Grid Engine" scheduler environment variable \env{PE_HOSTFILE}.
 An example of a job submission that results in this is
 \verb{qsub -pe mpi 8} (or \verb{qsub -pe ompi 8}), which
 requests eight cores on any number of machines.
+The workers are listed in the same order as the machines in
+\env{PE_HOSTFILE}, where the machine running the job script comes
+first.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
@@ -96,16 +99,15 @@ Query Slurm environment variable \env{SLURM_JOB_NODELIST} (fallback
 to legacy \env{SLURM_NODELIST}) and parse set of nodes.
 Then query Slurm environment variable \env{SLURM_JOB_CPUS_PER_NODE}
 (fallback \env{SLURM_TASKS_PER_NODE}) to infer how many CPU cores
-Slurm has allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
-is set, which is always a scalar, then that is respected too, i.e.
-if it is smaller, then that is used for all nodes.
+Slurm has allotted to each of the nodes.
 For example, if \code{SLURM_NODELIST="n1,n[03-05]"} (expands to
 \code{c("n1", "n03", "n04", "n05")}) and \code{SLURM_JOB_CPUS_PER_NODE="2(x2),3,2"}
 (expands to \code{c(2, 2, 3, 2)}), then
 \code{c("n1", "n1", "n03", "n03", "n04", "n04", "n04", "n05", "n05")} is
-returned.  If in addition, \code{SLURM_CPUS_PER_TASK=1}, which can happen
-depending on hyperthreading configurations on the Slurm cluster, then
-\code{c("n1", "n03", "n04", "n05")} is returned.
+returned.  Note that \env{SLURM_CPUS_PER_TASK} is not used to limit
+the number of workers per node.  This means that the number of
+workers on the current machine equals \code{availableCores()} in the
+Slurm job script.
 
 \item \code{"custom"} -
 If option

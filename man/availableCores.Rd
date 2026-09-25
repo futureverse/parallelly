@@ -175,6 +175,11 @@ Query the "Grid Engine" scheduler environment variable \env{NSLOTS}.
 An example of a job submission that results in this is
 \verb{qsub -pe smp 2} (or \verb{qsub -pe by_node 2}), which
 requests two cores on a single machine.
+If the job spans multiple machines, e.g. \verb{qsub -pe mpi 16},
+\env{NSLOTS} is the total number of slots on all machines.
+Because of this, the number of slots allotted to the current
+machine according to the file that \env{PE_HOSTFILE} specifies
+is used instead, if available.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
@@ -183,15 +188,19 @@ Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 
 \item \code{"Slurm"} -
 Query Simple Linux Utility for Resource Management (Slurm)
-environment variable \env{SLURM_CPUS_PER_TASK}.
-This may or may not be set.  It can be set when submitting a job,
-e.g. \verb{sbatch --cpus-per-task=2 hello.sh} or by adding
-\verb{#SBATCH --cpus-per-task=2} to the \file{hello.sh} script.
-If \env{SLURM_CPUS_PER_TASK} is not set, then it will fall back to
-use \env{SLURM_CPUS_ON_NODE} if the job is a single-node job
-(\env{SLURM_JOB_NUM_NODES} is 1), e.g. \verb{sbatch --ntasks=2 hello.sh}.
-To make sure all tasks are assigned to a single node, specify
-\code{--nodes=1}, e.g. \verb{sbatch --nodes=1 --ntasks=16 hello.sh}.
+environment variable \env{SLURM_CPUS_ON_NODE}, which is the number
+of CPUs that Slurm has allotted to the job on the current machine.
+For example, \verb{sbatch --ntasks=4 --cpus-per-task=2 hello.sh}
+gives eight CPUs, when all tasks are assigned to the same machine.
+This is the number of cores available to the \file{hello.sh} job
+script, and similarly to the interactive shell of \command{salloc}.
+In a task launched by \command{srun} (as indicated by
+\env{SLURM_STEP_ID} being set), the CPUs on the machine are shared
+with the other tasks on that machine.  In this case,
+\env{SLURM_CPUS_PER_TASK} is used, if set, e.g.
+\code{--cpus-per-task=2}, otherwise the CPUs are split equally among the
+tasks of the job step on the current machine according to
+\env{SLURM_STEP_TASKS_PER_NODE}.
 
 \item \code{"custom"} -
 If option

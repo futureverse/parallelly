@@ -99,7 +99,7 @@ stopifnot(length(value) == 1L, is.character(value))
 message("- getCGroups1CpuSet()")
 value <- parallelly:::getCGroups1CpuSet()
 cat(sprintf("CPU set: [n=%d] %s\n", length(value), paste(sQuote(value), collapse = ", ")))
-stopifnot(length(value) >= 0L, is.integer(value), !any(is.na(value)))
+stopifnot(length(value) >= 0L, is.integer(value), !anyNA(value))
 
 
 message("- getCGroups1CpuQuotaMicroseconds()")
@@ -133,12 +133,12 @@ stopifnot(
 message("- getCGroups2CpuSet()")
 value <- parallelly:::getCGroups2CpuSet()
 cat(sprintf("CPU set: [n=%d] %s\n", length(value), paste(sQuote(value), collapse = ", ")))
-stopifnot(length(value) >= 0L, is.integer(value), !any(is.na(value)))
+stopifnot(length(value) >= 0L, is.integer(value), !anyNA(value))
 
 message("- getCGroups2CpuSet('cpuset.cpus.effective')")
 value <- parallelly:::getCGroups2CpuSet("cpuset.cpus.effective")
 cat(sprintf("CPU set: [n=%d] %s\n", length(value), paste(sQuote(value), collapse = ", ")))
-stopifnot(length(value) >= 0L, is.integer(value), !any(is.na(value)))
+stopifnot(length(value) >= 0L, is.integer(value), !anyNA(value))
 
 message("- getCGroups2CpuMax()")
 value <- parallelly:::getCGroups2CpuMax()
@@ -162,7 +162,7 @@ stopifnot(length(n) == 1L, is.integer(n), is.na(n) || n >= 1L)
 
 message("*** cgroups ... DONE")
 
-root <- system.file(package = "parallelly", "test-data", mustWork = TRUE)
+root <- system.file(package = "parallelly", "test-data", "cgroups", mustWork = TRUE)
 for (dir in c("no-cgroups", "mixed-cgroups", "cgroups1", "cgroups2")) {
   message(sprintf("%s - real-world ...", dir))
   path <- file.path(root, dir)

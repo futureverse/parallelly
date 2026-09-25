@@ -15,6 +15,9 @@ summary.RichSOCKnode <- function(object, ...) {
   if (!is.null(con)) {
     res$connection_index <- as.integer(con)
     res$connection <- tryCatch({
+      ## In R (< 4.0.0), summary() of a closed connection does not
+      ## give an error, if its index has been reused
+      if (!isConnectionValid(con)) stop("invalid connection")
       summary(con)$description
     }, error = function(ex) {
       exists <- (res$connection_index %in% getAllConnections())

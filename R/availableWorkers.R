@@ -63,6 +63,9 @@
 #'    An example of a job submission that results in this is
 #'    `qsub -pe mpi 8` (or `qsub -pe ompi 8`), which
 #'    requests eight cores on any number of machines.
+#'    The workers are listed in the same order as the machines in
+#'    \env{PE_HOSTFILE}, where the machine running the job script comes
+#'    first.
 #'    Known Grid Engine schedulers are
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
@@ -76,16 +79,15 @@
 #'    to legacy \env{SLURM_NODELIST}) and parse set of nodes.
 #'    Then query Slurm environment variable \env{SLURM_JOB_CPUS_PER_NODE}
 #'    (fallback \env{SLURM_TASKS_PER_NODE}) to infer how many CPU cores
-#'    Slurm has allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
-#'    is set, which is always a scalar, then that is respected too, i.e.
-#'    if it is smaller, then that is used for all nodes.
+#'    Slurm has allotted to each of the nodes.
 #'    For example, if `SLURM_NODELIST="n1,n[03-05]"` (expands to
 #'    `c("n1", "n03", "n04", "n05")`) and `SLURM_JOB_CPUS_PER_NODE="2(x2),3,2"`
 #'    (expands to `c(2, 2, 3, 2)`), then
 #'    `c("n1", "n1", "n03", "n03", "n04", "n04", "n04", "n05", "n05")` is
-#'    returned.  If in addition, `SLURM_CPUS_PER_TASK=1`, which can happen
-#'    depending on hyperthreading configurations on the Slurm cluster, then 
-#'    `c("n1", "n03", "n04", "n05")` is returned.
+#'    returned.  Note that \env{SLURM_CPUS_PER_TASK} is not used to limit
+#'    the number of workers per node.  This means that the number of
+#'    workers on the current machine equals `availableCores()` in the
+#'    Slurm job script.
 #'
 #'  \item `"custom"` -
 #'    If option
@@ -511,7 +513,16 @@ availableWorkersSGE <- function() {
     return(NA_character_)
   }
   
-  w <- read_pe_hostfile(pathname, expand = TRUE)
+  ## Keep the order of PE_HOSTFILE, which lists the host running the
+  ## job script first
+  data <- read_pe_hostfile(pathname, sort = FALSE)
+
+  ## A host may be listed more than once, e.g. once per queue
+  nodes <- unique(data$node)
+  counts <- vapply(nodes, FUN = function(node) {
+    sum(data$count[data$node == node])
+  }, FUN.VALUE = NA_integer_, USE.NAMES = FALSE)
+  w <- rep(nodes, times = counts)
 
   ## Sanity checks: It is not always true that length(w) == $NSLOTS, e.g.
   ## on the UCSF Wynton SGE cluster, 'qsub -pe mpi-8 16 ...' will produce
@@ -756,21 +767,11 @@ availableWorkersSlurm <- function() {
       return(NA_character_)
     }
 
-    ## Always respect 'SLURM_CPUS_PER_TASK' (always a scalar), if that exists
-    n <- getenv_int("SLURM_CPUS_PER_TASK")
-    if (!is.na(n) && n > 0L) {
-      c0 <- c
-      ## The number of usable CPUs per node is the number of tasks per node (c0 %/% n) 
-      ## multiplied by the CPUs per task (n). This fixes the bug where multiple tasks
-      ## per node were ignored.
-      c <- (c0 %/% n) * n
-      
-      ## Is our assumption that SLURM_CPUS_PER_TASK <= SLURM_JOB_CPUS_PER_NODE, correct?
-      if (any(c0 < n)) {
-        c[c0 < n] <- c0[c0 < n]
-        warnf("Unexpected values of Slurm environment variable. The Slurm environment variables specify CPU counts on one or more nodes that is strictly less than what 'SLURM_CPUS_PER_TASK' specifies. Will use the minimum of the two for each node: %s < %s", sQuote(nodecounts), n)
-      }
-    }
+    ## Note that 'SLURM_CPUS_PER_TASK' is not used to limit the number
+    ## of workers per node, because all CPUs Slurm allots on a node
+    ## are available. These may be more than the number of tasks times
+    ## 'SLURM_CPUS_PER_TASK', because Slurm allots whole cores on
+    ## hyperthreaded systems
 
     ## Expand workers list
     w <- as.list(w)

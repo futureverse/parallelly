@@ -47,7 +47,8 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "-w"),
+  rshcmd = c("srun", "--exact", "--overlap", "--overcommit", "--nodes=1",
+             "--ntasks=1", "--cpus-per-task=1", "-w"),
   rscript_sh = c("auto", "none")
 )
 print(cl)
@@ -70,7 +71,15 @@ $ sbatch script.sh
 
 This will request 16 tasks (CPU slots) across 4 compute nodes.
 
-Each parallel worker is launched via Slurm's `srun` command from the main R session that runs.
+Parallel workers on other machines are launched via Slurm's `srun`
+command from the main R session, whereas workers on the machine
+running the main R session are launched directly. 
+
+The `--cpus-per-task=1` Slurm option makes sure each worker launched
+via `srun` is allotted a single CPU. The `--overcommit` option is
+needed for older versions of Slurm, e.g. Slurm 21.08, where otherwise
+a worker waits for the CPUs of the other workers on the same machine,
+despite `--overlap`.
 
 Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:

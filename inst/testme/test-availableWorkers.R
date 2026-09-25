@@ -279,7 +279,7 @@ for (kk in seq_along(specs)) {
   cat(sprintf("truth: c(%s)\n", paste(sQuote(truth), collapse = ", ")))
   stopifnot(
     is.character(expanded),
-    !any(is.na(expanded)),
+    !anyNA(expanded),
     length(expanded) == length(truth),
     identical(expanded, truth)
   )
@@ -357,7 +357,7 @@ for (kk in seq_along(specs)) {
   cat(sprintf("truth: c(%s)\n", paste(sQuote(truth), collapse = ", ")))
   stopifnot(
     is.integer(expanded),
-    !any(is.na(expanded)),
+    !anyNA(expanded),
     length(expanded) == length(truth),
     identical(expanded, truth)
   )
@@ -366,7 +366,7 @@ for (kk in seq_along(specs)) {
 message("*** Slurm w/ SLURM_TASKS_PER_NODE ... DONE")
 
 message("*** Slurm odds'n'ends ...")
-# Respect SLURM_CPUS_PER_TASK, if set
+# All CPUs allotted on a node are available, regardless of SLURM_CPUS_PER_TASK
 Sys.setenv(
   SLURM_JOB_NODELIST = "n1",
   SLURM_JOB_CPUS_PER_NODE = "10(x1)",
@@ -374,8 +374,113 @@ Sys.setenv(
 )
 w <- parallelly:::availableWorkersSlurm()
 str(w)
-stopifnot(length(w) == 9L, all(w == "n1"))
+stopifnot(length(w) == 10L, all(w == "n1"))
+Sys.unsetenv(c("SLURM_JOB_NODELIST", "SLURM_JOB_CPUS_PER_NODE", "SLURM_CPUS_PER_TASK"))
 message("*** Slurm odds'n'ends ... DONE")
+
+
+message("*** Slurm scenarios observed on real clusters ...")
+
+## Slurm environment variables recorded on real Slurm clusters using
+## incl/slurm-sweep/, for the batch script (context 'batch') and for
+## tasks launched by 'srun' (context 'srun'). Empty cells correspond to
+## environment variables that are not set
+file <- system.file(package = "parallelly", "test-data", "slurm", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+slurm_vars <- grep("^SLURM", colnames(scenarios), value = TRUE)
+
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, scenario$sbatch, scenario$cluster))
+  envs <- unlist(scenario[slurm_vars])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(slurm_vars)
+  do.call(Sys.setenv, as.list(envs))
+  print(envs)
+
+  ## Expected workers, e.g. "n1*4,n2*2"
+  truth <- strsplit(scenario$expected_workers, split = ",", fixed = TRUE)[[1]]
+  truth <- structure(as.integer(sub(".*[*]", "", truth)), names = sub("[*].*", "", truth))
+  
+  w <- availableWorkers(methods = "Slurm")
+  counts <- table(w)[names(truth)]
+  print(counts)
+  stopifnot(
+    length(w) == sum(truth),
+    identical(unique(w), names(truth)),
+    all(counts == truth)
+  )
+}
+
+## Cleanup
+Sys.unsetenv(slurm_vars)
+
+message("*** Slurm scenarios observed on real clusters ... DONE")
+
+
+message("*** SGE scenarios observed on real clusters ...")
+
+## Grid Engine environment variables recorded on a real SGE cluster using
+## incl/sge-sweep/. Column 'PE_HOSTFILE_content' holds the lines of the
+## PE_HOSTFILE file, separated by semicolons
+file <- system.file(package = "parallelly", "test-data", "sge", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+scenarios <- subset(scenarios, !is.na(expected_workers))
+sge_vars <- c("HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE")
+ohostname <- Sys.getenv("HOSTNAME", NA_character_)
+
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, if (is.na(scenario$qsub)) "(no PE)" else scenario$qsub, scenario$cluster))
+  envs <- unlist(scenario[intersect(sge_vars, colnames(scenario))])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(sge_vars)
+  do.call(Sys.setenv, as.list(envs))
+  pathname <- tempfile(fileext = ".pe_hostfile")
+  writeLines(strsplit(scenario$PE_HOSTFILE_content, split = "; ", fixed = TRUE)[[1]], con = pathname)
+  Sys.setenv(PE_HOSTFILE = pathname)
+  print(envs)
+
+  ## Expected workers, e.g. "n1*4,n2*2"
+  truth <- strsplit(scenario$expected_workers, split = ",", fixed = TRUE)[[1]]
+  truth <- structure(as.integer(sub(".*[*]", "", truth)), names = sub("[*].*", "", truth))
+
+  ## Some parallel environments give fewer slots than NSLOTS, which
+  ## availableWorkers() warns about
+  w <- suppressWarnings(availableWorkers(methods = "SGE"))
+  counts <- table(w)[names(truth)]
+  print(counts)
+  stopifnot(
+    length(w) == sum(truth),
+    identical(unique(w), names(truth)),
+    all(counts == truth),
+    ## Workers on the same host are next to each other, in the order
+    ## of PE_HOSTFILE, which lists the host running the job script first
+    identical(w, rep(names(truth), times = truth)),
+    sub("[.].*", "", w[1]) == sub("[.].*", "", scenario$HOSTNAME)
+  )
+  file.remove(pathname)
+}
+
+## A host listed more than once, and not next to each other
+pathname <- tempfile(fileext = ".pe_hostfile")
+writeLines(c(
+  "n2 1 short.q@n2 UNDEFINED",
+  "n1 2 long.q@n1 UNDEFINED",
+  "n2 3 long.q@n2 UNDEFINED"
+), con = pathname)
+Sys.unsetenv(sge_vars)
+Sys.setenv(PE_HOSTFILE = pathname, NSLOTS = "6", HOSTNAME = "n2")
+w <- availableWorkers(methods = "SGE")
+print(w)
+stopifnot(identical(w, c(rep("n2", times = 4L), rep("n1", times = 2L))))
+file.remove(pathname)
+
+## Cleanup
+Sys.unsetenv(sge_vars)
+if (!is.na(ohostname)) Sys.setenv(HOSTNAME = ohostname)
+
+message("*** SGE scenarios observed on real clusters ... DONE")
 
 message("*** HPC related ... DONE")
 

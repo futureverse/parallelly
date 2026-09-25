@@ -168,8 +168,9 @@ ncores <- availableCores(methods = "Slurm")
 print(ncores)
 stopifnot(ncores == 16L)
 
-## Multi-node with SLURM_TASKS_PER_NODE (simple format)
-Sys.unsetenv("SLURM_CPUS_PER_TASK")
+## Multi-node with SLURM_TASKS_PER_NODE (simple format), which is
+## a fallback when SLURM_CPUS_ON_NODE is not set
+Sys.unsetenv(c("SLURM_CPUS_PER_TASK", "SLURM_CPUS_ON_NODE"))
 Sys.setenv(SLURM_JOB_NUM_NODES = "2", SLURM_TASKS_PER_NODE = "5,2")
 env$n <- NULL
 ncores <- availableCores(methods = "Slurm")
@@ -190,6 +191,45 @@ Sys.unsetenv(c("SLURM_CPUS_PER_TASK", "SLURM_JOB_NUM_NODES", "SLURM_NNODES",
 env$n <- NULL
 
 message("*** Slurm multi-node scenarios ... done")
+
+
+message("*** Slurm scenarios observed on real clusters ...")
+
+## Slurm environment variables recorded on real Slurm clusters using
+## incl/slurm-sweep/, for the batch script (context 'batch'), for
+## tasks launched by 'srun' (context 'srun'), and for the interactive
+## shell of 'salloc' (context 'salloc'). Empty cells correspond to
+## environment variables that are not set
+file <- system.file(package = "parallelly", "test-data", "slurm", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+slurm_vars <- grep("^SLURM", colnames(scenarios), value = TRUE)
+
+env <- environment(parallelly:::availableCoresSlurm)
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, scenario$sbatch, scenario$cluster))
+  envs <- unlist(scenario[slurm_vars])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(slurm_vars)
+  do.call(Sys.setenv, as.list(envs))
+  print(envs)
+  env$n <- NULL
+  truth <- as.integer(scenario$expected_cores)
+  ## Any warnings are unexpected
+  ncores <- withCallingHandlers({
+    availableCores(methods = "Slurm")
+  }, warning = function(w) {
+    stop("Unexpected warning: ", conditionMessage(w))
+  })
+  message(sprintf("availableCores(methods = \"Slurm\") = %d (truth = %d)", ncores, truth))
+  stopifnot(ncores == truth)
+}
+
+## Cleanup
+Sys.unsetenv(slurm_vars)
+env$n <- NULL
+
+message("*** Slurm scenarios observed on real clusters ... done")
 
 
 message("*** PBS NCPUS fallback ...")
@@ -524,6 +564,49 @@ Sys.unsetenv("NSLOTS")
 env$n <- NULL
 
 message("*** SGE method ... done")
+
+
+message("*** SGE scenarios observed on real clusters ...")
+
+## Grid Engine environment variables recorded on a real SGE cluster using
+## incl/sge-sweep/, for the job script (context 'job') and for processes
+## launched by 'qrsh -inherit' (context 'inherit'). Column
+## 'PE_HOSTFILE_content' holds the lines of the PE_HOSTFILE file,
+## separated by semicolons. Empty cells correspond to environment
+## variables that are not set
+file <- system.file(package = "parallelly", "test-data", "sge", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+sge_vars <- c("HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE")
+ohostname <- Sys.getenv("HOSTNAME", NA_character_)
+
+env <- environment(parallelly:::availableCoresSGE)
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, if (is.na(scenario$qsub)) "(no PE)" else scenario$qsub, scenario$cluster))
+  envs <- unlist(scenario[intersect(sge_vars, colnames(scenario))])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(sge_vars)
+  do.call(Sys.setenv, as.list(envs))
+  if (!is.na(scenario$PE_HOSTFILE_content)) {
+    pathname <- tempfile(fileext = ".pe_hostfile")
+    writeLines(strsplit(scenario$PE_HOSTFILE_content, split = "; ", fixed = TRUE)[[1]], con = pathname)
+    Sys.setenv(PE_HOSTFILE = pathname)
+  }
+  print(envs)
+  env$n <- NULL
+  truth <- as.integer(scenario$expected_cores)
+  ncores <- availableCores(methods = "SGE")
+  message(sprintf("availableCores(methods = \"SGE\") = %d (truth = %d)", ncores, truth))
+  stopifnot(ncores == truth)
+  if (!is.na(scenario$PE_HOSTFILE_content)) file.remove(pathname)
+}
+
+## Cleanup
+Sys.unsetenv(sge_vars)
+if (!is.na(ohostname)) Sys.setenv(HOSTNAME = ohostname)
+env$n <- NULL
+
+message("*** SGE scenarios observed on real clusters ... done")
 
 
 message("*** _R_CHECK_LIMIT_CORES_ method ...")

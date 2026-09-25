@@ -1,6 +1,8 @@
 Package: parallelly
-Version: 1.48.0-9019
+Version: 1.48.0-9026
 Title: Enhancing the 'parallel' Package
+Depends:
+    R (>= 3.3.0)
 Imports:
     parallel,
     tools,
