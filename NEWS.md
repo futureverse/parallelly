@@ -14,6 +14,9 @@
    jobs. It was already agile to using `qrsh` for multi-node
    tasks. See below bug fixes for details.
    
+ * `availableCores()` gained support for CPU resources provisioned by
+   HTCondor jobs.
+
 ## Documentation
 
  * Add example to HPC vignette on how to launch parallel workers in a
