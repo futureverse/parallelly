@@ -1,3 +1,6 @@
+# For R (< 3.6.3)
+if (!exists("anyNA", mode = "function")) anyNA <- function(x) any(is.na(x))
+
 isFALSE <- function(x) {
   is.logical(x) && length(x) == 1L && !is.na(x) && !x
 }

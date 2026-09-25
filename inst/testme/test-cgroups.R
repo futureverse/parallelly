@@ -99,7 +99,7 @@ stopifnot(length(value) == 1L, is.character(value))
 message("- getCGroups1CpuSet()")
 value <- parallelly:::getCGroups1CpuSet()
 cat(sprintf("CPU set: [n=%d] %s\n", length(value), paste(sQuote(value), collapse = ", ")))
-stopifnot(length(value) >= 0L, is.integer(value), !any(is.na(value)))
+stopifnot(length(value) >= 0L, is.integer(value), !anyNA(value))
 
 
 message("- getCGroups1CpuQuotaMicroseconds()")
@@ -133,12 +133,12 @@ stopifnot(
 message("- getCGroups2CpuSet()")
 value <- parallelly:::getCGroups2CpuSet()
 cat(sprintf("CPU set: [n=%d] %s\n", length(value), paste(sQuote(value), collapse = ", ")))
-stopifnot(length(value) >= 0L, is.integer(value), !any(is.na(value)))
+stopifnot(length(value) >= 0L, is.integer(value), !anyNA(value))
 
 message("- getCGroups2CpuSet('cpuset.cpus.effective')")
 value <- parallelly:::getCGroups2CpuSet("cpuset.cpus.effective")
 cat(sprintf("CPU set: [n=%d] %s\n", length(value), paste(sQuote(value), collapse = ", ")))
-stopifnot(length(value) >= 0L, is.integer(value), !any(is.na(value)))
+stopifnot(length(value) >= 0L, is.integer(value), !anyNA(value))
 
 message("- getCGroups2CpuMax()")
 value <- parallelly:::getCGroups2CpuMax()

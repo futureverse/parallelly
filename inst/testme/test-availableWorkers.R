@@ -279,7 +279,7 @@ for (kk in seq_along(specs)) {
   cat(sprintf("truth: c(%s)\n", paste(sQuote(truth), collapse = ", ")))
   stopifnot(
     is.character(expanded),
-    !any(is.na(expanded)),
+    !anyNA(expanded),
     length(expanded) == length(truth),
     identical(expanded, truth)
   )
@@ -357,7 +357,7 @@ for (kk in seq_along(specs)) {
   cat(sprintf("truth: c(%s)\n", paste(sQuote(truth), collapse = ", ")))
   stopifnot(
     is.integer(expanded),
-    !any(is.na(expanded)),
+    !anyNA(expanded),
     length(expanded) == length(truth),
     identical(expanded, truth)
   )
