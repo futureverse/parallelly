@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9029</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9030</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -187,13 +187,17 @@ scheduler that runs the R script <code>script.R</code> when launched. We
 can submit <code>script.sh</code> as:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">$</span> sbatch script.sh</span></code></pre></div>
 <p>This will request 16 tasks (CPU slots) across 4 compute nodes.</p>
-<p>Now how the parallel workers are launched via Slurm’s
-<code>srun</code> command from the main R session. This is what makes it
-work regardless whether the workers are on the current or other
-machines. Note also that the default, built-in approach to connect to
-other machines via SSH does not work on HPC clusters where SSH to
-compute nodes is disabled. In contrast, <code>srun</code> establishes
-the connection for us.</p>
+<p>Note how <code>rshcmd</code> makes parallel workers to be launched
+via Slurm’s <code>srun</code> command from the main R session. By
+design, argument <code>rshcmd</code> is only used for workers running on
+<em>other</em> machines - the argument is ignored for the workers that
+are launched on the current machine. This is what makes the above setup
+to work regardless whether the workers are on the current or other
+machines, or a mix.</p>
+<p>Note also that the default, built-in approach to connect to other
+machines via SSH does not work on HPC clusters where SSH to compute
+nodes is disabled. In contrast, <code>srun</code> establishes the
+connection for us.</p>
 <p>The <code>--cpus-per-task=1</code> Slurm option makes sure each
 worker launched via <code>srun</code> is allotted a single CPU. The
 <code>--overcommit</code> option is needed for older versions of Slurm,
@@ -311,12 +315,17 @@ we submit <code>script.sh</code> as:</p>
 then R and <strong>parallelly</strong> will set up a parallel cluster
 on. Exactly on which machines depends on where the job scheduler finds
 these requested slots.</p>
-<p>Now how the parallel workers are launched via SGE’s <code>qrsh</code>
-command from the main R session. This is what makes it work regardless
-whether the workers are on the current or other machines. Note also that
-the default, built-in approach to connect to other machines via SSH does
-not work on HPC clusters where SSH to compute nodes is disabled. In
-contrast, <code>qrsh</code> establishes the connection for us.</p>
+<p>Note how <code>rshcmd</code> makes parallel workers to be launched
+via SGE’s <code>qrsh</code> command from the main R session. By design,
+argument <code>rshcmd</code> is only used for workers running on
+<em>other</em> machines - the argument is ignored for the workers that
+are launched on the current machine. This is what makes the above setup
+to work regardless whether the workers are on the current or other
+machines, or a mix.</p>
+<p>Note also that the default, built-in approach to connect to other
+machines via SSH does not work on HPC clusters where SSH to compute
+nodes is disabled. In contrast, <code>qrsh</code> establishes the
+connection for us.</p>
 <p>Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="ex">Information</span> on R:</span>

@@ -71,12 +71,17 @@ $ sbatch script.sh
 
 This will request 16 tasks (CPU slots) across 4 compute nodes.
 
-Now how the parallel workers are launched via Slurm’s `srun` command
-from the main R session. This is what makes it work regardless whether
-the workers are on the current or other machines. Note also that the
-default, built-in approach to connect to other machines via SSH does not
-work on HPC clusters where SSH to compute nodes is disabled. In
-contrast, `srun` establishes the connection for us.
+Note how `rshcmd` makes parallel workers to be launched via Slurm’s
+`srun` command from the main R session. By design, argument `rshcmd` is
+only used for workers running on *other* machines - the argument is
+ignored for the workers that are launched on the current machine. This
+is what makes the above setup to work regardless whether the workers are
+on the current or other machines, or a mix.
+
+Note also that the default, built-in approach to connect to other
+machines via SSH does not work on HPC clusters where SSH to compute
+nodes is disabled. In contrast, `srun` establishes the connection for
+us.
 
 The `--cpus-per-task=1` Slurm option makes sure each worker launched via
 `srun` is allotted a single CPU. The `--overcommit` option is needed for
@@ -191,12 +196,17 @@ it will by default request 8 slots - on one or more machines, which then
 R and **parallelly** will set up a parallel cluster on. Exactly on which
 machines depends on where the job scheduler finds these requested slots.
 
-Now how the parallel workers are launched via SGE’s `qrsh` command from
-the main R session. This is what makes it work regardless whether the
-workers are on the current or other machines. Note also that the
-default, built-in approach to connect to other machines via SSH does not
-work on HPC clusters where SSH to compute nodes is disabled. In
-contrast, `qrsh` establishes the connection for us.
+Note how `rshcmd` makes parallel workers to be launched via SGE’s `qrsh`
+command from the main R session. By design, argument `rshcmd` is only
+used for workers running on *other* machines - the argument is ignored
+for the workers that are launched on the current machine. This is what
+makes the above setup to work regardless whether the workers are on the
+current or other machines, or a mix.
+
+Note also that the default, built-in approach to connect to other
+machines via SSH does not work on HPC clusters where SSH to compute
+nodes is disabled. In contrast, `qrsh` establishes the connection for
+us.
 
 Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:
