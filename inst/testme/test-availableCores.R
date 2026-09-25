@@ -196,8 +196,9 @@ message("*** Slurm multi-node scenarios ... done")
 message("*** Slurm scenarios observed on real clusters ...")
 
 ## Slurm environment variables recorded on real Slurm clusters using
-## incl/slurm-sweep/, for the batch script (context 'batch') and for
-## tasks launched by 'srun' (context 'srun'). Empty cells correspond to
+## incl/slurm-sweep/, for the batch script (context 'batch'), for
+## tasks launched by 'srun' (context 'srun'), and for the interactive
+## shell of 'salloc' (context 'salloc'). Empty cells correspond to
 ## environment variables that are not set
 file <- system.file(package = "parallelly", "test-data", "slurm", "scenarios.csv", mustWork = TRUE)
 scenarios <- read.csv(file, colClasses = "character", na.strings = "")
@@ -214,7 +215,12 @@ for (kk in seq_len(nrow(scenarios))) {
   print(envs)
   env$n <- NULL
   truth <- as.integer(scenario$expected_cores)
-  ncores <- availableCores(methods = "Slurm")
+  ## Any warnings are unexpected
+  ncores <- withCallingHandlers({
+    availableCores(methods = "Slurm")
+  }, warning = function(w) {
+    stop("Unexpected warning: ", conditionMessage(w))
+  })
   message(sprintf("availableCores(methods = \"Slurm\") = %d (truth = %d)", ncores, truth))
   stopifnot(ncores == truth)
 }
