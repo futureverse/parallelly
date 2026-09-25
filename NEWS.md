@@ -1,5 +1,15 @@
 # Version (development version)
 
+## Significant Changes
+
+ * `availableCores(method = "Slurm")` and `availableWorkers(method =
+   "Slurm")` have been updated to better reflect what is allotted by
+   Slurm under different combinations of `--nodes=<n>`,
+   `--ntasks=<t>`, and `--cpus-per-task=<c>`, and whether running R
+   via Slurm's `srun` or not. Agility to `srun` is new and has never
+   before been attempted by **parallelly**. See below bug fixes for
+   details.
+
 ## Documentation
 
  * Add example to HPC vignette on how to launch parallel workers in a
@@ -11,18 +21,41 @@
    (`cpu.cfs_quota_us` and `cpu.max`) set on a parent CGroup when a
    less restricted one was set on the process itself.
 
- * `availableWorkers(method = "Slurm")` incorrectly returned exactly
-   `SLURM_CPUS_PER_TASK` workers per node when that environment
-   variable was set, while completely ignoring the total number of
-   allocated CPUs on the node. This would underestimate the number of
-   workers available. Now it returns the number of Slurm tasks per
-   node, calculated as the total Slurm CPUs divided by
-   `SLURM_CPUS_PER_TASK`. This update also fixed a problem where it
-   for some Slurm resource requests could overestimate the number of
-   workers available.
-
  * `availableCores(which = "all", max = n)` would return only the
    smallest value among all and unnamed.
+
+ * `availableCores()` and `availableWorkers()` on Slurm:
+ 
+   - `availableWorkers(method = "Slurm")` incorrectly returned exactly
+     `SLURM_CPUS_PER_TASK` workers per node when that environment
+     variable was set, while completely ignoring the total number of
+     allocated CPUs on the node. This would underestimate the number
+     of workers available. Now it returns all CPUs that Slurm allotted
+     on each node, as given by `SLURM_JOB_CPUS_PER_NODE`.
+  
+   - `availableCores(method = "Slurm")` in a Slurm job script would
+     underestimate the number of CPU cores available when there was
+     more than one Slurm task on the current machine, e.g. `sbatch
+     --ntasks=16 --cpus-per-task=1` resulted in one core, although
+     Slurm allotted 16 CPUs.  Similarly, in multi-node jobs without
+     `--cpus-per-task=<c>`, it returned the number of Slurm tasks on
+     the first node rather than the number of CPUs allotted there,
+     e.g.  `sbatch --nodes=2 --ntasks=16` could result in eight
+     instead of nine cores.  Now it returns `SLURM_CPUS_ON_NODE`,
+     which also makes it agree with the number of workers on the
+     current machine according to `availableWorkers()`.
+  
+   - `availableCores(method = "Slurm")` in a task launched by `srun`
+     in a Slurm job without `--cpus-per-task=<c>` could return more
+     cores than allotted to the task, which could result in more
+     parallel workers than CPUs on the machine.  In single-node jobs,
+     it returned all CPUs on the machine for each task, e.g. 16 for
+     each of 16 tasks sharing 16 CPUs.  In multi-node jobs, it
+     returned the number of Slurm tasks on the first node, e.g. 14 for
+     each of 14 tasks sharing 16 CPUs.  The overall `availableCores()`
+     would only be protected against this if Slurm bound each task to
+     its own CPUs.  Now the CPUs on the machine are split equally
+     among the tasks there.
 
  * `isNodeAlive()` and `killNode()` would give an error, e.g.
    "Error in as.character(x) : cannot coerce type 'closure' to

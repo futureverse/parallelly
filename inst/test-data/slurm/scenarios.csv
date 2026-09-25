@@ -1,0 +1,10 @@
+"cluster","context","sbatch","expected_cores","expected_workers","SLURMD_NODENAME","SLURM_JOB_NUM_NODES","SLURM_JOB_NODELIST","SLURM_TASKS_PER_NODE","SLURM_JOB_CPUS_PER_NODE","SLURM_CPUS_ON_NODE","SLURM_CPUS_PER_TASK","SLURM_NTASKS","SLURM_STEP_ID","SLURM_STEP_NODELIST","SLURM_STEP_TASKS_PER_NODE"
+"cluster1","batch","--ntasks=16 --cpus-per-task=1",16,"node17*16","node17","1","node17","16","16","16","1","16",,,
+"cluster1","batch","--nodes=2 --ntasks=4 --cpus-per-task=2",6,"node03*6,node04*2","node03","2","node[03-04]","3,1","6,2","6","2","4",,,
+"cluster1","batch","--nodes=2 --ntasks=16 --cpus-per-task=3",46,"node03*46,node04*4","node03","2","node[03-04]","15,1","46,4","46","3","16",,,
+"cluster2","batch","--nodes=2 --ntasks=16",9,"node12*9,node13*8","node12","2","node[12-13]","8(x2)","9,8","9",,"16",,,
+"cluster1","batch","--nodes=2 --ntasks=2",2,"node03*2,node04*2","node03","2","node[03-04]","1(x2)","2(x2)","2",,"2",,,
+"cluster1","srun","--nodes=1-2 --ntasks=16",1,"node06*16,node17*2","node06","2","node[06,17]","14,2","16,2","16",,"16","0","node[06,17]","14,2"
+"cluster1","srun","--nodes=1-2 --ntasks=16",1,"node06*16,node17*2","node17","2","node[06,17]","14,2","16,2","2",,"16","0","node[06,17]","14,2"
+"cluster1","srun","--nodes=2",2,"node03*2,node04*2","node03","2","node[03-04]","1(x2)","2(x2)","2",,"2","0","node[03-04]","1(x2)"
+"cluster2","srun","--nodes=2 --ntasks=4 --cpus-per-task=3",3,"node12*9,node13*4","node12","2","node[12-13]","3,1","9,4","9","3","4","0","node[12-13]","3,1"
