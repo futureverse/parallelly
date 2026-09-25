@@ -49,7 +49,8 @@ cl <- makeClusterPSOCK(
   availableWorkers(),
   rshcmd = c("srun", "--exact", "--overlap", "--overcommit", "--nodes=1",
              "--ntasks=1", "--cpus-per-task=1", "-w"),
-  rscript_sh = c("auto", "none")
+  rscript_sh = c("auto", "none"),
+  rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
 
@@ -136,7 +137,8 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = "qrsh", rshopts = c("-inherit", "-nostdin", "-V")
+  rshcmd = "qrsh", rshopts = c("-inherit", "-nostdin", "-V"),
+  rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
 
@@ -208,7 +210,8 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = "pjrsh"
+  rshcmd = "pjrsh",
+  rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
 
@@ -232,3 +235,37 @@ $ pjsub -L vnode=3 -L vnode-core=18 script.sh
 
 to request 18 CPU cores on three compute nodes, which in total
 requests 3*18=54 compute slots.
+
+
+# Avoid overusing the CPUs via nested parallelism
+
+In all of the above examples, the parallel workers are set up with
+`rscript_startup = quote(options(mc.cores = 1L))`. This sets R option
+`mc.cores` to one in each worker, which makes `availableCores()`
+report a single CPU core when called in a worker.
+
+This matters for workers running on the same machine as the main R
+session. They are launched directly, rather than via the job
+scheduler, which means they inherit the settings of the main R
+session. For example, if the job scheduler allotted eight CPU cores
+on that machine, `availableCores()` would report eight cores in each
+of the eight workers there. If the code evaluated by the workers
+parallelizes further based on `availableCores()`, e.g.
+
+```r
+y <- parLapply(cl = cl, X, fun = function(x) {
+  parallel::mclapply(x, FUN = slow_fcn, mc.cores = parallelly::availableCores())
+})
+```
+
+then there could be up to 64 R processes competing for eight CPU
+cores.
+With `mc.cores = 1L`, `mclapply()` runs sequentially in each worker,
+which avoids overusing the CPUs.
+
+This is not needed when using the cluster via the **[future]**
+framework, e.g. `plan(cluster, workers = cl)`, because futures are
+evaluated with `mc.cores` set to one on parallel workers.
+
+
+[future]: https://future.futureverse.org
