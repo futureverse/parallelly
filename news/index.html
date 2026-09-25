@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9030</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9031</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,6 +84,11 @@
 <h3 id="significant-changes-development-version">Significant Changes<a class="anchor" aria-label="anchor" href="#significant-changes-development-version"></a></h3>
 <ul><li><p><code>availableCores(method = "Slurm")</code> and <code>availableWorkers(method = "Slurm")</code> have been updated to better reflect what is allotted by Slurm under different combinations of <code>--nodes=&lt;n&gt;</code>, <code>--ntasks=&lt;t&gt;</code>, and <code>--cpus-per-task=&lt;c&gt;</code>, and whether running R via Slurm’s <code>srun</code> or not. Agility to <code>srun</code> is new and has never before been attempted by <strong>parallelly</strong>. See below bug fixes for details.</p></li>
 <li><p><code>availableCores(method = "SGE")</code> is now agile to multi-node jobs. It was already agile to using <code>qrsh</code> for multi-node tasks. See below bug fixes for details.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> has an optional argument <code>rshcmd</code> for controlling how to launch the parallel workers that are other machines. It defaults to <code>rshcmd = &lt;ssh&gt;</code> (launch workers over SSH), when not specified. In this version, we add support for launching workers on other compute nodes via HPC job scheduler tools. Specifically, you can use either <code>rshcmd = "&lt;srun&gt;"</code> (Slurm), <code>rshcmd = "&lt;qrsh&gt;"</code> (Grid Engine), or <code>rshcmd = "&lt;pjrsh&gt;"</code> (Fujitsu Technical Computing Suite). These “shortcuts” expand to calls to those command with convenient defaults.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>

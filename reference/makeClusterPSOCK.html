@@ -29,7 +29,7 @@ background R workers, and how to connect to external machines."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9030</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9031</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -575,6 +575,29 @@ instance, a private SSH key can be provided as
 specify a PuTTY PPK file, e.g.
 <code>rshopts = c("-i", "C:/Users/joe/.ssh/my_keys.ppk")</code>.
 Contrary to <code>rshcmd</code>, elements of <code>rshopts</code> are not quoted.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="launching-workers-via-an-hpc-job-scheduler">Launching workers via an HPC job scheduler<a class="anchor" aria-label="anchor" href="#launching-workers-via-an-hpc-job-scheduler"></a></h2>
+
+
+<p>On high-performance compute (HPC) clusters, SSH access to compute nodes
+is often disabled. Instead, parallel workers on other compute nodes that
+are part of the same job can be launched via the job scheduler. The
+following <code>rshcmd</code> types are supported for this:</p><ul><li><p><code>"&lt;srun&gt;"</code> -
+Slurm's <code class="command">srun</code>, which launches each worker as a single-CPU
+job step via
+<code>srun --exact --overlap --overcommit --nodes=1 --ntasks=1 --cpus-per-task=1 -w &lt;worker&gt;</code>.
+Since <code class="command">srun</code> does not launch the worker via a shell,
+<code>rscript_sh[2]</code> defaults to <code>"none"</code> for this type.</p></li>
+<li><p><code>"&lt;qrsh&gt;"</code> -
+Grid Engine's (SGE) <code class="command">qrsh</code> via <code>qrsh -inherit -nostdin -V &lt;worker&gt;</code></p></li>
+<li><p><code>"&lt;pjrsh&gt;"</code> -
+Fujitsu Technical Computing Suite's (PJM) <code class="command">pjrsh</code> via
+<code>pjrsh &lt;worker&gt;</code></p></li>
+</ul><p>As with any <code>rshcmd</code>, these are only used for workers on <em>other</em>
+machines. Workers on the current machine are launched directly, which
+means <code>makeClusterPSOCK(availableWorkers(), rshcmd = "&lt;srun&gt;")</code> works
+also for single-node Slurm jobs.</p>
     </div>
     <div class="section level2">
     <h2 id="accessing-external-machines-that-prompts-for-a-password">Accessing external machines that prompts for a password<a class="anchor" aria-label="anchor" href="#accessing-external-machines-that-prompts-for-a-password"></a></h2>

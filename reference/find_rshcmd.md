@@ -13,7 +13,9 @@ find_rshcmd(which = NULL, first = FALSE, must_work = TRUE)
 - which:
 
   A character vector specifying which types of SSH clients to search
-  for. If NULL, a default set of clients supported by the current
+  for, e.g. `"ssh"`, `"putty-plink"`, and `"rstudio-ssh"`. It may also
+  specify an HPC job-scheduler command, i.e. `"srun"`, `"qrsh"`, and
+  `"pjrsh"`. If NULL, a default set of clients supported by the current
   platform is searched for.
 
 - first:

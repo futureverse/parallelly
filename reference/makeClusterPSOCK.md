@@ -500,6 +500,30 @@ a PuTTY PPK file, e.g.
 `rshopts = c("-i", "C:/Users/joe/.ssh/my_keys.ppk")`. Contrary to
 `rshcmd`, elements of `rshopts` are not quoted.
 
+## Launching workers via an HPC job scheduler
+
+On high-performance compute (HPC) clusters, SSH access to compute nodes
+is often disabled. Instead, parallel workers on other compute nodes that
+are part of the same job can be launched via the job scheduler. The
+following `rshcmd` types are supported for this:
+
+- `"<srun>"` - Slurm's `srun`, which launches each worker as a
+  single-CPU job step via
+  `srun --exact --overlap --overcommit --nodes=1 --ntasks=1 --cpus-per-task=1 -w <worker>`.
+  Since `srun` does not launch the worker via a shell, `rscript_sh[2]`
+  defaults to `"none"` for this type.
+
+- `"<qrsh>"` - Grid Engine's (SGE) `qrsh` via
+  `qrsh -inherit -nostdin -V <worker>`
+
+- `"<pjrsh>"` - Fujitsu Technical Computing Suite's (PJM) `pjrsh` via
+  `pjrsh <worker>`
+
+As with any `rshcmd`, these are only used for workers on *other*
+machines. Workers on the current machine are launched directly, which
+means `makeClusterPSOCK(availableWorkers(), rshcmd = "<srun>")` works
+also for single-node Slurm jobs.
+
 ## Accessing external machines that prompts for a password
 
 *IMPORTANT: With one exception, it is not possible to for these

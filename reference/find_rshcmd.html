@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9030</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9031</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +94,10 @@
 
 <dl><dt id="arg-which">which<a class="anchor" aria-label="anchor" href="#arg-which"></a></dt>
 <dd><p>A character vector specifying which types of SSH clients
-to search for.  If NULL, a default set of clients supported by the
+to search for, e.g. <code>"ssh"</code>, <code>"putty-plink"</code>, and <code>"rstudio-ssh"</code>.
+It may also specify an HPC job-scheduler command, i.e. <code>"srun"</code>,
+<code>"qrsh"</code>, and <code>"pjrsh"</code>.
+If NULL, a default set of clients supported by the
 current platform is searched for.</p></dd>
 
 

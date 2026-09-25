@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9030</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9031</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -167,9 +167,7 @@ cores.</p>
 <span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/availableWorkers.html">availableWorkers</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  rshcmd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"srun"</span>, <span class="st">"--exact"</span>, <span class="st">"--overlap"</span>, <span class="st">"--overcommit"</span>, <span class="st">"--nodes=1"</span>,</span>
-<span>             <span class="st">"--ntasks=1"</span>, <span class="st">"--cpus-per-task=1"</span>, <span class="st">"-w"</span><span class="op">)</span>,</span>
-<span>  rscript_sh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
+<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;srun&gt;"</span>,</span>
 <span>  rscript_startup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
@@ -187,35 +185,41 @@ scheduler that runs the R script <code>script.R</code> when launched. We
 can submit <code>script.sh</code> as:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">$</span> sbatch script.sh</span></code></pre></div>
 <p>This will request 16 tasks (CPU slots) across 4 compute nodes.</p>
-<p>Note how <code>rshcmd</code> makes parallel workers to be launched
-via Slurm’s <code>srun</code> command from the main R session. By
-design, argument <code>rshcmd</code> is only used for workers running on
-<em>other</em> machines - the argument is ignored for the workers that
-are launched on the current machine. This is what makes the above setup
-to work regardless whether the workers are on the current or other
-machines, or a mix.</p>
+<p>Note how <code>rshcmd = "&lt;srun&gt;"</code> makes parallel workers
+to be launched via Slurm’s <code>srun</code> command from the main R
+session. By design, argument <code>rshcmd</code> is only used for
+workers running on <em>other</em> machines - the argument is ignored for
+the workers that are launched on the current machine. This is what makes
+the above setup to work regardless whether the workers are on the
+current or other machines, or a mix.</p>
 <p>Note also that the default, built-in approach to connect to other
 machines via SSH does not work on HPC clusters where SSH to compute
 nodes is disabled. In contrast, <code>srun</code> establishes the
 connection for us.</p>
+<p>Specifically, <code>rshcmd = "&lt;srun&gt;"</code> launches each
+worker using:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="ex">srun</span> <span class="at">--exact</span> <span class="at">--overlap</span> <span class="at">--overcommit</span> <span class="at">--nodes</span><span class="op">=</span>1 <span class="at">--ntasks</span><span class="op">=</span>1 <span class="at">--cpus-per-task</span><span class="op">=</span>1 <span class="at">-w</span> <span class="op">&lt;</span>hostname<span class="op">&gt;</span> ...</span></code></pre></div>
 <p>The <code>--cpus-per-task=1</code> Slurm option makes sure each
 worker launched via <code>srun</code> is allotted a single CPU. The
 <code>--overcommit</code> option is needed for older versions of Slurm,
 e.g. Slurm 21.08, where otherwise a worker waits for the CPUs of the
-other workers on the same machine, despite <code>--overlap</code>.</p>
+other workers on the same machine, despite <code>--overlap</code>. If
+you need different <code>srun</code> options, you can specify them
+explicitly,
+e.g. <code>rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "-w")</code>.</p>
 <p>Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="ex">Information</span> on R:</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="ex">Running</span> R script:</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="ex">Socket</span> cluster with 16 nodes where 10 nodes are on host <span class="st">'localhost'</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="kw">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 </span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="ex">nodes</span> are on host <span class="st">'node14'</span> <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> </span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="ex">platform</span> x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 nodes are on host <span class="st">'node15'</span> <span class="er">(</span><span class="ex">R</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 nodes</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="ex">are</span> on host <span class="st">'node16'</span> <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform </span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="ex">x86_64-pc-linux-gnu</span><span class="kw">)</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="ex">[1]</span> 671.4629</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="ex">Information</span> on R:</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="ex">Running</span> R script:</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="ex">Socket</span> cluster with 16 nodes where 10 nodes are on host <span class="st">'localhost'</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="kw">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 </span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="ex">nodes</span> are on host <span class="st">'node14'</span> <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> </span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="ex">platform</span> x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 nodes are on host <span class="st">'node15'</span> <span class="er">(</span><span class="ex">R</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 nodes</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="ex">are</span> on host <span class="st">'node16'</span> <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform </span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="ex">x86_64-pc-linux-gnu</span><span class="kw">)</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="ex">[1]</span> 671.4629</span></code></pre></div>
 <p>What <code><a href="../reference/availableCores.html">availableCores()</a></code> and
 <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> return depends on what we request from
 Slurm. Here are a few examples of what they return in the job script,
@@ -275,26 +279,26 @@ slots.</p>
 <p>Consider the following two files: <code>script.sh</code> and
 <code>script.R</code>.</p>
 <p>script.sh:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co">#! /usr/bin/env bash</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#$ -cwd               ## Run in current working directory</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#$ -j y               ## Merge stdout and stderr</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#$ -l mem_free=100M   ## 100 MiB RAM per slot</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#$ -l h_rt=00:10:00   ## 10 minutes runtime </span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#$ -pe mpi 8          ## 8 compute slots</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Information on R:"</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--version</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Running R script:"</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="ex">Rscript</span> script.R</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co">#! /usr/bin/env bash</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#$ -cwd               ## Run in current working directory</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#$ -j y               ## Merge stdout and stderr</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#$ -l mem_free=100M   ## 100 MiB RAM per slot</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#$ -l h_rt=00:10:00   ## 10 minutes runtime </span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#$ -pe mpi 8          ## 8 compute slots</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Information on R:"</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--version</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Running R script:"</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="ex">Rscript</span> script.R</span></code></pre></div>
 <p>script.R:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">parallel</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/availableWorkers.html">availableWorkers</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  rshcmd <span class="op">=</span> <span class="st">"qrsh"</span>, rshopts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-inherit"</span>, <span class="st">"-nostdin"</span>, <span class="st">"-V"</span><span class="op">)</span>,</span>
+<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;qrsh&gt;"</span>,</span>
 <span>  rscript_startup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
@@ -310,33 +314,33 @@ slots.</p>
 <p>The <code>script.sh</code> file is a job script that we submit to the
 scheduler that runs the R script <code>script.R</code> when launched. If
 we submit <code>script.sh</code> as:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="ex">$</span> qsub script.sh</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="ex">$</span> qsub script.sh</span></code></pre></div>
 <p>it will by default request 8 slots - on one or more machines, which
 then R and <strong>parallelly</strong> will set up a parallel cluster
 on. Exactly on which machines depends on where the job scheduler finds
 these requested slots.</p>
-<p>Note how <code>rshcmd</code> makes parallel workers to be launched
-via SGE’s <code>qrsh</code> command from the main R session. By design,
-argument <code>rshcmd</code> is only used for workers running on
-<em>other</em> machines - the argument is ignored for the workers that
-are launched on the current machine. This is what makes the above setup
-to work regardless whether the workers are on the current or other
-machines, or a mix.</p>
+<p>Note how <code>rshcmd = "&lt;qrsh&gt;"</code> makes parallel workers
+to be launched via SGE’s <code>qrsh -inherit -nostdin -V</code> command
+from the main R session. By design, argument <code>rshcmd</code> is only
+used for workers running on <em>other</em> machines - the argument is
+ignored for the workers that are launched on the current machine. This
+is what makes the above setup to work regardless whether the workers are
+on the current or other machines, or a mix.</p>
 <p>Note also that the default, built-in approach to connect to other
 machines via SSH does not work on HPC clusters where SSH to compute
 nodes is disabled. In contrast, <code>qrsh</code> establishes the
 connection for us.</p>
 <p>Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="ex">Information</span> on R:</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="ex">Running</span> R script:</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="ex">Socket</span> cluster with 8 nodes where 4 nodes are on host ‘localhost’</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="kw">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 3</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="ex">nodes</span> are on host ‘node130’ <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> </span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="ex">platform</span> x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 1 node is on host ‘node16’ <span class="er">(</span><span class="ex">R</span> </span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="ex">[1]</span> 671.4629</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="ex">Information</span> on R:</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="ex">Running</span> R script:</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="ex">Socket</span> cluster with 8 nodes where 4 nodes are on host ‘localhost’</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="kw">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 3</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="ex">nodes</span> are on host ‘node130’ <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> </span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="ex">platform</span> x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 1 node is on host ‘node16’ <span class="er">(</span><span class="ex">R</span> </span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="ex">[1]</span> 671.4629</span></code></pre></div>
 <p>How SGE distributes the requested slots across machines depends on
 the <code>allocation_rule</code> setting of the parallel environment
 (PE), which we can inspect using <code>qconf -sp &lt;pe&gt;</code>. Here
@@ -405,21 +409,21 @@ nodes, each running multiple cores.</p>
 <p>Consider the following two files: <code>script.sh</code> and
 <code>script.R</code>.</p>
 <p>script.sh:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co">#! /usr/bin/env bash</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Information on R:"</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--version</span></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Running R script:"</span></span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="ex">Rscript</span> script.R</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co">#! /usr/bin/env bash</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Information on R:"</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--version</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Running R script:"</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="ex">Rscript</span> script.R</span></code></pre></div>
 <p>script.R:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://parallelly.futureverse.org">parallelly</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">parallel</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/availableWorkers.html">availableWorkers</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  rshcmd <span class="op">=</span> <span class="st">"pjrsh"</span>,</span>
+<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;pjrsh&gt;"</span>,</span>
 <span>  rscript_startup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
@@ -435,7 +439,7 @@ nodes, each running multiple cores.</p>
 <p>The <code>script.sh</code> file is a job script that we submit to the
 scheduler that runs the R script <code>script.R</code> when launched. We
 can submit <code>script.sh</code> as:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="ex">$</span> pjsub <span class="at">-L</span> vnode=3 <span class="at">-L</span> vnode-core=18 script.sh</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="ex">$</span> pjsub <span class="at">-L</span> vnode=3 <span class="at">-L</span> vnode-core=18 script.sh</span></code></pre></div>
 <p>to request 18 CPU cores on three compute nodes, which in total
 requests 3*18=54 compute slots.</p>
 </div>
@@ -455,7 +459,7 @@ example, if the job scheduler allotted 8 CPU cores on that machine,
 <code><a href="../reference/availableCores.html">availableCores()</a></code> would report 8 cores in each of the 8
 workers there. If the code evaluated by the workers parallelizes further
 based on <code><a href="../reference/availableCores.html">availableCores()</a></code>, e.g.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">parLapply</a></span><span class="op">(</span>cl <span class="op">=</span> <span class="va">cl</span>, <span class="va">X</span>, fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">mclapply</a></span><span class="op">(</span><span class="va">x</span>, FUN <span class="op">=</span> <span class="va">slow_fcn</span>, mc.cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="../reference/availableCores.html">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>

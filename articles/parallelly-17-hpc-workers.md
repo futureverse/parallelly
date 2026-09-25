@@ -44,9 +44,7 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = c("srun", "--exact", "--overlap", "--overcommit", "--nodes=1",
-             "--ntasks=1", "--cpus-per-task=1", "-w"),
-  rscript_sh = c("auto", "none"),
+  rshcmd = "<srun>",
   rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
@@ -71,23 +69,31 @@ $ sbatch script.sh
 
 This will request 16 tasks (CPU slots) across 4 compute nodes.
 
-Note how `rshcmd` makes parallel workers to be launched via Slurm’s
-`srun` command from the main R session. By design, argument `rshcmd` is
-only used for workers running on *other* machines - the argument is
-ignored for the workers that are launched on the current machine. This
-is what makes the above setup to work regardless whether the workers are
-on the current or other machines, or a mix.
+Note how `rshcmd = "<srun>"` makes parallel workers to be launched via
+Slurm’s `srun` command from the main R session. By design, argument
+`rshcmd` is only used for workers running on *other* machines - the
+argument is ignored for the workers that are launched on the current
+machine. This is what makes the above setup to work regardless whether
+the workers are on the current or other machines, or a mix.
 
 Note also that the default, built-in approach to connect to other
 machines via SSH does not work on HPC clusters where SSH to compute
 nodes is disabled. In contrast, `srun` establishes the connection for
 us.
 
+Specifically, `rshcmd = "<srun>"` launches each worker using:
+
+``` sh
+srun --exact --overlap --overcommit --nodes=1 --ntasks=1 --cpus-per-task=1 -w <hostname> ...
+```
+
 The `--cpus-per-task=1` Slurm option makes sure each worker launched via
 `srun` is allotted a single CPU. The `--overcommit` option is needed for
 older versions of Slurm, e.g. Slurm 21.08, where otherwise a worker
 waits for the CPUs of the other workers on the same machine, despite
-`--overlap`.
+`--overlap`. If you need different `srun` options, you can specify them
+explicitly,
+e.g. `rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "-w")`.
 
 Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:
@@ -169,7 +175,7 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = "qrsh", rshopts = c("-inherit", "-nostdin", "-V"),
+  rshcmd = "<qrsh>",
   rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
@@ -196,12 +202,13 @@ it will by default request 8 slots - on one or more machines, which then
 R and **parallelly** will set up a parallel cluster on. Exactly on which
 machines depends on where the job scheduler finds these requested slots.
 
-Note how `rshcmd` makes parallel workers to be launched via SGE’s `qrsh`
-command from the main R session. By design, argument `rshcmd` is only
-used for workers running on *other* machines - the argument is ignored
-for the workers that are launched on the current machine. This is what
-makes the above setup to work regardless whether the workers are on the
-current or other machines, or a mix.
+Note how `rshcmd = "<qrsh>"` makes parallel workers to be launched via
+SGE’s `qrsh -inherit -nostdin -V` command from the main R session. By
+design, argument `rshcmd` is only used for workers running on *other*
+machines - the argument is ignored for the workers that are launched on
+the current machine. This is what makes the above setup to work
+regardless whether the workers are on the current or other machines, or
+a mix.
 
 Note also that the default, built-in approach to connect to other
 machines via SSH does not work on HPC clusters where SSH to compute
@@ -276,7 +283,7 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = "pjrsh",
+  rshcmd = "<pjrsh>",
   rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
