@@ -122,6 +122,67 @@ worker <- "remote.example.org"
 options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "unknown", verbose = TRUE)
 stopifnot(inherits(options, "makeNodePSOCKOptions"))
 
+
+## Test HPC job-scheduler 'rshcmd' types using mockup executables
+if (.Platform[["OS.type"]] != "windows") {
+  message("- rshcmd = '<srun>', '<qrsh>', and '<pjrsh>' ...")
+
+  oenvs <- Sys.getenv("PATH", names = TRUE)
+
+  bin <- tempfile()
+  dir.create(bin)
+  for (name in c("srun", "qrsh", "pjrsh")) {
+    pathname <- file.path(bin, name)
+    writeLines(c("#! /bin/sh", "echo 'mockup 1.0'"), con = pathname)
+    Sys.chmod(pathname, mode = "0755")
+  }
+  Sys.setenv(PATH = paste(bin, oenvs[["PATH"]], sep = .Platform[["path.sep"]]))
+
+  worker <- "remote.example.org"
+  for (type in c("srun", "qrsh", "pjrsh")) {
+    options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = sprintf("<%s>", type), verbose = TRUE)
+    print(options)
+    stopifnot(
+      inherits(options, "makeNodePSOCKOptions"),
+      identical(attr(options[["rshcmd"]], "type"), type),
+      !options[["revtunnel"]],
+      grepl(type, options[["local_cmd"]], fixed = TRUE),
+      options[["rscript_sh"]][2] == if (type == "srun") "none" else "sh"
+    )
+  }
+
+  ## Explicit 'srun' command is also recognized as such
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = c("srun", "-w"))
+  stopifnot(
+    identical(attr(options[["rshcmd"]], "type"), "srun"),
+    options[["rscript_sh"]][2] == "none"
+  )
+
+  ## An explicit 'rscript_sh' is respected
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "<srun>", rscript_sh = "sh")
+  stopifnot(identical(options[["rscript_sh"]], c("sh", "sh")))
+
+  ## 'rshcmd' is not used for localhost workers
+  options <- makeNodePSOCK(action = "options", worker = Sys.info()[["nodename"]], port = 12345L, rshcmd = "<srun>")
+  stopifnot(
+    options[["localMachine"]],
+    !grepl("srun", options[["local_cmd"]], fixed = TRUE)
+  )
+
+  ## Undo
+  unlink(bin, recursive = TRUE)
+  do.call(Sys.setenv, as.list(oenvs))
+
+  ## An error is produced if the command is not on the PATH
+  if (!nzchar(Sys.which("srun"))) {
+    res <- tryCatch({
+      makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "<srun>")
+    }, error = identity)
+    print(res)
+    stopifnot(inherits(res, "error"))
+  }
+}
+
 options <- makeNodePSOCK(action = "options", port = 12345L, rshlogfile = FALSE, verbose = TRUE)
 stopifnot(inherits(options, "makeNodePSOCKOptions"))
 

@@ -14,6 +14,18 @@
    jobs. It was already agile to using `qrsh` for multi-node
    tasks. See below bug fixes for details.
    
+## New Features
+
+ * `makeClusterPSOCK()` has an optional argument `rshcmd` for
+   controlling how to launch the parallel workers that are other
+   machines. It defaults to `rshcmd = <ssh>` (launch workers over
+   SSH), when not specified. In this version, we add support for
+   launching workers on other compute nodes via HPC job scheduler
+   tools. Specifically, you can use either `rshcmd = "<srun>"`
+   (Slurm), `rshcmd = "<qrsh>"` (Grid Engine), or `rshcmd = "<pjrsh>"`
+   (Fujitsu Technical Computing Suite). These "shortcuts" expand to
+   calls to those command with convenient defaults.
+
 ## Documentation
 
  * Add example to HPC vignette on how to launch parallel workers in a

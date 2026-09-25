@@ -436,6 +436,31 @@ specify a PuTTY PPK file, e.g.
 Contrary to \code{rshcmd}, elements of \code{rshopts} are not quoted.
 }
 
+\section{Launching workers via an HPC job scheduler}{
+
+On high-performance compute (HPC) clusters, SSH access to compute nodes
+is often disabled. Instead, parallel workers on other compute nodes that
+are part of the same job can be launched via the job scheduler. The
+following \code{rshcmd} types are supported for this:
+\itemize{
+\item \code{"<srun>"} -
+Slurm's \command{srun}, which launches each worker as a single-CPU
+job step via
+\verb{srun --exact --overlap --overcommit --nodes=1 --ntasks=1 --cpus-per-task=1 -w <worker>}.
+Since \command{srun} does not launch the worker via a shell,
+\code{rscript_sh[2]} defaults to \code{"none"} for this type.
+\item \code{"<qrsh>"} -
+Grid Engine's (SGE) \command{qrsh} via \verb{qrsh -inherit -nostdin -V <worker>}
+\item \code{"<pjrsh>"} -
+Fujitsu Technical Computing Suite's (PJM) \command{pjrsh} via
+\verb{pjrsh <worker>}
+}
+As with any \code{rshcmd}, these are only used for workers on \emph{other}
+machines. Workers on the current machine are launched directly, which
+means \code{makeClusterPSOCK(availableWorkers(), rshcmd = "<srun>")} works
+also for single-node Slurm jobs.
+}
+
 \section{Accessing external machines that prompts for a password}{
 
 \emph{IMPORTANT: With one exception, it is not possible to for these

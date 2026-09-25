@@ -89,7 +89,10 @@ is_fqdn <- function(worker) {
 #' Search for SSH clients on the current system
 #'
 #' @param which A character vector specifying which types of SSH clients
-#' to search for.  If NULL, a default set of clients supported by the
+#' to search for, e.g. `"ssh"`, `"putty-plink"`, and `"rstudio-ssh"`.
+#' It may also specify an HPC job-scheduler command, i.e. `"srun"`,
+#' `"qrsh"`, and `"pjrsh"`.
+#' If NULL, a default set of clients supported by the
 #' current platform is searched for.
 #'
 #' @param first If TRUE, the first client found is returned, otherwise
@@ -159,6 +162,46 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
     bin
   }
 
+  ## Slurm: Launch as a job step on one of the nodes allotted to the job
+  ## * --exact: Only use the resources requested by the job step. Without
+  ##   it, the first job step on a node takes all of the job's memory
+  ##   on that node
+  ## * --overlap, --overcommit: Allow multiple job steps on the same
+  ##   node. Without --overcommit, a second concurrent job step on the
+  ##   same node might be pending forever (observed in Slurm 21.08)
+  ## * --cpus-per-task=1: Without it, the job step inherits the job's
+  ##   --cpus-per-task
+  find_srun <- function() {
+    bin <- Sys.which("srun")
+    if (!nzchar(bin)) return(NULL)
+    res <- c(bin, "--exact", "--overlap", "--overcommit", "--nodes=1",
+             "--ntasks=1", "--cpus-per-task=1", "-w")
+    attr(res, "type") <- "srun"
+    attr(res, "version") <- query_version(bin, args = "--version")
+    res
+  }
+
+  ## Grid Engine (SGE): Launch on one of the nodes allotted to the job
+  find_qrsh <- function() {
+    bin <- Sys.which("qrsh")
+    if (!nzchar(bin)) return(NULL)
+    res <- c(bin, "-inherit", "-nostdin", "-V")
+    attr(res, "type") <- "qrsh"
+    attr(res, "version") <- "<unknown>"
+    res
+  }
+
+  ## Fujitsu Technical Computing Suite (PJM): Launch on one of the nodes
+  ## allotted to the job
+  find_pjrsh <- function() {
+    bin <- Sys.which("pjrsh")
+    if (!nzchar(bin)) return(NULL)
+    res <- bin
+    attr(res, "type") <- "pjrsh"
+    attr(res, "version") <- "<unknown>"
+    res
+  }
+
   if (!is.null(which)) stop_if_not(is.character(which), length(which) >= 1L, !anyNA(which))
   stop_if_not(is.logical(first), length(first) == 1L, !is.na(first))
   stop_if_not(is.logical(must_work), length(must_work) == 1L, !is.na(must_work))
@@ -177,6 +220,9 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
       "ssh"         = find_ssh(),
       "putty-plink" = find_putty_plink(),
       "rstudio-ssh" = find_rstudio_ssh(),
+      "srun"        = find_srun(),
+      "qrsh"        = find_qrsh(),
+      "pjrsh"       = find_pjrsh(),
       stopf("Unknown 'rshcmd' type: %s", sQuote(name))
     )
     
