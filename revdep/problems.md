@@ -1,71 +1,18 @@
-# caretSDM (1.8.3)
+# chms (7.1)
 
-* GitHub: <https://github.com/luizesser/caretSDM>
-* Email: <mailto:luizesser@gmail.com>
-* GitHub mirror: <https://github.com/cran/caretSDM>
+* GitHub: <https://github.com/statcan/chms>
+* Email: <mailto:joel.barnes@statcan.gc.ca>
+* GitHub mirror: <https://github.com/cran/chms>
 
-Run `revdepcheck::revdep_details(, "caretSDM")` for more info
+Run `revdepcheck::revdep_details(, "chms")` for more info
 
 ## In both
 
-*   checking examples ... ERROR
+*   checking dependencies in R code ... NOTE
      ```
-     ...
-     Warning in CPL_write_gdal(mat, file, driver, options, type, dims, from,  :
-       GDAL Error 1: PROJ: proj_as_wkt: DatumEnsemble can only be exported to WKT2:2019
-     Warning in CPL_write_gdal(mat, file, driver, options, type, dims, from,  :
-       GDAL Error 1: PROJ: proj_as_wkt: DatumEnsemble can only be exported to WKT2:2019
-     Warning in CPL_gdalwarp(source, destination, options, oo, doo, config_options,  :
-       GDAL Error 1: Cannot compute bounding box of cutline. Cannot find source SRS
-     Error in `value[[3L]]()`:
-     ✖ GDAL warp failed.
-     In index: 1.
-     Backtrace:
-          ▆
-       1. ├─caretSDM::add_predictors(sa, bioc)
-       2. └─caretSDM:::add_predictors.stars(sa, bioc) at caretSDM/R/add_predictors.R:83:3
-       3.   └─caretSDM:::.add_predictors(...) at caretSDM/R/add_predictors.R:109:3
-       4.     ├─caretSDM::sdm_area(...) at caretSDM/R/add_predictors.R:123:3
-       5.     └─caretSDM:::sdm_area.stars(...) at caretSDM/R/sdm_area.R:126:3
-       6.       ├─dplyr::select(...) at caretSDM/R/sdm_area.R:288:5
-       7.       └─caretSDM:::.sdm_area_from_stars_using_gdal(...) at caretSDM/R/sdm_area.R:288:5
-       8.         └─base::tryCatch(...) at caretSDM/R/sdm_area.R:530:3
-       9.           └─base (local) tryCatchList(expr, classes, parentenv, handlers)
-      10.             └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-      11.               └─value[[3L]](cond)
-      12.                 └─cli::cli_abort(c(x = "GDAL warp failed.", i = e$message)) at caretSDM/R/sdm_area.R:579:7
-      13.                   └─rlang::abort(...)
-     Execution halted
-     ```
-
-*   checking tests ...
-     ```
-     ...
-         9.             └─cli::cli_abort(c(x = "GDAL warp failed.", i = e$message)) at caretSDM/R/sdm_area.R:579:7
-        10.               └─rlang::abort(...)
-       ── Error ('test-train_sdm.R:4:3'): (code run outside of `test_that()`) ─────────
-       Error in `value[[3L]](cond)`: x GDAL warp failed.
-       In index: 1.
-       Backtrace:
-            ▆
-         1. ├─caretSDM::add_predictors(sa, bioc) at test-train_sdm.R:4:3
-         2. └─caretSDM:::add_predictors.stars(sa, bioc) at caretSDM/R/add_predictors.R:83:3
-         3.   └─caretSDM:::.add_predictors(...) at caretSDM/R/add_predictors.R:109:3
-         4.     ├─caretSDM::sdm_area(...) at caretSDM/R/add_predictors.R:123:3
-         5.     └─caretSDM:::sdm_area.stars(...) at caretSDM/R/sdm_area.R:126:3
-         6.       ├─dplyr::select(...) at caretSDM/R/sdm_area.R:288:5
-         7.       └─caretSDM:::.sdm_area_from_stars_using_gdal(...) at caretSDM/R/sdm_area.R:288:5
-         8.         └─base::tryCatch(...) at caretSDM/R/sdm_area.R:530:3
-         9.           └─base (local) tryCatchList(expr, classes, parentenv, handlers)
-        10.             └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-        11.               └─value[[3L]](cond)
-        12.                 └─cli::cli_abort(c(x = "GDAL warp failed.", i = e$message)) at caretSDM/R/sdm_area.R:579:7
-        13.                   └─rlang::abort(...)
-       
-       [ FAIL 18 | WARN 68 | SKIP 74 | PASS 305 ]
-       Error:
-       ! Test failures.
-       Execution halted
+     Namespaces in Imports field not imported from:
+       ‘R6’ ‘dbplyr’ ‘knitr’ ‘mirai’ ‘mori’ ‘parallelly’ ‘readr’ ‘utils’
+       All declared Imports should be used.
      ```
 
 # COTAN (2.12.1)
@@ -109,7 +56,7 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
      > ### ** Examples
      > 
      > collectri <- get_collectri(organism='human', split_complexes=FALSE)
-     [2026-06-29 02:50:15] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
+     [2026-09-24 16:14:34] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
      Error in if (.keep) . else select(., -!!evs_col) : 
        argument is of length zero
      Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
@@ -190,6 +137,27 @@ Run `revdepcheck::revdep_details(, "decoupleR")` for more info
        ‘omnipathr-log’
      ```
 
+# flexstanr (0.2.0)
+
+* GitHub: <https://github.com/ACCIDDA/flexstanr>
+* Email: <mailto:carl.ab.pearson@gmail.com>
+* GitHub mirror: <https://github.com/cran/flexstanr>
+
+Run `revdepcheck::revdep_details(, "flexstanr")` for more info
+
+## In both
+
+*   checking whether startup messages can be suppressed ... NOTE
+     ```
+     code for methods in class “Rcpp_model_base” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_model_base” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_stan_fit” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     code for methods in class “Rcpp_stan_fit” was not checked for suspicious field assignments (recommended package ‘codetools’ not available?)
+     
+     It looks like this package (or a package it requires) has a startup
+     message which cannot be suppressed: see ?packageStartupMessage.
+     ```
+
 # future.batchtools (0.22.0)
 
 * GitHub: <https://github.com/futureverse/future.batchtools>
@@ -204,99 +172,6 @@ Run `revdepcheck::revdep_details(, "future.batchtools")` for more info
      ```
      Found the following files/directories:
        ‘.future-set-during-startup’
-     ```
-
-# gtfs2gps (2.1-4)
-
-* GitHub: <https://github.com/ipeaGIT/gtfs2gps>
-* Email: <mailto:pedro.andrade@inpe.br>
-* GitHub mirror: <https://github.com/cran/gtfs2gps>
-
-Run `revdepcheck::revdep_details(, "gtfs2gps")` for more info
-
-## In both
-
-*   checking tests ...
-     ```
-     ...
-       
-       > 
-       > test_check("gtfs2gps")
-       Saving _problems/test_simplify_shapes-7.R
-       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 119 ]
-       
-       ══ Failed tests ════════════════════════════════════════════════════════════════
-       ── Error ('test_simplify_shapes.R:7:5'): simplify_shapes ───────────────────────
-       Error: [] make_valid is not available for GEOS < 3.8
-       Backtrace:
-           ▆
-        1. └─gtfs2gps:::simplify_shapes(poa, 1e-05) at test_simplify_shapes.R:7:5
-        2.   ├─terra::simplifyGeom(x = gtfs_st_simpl, tolerance = tol) at gtfs2gps/R/simplify_shapes.R:20:3
-        3.   └─terra::simplifyGeom(x = gtfs_st_simpl, tolerance = tol)
-        4.     └─terra (local) .local(x, ...)
-        5.       ├─terra::makeValid(x)
-        6.       └─terra::makeValid(x)
-        7.         └─terra (local) .local(x, ...)
-        8.           └─terra:::messages(x)
-        9.             └─terra:::error(f, x@pntr$getError())
-       
-       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 119 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-# IFAA (1.14.0)
-
-* GitHub: <https://github.com/quranwu/IFAA>
-* Email: <mailto:lzg2151@gmail.com>
-
-Run `revdepcheck::revdep_details(, "IFAA")` for more info
-
-## In both
-
-*   checking package dependencies ... ERROR
-     ```
-     Package required but not available: ‘HDCI’
-     
-     See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-     manual.
-     ```
-
-# InPAS (2.20.0)
-
-* Email: <mailto:jou@morgridge.org>
-
-Run `revdepcheck::revdep_details(, "InPAS")` for more info
-
-## In both
-
-*   checking dependencies in R code ... NOTE
-     ```
-     There are ::: calls to the package's namespace in its code. A package
-       almost never needs to use ::: for its own objects:
-       ‘adjust_distalCPs’ ‘adjust_proximalCPs’ ‘adjust_proximalCPsByNBC’
-       ‘adjust_proximalCPsByPWM’ ‘calculate_mse’ ‘find_valleyBySpline’
-       ‘get_PAscore’ ‘get_PAscore2’ ‘remove_convergentUTR3s’
-       ‘search_distalCPs’ ‘search_proximalCPs’
-     ```
-
-*   checking Rd metadata ... NOTE
-     ```
-     Invalid package aliases in Rd file 'InPAS.Rd':
-       ‘-package’
-     ```
-
-*   checking Rd \usage sections ... NOTE
-     ```
-     Documented arguments not in \usage in Rd file 'get_UTR3TotalCov.Rd':
-       ‘gcCompensationensation’
-     
-     Functions with \usage entries need to have the appropriate \alias
-     entries, and all their arguments documented.
-     The \usage entries must correspond to syntactically valid R code.
-     See chapter ‘Writing R documentation files’ in the ‘Writing R
-     Extensions’ manual.
      ```
 
 # mappp (1.0.0)
@@ -329,46 +204,6 @@ Run `revdepcheck::revdep_details(, "NCC")` for more info
      ```
      Namespace in Imports field not imported from: ‘magick’
        All declared Imports should be used.
-     ```
-
-# reproducible (3.1.1)
-
-* GitHub: <https://github.com/PredictiveEcology/reproducible>
-* Email: <mailto:eliot.mcintire@canada.ca>
-* GitHub mirror: <https://github.com/cran/reproducible>
-
-Run `revdepcheck::revdep_details(, "reproducible")` for more info
-
-## In both
-
-*   checking tests ...
-     ```
-     ...
-        2. └─sf:::st_make_valid.sfc(p1)
-       ── Failure ('test-postProcessTerra.R:85:3'): testing terra ─────────────────────
-       Expected `sum(is.na(t1[]) != is.na(y[])) == 0` to be TRUE.
-       Differences:
-       `actual`:   FALSE
-       `expected`: TRUE 
-       
-       ── Error ('test-postProcessTerra.R:132:3'): testing terra ──────────────────────
-       Error: [] make_valid is not available for GEOS < 3.8
-       Backtrace:
-           ▆
-        1. └─reproducible::postProcessTo(xVect, v) at test-postProcessTerra.R:132:3
-        2.   └─reproducible::projectTo(...) at reproducible/R/postProcessTo.R:296:7
-        3.     └─reproducible::fixErrorsIn(from) at reproducible/R/postProcessTo.R:798:9
-        4.       └─reproducible:::makeVal(x) at reproducible/R/postProcessTo.R:440:9
-        5.         ├─terra::makeValid(x) at reproducible/R/postProcessTo.R:455:5
-        6.         └─terra::makeValid(x)
-        7.           └─terra (local) .local(x, ...)
-        8.             └─terra:::messages(x)
-        9.               └─terra:::error(f, x@pntr$getError())
-       
-       [ FAIL 3 | WARN 0 | SKIP 104 | PASS 624 ]
-       Error:
-       ! Test failures.
-       Execution halted
      ```
 
 # scruff (1.30.0)
@@ -418,8 +253,8 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 *   checking for non-standard things in the check directory ... NOTE
      ```
      Found the following files/directories:
-       ‘20260628_095522_10X_QC_sce.rda’
-       ‘20260628_095522__10x_bamqc_filtered.tsv’ ‘Demultiplex’
+       ‘20260924_171317_10X_QC_sce.rda’
+       ‘20260924_171317__10x_bamqc_filtered.tsv’ ‘Demultiplex’
      ```
 
 # streetscape (1.0.5)
