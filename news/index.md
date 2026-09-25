@@ -50,58 +50,47 @@
 
   - `availableCores(method = "SGE")` in a Grid Engine job script would
     overestimate the number of CPU cores available for a multi-node job,
-    because it returned `NSLOTS`, which is the total number of slots on
-    all machines, e.g. `qsub -pe mpi-2 16` would result in 16 cores on
-    each machine, although only two slots were allotted per machine. Now
-    it returns the number of slots allotted to the current machine
-    according to `PE_HOSTFILE`, in agreement with
-    [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md).
-    It only uses `NSLOTS` as a fallback if `PE_HOSTFILE` is not set.
+    because it returned the value of SGE environment variable `NSLOTS`.
+    Now it returns the number of slots allotted to the current machine
+    according to the SGE environment variable `PE_HOSTFILE` file, which
+    is what
+    [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+    also uses. It only uses `NSLOTS` as a fallback if `PE_HOSTFILE` does
+    not exist.
 
   - `availableWorkers(method = "SGE")` returned the workers sorted by
     hostname, which meant that the first worker was not necessarily the
     machine running the job script. Now the workers are listed in the
-    same order as in `PE_HOSTFILE`, which lists the machine running the
-    job script first. A machine that is listed more than once, e.g. once
-    per queue, is merged into one set of workers at its first position.
+    same order as in SGE file `PE_HOSTFILE`.
 
 - [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   and
   [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
   on Slurm:
 
-  - `availableWorkers(method = "Slurm")` incorrectly returned exactly
-    `SLURM_CPUS_PER_TASK` workers per node when that environment
-    variable was set, while completely ignoring the total number of
-    allocated CPUs on the node. This would underestimate the number of
-    workers available. Now it returns all CPUs that Slurm allotted on
-    each node, as given by `SLURM_JOB_CPUS_PER_NODE`.
+  - `availableWorkers(method = "Slurm")` underestimated the number of
+    workers available in some case, because it always returned the value
+    of environment variable `SLURM_CPUS_PER_TASK`. Now it returns all
+    CPUs that Slurm allotted on each node, as given by environment
+    variable `SLURM_JOB_CPUS_PER_NODE`.
 
   - `availableCores(method = "Slurm")` in a Slurm job script would
     underestimate the number of CPU cores available when there was more
     than one Slurm task on the current machine,
-    e.g. `sbatch --ntasks=16 --cpus-per-task=1` resulted in one core,
-    although Slurm allotted 16 CPUs. Similarly, in multi-node jobs
-    without `--cpus-per-task=<c>`, it returned the number of Slurm tasks
-    on the first node rather than the number of CPUs allotted there,
-    e.g. `sbatch --nodes=2 --ntasks=16` could result in eight instead of
-    nine cores. Now it returns `SLURM_CPUS_ON_NODE`, which also makes it
-    agree with the number of workers on the current machine according to
-    [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md).
+    e.g. `sbatch --ntasks=16 --cpus-per-task=1` returned 1 instead of
+    16, and `sbatch --nodes=2 --ntasks=16` returned 8 when it was
+    given 10. Now it returns the value of environment variable
+    `SLURM_CPUS_ON_NODE`, which is what
+    [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+    reflects.
 
-  - `availableCores(method = "Slurm")` in a task launched by `srun` in a
-    Slurm job without `--cpus-per-task=<c>` could return more cores than
-    allotted to the task, which could result in more parallel workers
-    than CPUs on the machine. In single-node jobs, it returned all CPUs
-    on the machine for each task, e.g. 16 for each of 16 tasks sharing
-    16 CPUs. In multi-node jobs, it returned the number of Slurm tasks
-    on the first node, e.g. 14 for each of 14 tasks sharing 16 CPUs. The
-    overall
-    [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
-    would only be protected against this if Slurm bound each task to its
-    own CPUs. Now the CPUs on the machine are split equally among the
-    tasks there. The interactive shell of `salloc`, which Slurm may run
-    as a special job step, is treated as a job script.
+  - `availableCores(method = "Slurm")` in a task launched by Slurm’s
+    `srun` in a job without `--cpus-per-task=<c>` could overestimate the
+    number of CPU cores available. In single-node jobs, it returned all
+    allotted CPUs on the machine for each task, e.g. 16 for each of 16
+    tasks, while only sharing 16 CPUs. In multi-node jobs, it returned
+    the number of Slurm tasks on the first node, e.g. 14 for each of 14
+    tasks, while only sharing 16 CPUs.
 
 - [`isNodeAlive()`](https://parallelly.futureverse.org/reference/isNodeAlive.md)
   and
@@ -166,7 +155,7 @@ CRAN release: 2026-06-29
   optional argument `workCommand` to customize the default
   `parallel:::workCommand()`.
 
-- Analogusly to
+- Analogously to
   [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md),
   [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
   queries also Linux CGroups v2 CPU affinity values `cpuset.cpus` and
@@ -760,8 +749,8 @@ CRAN release: 2023-01-13
 ### New Features
 
 - Add support for `availableWorkers(constraints = "connections")`, which
-  limits the number of workers that can be be used to the current number
-  of free R connections according to
+  limits the number of workers that can be used to the current number of
+  free R connections according to
   [`freeConnections()`](https://parallelly.futureverse.org/reference/availableConnections.md).
   This is the maximum number of PSOCK, SOCK, and MPI **parallel**
   cluster nodes we can open without running out of available R
@@ -1590,7 +1579,7 @@ CRAN release: 2020-10-20
 - It is now possible to set environment variables on workers before they
   are launched by
   [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
-  by specify them as as `<name>=<value>` as part of the `rscript` vector
+  by specifying them as `<name>=<value>` as part of the `rscript` vector
   argument, e.g. `rscript=c("ABC=123", "DEF='hello world'", "Rscript")`.
   This works because elements in `rscript` that match regular expression
   `"^ [[:alpha:]_][[:alnum:]_]*=.*"` are no longer shell quoted.

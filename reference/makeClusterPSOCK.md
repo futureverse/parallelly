@@ -668,7 +668,7 @@ for *non-interactive* shell sessions on the remote machine.
 
 If the remote machines are running on MS Windows, make sure to add
 argument `rscript_sh = "cmd"` when calling `makeClusterPSOCK()`, because
-the default is `rscript_sh = "sh"`, which assumes that that the remote
+the default is `rscript_sh = "sh"`, which assumes that the remote
 machines are Unix-like machines.
 
 Another reason for failing to setup remote workers could be that they

@@ -125,7 +125,7 @@ can be opened</em>. If none can be opened, then <code>default</code> is returned
 
 
 <p>This function attempts to validate that the TCP port returned is
-available and can be be opened. Thus, it is likely that this port
+available and can be opened. Thus, it is likely that this port
 is available momentarily after <code>freePort()</code> returns. However, due
 to race conditions, there is always a risk that the port is taken
 by another process on the same system after <code>freePort()</code> returns
@@ -136,10 +136,10 @@ but before, say, <code><a href="makeClusterPSOCK.html">makeClusterPSOCK()</a></c
 
 
 <p>For backward compatibility with the <strong>parallel</strong> package, the default
-set of of ports <code>freePort("random")</code>, or <code>freePort("auto")</code> with
+set of ports <code>freePort("random")</code>, or <code>freePort("auto")</code> with
 environment variable <code>R_PARALLEL_PORT=random</code> samples from is
 <code>11000:11999</code>.
-The set can be overriden by setting environment variable
+The set can be overridden by setting environment variable
 <code>R_PARALLELLY_RANDOM_PORTS</code>,  e.g.
 <code>R_PARALLELLY_RANDOM_PORTS="10001:10010,11000:54000"</code>.</p>
     </div>
@@ -152,7 +152,7 @@ The set can be overriden by setting environment variable
 <span class="r-in"><span><span class="co"># Get a random, free TCP port in 1024:65535</span></span></span>
 <span class="r-in"><span><span class="va">port</span> <span class="op">&lt;-</span> <span class="fu">freePort</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"A free TCP port: "</span>, <span class="va">port</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> A free TCP port: 65165</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> A free TCP port: 31328</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get a random, free TCP port in 11000:11999, which is what</span></span></span>
 <span class="r-in"><span><span class="co"># parallelly::makeClusterPSOCK() and parallel::makePSOCKcluster()</span></span></span>
@@ -160,13 +160,13 @@ The set can be overriden by setting environment variable
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.unsetenv</a></span><span class="op">(</span><span class="st">"R_PARALLELLY_RANDOM_PORTS"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">port</span> <span class="op">&lt;-</span> <span class="fu">freePort</span><span class="op">(</span><span class="st">"random"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"A free TCP port: "</span>, <span class="va">port</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> A free TCP port: 11866</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> A free TCP port: 11041</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Customize the range of ports to sample from to 30000:50000</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>R_PARALLELLY_RANDOM_PORTS <span class="op">=</span> <span class="st">"30000:50000"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">port</span> <span class="op">&lt;-</span> <span class="fu">freePort</span><span class="op">(</span><span class="st">"random"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"A free TCP port: "</span>, <span class="va">port</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> A free TCP port: 31083</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> A free TCP port: 36773</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Test if a specific port is free</span></span></span>
 <span class="r-in"><span><span class="va">isPortFree</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">port</span><span class="op">)</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="fu">freePort</span><span class="op">(</span><span class="va">port</span>, default <span class="op">=</span> <span class="cn">NA_integer_</span><span class="op">)</span><span class="op">)</span></span></span>

@@ -11,7 +11,7 @@ makeClusterSequential()
 ## Value
 
 Returns a `cluster` object of class `sequential_cluster` of length one.
-The element is is a cluster node of class `sequential_node`.
+The element is a cluster node of class `sequential_node`.
 
 ## Details
 
@@ -53,11 +53,11 @@ str(y)
 
 pid <- Sys.getpid()
 print(pid)
-#> [1] 382008
+#> [1] 25161
 y <- clusterEvalQ(cl, Sys.getpid())
 str(y)
 #> List of 1
-#>  $ : int 382008
+#>  $ : int 25161
 
 abc <- 3.14
 y <- clusterEvalQ(cl, { abc <- 42; abc })

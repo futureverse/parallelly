@@ -187,9 +187,13 @@ scheduler that runs the R script <code>script.R</code> when launched. We
 can submit <code>script.sh</code> as:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">$</span> sbatch script.sh</span></code></pre></div>
 <p>This will request 16 tasks (CPU slots) across 4 compute nodes.</p>
-<p>Parallel workers on other machines are launched via Slurm’s
-<code>srun</code> command from the main R session, whereas workers on
-the machine running the main R session are launched directly.</p>
+<p>Now how the parallel workers are launched via Slurm’s
+<code>srun</code> command from the main R session. This is what makes it
+work regardless whether the workers are on the current or other
+machines. Note also that the default, built-in approach to connect to
+other machines via SSH does not work on HPC clusters where SSH to
+compute nodes is disabled. In contrast, <code>srun</code> establishes
+the connection for us.</p>
 <p>The <code>--cpus-per-task=1</code> Slurm option makes sure each
 worker launched via <code>srun</code> is allotted a single CPU. The
 <code>--overcommit</code> option is needed for older versions of Slurm,
@@ -202,10 +206,10 @@ allot the slots across three machines:</p>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="ex">Running</span> R script:</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="ex">Socket</span> cluster with 16 nodes where 10 nodes are on host <span class="st">'localhost'</span></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="kw">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 </span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="ex">nodes</span> are on host <span class="st">'gcpu2-14'</span> <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> </span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="ex">platform</span> x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 nodes are on host <span class="st">'gcpu2-15'</span> <span class="er">(</span><span class="ex">R</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="ex">nodes</span> are on host <span class="st">'node14'</span> <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> </span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="ex">platform</span> x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 nodes are on host <span class="st">'node15'</span> <span class="er">(</span><span class="ex">R</span></span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 2 nodes</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="ex">are</span> on host <span class="st">'gcpu2-16'</span> <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform </span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="ex">are</span> on host <span class="st">'node16'</span> <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform </span>
 <span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="ex">x86_64-pc-linux-gnu</span><span class="kw">)</span></span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="ex">[1]</span> 671.4629</span></code></pre></div>
 <p>What <code><a href="../reference/availableCores.html">availableCores()</a></code> and
@@ -303,10 +307,16 @@ slots.</p>
 scheduler that runs the R script <code>script.R</code> when launched. If
 we submit <code>script.sh</code> as:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="ex">$</span> qsub script.sh</span></code></pre></div>
-<p>it will by default request eight slots - on one or more machines,
-which then R and <strong>parallelly</strong> will set up a parallel
-cluster on. Exactly on which machines depends on where the job scheduler
-finds these requested slots.</p>
+<p>it will by default request 8 slots - on one or more machines, which
+then R and <strong>parallelly</strong> will set up a parallel cluster
+on. Exactly on which machines depends on where the job scheduler finds
+these requested slots.</p>
+<p>Now how the parallel workers are launched via SGE’s <code>qrsh</code>
+command from the main R session. This is what makes it work regardless
+whether the workers are on the current or other machines. Note also that
+the default, built-in approach to connect to other machines via SSH does
+not work on HPC clusters where SSH to compute nodes is disabled. In
+contrast, <code>qrsh</code> establishes the connection for us.</p>
 <p>Here is the output from one such run, where the scheduler happened to
 allot the slots across three machines:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="ex">Information</span> on R:</span>
@@ -314,8 +324,8 @@ allot the slots across three machines:</p>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="ex">Running</span> R script:</span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="ex">Socket</span> cluster with 8 nodes where 4 nodes are on host ‘localhost’</span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="kw">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 3</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="ex">nodes</span> are on host ‘qb3-id130’ <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> </span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="ex">platform</span> x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 1 node is on host ‘qb3-as16’ <span class="er">(</span><span class="ex">R</span> </span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="ex">nodes</span> are on host ‘node130’ <span class="er">(</span><span class="ex">R</span> version 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> </span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="ex">platform</span> x86_64-pc-linux-gnu<span class="kw">)</span><span class="ex">,</span> 1 node is on host ‘node16’ <span class="er">(</span><span class="ex">R</span> </span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span><span class="ex">,</span> platform x86_64-pc-linux-gnu<span class="kw">)</span></span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="ex">[1]</span> 671.4629</span></code></pre></div>
 <p>How SGE distributes the requested slots across machines depends on
@@ -432,16 +442,16 @@ worker.</p>
 <p>This matters for workers running on the same machine as the main R
 session. They are launched directly, rather than via the job scheduler,
 which means they inherit the settings of the main R session. For
-example, if the job scheduler allotted eight CPU cores on that machine,
-<code><a href="../reference/availableCores.html">availableCores()</a></code> would report eight cores in each of the
-eight workers there. If the code evaluated by the workers parallelizes
-further based on <code><a href="../reference/availableCores.html">availableCores()</a></code>, e.g.</p>
+example, if the job scheduler allotted 8 CPU cores on that machine,
+<code><a href="../reference/availableCores.html">availableCores()</a></code> would report 8 cores in each of the 8
+workers there. If the code evaluated by the workers parallelizes further
+based on <code><a href="../reference/availableCores.html">availableCores()</a></code>, e.g.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">parLapply</a></span><span class="op">(</span>cl <span class="op">=</span> <span class="va">cl</span>, <span class="va">X</span>, fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">mclapply</a></span><span class="op">(</span><span class="va">x</span>, FUN <span class="op">=</span> <span class="va">slow_fcn</span>, mc.cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="../reference/availableCores.html">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>then there could be up to 64 R processes competing for eight CPU
-cores. With <code>mc.cores = 1L</code>, <code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">mclapply()</a></code> runs
+<p>then there could be up to 64 R processes competing for 8 CPU cores.
+With <code>mc.cores = 1L</code>, <code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">mclapply()</a></code> runs
 sequentially in each worker, which avoids overusing the CPUs.</p>
 <p>This is not needed when using the cluster via the <strong><a href="https://future.futureverse.org" class="external-link">future</a></strong> framework,
 e.g. <code>plan(cluster, workers = cl)</code>, because futures are

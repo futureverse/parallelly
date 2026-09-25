@@ -386,10 +386,10 @@ using something like:</p>
 <pre><code>'/usr/bin/ssh' -R 11058:localhost:11058 -l alice n1.remote.org Rscript ...
 '/usr/bin/ssh' -R 11059:localhost:11059 -l alice n1.remote.org Rscript ...</code></pre>
 <p>This tells us that there is one active SSH connection per parallel
-worker. It also reveals that that each of these connections uses a so
-called <em>reverse tunnel</em>, which is used to establish a unique
+worker. It also reveals that each of these connections uses a so called
+<em>reverse tunnel</em>, which is used to establish a unique
 communication channel between the main R process and the corresponding
-parallel worker. It also this use of reverse tunneling that avoids
+parallel worker. It is also this use of reverse tunneling that avoids
 having to configure dynamic DNS (DDNS) and port-forwarding in our local
 firewalls, which is cumbersome and requires administrative rights. When
 using <strong>parallelly</strong>, there is no need for administrative

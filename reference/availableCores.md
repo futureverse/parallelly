@@ -250,7 +250,7 @@ can trick `availableCores()` to believe there are 192 cores, by:
     #>            109
 
 To achieve the same from outside of R, for instance when running
-`R CMD check`, set the the corresponding environment variables, e.g.
+`R CMD check`, set the corresponding environment variables, e.g.
 
     $ export R_PARALLELLY_AVAILABLECORES_SYSTEM=192
     $ export R_PARALLELLY_AVAILABLECORES_METHODS=system

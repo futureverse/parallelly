@@ -337,7 +337,7 @@ you can trick <code>availableCores()</code> to believe there are 192 cores, by:<
 <span><span class="co">#&gt; connections-16</span></span>
 <span><span class="co">#&gt;            109</span></span></code></pre><p></p></div>
 <p>To achieve the same from outside of R, for instance when running
-<code>R CMD check</code>, set the the corresponding environment variables, e.g.</p>
+<code>R CMD check</code>, set the corresponding environment variables, e.g.</p>
 <p></p><div class="sourceCode sh"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">$</span> export R_PARALLELLY_AVAILABLECORES_SYSTEM=192</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="ex">$</span> export R_PARALLELLY_AVAILABLECORES_METHODS=system</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="ex">$</span> Rscript <span class="at">-e</span> parallelly::availableCores</span>

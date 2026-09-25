@@ -316,13 +316,13 @@ by R using something like:
     '/usr/bin/ssh' -R 11059:localhost:11059 -l alice n1.remote.org Rscript ...
 
 This tells us that there is one active SSH connection per parallel
-worker. It also reveals that that each of these connections uses a so
-called *reverse tunnel*, which is used to establish a unique
-communication channel between the main R process and the corresponding
-parallel worker. It also this use of reverse tunneling that avoids
-having to configure dynamic DNS (DDNS) and port-forwarding in our local
-firewalls, which is cumbersome and requires administrative rights. When
-using **parallelly**, there is no need for administrative rights - any
+worker. It also reveals that each of these connections uses a so called
+*reverse tunnel*, which is used to establish a unique communication
+channel between the main R process and the corresponding parallel
+worker. It is also this use of reverse tunneling that avoids having to
+configure dynamic DNS (DDNS) and port-forwarding in our local firewalls,
+which is cumbersome and requires administrative rights. When using
+**parallelly**, there is no need for administrative rights - any
 non-privileged user can launch remote parallel R workers.
 
 ### Example: Two parallel workers on two remote machines
