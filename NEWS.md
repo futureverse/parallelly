@@ -18,7 +18,7 @@
 
  * `makeClusterPSOCK()` has an optional argument `rshcmd` for
    controlling how to launch the parallel workers that are other
-   machines. It defaults to `rshcmd = <ssh>` (launch workers over
+   machines. It defaults to `rshcmd = "<ssh>"` (launch workers over
    SSH), when not specified. In this version, we add support for
    launching workers on other compute nodes via HPC job scheduler
    tools. Specifically, you can use either `rshcmd = "<srun>"`
