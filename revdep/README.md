@@ -10,15 +10,15 @@
 |collate  |en_US.UTF-8                                                              |
 |ctype    |en_US.UTF-8                                                              |
 |tz       |America/Los_Angeles                                                      |
-|date     |2026-09-24                                                               |
-|pandoc   |3.11 @                                                                   |
-|quarto   |1.10.18 @                                                                |
+|date     |2026-09-25                                                               |
+|pandoc   |3.11 @ /wynton/home/cbi/shared/software/CBI/pandoc-3.11/bin/pandoc       |
+|quarto   |1.10.18 @ /wynton/home/cbi/shared/software/CBI/quarto-1.10.18/bin/quarto |
 
 # Dependencies
 
 |package    |old    |new         |Δ  |
 |:----------|:------|:-----------|:--|
-|parallelly |1.48.0 |1.48.0-9019 |*  |
+|parallelly |1.48.0 |1.48.0-9028 |*  |
 
 # Revdeps
 
@@ -30,7 +30,7 @@
 |iccTraj |?       |      |        |     |
 |InPAS   |?       |      |        |     |
 
-## All (128)
+## All (127)
 
 |package             |version  |error |warning |note |
 |:-------------------|:--------|:-----|:-------|:----|
@@ -60,7 +60,6 @@
 |CSCNet              |0.1.4    |      |        |     |
 |ctsem               |3.11.1   |      |        |     |
 |dataquieR           |2.8.15   |      |        |     |
-|[decoupleR](problems.md#decoupler)|2.17.0   |3     |1       |1    |
 |DEoptim             |2.2-8    |      |        |     |
 |desla               |0.3.1    |      |        |     |
 |dipsaus             |0.3.5    |      |        |     |

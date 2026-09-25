@@ -31,112 +31,6 @@ Run `revdepcheck::revdep_details(, "COTAN")` for more info
        All declared Imports should be used.
      ```
 
-# decoupleR (2.17.0)
-
-* GitHub: <https://github.com/saezlab/decoupleR>
-* Email: <mailto:pau.badia@uni-heidelberg.de>
-
-Run `revdepcheck::revdep_details(, "decoupleR")` for more info
-
-## In both
-
-*   checking examples ... ERROR
-     ```
-     Running examples in ‘decoupleR-Ex.R’ failed
-     The error most likely occurred in:
-     
-     > ### Name: get_collectri
-     > ### Title: CollecTRI gene regulatory network. Wrapper to access CollecTRI
-     > ###   gene regulatory network. CollecTRI is a comprehensive resource
-     > ###   containing a curated collection of transcription factors (TFs) and
-     > ###   their target genes. It is an expansion of DoRothEA. Each interaction
-     > ###   is weighted by its mode of regulation (either positive or negative).
-     > ### Aliases: get_collectri
-     > 
-     > ### ** Examples
-     > 
-     > collectri <- get_collectri(organism='human', split_complexes=FALSE)
-     [2026-09-24 16:14:34] [WARN]    [OmnipathR] Accessing `collectri` as a static table: this is not the recommended way to access OmniPath data; it is only a backup plan for situations when our server or your computer is experiencing issues.
-     Error in if (.keep) . else select(., -!!evs_col) : 
-       argument is of length zero
-     Calls: get_collectri ... tidyselect_data_has_predicates -> unnest_evidences -> %>%
-     Execution halted
-     ```
-
-*   checking tests ...
-     ```
-     ...
-       + expected[8, ]   0.076411558
-       - actual[9, ]     1.000000000
-       + expected[9, ]   0.976649086
-       - actual[10, ]    1.000000000
-       + expected[10, ]  0.976649086
-       and 134 more ...
-       
-            actual$p_value | expected$p_value                 
-        [1] 0.105          - 0.075            [1]             
-        [2] 0.105          - 0.075            [2]             
-        [3] 0.519          - 0.548            [3]             
-        [4] 0.519          - 0.548            [4]             
-        [5] 0.010          | 0.010            [5]             
-        [6] 0.010          | 0.010            [6]             
-        [7] 0.087          - 0.076            [7]             
-        [8] 0.087          - 0.076            [8]             
-        [9] 1.000          - 0.977            [9]             
-       [10] 1.000          - 0.977            [10]            
-        ... ...              ...              and 134 more ...
-       
-       
-       [ FAIL 7 | WARN 7 | SKIP 0 | PASS 27 ]
-       Error:
-       ! Test failures.
-       Execution halted
-     ```
-
-*   checking re-building of vignette outputs ... ERROR
-     ```
-     ...
-      17. ├─OmnipathR:::has_column(., "evidences")
-      18. │ ├─col %in% colnames(data)
-      19. │ └─base::colnames(data)
-      20. │   └─base::is.data.frame(x)
-      21. ├─OmnipathR::filter_evidences(...)
-      22. │ └─expr(...) %>% eval_select(data) %>% names %>% ...
-      23. ├─OmnipathR:::if_null_len0(...)
-      24. │ └─value1 %>% is_empty_2 %>% if (value2) value1
-      25. ├─OmnipathR:::is_empty_2(.)
-      26. │ └─value %>% ...
-      27. ├─tidyselect::eval_select(., data)
-      28. │ └─tidyselect::tidyselect_data_has_predicates(data)
-      29. └─OmnipathR::unnest_evidences(., .keep = .keep)
-      30.   └─... %>% ...
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     
-     Error: processing vignette 'tf_sc.Rmd' failed with diagnostics:
-     argument is of length zero
-     --- failed re-building ‘tf_sc.Rmd’
-     
-     SUMMARY: processing the following files failed:
-       ‘tf_bk.Rmd’ ‘tf_sc.Rmd’
-     
-     Error: Vignette re-building failed.
-     Execution halted
-     ```
-
-*   checking Rd cross-references ... WARNING
-     ```
-     Missing link(s) in Rd file 'run_gsva.Rd':
-       ‘GSVA::gsva’ ‘GeneSetCollection’
-     
-     See section 'Cross-references' in the 'Writing R Extensions' manual.
-     ```
-
-*   checking for non-standard things in the check directory ... NOTE
-     ```
-     Found the following files/directories:
-       ‘omnipathr-log’
-     ```
-
 # flexstanr (0.2.0)
 
 * GitHub: <https://github.com/ACCIDDA/flexstanr>
@@ -253,8 +147,8 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 *   checking for non-standard things in the check directory ... NOTE
      ```
      Found the following files/directories:
-       ‘20260924_171317_10X_QC_sce.rda’
-       ‘20260924_171317__10x_bamqc_filtered.tsv’ ‘Demultiplex’
+       ‘20260925_011717_10X_QC_sce.rda’
+       ‘20260925_011717__10x_bamqc_filtered.tsv’ ‘Demultiplex’
      ```
 
 # streetscape (1.0.5)
