@@ -69,6 +69,7 @@ for spec in "${specs[@]}"; do
     -j y
     -o "${outdir}/\$JOB_ID.log"
     -l h_rt=00:05:00
+    -l mem_free=300M  ## per slot
     -w e  ## reject jobs that can never be scheduled
     "${extra_args[@]}"
     "${spec_args[@]}"

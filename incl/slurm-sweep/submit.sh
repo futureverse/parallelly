@@ -13,6 +13,8 @@
 #   PQ_DRYRUN=true   Only list the 'sbatch' calls
 #   PQ_SBATCH_ARGS   Extra 'sbatch' options for all jobs, e.g.
 #                    PQ_SBATCH_ARGS="--partition=debug"
+#                    These come after the default options, e.g.
+#                    PQ_SBATCH_ARGS="--mem-per-cpu=1G" overrides the default
 set -euo pipefail
 
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -64,7 +66,8 @@ for spec in "${specs[@]}"; do
   args=(
     --parsable
     --job-name=parallelly-query
-    --time=00:05:00
+    --time=00:10:00
+    --mem-per-cpu=300M  ## one R worker per CPU, cf. cluster.R
     --output="${outdir}/%j.log"
     "${extra_args[@]}"
     "${spec_args[@]}"
