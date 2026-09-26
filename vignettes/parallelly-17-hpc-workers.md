@@ -264,6 +264,7 @@ slots on each machine. In all cases, `availableCores()` returns the
 number of slots on the current machine. This is also true for
 workers launched on the other machines via `qrsh -inherit`.
 
+Although they look like ones, note that `$pe_slots` and `$fill_up` are _not_ environment variables, but SGE allocation rules. SGE allocation rules are described in `man sge_pe`.
 
 
 ## Example: Launch parallel workers via the Fujitsu Technical Computing Suite job scheduler
