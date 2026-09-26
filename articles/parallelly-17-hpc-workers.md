@@ -4,8 +4,8 @@
 
 This vignette illustrates how to launch parallel workers in
 high-performance compute (HPC) environments. The examples show how to
-launch multi-node workers as allotted by the job schedulers and
-reflected by
+launch both single-node and multi-node workers as allotted by the job
+schedulers and reflected by
 [`parallelly::availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md).
 
 On many HPC clusters, SSH access to compute nodes is disabled. Instead,
@@ -271,6 +271,10 @@ each machine. In all cases,
 [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
 returns the number of slots on the current machine. This is also true
 for workers launched on the other machines via `qrsh -inherit`.
+
+Although they look like ones, note that `$pe_slots` and `$fill_up` are
+*not* environment variables, but SGE allocation rules. SGE allocation
+rules are described in `man sge_pe`.
 
 ### Example: Launch parallel workers via the Fujitsu Technical Computing Suite job scheduler
 
