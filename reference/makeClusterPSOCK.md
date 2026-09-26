@@ -519,10 +519,17 @@ following `rshcmd` types are supported for this:
 - `"<pjrsh>"` - Fujitsu Technical Computing Suite's (PJM) `pjrsh` via
   `pjrsh <worker>`
 
+- `"<hpc>"` - Infers which of the above to use from the environment
+  variables of the job that the current R process runs in, i.e.
+  `"<srun>"` if `SLURM_JOB_ID` is set, `"<qrsh>"` if `PE_HOSTFILE` is
+  set, and `"<pjrsh>"` if `PJM_JOBID` is set. It is an error if none of
+  them is set, unless a fallback is given, e.g.
+  `rshcmd = c("<hpc>", "<ssh>")`.
+
 As with any `rshcmd`, these are only used for workers on *other*
 machines. Workers on the current machine are launched directly, which
-means `makeClusterPSOCK(availableWorkers(), rshcmd = "<srun>")` works
-also for single-node Slurm jobs.
+means `makeClusterPSOCK(availableWorkers(), rshcmd = "<hpc>")` works
+also for single-node jobs.
 
 ## Accessing external machines that prompts for a password
 
@@ -847,7 +854,7 @@ cl <- makeClusterPSOCK(
   rshopts = c("-P", 2200, "-i", "C:/Users/bobby/.ssh/putty.ppk"),
   dryrun = TRUE, quiet = TRUE
 )
-#> Warning: Failed to locate a default SSH client (checked: ‘putty-plink’). Please specify one via argument 'rshcmd'. Will still try with ‘ssh’.
+#> Warning: Failed to locate a default SSH client (checked: ‘putty-plink’). Please specify one via argument 'rshcmd'. Will still try with ‘ssh’
 
 
 ## EXAMPLE: Remote workers with specific setup
@@ -881,7 +888,7 @@ cl <- makeClusterPSOCK(
   "remote.server.org:2200", user = "bob", rshcmd = "<rstudio-ssh>",
   dryrun = TRUE, quiet = TRUE
 )
-#> Warning: Failed to locate a default SSH client (checked: ‘rstudio-ssh’). Please specify one via argument 'rshcmd'. Will still try with ‘ssh’.
+#> Warning: Failed to locate a default SSH client (checked: ‘rstudio-ssh’). Please specify one via argument 'rshcmd'. Will still try with ‘ssh’
 
 
 ## ---------------------------------------------------------------

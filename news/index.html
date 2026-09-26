@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9031</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9032</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,7 @@
 <div class="section level3">
 <h3 id="new-features-development-version">New Features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>
-<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> has an optional argument <code>rshcmd</code> for controlling how to launch the parallel workers that are other machines. It defaults to <code>rshcmd = "&lt;ssh&gt;"</code> (launch workers over SSH), when not specified. In this version, we add support for launching workers on other compute nodes via HPC job scheduler tools. Specifically, you can use either <code>rshcmd = "&lt;srun&gt;"</code> (Slurm), <code>rshcmd = "&lt;qrsh&gt;"</code> (Grid Engine), or <code>rshcmd = "&lt;pjrsh&gt;"</code> (Fujitsu Technical Computing Suite). These “shortcuts” expand to calls to those command with convenient defaults.</li>
+<code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> has an optional argument <code>rshcmd</code> for controlling how to launch the parallel workers that are other machines. It defaults to <code>rshcmd = "&lt;ssh&gt;"</code> (launch workers over SSH), when not specified. In this version, we add support for launching workers on other compute nodes via HPC job scheduler tools. Specifically, you can use either <code>rshcmd = "&lt;srun&gt;"</code> (Slurm), <code>rshcmd = "&lt;qrsh&gt;"</code> (Grid Engine), or <code>rshcmd = "&lt;pjrsh&gt;"</code> (Fujitsu Technical Computing Suite). These “shortcuts” expand to calls to those command with convenient defaults. There is also the generic <code>rshcmd = "&lt;hpc&gt;"</code>, which automatically infers which of these to use from the job environment variables available.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>

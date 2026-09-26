@@ -34,5 +34,5 @@ This function works only Unix-like system with `/proc/loadavg`.
 loadavg <- cpuLoad()
 print(loadavg)
 #>  1min  5min 15min 
-#>  1.37  0.78  0.59 
+#>  0.72  0.61  0.48 
 ```
