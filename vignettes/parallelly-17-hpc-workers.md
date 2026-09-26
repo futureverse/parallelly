@@ -11,7 +11,7 @@
 
 # Introduction
 
-This vignette illustrates how to launch parallel workers in high-performance compute (HPC) environments. The examples show how to launch multi-node workers as allotted by the job schedulers and reflected by `parallelly::availableWorkers()`.
+This vignette illustrates how to launch parallel workers in high-performance compute (HPC) environments. The examples show how to launch both single-node and multi-node workers as allotted by the job schedulers and reflected by `parallelly::availableWorkers()`.
 
 On many HPC clusters, SSH access to compute nodes is disabled.
 Instead, parallel workers on other compute nodes that are part of
