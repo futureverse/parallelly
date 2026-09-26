@@ -10,7 +10,8 @@ find_rshcmd(which = NULL, first = FALSE, must_work = TRUE)
 \item{which}{A character vector specifying which types of SSH clients
 to search for, e.g. \code{"ssh"}, \code{"putty-plink"}, and \code{"rstudio-ssh"}.
 It may also specify an HPC job-scheduler command, i.e. \code{"srun"},
-\code{"qrsh"}, and \code{"pjrsh"}.
+\code{"qrsh"}, and \code{"pjrsh"}, or \code{"hpc"}, which infers which of these
+three to use from the job environment of the current R process.
 If NULL, a default set of clients supported by the
 current platform is searched for.}
 

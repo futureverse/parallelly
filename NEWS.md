@@ -24,7 +24,9 @@
    tools. Specifically, you can use either `rshcmd = "<srun>"`
    (Slurm), `rshcmd = "<qrsh>"` (Grid Engine), or `rshcmd = "<pjrsh>"`
    (Fujitsu Technical Computing Suite). These "shortcuts" expand to
-   calls to those command with convenient defaults.
+   calls to those command with convenient defaults.  There is also the
+   generic `rshcmd = "<hpc>"`, which automatically infers which of
+   these to use from the job environment variables available.
 
 ## Documentation
 

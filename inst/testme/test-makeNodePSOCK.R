@@ -125,7 +125,7 @@ stopifnot(inherits(options, "makeNodePSOCKOptions"))
 
 ## Test HPC job-scheduler 'rshcmd' types using mockup executables
 if (.Platform[["OS.type"]] != "windows") {
-  message("- rshcmd = '<srun>', '<qrsh>', and '<pjrsh>' ...")
+  message("- rshcmd = '<srun>', '<qrsh>', '<pjrsh>', and '<hpc>' ...")
 
   oenvs <- Sys.getenv("PATH", names = TRUE)
 
@@ -150,6 +150,35 @@ if (.Platform[["OS.type"]] != "windows") {
       options[["rscript_sh"]][2] == if (type == "srun") "none" else "sh"
     )
   }
+
+  ## rshcmd = "<hpc>" infers the scheduler from the job environment
+  oenvs2 <- Sys.getenv(c("SLURM_JOB_ID", "PE_HOSTFILE", "PJM_JOBID"), unset = NA_character_, names = TRUE)
+  Sys.unsetenv(names(oenvs2))
+  envs <- c(srun = "SLURM_JOB_ID", qrsh = "PE_HOSTFILE", pjrsh = "PJM_JOBID")
+  for (type in names(envs)) {
+    args <- structure(list("1"), names = envs[[type]])
+    do.call(Sys.setenv, args)
+    options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "<hpc>")
+    stopifnot(
+      identical(attr(options[["rshcmd"]], "type"), type),
+      options[["rscript_sh"]][2] == if (type == "srun") "none" else "sh"
+    )
+    Sys.unsetenv(envs[[type]])
+  }
+
+  ## rshcmd = "<hpc>" outside of a job gives an error ...
+  res <- tryCatch({
+    makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "<hpc>")
+  }, error = identity)
+  print(res)
+  stopifnot(inherits(res, "error"))
+
+  ## ... unless there is a fallback
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = c("<hpc>", "<pjrsh>"))
+  stopifnot(identical(attr(options[["rshcmd"]], "type"), "pjrsh"))
+
+  oenvs2 <- oenvs2[!is.na(oenvs2)]
+  if (length(oenvs2) > 0) do.call(Sys.setenv, as.list(oenvs2))
 
   ## Explicit 'srun' command is also recognized as such
   options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = c("srun", "-w"))

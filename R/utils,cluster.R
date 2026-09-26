@@ -91,7 +91,8 @@ is_fqdn <- function(worker) {
 #' @param which A character vector specifying which types of SSH clients
 #' to search for, e.g. `"ssh"`, `"putty-plink"`, and `"rstudio-ssh"`.
 #' It may also specify an HPC job-scheduler command, i.e. `"srun"`,
-#' `"qrsh"`, and `"pjrsh"`.
+#' `"qrsh"`, and `"pjrsh"`, or `"hpc"`, which infers which of these
+#' three to use from the job environment of the current R process.
 #' If NULL, a default set of clients supported by the
 #' current platform is searched for.
 #'
@@ -202,6 +203,17 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
     res
   }
 
+  ## HPC job scheduler: Infer which of the above from the job
+  ## environment of the current R process
+  find_hpc <- function() {
+    switch(hpc_scheduler(),
+      "Slurm" = find_srun(),
+      "SGE"   = find_qrsh(),
+      "PJM"   = find_pjrsh(),
+      NULL
+    )
+  }
+
   if (!is.null(which)) stop_if_not(is.character(which), length(which) >= 1L, !anyNA(which))
   stop_if_not(is.logical(first), length(first) == 1L, !is.na(first))
   stop_if_not(is.logical(must_work), length(must_work) == 1L, !is.na(must_work))
@@ -223,6 +235,7 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
       "srun"        = find_srun(),
       "qrsh"        = find_qrsh(),
       "pjrsh"       = find_pjrsh(),
+      "hpc"         = find_hpc(),
       stopf("Unknown 'rshcmd' type: %s", sQuote(name))
     )
     
@@ -234,13 +247,27 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
 
   if (length(res) > 0) return(res)
   
-  msg <- sprintf("Failed to locate a default SSH client (checked: %s). Please specify one via argument 'rshcmd'.", paste(sQuote(which), collapse = ", ")) #nolint
+  msg <- sprintf("Failed to locate a default SSH client (checked: %s). Please specify one via argument 'rshcmd'", paste(sQuote(which), collapse = ", ")) #nolint
+  if ("hpc" %in% which && is.na(hpc_scheduler())) {
+    hpc_envs <- c("SLURM_JOB_ID", "PE_HOSTFILE", "PJM_JOBID")
+    msg <- sprintf("%s. Note that 'hpc' requires running in a Slurm, Grid Engine, or Fujitsu Technical Computing Suite (PJM) job, but none of the environment variables %s is set", msg, paste(sQuote(hpc_envs), collapse = ", ")) #nolint
+  }
   if (must_work) stop(msg)
 
   pathname <- "ssh"
-  msg <- sprintf("%s Will still try with %s.", msg, sQuote(paste(pathname, collapse = " ")))
+  msg <- sprintf("%s. Will still try with %s", msg, sQuote(paste(pathname, collapse = " ")))
   warning(msg)
   pathname
+}
+
+
+## The HPC job scheduler that the current R process runs in, if any.
+## Returns "Slurm", "SGE", "PJM", or NA_character_
+hpc_scheduler <- function() {
+  if (nzchar(Sys.getenv("SLURM_JOB_ID"))) return("Slurm")
+  if (nzchar(Sys.getenv("PE_HOSTFILE"))) return("SGE")
+  if (nzchar(Sys.getenv("PJM_JOBID"))) return("PJM")
+  NA_character_
 }
 
 

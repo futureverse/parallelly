@@ -228,11 +228,18 @@
 #'   \item `"<pjrsh>"` -
 #'     Fujitsu Technical Computing Suite's (PJM) \command{pjrsh} via
 #'     `pjrsh <worker>`
+#'   \item `"<hpc>"` -
+#'     Infers which of the above to use from the environment variables
+#'     of the job that the current R process runs in, i.e. `"<srun>"`
+#'     if \env{SLURM_JOB_ID} is set, `"<qrsh>"` if \env{PE_HOSTFILE} is
+#'     set, and `"<pjrsh>"` if \env{PJM_JOBID} is set.
+#'     It is an error if none of them is set, unless a fallback is given,
+#'     e.g. `rshcmd = c("<hpc>", "<ssh>")`.
 #' }
 #' As with any `rshcmd`, these are only used for workers on _other_
 #' machines. Workers on the current machine are launched directly, which
-#' means `makeClusterPSOCK(availableWorkers(), rshcmd = "<srun>")` works
-#' also for single-node Slurm jobs.
+#' means `makeClusterPSOCK(availableWorkers(), rshcmd = "<hpc>")` works
+#' also for single-node jobs.
 #' 
 #' @section Accessing external machines that prompts for a password:
 #' _IMPORTANT: With one exception, it is not possible to for these

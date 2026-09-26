@@ -454,11 +454,18 @@ Grid Engine's (SGE) \command{qrsh} via \verb{qrsh -inherit -nostdin -V <worker>}
 \item \code{"<pjrsh>"} -
 Fujitsu Technical Computing Suite's (PJM) \command{pjrsh} via
 \verb{pjrsh <worker>}
+\item \code{"<hpc>"} -
+Infers which of the above to use from the environment variables
+of the job that the current R process runs in, i.e. \code{"<srun>"}
+if \env{SLURM_JOB_ID} is set, \code{"<qrsh>"} if \env{PE_HOSTFILE} is
+set, and \code{"<pjrsh>"} if \env{PJM_JOBID} is set.
+It is an error if none of them is set, unless a fallback is given,
+e.g. \code{rshcmd = c("<hpc>", "<ssh>")}.
 }
 As with any \code{rshcmd}, these are only used for workers on \emph{other}
 machines. Workers on the current machine are launched directly, which
-means \code{makeClusterPSOCK(availableWorkers(), rshcmd = "<srun>")} works
-also for single-node Slurm jobs.
+means \code{makeClusterPSOCK(availableWorkers(), rshcmd = "<hpc>")} works
+also for single-node jobs.
 }
 
 \section{Accessing external machines that prompts for a password}{
