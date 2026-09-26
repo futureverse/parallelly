@@ -8,6 +8,20 @@ launch multi-node workers as allotted by the job schedulers and
 reflected by
 [`parallelly::availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md).
 
+On many HPC clusters, SSH access to compute nodes is disabled. Instead,
+parallel workers on other compute nodes that are part of the same job
+are launched via the job scheduler. All examples below use
+`rshcmd = "<hpc>"` for this. It identifies the job scheduler from the
+environment variables of the job that R runs in, and uses the
+corresponding launcher:
+
+- `"<srun>"` (Slurm), if `SLURM_JOB_ID` is set
+- `"<qrsh>"` (Grid Engine), if `PE_HOSTFILE` is set
+- `"<pjrsh>"` (Fujitsu Technical Computing Suite), if `PJM_JOBID` is set
+
+If none of them are set, `rshcmd = "<hpc>"` produces an error. Use
+`rshcmd = c("<hpc>", "<ssh>")` to have it fall back to SSH.
+
 ## Examples
 
 ### Example: Launch parallel workers via the Slurm job scheduler
@@ -44,7 +58,7 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = "<srun>",
+  rshcmd = "<hpc>",
   rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
@@ -69,19 +83,21 @@ $ sbatch script.sh
 
 This will request 16 tasks (CPU slots) across 4 compute nodes.
 
-Note how `rshcmd = "<srun>"` makes parallel workers to be launched via
-Slurm’s `srun` command from the main R session. By design, argument
-`rshcmd` is only used for workers running on *other* machines - the
-argument is ignored for the workers that are launched on the current
-machine. This is what makes the above setup to work regardless whether
-the workers are on the current or other machines, or a mix.
+Note how `rshcmd = "<hpc>"` makes parallel workers to be launched via
+Slurm’s `srun` command from the main R session. Since R runs in a Slurm
+job, `SLURM_JOB_ID` is set, and `"<hpc>"` therefore resolves to
+`"<srun>"`. By design, argument `rshcmd` is only used for workers
+running on *other* machines - the argument is ignored for the workers
+that are launched on the current machine. This is what makes the above
+setup to work regardless whether the workers are on the current or other
+machines, or a mix.
 
 Note also that the default, built-in approach to connect to other
 machines via SSH does not work on HPC clusters where SSH to compute
 nodes is disabled. In contrast, `srun` establishes the connection for
 us.
 
-Specifically, `rshcmd = "<srun>"` launches each worker using:
+Specifically, `"<srun>"` launches each worker using:
 
 ``` sh
 srun --exact --overlap --overcommit --nodes=1 --ntasks=1 --cpus-per-task=1 -w <hostname> ...
@@ -175,7 +191,7 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = "<qrsh>",
+  rshcmd = "<hpc>",
   rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
@@ -202,13 +218,15 @@ it will by default request 8 slots - on one or more machines, which then
 R and **parallelly** will set up a parallel cluster on. Exactly on which
 machines depends on where the job scheduler finds these requested slots.
 
-Note how `rshcmd = "<qrsh>"` makes parallel workers to be launched via
-SGE’s `qrsh -inherit -nostdin -V` command from the main R session. By
-design, argument `rshcmd` is only used for workers running on *other*
-machines - the argument is ignored for the workers that are launched on
-the current machine. This is what makes the above setup to work
-regardless whether the workers are on the current or other machines, or
-a mix.
+Note how `rshcmd = "<hpc>"` makes parallel workers to be launched via
+SGE’s `qrsh` command from the main R session. Since R runs in a parallel
+environment of an SGE job, `PE_HOSTFILE` is set, and `"<hpc>"` therefore
+resolves to `"<qrsh>"`, which launches each worker using
+`qrsh -inherit -nostdin -V <hostname> ...`. By design, argument `rshcmd`
+is only used for workers running on *other* machines - the argument is
+ignored for the workers that are launched on the current machine. This
+is what makes the above setup to work regardless whether the workers are
+on the current or other machines, or a mix.
 
 Note also that the default, built-in approach to connect to other
 machines via SSH does not work on HPC clusters where SSH to compute
@@ -283,7 +301,7 @@ library(parallel)
 
 cl <- makeClusterPSOCK(
   availableWorkers(),
-  rshcmd = "<pjrsh>",
+  rshcmd = "<hpc>",
   rscript_startup = quote(options(mc.cores = 1L))
 )
 print(cl)
@@ -308,6 +326,13 @@ $ pjsub -L vnode=3 -L vnode-core=18 script.sh
 
 to request 18 CPU cores on three compute nodes, which in total requests
 3\*18=54 compute slots.
+
+Note how `rshcmd = "<hpc>"` makes parallel workers to be launched via
+the Fujitsu Technical Computing Suite’s `pjrsh` command from the main R
+session. Since R runs in a PJM job, `PJM_JOBID` is set, and `"<hpc>"`
+therefore resolves to `"<pjrsh>"`, which launches each worker using
+`pjrsh <hostname> ...`. As in the above examples, argument `rshcmd` is
+only used for workers running on *other* machines.
 
 ## Avoid overusing the CPUs via nested parallelism
 

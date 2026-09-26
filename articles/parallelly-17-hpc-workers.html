@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9032</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9033</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,6 +135,26 @@ Bengtsson</h4>
 high-performance compute (HPC) environments. The examples show how to
 launch multi-node workers as allotted by the job schedulers and
 reflected by <code><a href="../reference/availableWorkers.html">parallelly::availableWorkers()</a></code>.</p>
+<p>On many HPC clusters, SSH access to compute nodes is disabled.
+Instead, parallel workers on other compute nodes that are part of the
+same job are launched via the job scheduler. All examples below use
+<code>rshcmd = "&lt;hpc&gt;"</code> for this. It identifies the job
+scheduler from the environment variables of the job that R runs in, and
+uses the corresponding launcher:</p>
+<ul>
+<li>
+<code>"&lt;srun&gt;"</code> (Slurm), if <code>SLURM_JOB_ID</code> is
+set</li>
+<li>
+<code>"&lt;qrsh&gt;"</code> (Grid Engine), if
+<code>PE_HOSTFILE</code> is set</li>
+<li>
+<code>"&lt;pjrsh&gt;"</code> (Fujitsu Technical Computing Suite), if
+<code>PJM_JOBID</code> is set</li>
+</ul>
+<p>If none of them are set, <code>rshcmd = "&lt;hpc&gt;"</code> produces
+an error. Use <code>rshcmd = c("&lt;hpc&gt;", "&lt;ssh&gt;")</code> to
+have it fall back to SSH.</p>
 </div>
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
@@ -167,7 +187,7 @@ cores.</p>
 <span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/availableWorkers.html">availableWorkers</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;srun&gt;"</span>,</span>
+<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;hpc&gt;"</span>,</span>
 <span>  rscript_startup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
@@ -185,19 +205,21 @@ scheduler that runs the R script <code>script.R</code> when launched. We
 can submit <code>script.sh</code> as:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">$</span> sbatch script.sh</span></code></pre></div>
 <p>This will request 16 tasks (CPU slots) across 4 compute nodes.</p>
-<p>Note how <code>rshcmd = "&lt;srun&gt;"</code> makes parallel workers
+<p>Note how <code>rshcmd = "&lt;hpc&gt;"</code> makes parallel workers
 to be launched via Slurm’s <code>srun</code> command from the main R
-session. By design, argument <code>rshcmd</code> is only used for
-workers running on <em>other</em> machines - the argument is ignored for
-the workers that are launched on the current machine. This is what makes
-the above setup to work regardless whether the workers are on the
-current or other machines, or a mix.</p>
+session. Since R runs in a Slurm job, <code>SLURM_JOB_ID</code> is set,
+and <code>"&lt;hpc&gt;"</code> therefore resolves to
+<code>"&lt;srun&gt;"</code>. By design, argument <code>rshcmd</code> is
+only used for workers running on <em>other</em> machines - the argument
+is ignored for the workers that are launched on the current machine.
+This is what makes the above setup to work regardless whether the
+workers are on the current or other machines, or a mix.</p>
 <p>Note also that the default, built-in approach to connect to other
 machines via SSH does not work on HPC clusters where SSH to compute
 nodes is disabled. In contrast, <code>srun</code> establishes the
 connection for us.</p>
-<p>Specifically, <code>rshcmd = "&lt;srun&gt;"</code> launches each
-worker using:</p>
+<p>Specifically, <code>"&lt;srun&gt;"</code> launches each worker
+using:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="ex">srun</span> <span class="at">--exact</span> <span class="at">--overlap</span> <span class="at">--overcommit</span> <span class="at">--nodes</span><span class="op">=</span>1 <span class="at">--ntasks</span><span class="op">=</span>1 <span class="at">--cpus-per-task</span><span class="op">=</span>1 <span class="at">-w</span> <span class="op">&lt;</span>hostname<span class="op">&gt;</span> ...</span></code></pre></div>
 <p>The <code>--cpus-per-task=1</code> Slurm option makes sure each
 worker launched via <code>srun</code> is allotted a single CPU. The
@@ -298,7 +320,7 @@ slots.</p>
 <span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/availableWorkers.html">availableWorkers</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;qrsh&gt;"</span>,</span>
+<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;hpc&gt;"</span>,</span>
 <span>  rscript_startup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
@@ -319,13 +341,18 @@ we submit <code>script.sh</code> as:</p>
 then R and <strong>parallelly</strong> will set up a parallel cluster
 on. Exactly on which machines depends on where the job scheduler finds
 these requested slots.</p>
-<p>Note how <code>rshcmd = "&lt;qrsh&gt;"</code> makes parallel workers
-to be launched via SGE’s <code>qrsh -inherit -nostdin -V</code> command
-from the main R session. By design, argument <code>rshcmd</code> is only
-used for workers running on <em>other</em> machines - the argument is
-ignored for the workers that are launched on the current machine. This
-is what makes the above setup to work regardless whether the workers are
-on the current or other machines, or a mix.</p>
+<p>Note how <code>rshcmd = "&lt;hpc&gt;"</code> makes parallel workers
+to be launched via SGE’s <code>qrsh</code> command from the main R
+session. Since R runs in a parallel environment of an SGE job,
+<code>PE_HOSTFILE</code> is set, and <code>"&lt;hpc&gt;"</code>
+therefore resolves to <code>"&lt;qrsh&gt;"</code>, which launches each
+worker using
+<code>qrsh -inherit -nostdin -V &lt;hostname&gt; ...</code>. By design,
+argument <code>rshcmd</code> is only used for workers running on
+<em>other</em> machines - the argument is ignored for the workers that
+are launched on the current machine. This is what makes the above setup
+to work regardless whether the workers are on the current or other
+machines, or a mix.</p>
 <p>Note also that the default, built-in approach to connect to other
 machines via SSH does not work on HPC clusters where SSH to compute
 nodes is disabled. In contrast, <code>qrsh</code> establishes the
@@ -423,7 +450,7 @@ nodes, each running multiple cores.</p>
 <span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/availableWorkers.html">availableWorkers</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;pjrsh&gt;"</span>,</span>
+<span>  rshcmd <span class="op">=</span> <span class="st">"&lt;hpc&gt;"</span>,</span>
 <span>  rscript_startup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
@@ -442,6 +469,14 @@ can submit <code>script.sh</code> as:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="ex">$</span> pjsub <span class="at">-L</span> vnode=3 <span class="at">-L</span> vnode-core=18 script.sh</span></code></pre></div>
 <p>to request 18 CPU cores on three compute nodes, which in total
 requests 3*18=54 compute slots.</p>
+<p>Note how <code>rshcmd = "&lt;hpc&gt;"</code> makes parallel workers
+to be launched via the Fujitsu Technical Computing Suite’s
+<code>pjrsh</code> command from the main R session. Since R runs in a
+PJM job, <code>PJM_JOBID</code> is set, and <code>"&lt;hpc&gt;"</code>
+therefore resolves to <code>"&lt;pjrsh&gt;"</code>, which launches each
+worker using <code>pjrsh &lt;hostname&gt; ...</code>. As in the above
+examples, argument <code>rshcmd</code> is only used for workers running
+on <em>other</em> machines.</p>
 </div>
 </div>
 <div class="section level2">
