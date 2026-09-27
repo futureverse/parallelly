@@ -79,6 +79,9 @@ are supported:
 \itemize{
 \item \code{"system"} -
 Query \code{\link[parallel]{detectCores}(logical = logical)}.
+If it returns a missing value, which happens on platforms where
+the number of cores cannot be detected, such as webR, then \code{1} is
+used.
 
 \item \code{"/proc/self/status"} -
 Query \code{Cpus_allowed_list} of \verb{/proc/self/status}.
