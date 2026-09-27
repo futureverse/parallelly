@@ -267,6 +267,22 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
 }
 
 
+## Check if 'rshcmd' support SSH-specific options from makeNodePSOCK()
+## arguments 'user' (-l), 'revtunnel' (-R), and 'rshlogfile' (-E)?
+rshcmd_supports <- function(rshcmd, option = c("user", "revtunnel", "rshlogfile")) {
+  option <- match.arg(option)
+  if (is.function(rshcmd)) return(TRUE)
+  type <- attr(rshcmd, "type")
+  if (is.null(type) || type == "<unknown>") return(TRUE)
+  types <- switch(option,
+    user       = c("ssh", "rstudio-ssh", "putty-plink", "rsh"),
+    revtunnel  = c("ssh", "rstudio-ssh", "putty-plink"),
+    rshlogfile = c("ssh", "rstudio-ssh")
+  )
+  (type %in% types)
+}
+
+
 ## The HPC job scheduler that the current R process runs in, if any.
 ## Returns "Slurm", "SGE", "PJM", or NA_character_
 hpc_scheduler <- function() {

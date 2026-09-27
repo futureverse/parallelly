@@ -985,7 +985,21 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
       rshcmd_label <- sprintf("%s [%s]", paste(sQuote(rshcmd), collapse = ", "), s)
     }
     if (verbose) mdebugf("%sUsing 'rshcmd': %s", verbose_prefix, rshcmd_label)
-    
+
+    ## Assert that 'rshcmd' supports the requested SSH-specific options
+    requested <- c(
+      user       = (length(user) == 1L),
+      revtunnel  = revtunnel,
+      rshlogfile = is.character(rshlogfile)
+    )
+    requested <- requested[requested]
+    for (option in names(requested)) {
+      if (!rshcmd_supports(rshcmd, option)) {
+        stopf("Argument %s is not supported for 'rshcmd' of type %s: %s",
+              sQuote(option), sQuote(attr(rshcmd, "type")), rshcmd_label)
+      }
+    }
+
     ## User?
     if (length(user) == 1L) rshopts <- c("-l", user, rshopts)
 

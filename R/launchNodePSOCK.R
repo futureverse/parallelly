@@ -183,7 +183,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
            smsg <- sprintf("%s The first %d lines are:\n%s", smsg, length(lmsg), paste(lmsg, collapse = "\n"))
          }
          suggestions <- c(suggestions, smsg)
-       } else {
+       } else if (rshcmd_supports(rshcmd, "rshlogfile")) {
          suggestions <- c(suggestions, sprintf("Set 'rshlogfile=TRUE' to enable logging for %s.", paste(sQuote(rshcmd), collapse = " ")))
        }
        

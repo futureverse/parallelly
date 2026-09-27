@@ -191,6 +191,38 @@ if (.Platform[["OS.type"]] != "windows") {
   options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "<srun>", rscript_sh = "sh")
   stopifnot(identical(options[["rscript_sh"]], c("sh", "sh")))
 
+  ## SSH options are only supported by SSH-like 'rshcmd' types 
+  for (type in c("srun", "qrsh", "pjrsh")) {
+    rshcmd <- sprintf("<%s>", type)
+    for (args in list(list(user = "alice"), list(revtunnel = TRUE), list(rshlogfile = TRUE))) {
+      res <- tryCatch({
+        do.call(makeNodePSOCK, args = c(list(action = "options", worker = worker, port = 12345L, rshcmd = rshcmd), args))
+      }, error = identity)
+      print(res)
+      stopifnot(inherits(res, "error"))
+    }
+  }
+
+  ## The 'rsh' type is similar to SSH
+  pathname <- file.path(bin, "rsh")
+  writeLines(c("#! /bin/sh", "echo 'mockup 1.0'"), con = pathname)
+  Sys.chmod(pathname, mode = "0755")
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = pathname, user = "alice")
+  stopifnot(grepl("-l alice", options[["rsh_call"]], fixed = TRUE))
+  res <- tryCatch({
+    makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = pathname, revtunnel = TRUE)
+  }, error = identity)
+  stopifnot(inherits(res, "error"))
+
+  ## We also allow them for unknown 'rshcmd' types
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "my_ssh", user = "alice", revtunnel = TRUE, rshlogfile = TRUE)
+  stopifnot(
+    identical(attr(options[["rshcmd"]], "type"), "<unknown>"),
+    grepl("-l alice", options[["rsh_call"]], fixed = TRUE),
+    grepl("-R ", options[["rsh_call"]], fixed = TRUE),
+    grepl("-E ", options[["rsh_call"]], fixed = TRUE)
+  )
+
   ## 'rshcmd' is not used for localhost workers
   options <- makeNodePSOCK(action = "options", worker = Sys.info()[["nodename"]], port = 12345L, rshcmd = "<srun>")
   stopifnot(
