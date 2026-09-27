@@ -22,4 +22,5 @@ workRPSOCK(workCommand = NULL)
 ## Value
 
 Nothing. The function enters an event loop and does not return until the
-worker receives a `"DONE"` message.
+worker receives a `"DONE"` message. If the connection to the parent
+process is lost, then an error is produced.
