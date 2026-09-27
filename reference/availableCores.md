@@ -95,6 +95,8 @@ supported:
 
 - `"system"` - Query
   [`detectCores`](https://rdrr.io/r/parallel/detectCores.html)`(logical = logical)`.
+  If it returns a missing value, which happens on platforms where the
+  number of cores cannot be detected, such as webR, then `1` is used.
 
 - `"/proc/self/status"` - Query `Cpus_allowed_list` of
   `/proc/self/status`.
