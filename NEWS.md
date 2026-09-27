@@ -99,6 +99,11 @@
    SSH tunneling, if no SSH client could be found on the current
    machine.
 
+ * Parallel workers launched with `rscript_call =
+   "parallelly:::workRPSOCK()"` would terminate with an "Error in
+   unserialize(node$con) : error reading from connection" error even when
+   stopped with `parallel::stopCluster()`.
+
  * `makeClusterPSOCK()` would still record the call stack for each
    node, even if argument `calls = FALSE` (default).
    
