@@ -95,6 +95,10 @@
  * `makeNodePSOCK(..., manual = TRUE)` would unexpectedly run the
    pre-launch self-test on localhost.
 
+ * `makeNodePSOCK(..., manual = TRUE)` would not default to reverse
+   SSH tunneling, if no SSH client could be found on the current
+   machine.
+
  * `makeClusterPSOCK()` would still record the call stack for each
    node, even if argument `calls = FALSE` (default).
    

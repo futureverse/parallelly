@@ -347,4 +347,24 @@ options <- makeNodePSOCK(port = 12345L, manual = TRUE, dryrun = TRUE, quiet = TR
 stopifnot(inherits(options, "makeNodePSOCKOptions"), is.null(options[["pidfile"]]))
 
 
+## Assert that the fallback 'ssh' client, used when no SSH client is found
+## and dryrun = TRUE, is of type 'ssh', which means revtunnel = TRUE
+if (.Platform[["OS.type"]] != "windows") {
+  message("- dryrun = TRUE falls back to 'ssh' when no SSH client is found ...")
+  opath <- Sys.getenv("PATH")
+  Sys.setenv(PATH = tempdir())
+  options <- tryCatch({
+    suppressWarnings({
+      makeNodePSOCK(action = "options", worker = "remote.example.org", port = 12345L, dryrun = TRUE)
+    })
+  }, finally = Sys.setenv(PATH = opath))
+  print(options[["rshcmd"]])
+  stopifnot(
+    identical(as.vector(options[["rshcmd"]]), "ssh"),
+    identical(attr(options[["rshcmd"]], "type"), "ssh"),
+    options[["revtunnel"]]
+  )
+}
+
+
 message("*** makeNodePSOCK() ... DONE")

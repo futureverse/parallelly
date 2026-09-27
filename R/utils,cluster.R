@@ -255,9 +255,15 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
   if (must_work) stop(msg)
 
   pathname <- "ssh"
+  attr(pathname, "type") <- "ssh"
+  attr(pathname, "version") <- "<unknown>"
   msg <- sprintf("%s. Will still try with %s", msg, sQuote(paste(pathname, collapse = " ")))
   warning(msg)
-  pathname
+  ## Return a list, as above, so that attributes are preserved by
+  ## callers that use res[[1]]
+  res <- list(ssh = pathname)
+  if (first) return(pathname)
+  res
 }
 
 
