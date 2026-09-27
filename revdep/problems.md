@@ -147,8 +147,8 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 *   checking for non-standard things in the check directory ... NOTE
      ```
      Found the following files/directories:
-       ‘20260925_011717_10X_QC_sce.rda’
-       ‘20260925_011717__10x_bamqc_filtered.tsv’ ‘Demultiplex’
+       ‘20260926_165129_10X_QC_sce.rda’
+       ‘20260926_165129__10x_bamqc_filtered.tsv’ ‘Demultiplex’
      ```
 
 # streetscape (1.0.5)

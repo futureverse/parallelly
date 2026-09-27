@@ -10,15 +10,15 @@
 |collate  |en_US.UTF-8                                                              |
 |ctype    |en_US.UTF-8                                                              |
 |tz       |America/Los_Angeles                                                      |
-|date     |2026-09-25                                                               |
-|pandoc   |3.11 @ /wynton/home/cbi/shared/software/CBI/pandoc-3.11/bin/pandoc       |
-|quarto   |1.10.18 @ /wynton/home/cbi/shared/software/CBI/quarto-1.10.18/bin/quarto |
+|date     |2026-09-26                                                               |
+|pandoc   |3.11                                                                     |
+|quarto   |1.10.18                                                                  |
 
 # Dependencies
 
 |package    |old    |new         |Δ  |
 |:----------|:------|:-----------|:--|
-|parallelly |1.48.0 |1.48.0-9028 |*  |
+|parallelly |1.48.0 |1.48.0-9033 |*  |
 
 # Revdeps
 
@@ -30,7 +30,7 @@
 |iccTraj |?       |      |        |     |
 |InPAS   |?       |      |        |     |
 
-## All (127)
+## All (130)
 
 |package             |version  |error |warning |note |
 |:-------------------|:--------|:-----|:-------|:----|
@@ -60,6 +60,7 @@
 |CSCNet              |0.1.4    |      |        |     |
 |ctsem               |3.11.1   |      |        |     |
 |dataquieR           |2.8.15   |      |        |     |
+|DEmixR              |0.3.0    |      |        |     |
 |DEoptim             |2.2-8    |      |        |     |
 |desla               |0.3.1    |      |        |     |
 |dipsaus             |0.3.5    |      |        |     |
@@ -104,11 +105,13 @@
 |LWFBrook90R         |0.6.3    |      |        |     |
 |[mappp](problems.md#mappp)|1.0.0    |      |        |1    |
 |MCseqReplic         |1.1.0    |      |        |     |
+|memtoc              |0.1.1    |      |        |     |
 |mice                |3.19.0   |      |        |     |
 |mlr3                |1.8.0    |      |        |     |
 |mmrm                |0.3.18   |      |        |     |
 |modeltime           |1.3.5    |      |        |     |
 |modeltuning         |0.1.4    |      |        |     |
+|moire               |3.7.0    |      |        |     |
 |multilevelmediation |0.5.0    |      |        |     |
 |[NCC](problems.md#ncc)|1.0      |      |        |1    |
 |nebula              |1.5.8    |      |        |     |
