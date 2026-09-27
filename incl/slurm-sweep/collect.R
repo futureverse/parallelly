@@ -49,6 +49,20 @@ data$cores_eq_cpus_on_node  <- (ncores == as.integer(data$SLURM_CPUS_ON_NODE))
 data$workers_eq_job_cpus    <- (as.integer(data$nworkers) == sum_counts(data$SLURM_JOB_CPUS_PER_NODE))
 data$workers_eq_ntasks      <- (as.integer(data$nworkers) == sum_counts(data$SLURM_TASKS_PER_NODE))
 
+## Check if availableCores() method "Slurm" agree with the CPU affinity methods
+affinity_methods <- c("/proc/self/status", "cgroups.cpuset",
+                      "cgroups2.cpuset.cpus.effective", "nproc")
+affinity_fields <- intersect(paste0("availableCores.", affinity_methods), colnames(data))
+data$affinity <- if (length(affinity_fields) > 0) {
+  apply(data[affinity_fields], MARGIN = 1L, FUN = function(x) {
+    x <- as.integer(x)
+    if (all(is.na(x))) NA_integer_ else min(x, na.rm = TRUE)
+  })
+} else {
+  NA_integer_
+}
+data$slurm_eq_affinity <- (as.integer(data$availableCores.Slurm) == data$affinity)
+
 ## Per-task view from 'srun', one file per task
 srun_files <- dir(outdir, pattern = "[.]srun[.][0-9]+[.]dcf$", full.names = TRUE)
 if (length(srun_files) > 0) {
@@ -133,13 +147,14 @@ write.csv(data, file.path(outdir, "summary.csv"), row.names = FALSE)
 cols <- c("spec", "availableCores", "nworkers.local", "availableWorkers",
           "SLURM_JOB_NODELIST", "SLURM_TASKS_PER_NODE",
           "SLURM_JOB_CPUS_PER_NODE", "SLURM_CPUS_ON_NODE",
-          "SLURM_CPUS_PER_TASK", "availableCores.nproc", "srun_cores",
+          "SLURM_CPUS_PER_TASK", "availableCores.Slurm", "affinity",
+          "availableCores.nproc", "srun_cores",
           "srun_cpus_on_node", "srun_nproc", "psock_status",
           "psock_seconds", "psock_step_waits", "psock_cores", "psock_nproc",
           "psock_oversubscribed", "psock_oversubscribed_srun",
           "psock_oversubscribed_direct",
           "cores_eq_local_workers", "cores_eq_cpus_on_node",
-          "workers_eq_job_cpus")
+          "workers_eq_job_cpus", "slurm_eq_affinity")
 cols <- intersect(cols, colnames(data))
 cols <- cols[vapply(data[cols], FUN.VALUE = NA, FUN = function(x) !all(is.na(x)))]
 data2 <- data[cols]
@@ -150,4 +165,11 @@ print(data2, right = FALSE, row.names = FALSE)
 bad <- which(!data$cores_eq_local_workers)
 cat(sprintf("\navailableCores() != #local availableWorkers() in %d of %d jobs\n",
             length(bad), nrow(data)))
+bad <- which(!data$slurm_eq_affinity)
+cat(sprintf("availableCores(method = \"Slurm\") != CPU affinity in %d of %d jobs\n",
+            length(bad), nrow(data)))
+if (length(bad) > 0) {
+  cols <- c("spec", "SLURMD_NODENAME", "availableCores.Slurm", affinity_fields)
+  print(data[bad, cols], right = FALSE, row.names = FALSE)
+}
 cat(sprintf("Full results: %s\n", file.path(outdir, "summary.csv")))
