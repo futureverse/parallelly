@@ -49,7 +49,7 @@ g++ -std=gnu++20 -shared -L/wynton/home/cbi/shared/software/CBI/_rocky8/R-4.6.1-
 * DONE (BayesianTools)
 
 The downloaded source packages are in
-	‘/scratch/hb/RtmpVpKpv6/downloaded_packages’
+	‘/scratch/hb/RtmpY9jhSL/downloaded_packages’
 Error in loadNamespace(x) : there is no package called ‘callr’
 
 
@@ -96,7 +96,7 @@ g++ -std=gnu++20 -shared -L/wynton/home/cbi/shared/software/CBI/_rocky8/R-4.6.1-
 * DONE (BayesianTools)
 
 The downloaded source packages are in
-	‘/scratch/hb/RtmpVpKpv6/downloaded_packages’
+	‘/scratch/hb/RtmpY9jhSL/downloaded_packages’
 Error in loadNamespace(x) : there is no package called ‘callr’
 
 
@@ -116,16 +116,16 @@ Run `revdepcheck::revdep_details(, "iccTraj")` for more info
 
 
 
-trying URL 'https://cloud.r-project.org/src/contrib/magic_1.6-1-1.tar.gz'
-Content type 'application/x-gzip' length 179962 bytes (175 KB)
-==================================================
-downloaded 175 KB
-
 * installing *binary* package ‘abind’ ...
 * package ‘abind’ successfully unpacked and SHA256 sums checked
 * DONE (abind)
 * installing *binary* package ‘cli’ ...
 * package ‘cli’ successfully unpacked and SHA256 sums checked
+* DONE (cli)
+* installing *binary* package ‘codetools’ ...
+* package ‘codetools’ successfully unpacked and SHA256 sums checked
+* DONE (codetools)
+* installing *binary* package ‘digest’ ...
 ...
 ** testing if installed package can be loaded from final location
 ** testing if installed package keeps a record of temporary installation path
@@ -135,7 +135,7 @@ downloaded 175 KB
 * DONE (dplyr)
 
 The downloaded source packages are in
-	‘/scratch/hb/RtmpjYnMOM/downloaded_packages’
+	‘/scratch/hb/Rtmpg3rjog/downloaded_packages’
 Error in loadNamespace(x) : there is no package called ‘callr’
 
 
@@ -146,16 +146,16 @@ Error in loadNamespace(x) : there is no package called ‘callr’
 
 
 
-trying URL 'https://cloud.r-project.org/src/contrib/magic_1.6-1-1.tar.gz'
-Content type 'application/x-gzip' length 179962 bytes (175 KB)
-==================================================
-downloaded 175 KB
-
 * installing *binary* package ‘abind’ ...
 * package ‘abind’ successfully unpacked and SHA256 sums checked
 * DONE (abind)
 * installing *binary* package ‘cli’ ...
 * package ‘cli’ successfully unpacked and SHA256 sums checked
+* DONE (cli)
+* installing *binary* package ‘codetools’ ...
+* package ‘codetools’ successfully unpacked and SHA256 sums checked
+* DONE (codetools)
+* installing *binary* package ‘digest’ ...
 ...
 ** testing if installed package can be loaded from final location
 ** testing if installed package keeps a record of temporary installation path
@@ -165,7 +165,7 @@ downloaded 175 KB
 * DONE (dplyr)
 
 The downloaded source packages are in
-	‘/scratch/hb/RtmpjYnMOM/downloaded_packages’
+	‘/scratch/hb/Rtmpg3rjog/downloaded_packages’
 Error in loadNamespace(x) : there is no package called ‘callr’
 
 
@@ -204,7 +204,7 @@ Run `revdepcheck::revdep_details(, "InPAS")` for more info
 * DONE (EnsDb.Mmusculus.v79)
 
 The downloaded source packages are in
-	‘/scratch/hb/RtmpShUv1c/downloaded_packages’
+	‘/scratch/hb/RtmpmMRPhu/downloaded_packages’
 Error in loadNamespace(x) : there is no package called ‘callr’
 
 
@@ -234,7 +234,7 @@ Error in loadNamespace(x) : there is no package called ‘callr’
 * DONE (EnsDb.Mmusculus.v79)
 
 The downloaded source packages are in
-	‘/scratch/hb/RtmpShUv1c/downloaded_packages’
+	‘/scratch/hb/RtmpmMRPhu/downloaded_packages’
 Error in loadNamespace(x) : there is no package called ‘callr’
 
 

@@ -69,7 +69,7 @@ pkgs_cores=(gtfs2emis gtfs2gps rtemis simIDM)
 revdep/run.R --rm "${pkgs_cores[@]}"
 
 ## Requires sequential processing due to clashes, e.g. port and cache
-pkgs_seq=(aramappings TSEAL) # /2026-04-16
+pkgs_seq=(aramappings SimDesign TSEAL) # /2026-04-16
 revdep/run.R --rm "${pkgs_seq[@]}"
 
 ## Run revdep check

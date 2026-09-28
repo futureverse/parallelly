@@ -10,7 +10,7 @@
 |collate  |en_US.UTF-8                                                              |
 |ctype    |en_US.UTF-8                                                              |
 |tz       |America/Los_Angeles                                                      |
-|date     |2026-09-26                                                               |
+|date     |2026-09-28                                                               |
 |pandoc   |3.11                                                                     |
 |quarto   |1.10.18                                                                  |
 
@@ -18,7 +18,7 @@
 
 |package    |old    |new         |Δ  |
 |:----------|:------|:-----------|:--|
-|parallelly |1.48.0 |1.48.0-9033 |*  |
+|parallelly |1.48.0 |1.48.0-9038 |*  |
 
 # Revdeps
 
@@ -30,7 +30,7 @@
 |iccTraj |?       |      |        |     |
 |InPAS   |?       |      |        |     |
 
-## All (130)
+## All (131)
 
 |package             |version  |error |warning |note |
 |:-------------------|:--------|:-----|:-------|:----|
@@ -139,7 +139,8 @@
 |SDModels            |2.0.2    |      |        |     |
 |seqimpute           |2.2.1    |      |        |     |
 |SEQTaRget           |1.4.4    |      |        |     |
-|SimDesign           |2.27     |      |        |     |
+|sigminer            |2.3.3    |      |        |     |
+|SimDesign           |2.27     |-1    |        |     |
 |simIDM              |0.1.1    |      |        |     |
 |sits                |1.5.4    |      |        |     |
 |sleacr              |0.1.3    |      |        |     |
