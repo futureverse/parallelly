@@ -99,7 +99,9 @@ supported:
   number of cores cannot be detected, such as webR, then `1` is used.
 
 - `"/proc/self/status"` - Query `Cpus_allowed_list` of
-  `/proc/self/status`.
+  `/proc/self/status`. Since this list may include CPUs that are not
+  online, only CPUs that are also online according to
+  `/sys/devices/system/cpu/online` are counted.
 
 - `"cgroups.cpuset"` - On Unix, query control group (cgroup v1)
   *affinity* value `cpuset.cpus`.

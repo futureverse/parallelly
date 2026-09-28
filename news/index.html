@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9037</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9038</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,6 +101,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> did not respect CGroups v1 and v2 CPU quotas (<code>cpu.cfs_quota_us</code> and <code>cpu.max</code>) set on a parent CGroup when a less restricted one was set on the process itself.</p></li>
+<li><p><code>availableCores(methods = "/proc/self/status")</code> could overestimate the number of CPU cores on machines where not all CPU sockets are used. For example, a machine could hold 64 CPUs, but only 48 are installed.</p></li>
 <li><p><code>availableCores(which = "all", max = n)</code> would return only the smallest value among all and unnamed.</p></li>
 <li>
 <p><code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> on SGE:</p>
