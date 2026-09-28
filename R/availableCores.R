@@ -62,6 +62,9 @@
 #'
 #'  \item `"/proc/self/status"` -
 #'    Query \code{Cpus_allowed_list} of `/proc/self/status`.
+#'    Since this list may include CPUs that are not online, only CPUs
+#'    that are also online according to `/sys/devices/system/cpu/online`
+#'    are counted.
 #'
 #'  \item `"cgroups.cpuset"` -
 #'    On Unix, query control group (cgroup v1) _affinity_ value
@@ -398,18 +401,8 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       ## Number of cores available according to parallel::detectCores()
       n <- detectCores(logical = logical)
     } else if (method == "/proc/self/status") {
-      pathname <- "/proc/self/status"
-      if (file_test("-f", pathname)) {
-        bfr <- readLines(pathname, warn = FALSE)
-        bfr <- grep("^Cpus_allowed_list:", bfr, value = TRUE)
-        if (length(bfr) == 1) {
-          bfr <- sub("^Cpus_allowed_list:\t", "", bfr)
-          if (nzchar(bfr)) {
-            bfr <- slurm_expand_nodelist(sprintf("[%s]", bfr))
-            n <- length(bfr)
-          }
-        }
-      }
+      cpus <- getProcSelfStatusCpuSet()
+      if (length(cpus) > 0L) n <- length(cpus)
     } else if (method == "cgroups.cpuset") {
       ## Number of cores according to Unix cgroups v1 CPU set
       n <- length(getCGroups1CpuSet())
@@ -901,3 +894,35 @@ slurm_step_ntasks_on_node <- function() {
 
 
 cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_character("default"), cli_arg_character("which"), cli_arg_integer("omit"), cli_arg_numeric("max"))
+
+
+## Get the set of CPUs that the current process may run on, according to
+## 'Cpus_allowed_list' of /proc/self/status (Linux). This list may include
+## CPUs that are not online, e.g. '0-63' on a machine with 48 CPUs, which
+## is why only CPUs that are also online are returned, if known.
+## Returns an integer vector of CPU IDs, which is empty if unknown.
+getProcSelfStatusCpuSet <- function(status = "/proc/self/status", online = "/sys/devices/system/cpu/online") {
+  ## Parse a CPU list, e.g. "0-3,8,10-11"
+  parse_cpu_list <- function(x) {
+    x <- gsub("[[:space:]]", "", x)
+    if (!nzchar(x)) return(integer(0L))
+    as.integer(slurm_expand_nodelist(sprintf("[%s]", x)))
+  }
+
+  if (!file_test("-f", status)) return(integer(0L))
+  bfr <- readLines(status, warn = FALSE)
+  bfr <- grep("^Cpus_allowed_list:", bfr, value = TRUE)
+  if (length(bfr) != 1L) return(integer(0L))
+  cpus <- parse_cpu_list(sub("^Cpus_allowed_list:", "", bfr))
+
+  ## Keep only CPUs that are online?
+  if (length(cpus) > 0L && file_test("-f", online)) {
+    bfr <- readLines(online, n = 1L, warn = FALSE)
+    if (length(bfr) == 1L) {
+      online_cpus <- parse_cpu_list(bfr)
+      if (length(online_cpus) > 0L) cpus <- intersect(cpus, online_cpus)
+    }
+  }
+
+  cpus
+}

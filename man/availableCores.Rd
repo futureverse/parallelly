@@ -85,6 +85,9 @@ used.
 
 \item \code{"/proc/self/status"} -
 Query \code{Cpus_allowed_list} of \verb{/proc/self/status}.
+Since this list may include CPUs that are not online, only CPUs
+that are also online according to \verb{/sys/devices/system/cpu/online}
+are counted.
 
 \item \code{"cgroups.cpuset"} -
 On Unix, query control group (cgroup v1) \emph{affinity} value

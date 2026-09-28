@@ -43,6 +43,10 @@
    (`cpu.cfs_quota_us` and `cpu.max`) set on a parent CGroup when a
    less restricted one was set on the process itself.
 
+ * `availableCores(methods = "/proc/self/status")` could overestimate
+   the number of CPU cores on machines where not all CPU sockets are used.
+   For example, a machine could hold 64 CPUs, but only 48 are installed.
+
  * `availableCores(which = "all", max = n)` would return only the
    smallest value among all and unnamed.
 

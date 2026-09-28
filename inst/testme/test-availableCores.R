@@ -704,6 +704,42 @@ if (file.exists("/proc/self/status")) {
   }
 }
 
+## 'Cpus_allowed_list' may list CPUs that are not online, e.g. '0-63'
+## on a machine with 48 CPUs. Only CPUs that are online should count
+getProcSelfStatusCpuSet <- parallelly:::getProcSelfStatusCpuSet
+status <- tempfile()
+online <- tempfile()
+writeLines(c("Name:\tR", "Cpus_allowed:\tffffffff,ffffffff", "Cpus_allowed_list:\t0-63"), con = status)
+writeLines("0-47", con = online)
+cpus <- getProcSelfStatusCpuSet(status = status, online = online)
+print(cpus)
+stopifnot(identical(cpus, 0:47))
+
+## A job's CPU set is not affected
+writeLines(c("Name:\tR", "Cpus_allowed_list:\t25,45,77,97"), con = status)
+writeLines("0-103", con = online)
+cpus <- getProcSelfStatusCpuSet(status = status, online = online)
+print(cpus)
+stopifnot(identical(cpus, c(25L, 45L, 77L, 97L)))
+
+## Online CPUs may be non-contiguous
+writeLines(c("Name:\tR", "Cpus_allowed_list:\t0-7"), con = status)
+writeLines("0-1,4-5", con = online)
+cpus <- getProcSelfStatusCpuSet(status = status, online = online)
+print(cpus)
+stopifnot(identical(cpus, c(0L, 1L, 4L, 5L)))
+
+## Without information on online CPUs, all allowed CPUs are returned
+cpus <- getProcSelfStatusCpuSet(status = status, online = tempfile())
+print(cpus)
+stopifnot(identical(cpus, 0:7))
+
+## No 'Cpus_allowed_list' gives an empty set
+writeLines("Name:\tR", con = status)
+cpus <- getProcSelfStatusCpuSet(status = status, online = online)
+stopifnot(identical(cpus, integer(0L)))
+file.remove(c(status, online))
+
 message("*** /proc/self/status method ... done")
 
 
