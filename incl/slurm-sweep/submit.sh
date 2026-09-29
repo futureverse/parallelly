@@ -37,6 +37,8 @@ extra_specs=(
   "--nodes=1 --ntasks=4 --cpus-per-task=2 --threads-per-core=1"
   "--nodes=2 --ntasks=4 --cpus-per-task=2 --distribution=cyclic"
   "--nodes=1 --exclusive"
+  ## The job script in the 'parallelly-17-hpc-workers' vignette
+  "--nodes=4 --ntasks=16 --cpus-per-task=1"
 )
 
 specs=()

@@ -23,4 +23,10 @@ if [[ -n ${PE_HOSTFILE:-} && -f ${PE_HOSTFILE} ]]; then
     qrsh -inherit -nostdin "${host}" env R_LIBS="${libs}" "${rscript}" "${here}/probe.R" "${outdir}/${JOB_ID}.inherit.${host}.dcf" \
       || echo "qrsh -inherit ${host} failed (exit code $?)" >&2
   done < <(awk '{ print $1 }' "${PE_HOSTFILE}" | sort -u)
+
+  ## The per-worker view, when launching parallel workers as in the
+  ## 'parallelly-17-hpc-workers' vignette. Give up after four minutes,
+  ## in case launching the workers stalls
+  timeout 240 Rscript "${here}/cluster.R" "${outdir}" \
+    || echo "cluster.R failed (exit code $?)" >&2
 fi

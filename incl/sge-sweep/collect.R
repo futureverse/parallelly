@@ -60,6 +60,38 @@ if (length(inherit_files) > 0) {
   data$inherit_nproc       <- per_job("availableCores.nproc")
 }
 
+## Launching parallel workers as in the 'parallelly-17-hpc-workers'
+## vignette, i.e. via 'qrsh -inherit' for workers on other hosts
+psock_files <- file.path(outdir, sprintf("%s.psock.dcf", data$JOB_ID))
+has_psock <- file_test("-f", psock_files)
+if (any(has_psock)) {
+  psock <- read_dcfs(psock_files[has_psock])
+  idx <- match(data$JOB_ID, psock$JOB_ID)
+  data$psock_status  <- psock$status[idx]
+  data$psock_seconds <- psock$seconds[idx]
+}
+
+## What each parallel worker sees
+worker_files <- dir(outdir, pattern = "[.]psock[.][0-9]+[.]dcf$", full.names = TRUE)
+if (length(worker_files) > 0) {
+  workers <- read_dcfs(worker_files)
+  workers <- workers[order(as.integer(workers$JOB_ID), as.integer(workers$worker)), ]
+  workers <- cbind(spec = jobs$spec[match(workers$JOB_ID, jobs$job_id)], workers)
+  write.csv(workers, file.path(outdir, "summary-psock.csv"), row.names = FALSE)
+
+  ## Per-job tallies across workers, e.g. "2*8" for 8 workers with two cores
+  tally_per_job <- function(field) {
+    vapply(data$JOB_ID, FUN.VALUE = NA_character_, FUN = function(id) {
+      x <- workers[[field]][workers$JOB_ID == id]
+      if (length(x) == 0) return(NA_character_)
+      t <- table(x)
+      paste(sprintf("%s*%d", names(t), t), collapse = ",")
+    })
+  }
+  data$psock_cores <- tally_per_job("availableCores")
+  data$psock_nproc <- tally_per_job("availableCores.nproc")
+}
+
 write.csv(data, file.path(outdir, "summary.csv"), row.names = FALSE)
 
 ## Print compact table
@@ -67,6 +99,7 @@ cols <- c("spec", "allocation_rule", "availableCores", "slots.local",
           "nworkers.local", "availableWorkers", "NSLOTS", "NHOSTS",
           "SGE_BINDING", "availableCores.nproc", "inherit_cores",
           "inherit_slots_local", "inherit_nproc",
+          "psock_status", "psock_seconds", "psock_cores", "psock_nproc",
           "cores_eq_local_workers", "cores_eq_local_slots",
           "workers_eq_nslots")
 cols <- intersect(cols, colnames(data))
@@ -78,4 +111,19 @@ print(data2, right = FALSE, row.names = FALSE)
 bad <- which(!data$cores_eq_local_workers)
 cat(sprintf("\navailableCores() != #local availableWorkers() in %d of %d jobs\n",
             length(bad), nrow(data)))
+
+## Which kinds of allocation rules were covered? A fixed number of slots
+## per host, e.g. '2', is reported as '<integer>'
+rules <- data$allocation_rule[!is.na(data$allocation_rule)]
+rules <- unique(sub("^[[:digit:]]+$", "<integer>", rules))
+missing <- setdiff(c("$pe_slots", "$fill_up", "$round_robin", "<integer>"), rules)
+cat(sprintf("Allocation rules covered: %s\n", paste(sort(rules), collapse = ", ")))
+if (length(missing) > 0) {
+  cat(sprintf("Allocation rules not covered: %s\n", paste(missing, collapse = ", ")))
+}
+
+## Jobs spanning more than one host, which are needed to see how slots
+## are split across hosts
+multi <- sum(as.integer(data$NHOSTS) > 1L, na.rm = TRUE)
+cat(sprintf("Jobs spanning more than one host: %d of %d\n", multi, nrow(data)))
 cat(sprintf("Full results: %s\n", file.path(outdir, "summary.csv")))

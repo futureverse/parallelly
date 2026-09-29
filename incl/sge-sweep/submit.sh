@@ -2,7 +2,8 @@
 # Submit one Grid Engine (SGE) job per combination of parallel
 # environment (PE) and number of slots, where each job records what SGE
 # sets and what parallelly reports, both in the job script and on each
-# host of the job via 'qrsh -inherit'
+# host of the job via 'qrsh -inherit', and whether parallel workers can
+# be launched as in the 'parallelly-17-hpc-workers' vignette
 #
 # Usage:
 #   ./submit.sh [outdir]
@@ -68,7 +69,7 @@ for spec in "${specs[@]}"; do
     -N parallelly-query
     -j y
     -o "${outdir}/\$JOB_ID.log"
-    -l h_rt=00:05:00
+    -l h_rt=00:10:00
     -l mem_free=300M  ## per slot
     -w e  ## reject jobs that can never be scheduled
     "${extra_args[@]}"

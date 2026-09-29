@@ -1,10 +1,7 @@
 # Launch parallel workers as in the 'parallelly-17-hpc-workers' vignette,
-# i.e. using rshcmd = "<hpc>", which resolves to "<srun>", and record
-# whether it succeeded and what each worker sees. "<srun>" launches one
-# 'srun --exact --overlap --overcommit --nodes=1 --ntasks=1
-# --cpus-per-task=1' job step per worker. Option '--overcommit' is needed
-# on Slurm 21.08, where otherwise a job step waits for the CPUs of other
-# job steps on the same node, although '--overlap' is specified.
+# i.e. using rshcmd = "<hpc>", which resolves to "<qrsh>", and record
+# whether it succeeded and what each worker sees. "<qrsh>" launches
+# each worker on another host via 'qrsh -inherit -nostdin -V'.
 # Contrary to the vignette, 'rscript_startup' does not set 'mc.cores',
 # so that we can see what availableCores() reports in each worker
 #
@@ -12,20 +9,19 @@
 #
 # Writes <outdir>/<jobid>.psock.dcf with a summary of the launch, and
 # <outdir>/<jobid>.psock.<worker>.dcf for each worker. The output from
-# 'srun' when launching the workers is written to <outdir>/<jobid>.psock.out
+# 'qrsh' when launching the workers is written to <outdir>/<jobid>.psock.out
 library(parallelly)
 
 args <- commandArgs(trailingOnly = TRUE)
 outdir <- args[1]
-jobid <- Sys.getenv("SLURM_JOB_ID")
+jobid <- Sys.getenv("JOB_ID")
 
-## Skip jobs with too many workers, e.g. --exclusive, which would take
-## too long to launch
+## Skip jobs with too many workers, which would take too long to launch
 max_workers <- as.integer(Sys.getenv("PQ_MAX_WORKERS", "128"))
 
 workers <- availableWorkers()
 res <- list(
-  SLURM_JOB_ID = jobid,
+  JOB_ID = jobid,
   nworkers = length(workers),
   nnodes = length(unique(workers))
 )
@@ -39,8 +35,7 @@ probe <- function() {
   )
   all <- parallelly::availableCores(which = "all")
   for (name in names(all)) res[[paste0("availableCores.", name)]] <- all[[name]]
-  envs <- Sys.getenv()
-  envs <- envs[grep("^SLURM", names(envs))]
+  envs <- Sys.getenv(c("JOB_ID", "HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE"), unset = NA_character_, names = TRUE)
   for (name in names(envs)) res[[name]] <- envs[[name]]
   lapply(res, FUN = as.character)
 }
@@ -68,7 +63,7 @@ if (length(workers) > max_workers) {
     parallel::stopCluster(cl)
     for (kk in seq_along(infos)) {
       info <- c(list(worker = kk), infos[[kk]])
-      if (is.null(info$SLURM_JOB_ID)) info$SLURM_JOB_ID <- jobid
+      if (is.na(info$JOB_ID)) info$JOB_ID <- jobid
       file <- file.path(outdir, sprintf("%s.psock.%d.dcf", jobid, kk))
       write.dcf(as.data.frame(info, check.names = FALSE), file = file)
     }
