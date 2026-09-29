@@ -163,6 +163,9 @@
 #'    Because of this, the number of slots allotted to the current
 #'    machine according to the file that \env{PE_HOSTFILE} specifies
 #'    is used instead, if available.
+#'    In processes launched by `qrsh -inherit`, \env{PE_HOSTFILE} is not
+#'    set. On the machine running the job script, the file is searched for
+#'    in the job's spool folder via \env{SGE_JOB_SPOOL_DIR}.
 #'    Known Grid Engine schedulers are
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
@@ -750,10 +753,8 @@ availableCoresSGE <- local({
   function() {
     if (!is.null(n)) return(n)
     ## In the job script of a job spanning multiple hosts, NSLOTS is the
-    ## total number of slots on all hosts, whereas PE_HOSTFILE gives the
-    ## number of slots per host. In processes launched on other hosts
-    ## by 'qrsh -inherit', PE_HOSTFILE is not set, and NSLOTS is the
-    ## number of slots on that host
+    ## total number of slots on all hosts, whereas the PE hostfile gives
+    ## the number of slots per host.
     n <<- sge_slots_on_host()
     if (is.na(n)) n <<- getenv_int("NSLOTS")
     n
@@ -761,10 +762,31 @@ availableCoresSGE <- local({
 })
 
 
-## Number of slots on the current host according to PE_HOSTFILE
-sge_slots_on_host <- function() {
+## Pathname of the PE hostfile, if available. It is given by
+## PE_HOSTFILE in the job script and in processes launched from it. In
+## processes launched by 'qrsh -inherit', PE_HOSTFILE is not set, and
+## if set, e.g.  via 'qrsh -inherit -V', it is the pathname on the
+## host running the job script. Instead, SGE_JOB_SPOOL_DIR is set to a
+## subfolder of the job's spool folder,
+## '<spool>/active_jobs/<job-id>.<task-id>/<petask-id>.<hostname>',
+## where the job's spool folder holds the 'pe_hostfile' file. This
+## file exists only on the host running the job script.
+sge_pe_hostfile <- function() {
   pathname <- getenv_chr("PE_HOSTFILE")
-  if (is.na(pathname) || !file_test("-f", pathname)) return(NA_integer_)
+  if (!is.na(pathname) && file_test("-f", pathname)) return(pathname)
+  spool <- getenv_chr("SGE_JOB_SPOOL_DIR")
+  if (is.na(spool)) return(NA_character_)
+  pathnames <- file.path(c(spool, dirname(spool)), "pe_hostfile")
+  pathnames <- pathnames[file_test("-f", pathnames)]
+  if (length(pathnames) == 0L) return(NA_character_)
+  pathnames[1]
+} ## sge_pe_hostfile()
+
+
+## Number of slots on the current host according to the PE hostfile
+sge_slots_on_host <- function() {
+  pathname <- sge_pe_hostfile()
+  if (is.na(pathname)) return(NA_integer_)
   data <- tryCatch(read_pe_hostfile(pathname, sort = FALSE), error = function(ex) NULL)
   if (is.null(data)) return(NA_integer_)
 

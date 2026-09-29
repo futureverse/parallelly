@@ -186,6 +186,9 @@ If the job spans multiple machines, e.g. \verb{qsub -pe mpi 16},
 Because of this, the number of slots allotted to the current
 machine according to the file that \env{PE_HOSTFILE} specifies
 is used instead, if available.
+In processes launched by \code{qrsh -inherit}, \env{PE_HOSTFILE} is not
+set. On the machine running the job script, the file is searched for
+in the job's spool folder via \env{SGE_JOB_SPOOL_DIR}.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),

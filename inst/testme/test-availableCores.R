@@ -573,10 +573,15 @@ message("*** SGE scenarios observed on real clusters ...")
 ## launched by 'qrsh -inherit' (context 'inherit'). Column
 ## 'PE_HOSTFILE_content' holds the lines of the PE_HOSTFILE file,
 ## separated by semicolons. Empty cells correspond to environment
-## variables that are not set
+## variables that are not set. Processes launched by 'qrsh -inherit'
+## have no PE_HOSTFILE, but SGE_JOB_SPOOL_DIR, which is a folder below
+## the job's spool folder, e.g. '<spool>/active_jobs/123.1/1.n1'.
+## On the host running the job script, the job's spool folder holds
+## the 'pe_hostfile' file, whose lines are in column
+## 'spool_pe_hostfile_content'. On the other hosts, there is none
 file <- system.file(package = "parallelly", "test-data", "sge", "scenarios.csv", mustWork = TRUE)
 scenarios <- read.csv(file, colClasses = "character", na.strings = "")
-sge_vars <- c("HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE")
+sge_vars <- c("HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE", "SGE_JOB_SPOOL_DIR")
 ohostname <- Sys.getenv("HOSTNAME", NA_character_)
 
 env <- environment(parallelly:::availableCoresSGE)
@@ -592,6 +597,15 @@ for (kk in seq_len(nrow(scenarios))) {
     writeLines(strsplit(scenario$PE_HOSTFILE_content, split = "; ", fixed = TRUE)[[1]], con = pathname)
     Sys.setenv(PE_HOSTFILE = pathname)
   }
+  if (scenario$context == "inherit") {
+    spool <- file.path(tempfile(), "active_jobs", "123.1")
+    task_spool <- file.path(spool, paste0("1.", scenario$HOSTNAME))
+    dir.create(task_spool, recursive = TRUE)
+    if (!is.na(scenario$spool_pe_hostfile_content)) {
+      writeLines(strsplit(scenario$spool_pe_hostfile_content, split = "; ", fixed = TRUE)[[1]], con = file.path(spool, "pe_hostfile"))
+    }
+    Sys.setenv(SGE_JOB_SPOOL_DIR = task_spool)
+  }
   print(envs)
   env$n <- NULL
   truth <- as.integer(scenario$expected_cores)
@@ -599,6 +613,7 @@ for (kk in seq_len(nrow(scenarios))) {
   message(sprintf("availableCores(methods = \"SGE\") = %d (truth = %d)", ncores, truth))
   stopifnot(ncores == truth)
   if (!is.na(scenario$PE_HOSTFILE_content)) file.remove(pathname)
+  if (scenario$context == "inherit") unlink(dirname(dirname(spool)), recursive = TRUE)
 }
 
 ## Cleanup

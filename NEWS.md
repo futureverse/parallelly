@@ -57,8 +57,9 @@
      multi-node job, because it returned the value of SGE environment
      variable `NSLOTS`. Now it returns the number of slots allotted to
      the current machine according to the SGE environment variable
-     `PE_HOSTFILE` file, which is what `availableWorkers()` also
-     uses. It only uses `NSLOTS` as a fallback if `PE_HOSTFILE` does
+     `PE_HOSTFILE` file (or the`pe_hostfile` under
+     `SGE_JOB_SPOOL_DIR`), which is what `availableWorkers()` also
+     uses. It only uses `NSLOTS` as a fallback if such a hostfile does
      not exist.
 
    - `availableWorkers(method = "SGE")` returned the workers sorted by
