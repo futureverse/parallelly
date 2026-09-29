@@ -63,11 +63,11 @@
     overestimate the number of CPU cores available for a multi-node job,
     because it returned the value of SGE environment variable `NSLOTS`.
     Now it returns the number of slots allotted to the current machine
-    according to the SGE environment variable `PE_HOSTFILE` file, which
-    is what
+    according to the SGE environment variable `PE_HOSTFILE` file (or
+    the`pe_hostfile` under `SGE_JOB_SPOOL_DIR`), which is what
     [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
-    also uses. It only uses `NSLOTS` as a fallback if `PE_HOSTFILE` does
-    not exist.
+    also uses. It only uses `NSLOTS` as a fallback if such a hostfile
+    does not exist.
 
   - `availableWorkers(method = "SGE")` returned the workers sorted by
     hostname, which meant that the first worker was not necessarily the

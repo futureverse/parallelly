@@ -182,7 +182,10 @@ supported:
   `qsub -pe mpi 16`, `NSLOTS` is the total number of slots on all
   machines. Because of this, the number of slots allotted to the current
   machine according to the file that `PE_HOSTFILE` specifies is used
-  instead, if available. Known Grid Engine schedulers are Oracle Grid
+  instead, if available. In processes launched by `qrsh -inherit`,
+  `PE_HOSTFILE` is not set. On the machine running the job script, the
+  file is searched for in the job's spool folder via
+  `SGE_JOB_SPOOL_DIR`. Known Grid Engine schedulers are Oracle Grid
   Engine (OGE; acquired Sun Microsystems in 2010), Univa Grid Engine
   (UGE; fork of open-source SGE 6.2u5), Altair Grid Engine (AGE;
   acquired Univa Corporation in 2020), Son of Grid Engine (SGE aka SoGE;

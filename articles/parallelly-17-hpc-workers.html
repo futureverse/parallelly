@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9038</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9040</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -231,7 +231,7 @@ you need different <code>srun</code> options, you can specify them
 explicitly,
 e.g. <code>rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "-w")</code>.</p>
 <p>Here is the output from one such run, where the scheduler happened to
-allot the slots across three machines:</p>
+allot the slots across 3 machines:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="ex">Information</span> on R:</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span></span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="ex">Running</span> R script:</span>
@@ -245,48 +245,172 @@ allot the slots across three machines:</p>
 <span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="ex">[1]</span> 671.4629</span></code></pre></div>
 <p>What <code><a href="../reference/availableCores.html">availableCores()</a></code> and
 <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> return depends on what we request from
-Slurm. Here are a few examples of what they return in the job script,
+Slurm, and on where R runs, i.e. in the job script, in the interactive
+shell of <code>salloc</code>, or in a task launched by
+<code>srun</code>. Here is what they returned on real Slurm clusters,
 where <code>n1</code> is the machine running the job script:</p>
 <table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
 <thead><tr class="header">
 <th>Slurm options</th>
+<th>Where R runs</th>
 <th><code><a href="../reference/availableCores.html">availableCores()</a></code></th>
 <th><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code></th>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td>(none), hyperthreaded</td>
+<td>job script</td>
+<td>2</td>
+<td>2 × <code>n1</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>--ntasks=16 --cpus-per-task=1</code></td>
+<td>job script</td>
+<td>16</td>
+<td>16 × <code>n1</code>
+</td>
+</tr>
+<tr class="odd">
 <td><code>--nodes=1 --ntasks=4</code></td>
+<td>job script</td>
 <td>4</td>
 <td>4 × <code>n1</code>
 </td>
 </tr>
 <tr class="even">
 <td><code>--nodes=1 --ntasks=4 --cpus-per-task=2</code></td>
+<td>job script</td>
 <td>8</td>
 <td>8 × <code>n1</code>
 </td>
 </tr>
 <tr class="odd">
+<td><code>--ntasks=1 --cpus-per-task=4</code></td>
+<td>job script</td>
+<td>4</td>
+<td>4 × <code>n1</code>
+</td>
+</tr>
+<tr class="even">
+<td>
+<code>--cpus-per-task=3</code>, hyperthreaded</td>
+<td>job script</td>
+<td>4</td>
+<td>4 × <code>n1</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>--nodes=1 --exclusive</code></td>
+<td>job script</td>
+<td>all CPUs on <code>n1</code>, e.g. 336</td>
+<td>all CPUs × <code>n1</code>
+</td>
+</tr>
+<tr class="even">
+<td>
+<code>--nodes=2 --ntasks=2</code>, hyperthreaded</td>
+<td>job script</td>
+<td>2</td>
+<td>2 × <code>n1</code>, 2 × <code>n2</code>
+</td>
+</tr>
+<tr class="odd">
 <td><code>--nodes=2 --ntasks-per-node=2</code></td>
+<td>job script</td>
 <td>2</td>
 <td>2 × <code>n1</code>, 2 × <code>n2</code>
 </td>
 </tr>
 <tr class="even">
 <td><code>--nodes=2 --ntasks=4 --cpus-per-task=2</code></td>
+<td>job script</td>
 <td>6</td>
 <td>6 × <code>n1</code>, 2 × <code>n2</code>
 </td>
 </tr>
+<tr class="odd">
+<td><code>--nodes=2 --ntasks=16</code></td>
+<td>job script</td>
+<td>9</td>
+<td>9 × <code>n1</code>, 8 × <code>n2</code>
+</td>
+</tr>
+<tr class="even">
+<td>
+<code>--nodes=2 --ntasks=16</code>, another cluster</td>
+<td>job script</td>
+<td>2</td>
+<td>2 × <code>n1</code>, 14 × <code>n2</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>--nodes=2 --ntasks=16 --cpus-per-task=3</code></td>
+<td>job script</td>
+<td>46</td>
+<td>46 × <code>n1</code>, 4 × <code>n2</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>--nodes=4 --ntasks=16 --cpus-per-task=1</code></td>
+<td>job script</td>
+<td>2</td>
+<td>2 × <code>n1</code>, 10 × <code>n2</code>, 2 × <code>n3</code>, 2 ×
+<code>n4</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>--nodes=2 --ntasks=4</code></td>
+<td>
+<code>salloc</code> shell</td>
+<td>2</td>
+<td>2 × <code>n1</code>, 2 × <code>n2</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>--nodes=2</code></td>
+<td>
+<code>srun</code> task</td>
+<td>2</td>
+<td>2 × <code>n1</code>, 2 × <code>n2</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>--nodes=1-2 --ntasks=16</code></td>
+<td>
+<code>srun</code> task</td>
+<td>1</td>
+<td>16 × <code>n1</code>, 2 × <code>n2</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>--nodes=2 --ntasks=4 --cpus-per-task=3</code></td>
+<td>
+<code>srun</code> task</td>
+<td>3</td>
+<td>9 × <code>n1</code>, 4 × <code>n2</code>
+</td>
+</tr>
 </tbody>
 </table>
-<p>Note how <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> returns one worker per CPU
-allotted, not one per task, and how <code><a href="../reference/availableCores.html">availableCores()</a></code>
-returns the number of CPUs allotted on the current machine. The last
-example shows that Slurm does not necessarily spread the tasks evenly
-across machines. Also, on machines with hyperthreading, Slurm allots
+<p>Note how <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> returns 1 worker per CPU
+allotted, not 1 per task, and how <code><a href="../reference/availableCores.html">availableCores()</a></code> returns
+the number of CPUs allotted on the current machine. Slurm does not
+necessarily spread the CPUs evenly across machines, and the machine
+running the job script does not necessarily get the most. For instance,
+<code>--nodes=2 --ntasks=16</code> gave 9 + 8 CPUs on one cluster and 2
++ 14 on another. Also, on machines with hyperthreading, Slurm allots
 whole CPU cores, meaning that, for instance,
-<code>--cpus-per-task=3</code> may result in four CPUs.</p>
+<code>--cpus-per-task=3</code> may result in 4 CPUs. In a task launched
+by <code>srun</code>, <code><a href="../reference/availableCores.html">availableCores()</a></code> returns the number
+of CPUs of that task, whereas <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> still
+returns all the workers of the job.</p>
 </div>
 <div class="section level3">
 <h3 id="example-launch-parallel-workers-via-the-grid-engine-job-scheduler">Example: Launch parallel workers via the Grid Engine job
@@ -359,7 +483,7 @@ machines via SSH does not work on HPC clusters where SSH to compute
 nodes is disabled. In contrast, <code>qrsh</code> establishes the
 connection for us.</p>
 <p>Here is the output from one such run, where the scheduler happened to
-allot the slots across three machines:</p>
+allot the slots across 3 machines:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="ex">Information</span> on R:</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="er">(</span><span class="ex">R</span><span class="kw">)</span> <span class="ex">version</span> 4.6.1 <span class="er">(</span><span class="ex">2026-06-24</span><span class="kw">)</span></span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="ex">Running</span> R script:</span>
@@ -372,19 +496,23 @@ allot the slots across three machines:</p>
 <p>How SGE distributes the requested slots across machines depends on
 the <code>allocation_rule</code> setting of the parallel environment
 (PE), which we can inspect using <code>qconf -sp &lt;pe&gt;</code>. Here
-are a few examples of what <code><a href="../reference/availableCores.html">availableCores()</a></code> and
-<code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> return in the job script, where
-<code>n1</code> is the machine running the job script:</p>
+is what <code><a href="../reference/availableCores.html">availableCores()</a></code> and
+<code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> returned on a real SGE cluster, where
+<code>n1</code> is the machine running the job script. The last two rows
+are for processes launched via <code>qrsh -inherit</code>, e.g. parallel
+workers launched using <code>rshcmd = "&lt;qrsh&gt;"</code>:</p>
 <table class="table">
 <colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
 </colgroup>
 <thead><tr class="header">
 <th>SGE options</th>
 <th>Allocation rule</th>
+<th>Where R runs</th>
 <th><code><a href="../reference/availableCores.html">availableCores()</a></code></th>
 <th><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code></th>
 </tr></thead>
@@ -392,40 +520,126 @@ are a few examples of what <code><a href="../reference/availableCores.html">avai
 <tr class="odd">
 <td>(none)</td>
 <td>-</td>
+<td>job script</td>
 <td>1</td>
 <td><code>localhost</code></td>
 </tr>
 <tr class="even">
+<td><code>-pe smp 1</code></td>
+<td><code>$pe_slots</code></td>
+<td>job script</td>
+<td>1</td>
+<td>1 × <code>n1</code>
+</td>
+</tr>
+<tr class="odd">
 <td><code>-pe smp 4</code></td>
 <td><code>$pe_slots</code></td>
+<td>job script</td>
 <td>4</td>
 <td>4 × <code>n1</code>
 </td>
 </tr>
+<tr class="even">
+<td><code>-pe smp 16</code></td>
+<td><code>$pe_slots</code></td>
+<td>job script</td>
+<td>16</td>
+<td>16 × <code>n1</code>
+</td>
+</tr>
 <tr class="odd">
-<td><code>-pe mpi 8</code></td>
-<td><code>$fill_up</code></td>
+<td><code>-pe smp 4 -binding linear:4</code></td>
+<td><code>$pe_slots</code></td>
+<td>job script</td>
 <td>4</td>
-<td>4 × <code>n1</code>, 3 × <code>n2</code>, 1 × <code>n3</code>
+<td>4 × <code>n1</code>
+</td>
+</tr>
+<tr class="even">
+<td>
+<code>-pe mpi 8</code>, fits on 1 machine</td>
+<td><code>$fill_up</code></td>
+<td>job script</td>
+<td>8</td>
+<td>8 × <code>n1</code>
+</td>
+</tr>
+<tr class="odd">
+<td>
+<code>-pe mpi 4</code>, spans 2 machines</td>
+<td><code>$fill_up</code></td>
+<td>job script</td>
+<td>2</td>
+<td>2 × <code>n1</code>, 2 × <code>n2</code>
+</td>
+</tr>
+<tr class="even">
+<td>
+<code>-pe mpi 16</code>, spans 4 machines</td>
+<td><code>$fill_up</code></td>
+<td>job script</td>
+<td>3</td>
+<td>3 × <code>n1</code>, 10 × <code>n2</code>, 1 × <code>n3</code>, 2 ×
+<code>n4</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>-pe mpi-2 4</code></td>
+<td><code>2</code></td>
+<td>job script</td>
+<td>2</td>
+<td>2 × <code>n1</code>, 2 × <code>n2</code>
 </td>
 </tr>
 <tr class="even">
 <td><code>-pe mpi-2 8</code></td>
 <td><code>2</code></td>
+<td>job script</td>
 <td>2</td>
 <td>2 × <code>n1</code>, 2 × <code>n2</code>, 2 × <code>n3</code>, 2 ×
 <code>n4</code>
 </td>
 </tr>
+<tr class="odd">
+<td><code>-pe mpi-2 16</code></td>
+<td><code>2</code></td>
+<td>job script</td>
+<td>2</td>
+<td>2 × <code>n1</code>, 2 × <code>n2</code>, …, 2 ×
+<code>n8</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>-pe mpi-2 16</code></td>
+<td><code>2</code></td>
+<td>
+<code>qrsh -inherit</code> on <code>n1</code>
+</td>
+<td>2</td>
+<td>2 × <code>localhost</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>-pe mpi-2 16</code></td>
+<td><code>2</code></td>
+<td>
+<code>qrsh -inherit</code> on another machine</td>
+<td>2</td>
+<td>2 × <code>localhost</code>
+</td>
+</tr>
 </tbody>
 </table>
-<p>The <code>$pe_slots</code> rule places all slots on a single machine,
-<code>$fill_up</code> fills up one machine before moving on to the next
-one, as in the above example run, and a fixed number, here two, places
-that many slots on each machine. In all cases,
-<code><a href="../reference/availableCores.html">availableCores()</a></code> returns the number of slots on the current
-machine. This is also true for workers launched on the other machines
-via <code>qrsh -inherit</code>.</p>
+<p>Per <code>man sge_pe</code>, the <code>$pe_slots</code> rule places
+all slots on a single machine, <code>$fill_up</code> fills up one
+machine before moving on to the next one, as in the above example run,
+and a fixed number, here 2, places that many slots on each machine. In
+all cases, <code><a href="../reference/availableCores.html">availableCores()</a></code> returns the number of slots on
+the current machine. This is also true for processes launched via
+<code>qrsh -inherit</code>, both on the machine running the job script
+and on the other machines, where <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> returns
+that many workers on <code>localhost</code>.</p>
 <p>Although they look like ones, note that <code>$pe_slots</code> and
 <code>$fill_up</code> are <em>not</em> environment variables, but SGE
 allocation rules. SGE allocation rules are described in
@@ -472,8 +686,8 @@ nodes, each running multiple cores.</p>
 scheduler that runs the R script <code>script.R</code> when launched. We
 can submit <code>script.sh</code> as:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="ex">$</span> pjsub <span class="at">-L</span> vnode=3 <span class="at">-L</span> vnode-core=18 script.sh</span></code></pre></div>
-<p>to request 18 CPU cores on three compute nodes, which in total
-requests 3*18=54 compute slots.</p>
+<p>to request 18 CPU cores on 3 compute nodes, which in total requests
+3*18=54 compute slots.</p>
 <p>Note how <code>rshcmd = "&lt;hpc&gt;"</code> makes parallel workers
 to be launched via the Fujitsu Technical Computing Suite’s
 <code>pjrsh</code> command from the main R session. Since R runs in a
@@ -489,7 +703,7 @@ on <em>other</em> machines.</p>
 </h2>
 <p>In all of the above examples, the parallel workers are set up with
 <code>rscript_startup = quote(options(mc.cores = 1L))</code>. This sets
-R option <code>mc.cores</code> to one in each worker, which makes
+R option <code>mc.cores</code> to 1 in each worker, which makes
 <code><a href="../reference/availableCores.html">availableCores()</a></code> report a single CPU core when called in a
 worker.</p>
 <p>This matters for workers running on the same machine as the main R
@@ -508,7 +722,7 @@ With <code>mc.cores = 1L</code>, <code><a href="https://rdrr.io/r/parallel/mclap
 sequentially in each worker, which avoids overusing the CPUs.</p>
 <p>This is not needed when using the cluster via the <strong><a href="https://future.futureverse.org" class="external-link">future</a></strong> framework,
 e.g. <code>plan(cluster, workers = cl)</code>, because futures are
-evaluated with <code>mc.cores</code> set to one on parallel workers.</p>
+evaluated with <code>mc.cores</code> set to 1 on parallel workers.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

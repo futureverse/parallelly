@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9038</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9040</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,7 +105,7 @@
 <li><p><code>availableCores(which = "all", max = n)</code> would return only the smallest value among all and unnamed.</p></li>
 <li>
 <p><code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> on SGE:</p>
-<ul><li><p><code>availableCores(method = "SGE")</code> in a Grid Engine job script would overestimate the number of CPU cores available for a multi-node job, because it returned the value of SGE environment variable <code>NSLOTS</code>. Now it returns the number of slots allotted to the current machine according to the SGE environment variable <code>PE_HOSTFILE</code> file, which is what <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> also uses. It only uses <code>NSLOTS</code> as a fallback if <code>PE_HOSTFILE</code> does not exist.</p></li>
+<ul><li><p><code>availableCores(method = "SGE")</code> in a Grid Engine job script would overestimate the number of CPU cores available for a multi-node job, because it returned the value of SGE environment variable <code>NSLOTS</code>. Now it returns the number of slots allotted to the current machine according to the SGE environment variable <code>PE_HOSTFILE</code> file (or the<code>pe_hostfile</code> under <code>SGE_JOB_SPOOL_DIR</code>), which is what <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> also uses. It only uses <code>NSLOTS</code> as a fallback if such a hostfile does not exist.</p></li>
 <li><p><code>availableWorkers(method = "SGE")</code> returned the workers sorted by hostname, which meant that the first worker was not necessarily the machine running the job script. Now the workers are listed in the same order as in SGE file <code>PE_HOSTFILE</code>.</p></li>
 </ul></li>
 <li>
