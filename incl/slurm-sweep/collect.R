@@ -1,8 +1,15 @@
 # Summarize the results of submit.sh
 #
 # Usage: Rscript collect.R <outdir>
+#
+# Hostnames are anonymized as n1, n2, n3, ... in the summaries, but not
+# in the raw results in <outdir>. Use PQ_ANONYMIZE=false to keep them
 args <- commandArgs(trailingOnly = TRUE)
 outdir <- if (length(args) > 0) args[1] else "."
+
+## Load anonymize_hostnames() from the same folder as this script
+here <- dirname(sub("^--file=", "", grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)[1]))
+source(file.path(here, "anonymize.R"))
 
 jobs <- read.delim(file.path(outdir, "jobs.tsv"), colClasses = "character")
 
@@ -30,6 +37,27 @@ read_dcfs <- function(files) {
 
 data <- read_dcfs(files)
 data <- cbind(spec = jobs$spec, data)
+
+## Per-task view from 'srun', one file per task
+srun_files <- dir(outdir, pattern = "[.]srun[.][0-9]+[.]dcf$", full.names = TRUE)
+srun <- if (length(srun_files) > 0) read_dcfs(srun_files) else NULL
+
+## What each parallel worker sees
+worker_files <- dir(outdir, pattern = "[.]psock[.][0-9]+[.]dcf$", full.names = TRUE)
+workers <- if (length(worker_files) > 0) read_dcfs(worker_files) else NULL
+
+## Anonymize hostnames, using the same aliases in all results
+if (as.logical(Sys.getenv("PQ_ANONYMIZE", "true"))) {
+  frames <- anonymize_hostnames(
+    list(data = data, srun = srun, workers = workers),
+    host_fields = c("SLURMD_NODENAME", "hostname", "nodename"),
+    nodelist_fields = c("SLURM_JOB_NODELIST", "SLURM_NODELIST", "SLURM_STEP_NODELIST"),
+    workers_fields = "availableWorkers"
+  )
+  data <- frames$data
+  srun <- frames$srun
+  workers <- frames$workers
+}
 
 ## Sum of expanded Slurm node counts, e.g. "4(x2),2" -> 10
 sum_counts <- function(x) {
@@ -63,10 +91,8 @@ data$affinity <- if (length(affinity_fields) > 0) {
 }
 data$slurm_eq_affinity <- (as.integer(data$availableCores.Slurm) == data$affinity)
 
-## Per-task view from 'srun', one file per task
-srun_files <- dir(outdir, pattern = "[.]srun[.][0-9]+[.]dcf$", full.names = TRUE)
-if (length(srun_files) > 0) {
-  srun <- read_dcfs(srun_files)
+## Per-task view from 'srun'
+if (!is.null(srun)) {
   srun <- srun[order(as.integer(srun$SLURM_JOB_ID), as.integer(srun$SLURM_PROCID)), ]
   srun <- cbind(spec = jobs$spec[match(srun$SLURM_JOB_ID, jobs$job_id)], srun)
   write.csv(srun, file.path(outdir, "summary-srun.csv"), row.names = FALSE)
@@ -102,9 +128,7 @@ if (any(has_psock)) {
 }
 
 ## What each parallel worker sees
-worker_files <- dir(outdir, pattern = "[.]psock[.][0-9]+[.]dcf$", full.names = TRUE)
-if (length(worker_files) > 0) {
-  workers <- read_dcfs(worker_files)
+if (!is.null(workers)) {
   workers <- workers[order(as.integer(workers$SLURM_JOB_ID), as.integer(workers$worker)), ]
   workers <- cbind(spec = jobs$spec[match(workers$SLURM_JOB_ID, jobs$job_id)], workers)
   write.csv(workers, file.path(outdir, "summary-psock.csv"), row.names = FALSE)

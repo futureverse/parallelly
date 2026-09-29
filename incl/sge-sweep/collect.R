@@ -1,8 +1,15 @@
 # Summarize the results of submit.sh
 #
 # Usage: Rscript collect.R <outdir>
+#
+# Hostnames are anonymized as n1, n2, n3, ... in the summaries, but not
+# in the raw results in <outdir>. Use PQ_ANONYMIZE=false to keep them
 args <- commandArgs(trailingOnly = TRUE)
 outdir <- if (length(args) > 0) args[1] else "."
+
+## Load anonymize_hostnames() from the same folder as this script
+here <- dirname(sub("^--file=", "", grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)[1]))
+source(file.path(here, "anonymize.R"))
 
 jobs <- read.delim(file.path(outdir, "jobs.tsv"), colClasses = "character")
 
@@ -31,6 +38,27 @@ read_dcfs <- function(files) {
 data <- read_dcfs(files)
 data <- cbind(spec = jobs$spec, data)
 
+## Per-host view from 'qrsh -inherit', one file per host
+inherit_files <- dir(outdir, pattern = "[.]inherit[.].+[.]dcf$", full.names = TRUE)
+inherit <- if (length(inherit_files) > 0) read_dcfs(inherit_files) else NULL
+
+## What each parallel worker sees
+worker_files <- dir(outdir, pattern = "[.]psock[.][0-9]+[.]dcf$", full.names = TRUE)
+workers <- if (length(worker_files) > 0) read_dcfs(worker_files) else NULL
+
+## Anonymize hostnames, using the same aliases in all results
+if (as.logical(Sys.getenv("PQ_ANONYMIZE", "true"))) {
+  frames <- anonymize_hostnames(
+    list(data = data, inherit = inherit, workers = workers),
+    host_fields = c("HOSTNAME", "nodename"),
+    hostfile_fields = "PE_HOSTFILE.content",
+    workers_fields = "availableWorkers"
+  )
+  data <- frames$data
+  inherit <- frames$inherit
+  workers <- frames$workers
+}
+
 ## Settings of the parallel environments (PEs) used
 pes <- read.delim(file.path(outdir, "pes.tsv"), colClasses = "character")
 data$allocation_rule <- pes$allocation_rule[match(data$PE, pes$pe)]
@@ -40,10 +68,8 @@ data$cores_eq_local_workers <- (ncores == as.integer(data$nworkers.local))
 data$cores_eq_local_slots   <- (ncores == as.integer(data$slots.local))
 data$workers_eq_nslots      <- (as.integer(data$nworkers) == as.integer(data$NSLOTS))
 
-## Per-host view from 'qrsh -inherit', one file per host
-inherit_files <- dir(outdir, pattern = "[.]inherit[.].+[.]dcf$", full.names = TRUE)
-if (length(inherit_files) > 0) {
-  inherit <- read_dcfs(inherit_files)
+## Per-host view from 'qrsh -inherit'
+if (!is.null(inherit)) {
   inherit <- inherit[order(as.integer(inherit$JOB_ID), inherit$nodename), ]
   inherit <- cbind(spec = jobs$spec[match(inherit$JOB_ID, jobs$job_id)], inherit)
   write.csv(inherit, file.path(outdir, "summary-inherit.csv"), row.names = FALSE)
@@ -72,9 +98,7 @@ if (any(has_psock)) {
 }
 
 ## What each parallel worker sees
-worker_files <- dir(outdir, pattern = "[.]psock[.][0-9]+[.]dcf$", full.names = TRUE)
-if (length(worker_files) > 0) {
-  workers <- read_dcfs(worker_files)
+if (!is.null(workers)) {
   workers <- workers[order(as.integer(workers$JOB_ID), as.integer(workers$worker)), ]
   workers <- cbind(spec = jobs$spec[match(workers$JOB_ID, jobs$job_id)], workers)
   write.csv(workers, file.path(outdir, "summary-psock.csv"), row.names = FALSE)
