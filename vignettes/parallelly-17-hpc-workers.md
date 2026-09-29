@@ -112,7 +112,7 @@ specify them explicitly, e.g. `rshcmd = c("srun", "--exact",
 "--overlap", "--nodes=1", "--ntasks=1", "-w")`.
 
 Here is the output from one such run, where the scheduler happened to
-allot the slots across three machines:
+allot the slots across 3 machines:
 
 ```sh
 Information on R:
@@ -129,24 +129,43 @@ x86_64-pc-linux-gnu)
 ```
 
 What `availableCores()` and `availableWorkers()` return depends on
-what we request from Slurm. Here are a few examples of what they
-return in the job script, where `n1` is the machine running the job
-script:
+what we request from Slurm, and on where R runs, i.e. in the job
+script, in the interactive shell of `salloc`, or in a task launched
+by `srun`. Here is what they returned on real Slurm clusters, where
+`n1` is the machine running the job script:
 
-| Slurm options | `availableCores()` | `availableWorkers()` |
-| --- | --- | --- |
-| `--nodes=1 --ntasks=4` | 4 | 4 × `n1` |
-| `--nodes=1 --ntasks=4 --cpus-per-task=2` | 8 | 8 × `n1` |
-| `--nodes=2 --ntasks-per-node=2` | 2 | 2 × `n1`, 2 × `n2` |
-| `--nodes=2 --ntasks=4 --cpus-per-task=2` | 6 | 6 × `n1`, 2 × `n2` |
+| Slurm options | Where R runs | `availableCores()` | `availableWorkers()` |
+| --- | --- | --- | --- |
+| (none), hyperthreaded | job script | 2 | 2 × `n1` |
+| `--ntasks=16 --cpus-per-task=1` | job script | 16 | 16 × `n1` |
+| `--nodes=1 --ntasks=4` | job script | 4 | 4 × `n1` |
+| `--nodes=1 --ntasks=4 --cpus-per-task=2` | job script | 8 | 8 × `n1` |
+| `--ntasks=1 --cpus-per-task=4` | job script | 4 | 4 × `n1` |
+| `--cpus-per-task=3`, hyperthreaded | job script | 4 | 4 × `n1` |
+| `--nodes=1 --exclusive` | job script | all CPUs on `n1`, e.g. 336 | all CPUs × `n1` |
+| `--nodes=2 --ntasks=2`, hyperthreaded | job script | 2 | 2 × `n1`, 2 × `n2` |
+| `--nodes=2 --ntasks-per-node=2` | job script | 2 | 2 × `n1`, 2 × `n2` |
+| `--nodes=2 --ntasks=4 --cpus-per-task=2` | job script | 6 | 6 × `n1`, 2 × `n2` |
+| `--nodes=2 --ntasks=16` | job script | 9 | 9 × `n1`, 8 × `n2` |
+| `--nodes=2 --ntasks=16`, another cluster | job script | 2 | 2 × `n1`, 14 × `n2` |
+| `--nodes=2 --ntasks=16 --cpus-per-task=3` | job script | 46 | 46 × `n1`, 4 × `n2` |
+| `--nodes=4 --ntasks=16 --cpus-per-task=1` | job script | 2 | 2 × `n1`, 10 × `n2`, 2 × `n3`, 2 × `n4` |
+| `--nodes=2 --ntasks=4` | `salloc` shell | 2 | 2 × `n1`, 2 × `n2` |
+| `--nodes=2` | `srun` task | 2 | 2 × `n1`, 2 × `n2` |
+| `--nodes=1-2 --ntasks=16` | `srun` task | 1 | 16 × `n1`, 2 × `n2` |
+| `--nodes=2 --ntasks=4 --cpus-per-task=3` | `srun` task | 3 | 9 × `n1`, 4 × `n2` |
 
-Note how `availableWorkers()` returns one worker per CPU allotted,
-not one per task, and how `availableCores()` returns the number of
-CPUs allotted on the current machine. The last example shows that
-Slurm does not necessarily spread the tasks evenly across machines.
-Also, on machines with hyperthreading, Slurm allots whole CPU cores,
-meaning that, for instance, `--cpus-per-task=3` may result in four
-CPUs.
+Note how `availableWorkers()` returns 1 worker per CPU allotted,
+not 1 per task, and how `availableCores()` returns the number of
+CPUs allotted on the current machine. Slurm does not necessarily
+spread the CPUs evenly across machines, and the machine running the
+job script does not necessarily get the most. For instance,
+`--nodes=2 --ntasks=16` gave 9 + 8 CPUs on one cluster and 2 + 14 on
+another. Also, on machines with hyperthreading, Slurm allots whole
+CPU cores, meaning that, for instance, `--cpus-per-task=3` may result
+in 4 CPUs. In a task launched by `srun`, `availableCores()` returns
+the number of CPUs of that task, whereas `availableWorkers()` still
+returns all the workers of the job.
 
 
 ## Example: Launch parallel workers via the Grid Engine job scheduler
@@ -230,7 +249,7 @@ nodes is disabled. In contrast, `qrsh` establishes the connection for
 us.
 
 Here is the output from one such run, where the scheduler happened to
-allot the slots across three machines:
+allot the slots across 3 machines:
 
 ```sh
 Information on R:
@@ -246,23 +265,36 @@ version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)
 
 How SGE distributes the requested slots across machines depends on
 the `allocation_rule` setting of the parallel environment (PE), which
-we can inspect using `qconf -sp <pe>`. Here are a few examples of
-what `availableCores()` and `availableWorkers()` return in the job
-script, where `n1` is the machine running the job script:
+we can inspect using `qconf -sp <pe>`. Here is what
+`availableCores()` and `availableWorkers()` returned on a real SGE
+cluster, where `n1` is the machine running the job script. The last
+two rows are for processes launched via `qrsh -inherit`, e.g. parallel
+workers launched using `rshcmd = "<qrsh>"`:
 
-| SGE options | Allocation rule | `availableCores()` | `availableWorkers()` |
-| --- | --- | --- | --- |
-| (none) | - | 1 | `localhost` |
-| `-pe smp 4` | `$pe_slots` | 4 | 4 × `n1` |
-| `-pe mpi 8` | `$fill_up` | 4 | 4 × `n1`, 3 × `n2`, 1 × `n3` |
-| `-pe mpi-2 8` | `2` | 2 | 2 × `n1`, 2 × `n2`, 2 × `n3`, 2 × `n4` |
+| SGE options | Allocation rule | Where R runs | `availableCores()` | `availableWorkers()` |
+| --- | --- | --- | --- | --- |
+| (none) | - | job script | 1 | `localhost` |
+| `-pe smp 1` | `$pe_slots` | job script | 1 | 1 × `n1` |
+| `-pe smp 4` | `$pe_slots` | job script | 4 | 4 × `n1` |
+| `-pe smp 16` | `$pe_slots` | job script | 16 | 16 × `n1` |
+| `-pe smp 4 -binding linear:4` | `$pe_slots` | job script | 4 | 4 × `n1` |
+| `-pe mpi 8`, fits on 1 machine | `$fill_up` | job script | 8 | 8 × `n1` |
+| `-pe mpi 4`, spans 2 machines | `$fill_up` | job script | 2 | 2 × `n1`, 2 × `n2` |
+| `-pe mpi 16`, spans 4 machines | `$fill_up` | job script | 3 | 3 × `n1`, 10 × `n2`, 1 × `n3`, 2 × `n4` |
+| `-pe mpi-2 4` | `2` | job script | 2 | 2 × `n1`, 2 × `n2` |
+| `-pe mpi-2 8` | `2` | job script | 2 | 2 × `n1`, 2 × `n2`, 2 × `n3`, 2 × `n4` |
+| `-pe mpi-2 16` | `2` | job script | 2 | 2 × `n1`, 2 × `n2`, ..., 2 × `n8` |
+| `-pe mpi-2 16` | `2` | `qrsh -inherit` on `n1` | 2 | 2 × `localhost` |
+| `-pe mpi-2 16` | `2` | `qrsh -inherit` on another machine | 2 | 2 × `localhost` |
 
-The `$pe_slots` rule places all slots on a single machine, `$fill_up`
-fills up one machine before moving on to the next one, as in the
-above example run, and a fixed number, here two, places that many
-slots on each machine. In all cases, `availableCores()` returns the
-number of slots on the current machine. This is also true for
-workers launched on the other machines via `qrsh -inherit`.
+Per `man sge_pe`, the `$pe_slots` rule places all slots on a single
+machine, `$fill_up` fills up one machine before moving on to the next
+one, as in the above example run, and a fixed number, here 2, places
+that many slots on each machine. In all cases, `availableCores()`
+returns the number of slots on the current machine. This is also true
+for processes launched via `qrsh -inherit`, both on the machine
+running the job script and on the other machines, where
+`availableWorkers()` returns that many workers on `localhost`.
 
 Although they look like ones, note that `$pe_slots` and `$fill_up` are _not_ environment variables, but SGE allocation rules. SGE allocation rules are described in `man sge_pe`.
 
@@ -318,7 +350,7 @@ that runs the R script `script.R` when launched. We can submit
 $ pjsub -L vnode=3 -L vnode-core=18 script.sh
 ```
 
-to request 18 CPU cores on three compute nodes, which in total
+to request 18 CPU cores on 3 compute nodes, which in total
 requests 3*18=54 compute slots.
 
 Note how `rshcmd = "<hpc>"` makes parallel workers to be launched via
@@ -334,7 +366,7 @@ machines.
 
 In all of the above examples, the parallel workers are set up with
 `rscript_startup = quote(options(mc.cores = 1L))`. This sets R option
-`mc.cores` to one in each worker, which makes `availableCores()`
+`mc.cores` to 1 in each worker, which makes `availableCores()`
 report a single CPU core when called in a worker.
 
 This matters for workers running on the same machine as the main R
@@ -358,7 +390,7 @@ which avoids overusing the CPUs.
 
 This is not needed when using the cluster via the **[future]**
 framework, e.g. `plan(cluster, workers = cl)`, because futures are
-evaluated with `mc.cores` set to one on parallel workers.
+evaluated with `mc.cores` set to 1 on parallel workers.
 
 
 [future]: https://future.futureverse.org
