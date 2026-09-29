@@ -195,8 +195,8 @@ message("*** Slurm multi-node scenarios ... done")
 
 message("*** Slurm scenarios observed on real clusters ...")
 
-## Slurm environment variables recorded on real Slurm clusters using
-## incl/slurm-sweep/, for the batch script (context 'batch'), for
+## Slurm environment variables recorded on real Slurm clusters, for
+## the batch script (context 'batch'), for
 ## tasks launched by 'srun' (context 'srun'), and for the interactive
 ## shell of 'salloc' (context 'salloc'). Empty cells correspond to
 ## environment variables that are not set
@@ -568,8 +568,8 @@ message("*** SGE method ... done")
 
 message("*** SGE scenarios observed on real clusters ...")
 
-## Grid Engine environment variables recorded on a real SGE cluster using
-## incl/sge-sweep/, for the job script (context 'job') and for processes
+## Grid Engine environment variables recorded on a real SGE cluster,
+## for the job script (context 'job') and for processes
 ## launched by 'qrsh -inherit' (context 'inherit'). Column
 ## 'PE_HOSTFILE_content' holds the lines of the PE_HOSTFILE file,
 ## separated by semicolons. Empty cells correspond to environment

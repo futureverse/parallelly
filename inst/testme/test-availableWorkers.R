@@ -381,8 +381,8 @@ message("*** Slurm odds'n'ends ... DONE")
 
 message("*** Slurm scenarios observed on real clusters ...")
 
-## Slurm environment variables recorded on real Slurm clusters using
-## incl/slurm-sweep/, for the batch script (context 'batch') and for
+## Slurm environment variables recorded on real Slurm clusters, for
+## the batch script (context 'batch') and for
 ## tasks launched by 'srun' (context 'srun'). Empty cells correspond to
 ## environment variables that are not set
 file <- system.file(package = "parallelly", "test-data", "slurm", "scenarios.csv", mustWork = TRUE)
@@ -420,8 +420,8 @@ message("*** Slurm scenarios observed on real clusters ... DONE")
 
 message("*** SGE scenarios observed on real clusters ...")
 
-## Grid Engine environment variables recorded on a real SGE cluster using
-## incl/sge-sweep/. Column 'PE_HOSTFILE_content' holds the lines of the
+## Grid Engine environment variables recorded on a real SGE cluster.
+## Column 'PE_HOSTFILE_content' holds the lines of the
 ## PE_HOSTFILE file, separated by semicolons
 file <- system.file(package = "parallelly", "test-data", "sge", "scenarios.csv", mustWork = TRUE)
 scenarios <- read.csv(file, colClasses = "character", na.strings = "")
