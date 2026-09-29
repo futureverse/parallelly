@@ -18,11 +18,15 @@ if [[ -n ${PE_HOSTFILE:-} && -f ${PE_HOSTFILE} ]]; then
   ## 'qrsh -inherit' does not pass on the job's environment, so pass on
   ## the R library path explicitly
   libs=$("${rscript}" -e 'cat(.libPaths(), sep = ":")')
-  ## A host may be listed more than once, e.g. once per queue
+  ## A host may be listed more than once, e.g. once per queue. Query
+  ## all hosts in parallel, and give up on a host after 60 seconds, in
+  ## case 'qrsh -inherit' stalls, which has been observed to take up to
+  ## 107 seconds
   while read -r host; do
-    qrsh -inherit -nostdin "${host}" env R_LIBS="${libs}" "${rscript}" "${here}/probe.R" "${outdir}/${JOB_ID}.inherit.${host}.dcf" \
-      || echo "qrsh -inherit ${host} failed (exit code $?)" >&2
+    timeout 60 qrsh -inherit -nostdin "${host}" env R_LIBS="${libs}" "${rscript}" "${here}/probe.R" "${outdir}/${JOB_ID}.inherit.${host}.dcf" \
+      || echo "qrsh -inherit ${host} failed (exit code $?)" >&2 &
   done < <(awk '{ print $1 }' "${PE_HOSTFILE}" | sort -u)
+  wait
 
   ## The per-worker view, when launching parallel workers as in the
   ## 'parallelly-17-hpc-workers' vignette. Give up after 90 seconds,

@@ -38,13 +38,13 @@ read -r -a slots_set <<< "${PQ_SLOTS:-1 2 4 8 16}"
 
 ## Record the settings of each PE, which are site specific
 pes_file="${outdir}/pes.tsv"
-printf "pe\tallocation_rule\tcontrol_slaves\tslots\n" > "${pes_file}"
+printf "pe\tallocation_rule\tcontrol_slaves\tjob_is_first_task\tslots\n" > "${pes_file}"
 for pe in "${pes[@]}"; do
   if settings=$(qconf -sp "${pe}" 2>/dev/null); then
     get() { awk -v key="$1" '$1 == key { print $2 }' <<< "${settings}"; }
-    printf "%s\t%s\t%s\t%s\n" "${pe}" "$(get allocation_rule)" "$(get control_slaves)" "$(get slots)" >> "${pes_file}"
+    printf "%s\t%s\t%s\t%s\t%s\n" "${pe}" "$(get allocation_rule)" "$(get control_slaves)" "$(get job_is_first_task)" "$(get slots)" >> "${pes_file}"
   else
-    printf "%s\t\t\t\n" "${pe}" >> "${pes_file}"
+    printf "%s\t\t\t\t\n" "${pe}" >> "${pes_file}"
   fi
 done
 
@@ -75,7 +75,7 @@ for spec in "${specs[@]}"; do
     -N parallelly-query
     -j y
     -o "${outdir}/\$JOB_ID.log"
-    -l h_rt=00:03:00
+    -l h_rt=00:05:00  ## 'qrsh -inherit' can be slow
     -l mem_free=300M  ## per slot
     -w "${verify}"
     "${extra_args[@]}"

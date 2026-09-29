@@ -126,6 +126,12 @@ if (as.logical(Sys.getenv("PQ_ANONYMIZE", "true"))) {
 ## Settings of the parallel environments (PEs) used
 pes <- read.delim(file.path(outdir, "pes.tsv"), colClasses = "character")
 data$allocation_rule <- pes$allocation_rule[match(data$PE, pes$pe)]
+## With 'job_is_first_task TRUE', the job script uses one of the slots,
+## e.g. 'qrsh -inherit' to the job's own host fails for '-pe <pe> 1'.
+## Not recorded by older versions of submit.sh
+if (!is.null(pes$job_is_first_task)) {
+  data$job_is_first_task <- pes$job_is_first_task[match(data$PE, pes$pe)]
+}
 
 ncores <- as.integer(data$availableCores)
 data$cores_eq_local_workers <- (ncores == as.integer(data$nworkers.local))
@@ -183,7 +189,7 @@ if (!is.null(workers)) {
 write.csv(data, file.path(outdir, "summary.csv"), row.names = FALSE)
 
 ## Print compact table
-cols <- c("spec", "allocation_rule", "availableCores", "slots.local",
+cols <- c("spec", "allocation_rule", "job_is_first_task", "availableCores", "slots.local",
           "nworkers.local", "availableWorkers", "NSLOTS", "NHOSTS",
           "SGE_BINDING", "availableCores.nproc", "inherit_cores",
           "inherit_slots_local", "inherit_nproc",
