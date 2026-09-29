@@ -12,7 +12,9 @@
 #   Rscript collect.R <outdir>
 #
 # Options:
-#   PQ_DRYRUN=true   Only list the 'qsub' calls
+#   PQ_DRYRUN=true   Only list the 'qsub' calls, and check each with
+#                    'qsub -w v', which reports whether the job could be
+#                    scheduled on an empty cluster, without submitting it
 #   PQ_PES           Parallel environments to use, e.g. PQ_PES="smp mpi"
 #                    (default: all PEs according to 'qconf -spl')
 #   PQ_SLOTS         Number of slots to request (default: "1 2 4 8 16")
@@ -61,6 +63,10 @@ done
 jobs="${outdir}/jobs.tsv"
 [[ -f ${jobs} ]] || printf "job_id\tspec\n" > "${jobs}"
 
+## Reject jobs that can never be scheduled ('-w e'), or, in dry-run
+## mode, only check whether they could be scheduled ('-w v')
+if ${PQ_DRYRUN:-false}; then verify="v"; else verify="e"; fi
+
 for spec in "${specs[@]}"; do
   read -r -a spec_args <<< "${spec}"
   args=(
@@ -71,13 +77,18 @@ for spec in "${specs[@]}"; do
     -o "${outdir}/\$JOB_ID.log"
     -l h_rt=00:10:00
     -l mem_free=300M  ## per slot
-    -w e  ## reject jobs that can never be scheduled
+    -w "${verify}"
     "${extra_args[@]}"
     "${spec_args[@]}"
   )
 
   if ${PQ_DRYRUN:-false}; then
     echo "qsub ${args[*]} ${here}/probe.sh ${outdir} ${here}"
+    ## Ask SGE whether the job could be scheduled, e.g.
+    ## "verification: found suitable queue(s)"
+    if command -v qsub > /dev/null; then
+      qsub "${args[@]}" "${here}/probe.sh" "${outdir}" "${here}" 2>&1 | sed 's/^/  => /' || true
+    fi
     continue
   fi
 

@@ -15,9 +15,69 @@ jobs <- read.delim(file.path(outdir, "jobs.tsv"), colClasses = "character")
 
 files <- file.path(outdir, sprintf("%s.dcf", jobs$job_id))
 done <- file_test("-f", files)
+## Status of jobs without results, i.e. rejected by 'sbatch', still
+## pending or running, or ended without results, e.g. cancelled because
+## they passed their deadline. The status is looked up using 'squeue'
+## and 'sacct', if available. Hostnames are not anonymized here, e.g.
+## in reasons such as 'ReqNodeNotAvail, UnavailableNodes:n12'
+job_status <- function(ids) {
+  status <- rep("unknown", times = length(ids))
+  reason <- rep("", times = length(ids))
+  run <- function(cmd, args) {
+    if (!nzchar(Sys.which(cmd))) return(character(0L))
+    suppressWarnings(system2(cmd, args = shQuote(args), stdout = TRUE, stderr = FALSE))
+  }
+  split <- function(lines) {
+    lines <- lines[grepl("|", lines, fixed = TRUE)]
+    lapply(strsplit(lines, split = "|", fixed = TRUE), FUN = trimws)
+  }
+
+  ## Jobs still in the queue, e.g. "123|PENDING|PartitionNodeLimit"
+  lines <- run("squeue", c("--noheader", "--name=parallelly-query",
+                           paste0("--user=", Sys.getenv("USER")),
+                           "--format=%i|%T|%r"))
+  for (x in split(lines)) {
+    idx <- which(ids == x[1])
+    if (length(idx) == 0L) next
+    status[idx] <- tolower(x[2])
+    if (length(x) >= 3 && !x[3] %in% c("None", "")) reason[idx] <- x[3]
+  }
+
+  ## Jobs no longer in the queue, e.g. "123|DEADLINE|0:0"
+  left <- ids[status == "unknown"]
+  if (length(left) > 0L) {
+    lines <- run("sacct", c("--noheader", "--parsable2", "--allocations",
+                            paste0("--jobs=", paste(left, collapse = ",")),
+                            "--format=JobID,State,ExitCode"))
+    for (x in split(lines)) {
+      idx <- which(ids == x[1])
+      if (length(idx) == 0L) next
+      state <- tolower(sub(" .*", "", x[2]))
+      if (state == "completed") {
+        status[idx] <- "completed without results"
+      } else {
+        status[idx] <- state
+      }
+      if (length(x) >= 3 && x[3] != "0:0") reason[idx] <- sprintf("exit code %s", x[3])
+    }
+  }
+
+  data.frame(status = status, reason = reason)
+}
+
 if (any(!done)) {
-  message(sprintf("Skipping %d of %d jobs without results (rejected, pending, or failed)",
-          sum(!done), length(done)))
+  message(sprintf("Skipping %d of %d jobs without results:", sum(!done), length(done)))
+  todo <- jobs[!done, ]
+  status <- data.frame(status = rep("rejected by sbatch", times = nrow(todo)), reason = "")
+  submitted <- (todo$job_id != "rejected")
+  if (any(submitted)) status[submitted, ] <- job_status(todo$job_id[submitted])
+  todo <- cbind(todo, status)
+  todo$spec[!nzchar(todo$spec)] <- "(defaults)"
+  print(todo, right = FALSE, row.names = FALSE)
+  pending <- todo$job_id[todo$status == "pending"]
+  if (length(pending) > 0L) {
+    cat(sprintf("\nTo cancel the %d pending jobs: scancel %s\n\n", length(pending), paste(pending, collapse = " ")))
+  }
 }
 jobs <- jobs[done, ]
 files <- files[done]

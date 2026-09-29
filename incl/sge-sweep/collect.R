@@ -15,9 +15,73 @@ jobs <- read.delim(file.path(outdir, "jobs.tsv"), colClasses = "character")
 
 files <- file.path(outdir, sprintf("%s.dcf", jobs$job_id))
 done <- file_test("-f", files)
+## Status of jobs without results, i.e. rejected by 'qsub', still
+## pending or running, in an error state, or ended without results. The
+## status is looked up using 'qstat' and 'qacct', if available. Hostnames
+## are not anonymized here
+job_status <- function(ids) {
+  status <- rep("unknown", times = length(ids))
+  reason <- rep("", times = length(ids))
+  run <- function(cmd, args) {
+    if (!nzchar(Sys.which(cmd))) return(character(0L))
+    suppressWarnings(system2(cmd, args = shQuote(args), stdout = TRUE, stderr = FALSE))
+  }
+
+  ## Jobs still in the queue, e.g. "123 0.5 parallelly-query alice qw ..."
+  lines <- run("qstat", c("-u", Sys.getenv("USER")))
+  for (x in strsplit(trimws(lines), split = "[[:space:]]+")) {
+    idx <- which(ids == x[1])
+    if (length(idx) == 0L || length(x) < 5L) next
+    state <- x[5]
+    status[idx] <- if (grepl("E", state, fixed = TRUE)) {
+      sprintf("error (%s)", state)  ## e.g. 'Eqw', which never starts
+    } else if (grepl("h", state, fixed = TRUE)) {
+      sprintf("on hold (%s)", state)
+    } else if (grepl("qw", state, fixed = TRUE)) {
+      "pending"
+    } else {
+      sprintf("running (%s)", state)
+    }
+    ## Why? Requires 'schedd_job_info true' for pending jobs
+    info <- run("qstat", c("-j", x[1]))
+    info <- grep("^(error reason|scheduling info)", info, value = TRUE)
+    if (length(info) > 0L) reason[idx] <- trimws(sub("^[^:]*:", "", info[1]))
+  }
+
+  ## Jobs no longer in the queue
+  for (kk in which(status == "unknown")) {
+    info <- run("qacct", c("-j", ids[kk]))
+    get <- function(key) {
+      value <- grep(sprintf("^%s[[:space:]]", key), info, value = TRUE)
+      if (length(value) == 0L) NA_character_ else trimws(sub(sprintf("^%s", key), "", value[1]))
+    }
+    failed <- get("failed")
+    if (is.na(failed)) next
+    if (failed != "0") {
+      status[kk] <- "failed"
+      reason[kk] <- failed
+    } else {
+      status[kk] <- "finished without results"
+      reason[kk] <- sprintf("exit status %s", get("exit_status"))
+    }
+  }
+
+  data.frame(status = status, reason = reason)
+}
+
 if (any(!done)) {
-  message(sprintf("Skipping %d of %d jobs without results (rejected, pending, or failed)",
-          sum(!done), length(done)))
+  message(sprintf("Skipping %d of %d jobs without results:", sum(!done), length(done)))
+  todo <- jobs[!done, ]
+  status <- data.frame(status = rep("rejected by qsub", times = nrow(todo)), reason = "")
+  submitted <- (todo$job_id != "rejected")
+  if (any(submitted)) status[submitted, ] <- job_status(todo$job_id[submitted])
+  todo <- cbind(todo, status)
+  todo$spec[!nzchar(todo$spec)] <- "(no PE)"
+  print(todo, right = FALSE, row.names = FALSE)
+  stuck <- todo$job_id[todo$status == "pending" | grepl("^(error|on hold)", todo$status)]
+  if (length(stuck) > 0L) {
+    cat(sprintf("\nTo delete the %d pending, on-hold, or failed-to-start jobs: qdel %s\n\n", length(stuck), paste(stuck, collapse = " ")))
+  }
 }
 jobs <- jobs[done, ]
 files <- files[done]

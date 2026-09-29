@@ -10,7 +10,14 @@
 #   Rscript collect.R <outdir>
 #
 # Options:
-#   PQ_DRYRUN=true   Only list the 'sbatch' calls
+#   PQ_DRYRUN=true   Only list the 'sbatch' calls, and check each with
+#                    'sbatch --test-only', which reports whether and when
+#                    the job would start, without submitting it
+#   PQ_DEADLINE      Have Slurm cancel jobs that have not finished by
+#                    then (default: "now+2hours"), so that jobs that
+#                    cannot start, e.g. because of partition or QOS
+#                    limits, do not stay in the queue forever. Use
+#                    PQ_DEADLINE="" to not set a deadline
 #   PQ_SBATCH_ARGS   Extra 'sbatch' options for all jobs, e.g.
 #                    PQ_SBATCH_ARGS="--partition=debug"
 #                    These come after the default options, e.g.
@@ -23,6 +30,10 @@ mkdir -p "${outdir}"
 outdir=$(cd "${outdir}" && pwd)
 
 read -r -a extra_args <<< "${PQ_SBATCH_ARGS:-}"
+
+deadline_args=()
+deadline=${PQ_DEADLINE-now+2hours}
+[[ -n ${deadline} ]] && deadline_args=(--deadline="${deadline}")
 
 ## Full grid of (--nodes, --ntasks, --cpus-per-task); "" = not specified
 nodes_set=("" 1 2 "1-2")
@@ -71,12 +82,18 @@ for spec in "${specs[@]}"; do
     --time=00:10:00
     --mem-per-cpu=300M  ## one R worker per CPU, cf. cluster.R
     --output="${outdir}/%j.log"
+    "${deadline_args[@]}"
     "${extra_args[@]}"
     "${spec_args[@]}"
   )
   
   if ${PQ_DRYRUN:-false}; then
     echo "sbatch ${args[*]} ${here}/probe.sh ${outdir} ${here}"
+    ## Ask Slurm whether and when the job would start, e.g.
+    ## "sbatch: Job 123 to start at ... on nodes n1 in partition p"
+    if command -v sbatch > /dev/null; then
+      sbatch --test-only "${args[@]}" "${here}/probe.sh" "${outdir}" "${here}" 2>&1 | sed 's/^/  => /' || true
+    fi
     continue
   fi
   
