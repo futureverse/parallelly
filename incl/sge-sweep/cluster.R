@@ -35,7 +35,7 @@ probe <- function() {
   )
   all <- parallelly::availableCores(which = "all")
   for (name in names(all)) res[[paste0("availableCores.", name)]] <- all[[name]]
-  envs <- Sys.getenv(c("JOB_ID", "HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE"), unset = NA_character_, names = TRUE)
+  envs <- Sys.getenv(c("JOB_ID", "HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE", "SGE_JOB_SPOOL_DIR"), unset = NA_character_, names = TRUE)
   for (name in names(envs)) res[[name]] <- envs[[name]]
   lapply(res, FUN = as.character)
 }

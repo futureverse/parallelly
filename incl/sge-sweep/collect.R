@@ -154,6 +154,12 @@ if (!is.null(inherit)) {
   data$inherit_cores       <- per_job("availableCores")
   data$inherit_slots_local <- per_job("slots.local")
   data$inherit_nproc       <- per_job("availableCores.nproc")
+  ## Could the PE hostfile be found via SGE_JOB_SPOOL_DIR, e.g. "yes,no"?
+  if (!is.null(inherit$spool.pe_hostfile)) {
+    inherit$spool_found <- ifelse(is.na(inherit$spool.pe_hostfile), NA,
+                             ifelse(inherit$spool.pe_hostfile == "(none)", "no", "yes"))
+    data$inherit_spool_pe_hostfile <- per_job("spool_found")
+  }
 }
 
 ## Launching parallel workers as in the 'parallelly-17-hpc-workers'
@@ -194,6 +200,7 @@ cols <- c("spec", "allocation_rule", "job_is_first_task", "availableCores", "slo
           "SGE_BINDING", "availableCores.nproc", "inherit_cores",
           "inherit_slots_local", "inherit_nproc",
           "psock_status", "psock_seconds", "psock_cores", "psock_nproc",
+          "inherit_spool_pe_hostfile",
           "cores_eq_local_workers", "cores_eq_local_slots",
           "workers_eq_nslots")
 cols <- intersect(cols, colnames(data))
