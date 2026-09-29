@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9040</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9041</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -271,28 +271,43 @@ where <code>n1</code> is the machine running the job script:</p>
 </td>
 </tr>
 <tr class="even">
+<td>(none), not hyperthreaded</td>
+<td>job script</td>
+<td>1</td>
+<td>1 × <code>n1</code>
+</td>
+</tr>
+<tr class="odd">
 <td><code>--ntasks=16 --cpus-per-task=1</code></td>
 <td>job script</td>
 <td>16</td>
 <td>16 × <code>n1</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>--nodes=1 --ntasks=4</code></td>
 <td>job script</td>
 <td>4</td>
 <td>4 × <code>n1</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>--nodes=1 --ntasks=4 --cpus-per-task=2</code></td>
 <td>job script</td>
 <td>8</td>
 <td>8 × <code>n1</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>--ntasks=1 --cpus-per-task=4</code></td>
+<td>job script</td>
+<td>4</td>
+<td>4 × <code>n1</code>
+</td>
+</tr>
+<tr class="odd">
+<td>
+<code>--cpus-per-task=3</code>, hyperthreaded</td>
 <td>job script</td>
 <td>4</td>
 <td>4 × <code>n1</code>
@@ -300,10 +315,10 @@ where <code>n1</code> is the machine running the job script:</p>
 </tr>
 <tr class="even">
 <td>
-<code>--cpus-per-task=3</code>, hyperthreaded</td>
+<code>--cpus-per-task=3</code>, not hyperthreaded</td>
 <td>job script</td>
-<td>4</td>
-<td>4 × <code>n1</code>
+<td>3</td>
+<td>3 × <code>n1</code>
 </td>
 </tr>
 <tr class="odd">
@@ -322,27 +337,35 @@ where <code>n1</code> is the machine running the job script:</p>
 </td>
 </tr>
 <tr class="odd">
+<td>
+<code>--nodes=2 --ntasks=2</code>, not hyperthreaded</td>
+<td>job script</td>
+<td>1</td>
+<td>1 × <code>n1</code>, 1 × <code>n2</code>
+</td>
+</tr>
+<tr class="even">
 <td><code>--nodes=2 --ntasks-per-node=2</code></td>
 <td>job script</td>
 <td>2</td>
 <td>2 × <code>n1</code>, 2 × <code>n2</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>--nodes=2 --ntasks=4 --cpus-per-task=2</code></td>
 <td>job script</td>
 <td>6</td>
 <td>6 × <code>n1</code>, 2 × <code>n2</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>--nodes=2 --ntasks=16</code></td>
 <td>job script</td>
 <td>9</td>
 <td>9 × <code>n1</code>, 8 × <code>n2</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>
 <code>--nodes=2 --ntasks=16</code>, another cluster</td>
 <td>job script</td>
@@ -350,14 +373,14 @@ where <code>n1</code> is the machine running the job script:</p>
 <td>2 × <code>n1</code>, 14 × <code>n2</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>--nodes=2 --ntasks=16 --cpus-per-task=3</code></td>
 <td>job script</td>
 <td>46</td>
 <td>46 × <code>n1</code>, 4 × <code>n2</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>--nodes=4 --ntasks=16 --cpus-per-task=1</code></td>
 <td>job script</td>
 <td>2</td>
@@ -365,7 +388,7 @@ where <code>n1</code> is the machine running the job script:</p>
 <code>n4</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>--nodes=2 --ntasks=4</code></td>
 <td>
 <code>salloc</code> shell</td>
@@ -373,7 +396,7 @@ where <code>n1</code> is the machine running the job script:</p>
 <td>2 × <code>n1</code>, 2 × <code>n2</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>--nodes=2</code></td>
 <td>
 <code>srun</code> task</td>
@@ -381,7 +404,7 @@ where <code>n1</code> is the machine running the job script:</p>
 <td>2 × <code>n1</code>, 2 × <code>n2</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>--nodes=1-2 --ntasks=16</code></td>
 <td>
 <code>srun</code> task</td>
@@ -389,7 +412,7 @@ where <code>n1</code> is the machine running the job script:</p>
 <td>16 × <code>n1</code>, 2 × <code>n2</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>--nodes=2 --ntasks=4 --cpus-per-task=3</code></td>
 <td>
 <code>srun</code> task</td>

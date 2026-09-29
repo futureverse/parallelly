@@ -140,13 +140,16 @@ clusters, where `n1` is the machine running the job script:
 | Slurm options | Where R runs | [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md) | [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md) |
 |----|----|----|----|
 | (none), hyperthreaded | job script | 2 | 2 × `n1` |
+| (none), not hyperthreaded | job script | 1 | 1 × `n1` |
 | `--ntasks=16 --cpus-per-task=1` | job script | 16 | 16 × `n1` |
 | `--nodes=1 --ntasks=4` | job script | 4 | 4 × `n1` |
 | `--nodes=1 --ntasks=4 --cpus-per-task=2` | job script | 8 | 8 × `n1` |
 | `--ntasks=1 --cpus-per-task=4` | job script | 4 | 4 × `n1` |
 | `--cpus-per-task=3`, hyperthreaded | job script | 4 | 4 × `n1` |
+| `--cpus-per-task=3`, not hyperthreaded | job script | 3 | 3 × `n1` |
 | `--nodes=1 --exclusive` | job script | all CPUs on `n1`, e.g. 336 | all CPUs × `n1` |
 | `--nodes=2 --ntasks=2`, hyperthreaded | job script | 2 | 2 × `n1`, 2 × `n2` |
+| `--nodes=2 --ntasks=2`, not hyperthreaded | job script | 1 | 1 × `n1`, 1 × `n2` |
 | `--nodes=2 --ntasks-per-node=2` | job script | 2 | 2 × `n1`, 2 × `n2` |
 | `--nodes=2 --ntasks=4 --cpus-per-task=2` | job script | 6 | 6 × `n1`, 2 × `n2` |
 | `--nodes=2 --ntasks=16` | job script | 9 | 9 × `n1`, 8 × `n2` |
