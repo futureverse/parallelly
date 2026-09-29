@@ -75,7 +75,7 @@ for spec in "${specs[@]}"; do
     -N parallelly-query
     -j y
     -o "${outdir}/\$JOB_ID.log"
-    -l h_rt=00:10:00
+    -l h_rt=00:03:00
     -l mem_free=300M  ## per slot
     -w "${verify}"
     "${extra_args[@]}"

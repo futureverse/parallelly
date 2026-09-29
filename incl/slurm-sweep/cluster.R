@@ -21,7 +21,7 @@ jobid <- Sys.getenv("SLURM_JOB_ID")
 
 ## Skip jobs with too many workers, e.g. --exclusive, which would take
 ## too long to launch
-max_workers <- as.integer(Sys.getenv("PQ_MAX_WORKERS", "128"))
+max_workers <- as.integer(Sys.getenv("PQ_MAX_WORKERS", "32"))
 
 workers <- availableWorkers()
 res <- list(

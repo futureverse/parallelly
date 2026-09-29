@@ -14,7 +14,7 @@ Rscript "${here}/probe.R" "${outdir}/${SLURM_JOB_ID}.dcf"
 srun Rscript "${here}/probe.R" "${outdir}/${SLURM_JOB_ID}.srun.%t.dcf"
 
 ## The per-worker view, when launching parallel workers as in the
-## 'parallelly-17-hpc-workers' vignette. Give up after four minutes,
+## 'parallelly-17-hpc-workers' vignette. Give up after 90 seconds,
 ## in case launching the workers stalls
-timeout 240 Rscript "${here}/cluster.R" "${outdir}" \
+timeout 90 Rscript "${here}/cluster.R" "${outdir}" \
   || echo "cluster.R failed (exit code $?)" >&2

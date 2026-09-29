@@ -37,7 +37,7 @@ deadline=${PQ_DEADLINE-now+2hours}
 
 ## Full grid of (--nodes, --ntasks, --cpus-per-task); "" = not specified
 nodes_set=("" 1 2 "1-2")
-ntasks_set=("" 1 2 4 16)
+ntasks_set=("" 1 2 4)
 cpus_per_task_set=("" 1 2 3 4)
 
 ## Additional, hand-picked specifications
@@ -48,6 +48,10 @@ extra_specs=(
   "--nodes=1 --ntasks=4 --cpus-per-task=2 --threads-per-core=1"
   "--nodes=2 --ntasks=4 --cpus-per-task=2 --distribution=cyclic"
   "--nodes=1 --exclusive"
+  ## Many tasks, split unevenly across nodes. Not part of the grid,
+  ## because, with --cpus-per-task, that many tasks may need up to 64
+  ## CPUs on one node, which may never become available
+  "--nodes=2 --ntasks=16"
   ## The job script in the 'parallelly-17-hpc-workers' vignette
   "--nodes=4 --ntasks=16 --cpus-per-task=1"
 )
@@ -79,7 +83,7 @@ for spec in "${specs[@]}"; do
   args=(
     --parsable
     --job-name=parallelly-query
-    --time=00:10:00
+    --time=00:03:00
     --mem-per-cpu=300M  ## one R worker per CPU, cf. cluster.R
     --output="${outdir}/%j.log"
     "${deadline_args[@]}"

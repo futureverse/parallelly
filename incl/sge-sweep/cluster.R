@@ -17,7 +17,7 @@ outdir <- args[1]
 jobid <- Sys.getenv("JOB_ID")
 
 ## Skip jobs with too many workers, which would take too long to launch
-max_workers <- as.integer(Sys.getenv("PQ_MAX_WORKERS", "128"))
+max_workers <- as.integer(Sys.getenv("PQ_MAX_WORKERS", "32"))
 
 workers <- availableWorkers()
 res <- list(
