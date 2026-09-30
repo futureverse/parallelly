@@ -109,7 +109,9 @@ older versions of Slurm, e.g. Slurm 21.08, where otherwise a worker
 waits for the CPUs of the other workers on the same machine, despite
 `--overlap`. If you need different `srun` options, you can specify them
 explicitly,
-e.g. `rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "-w")`.
+e.g. `rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "--cpus-per-task=1", "-w")`.
+Note that if you are on an older version of Slurm, e.g. Slurm 21.08, you
+need to include `--overcommit` as well.
 
 Here is the output from one such run, where the scheduler happened to
 allot the slots across 3 machines:

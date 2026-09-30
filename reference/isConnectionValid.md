@@ -123,7 +123,7 @@ connectionId(stdin())        ## 0L
 isConnectionValid(stdout())  ## TRUE
 #> [1] FALSE
 #> attr(,"reason")
-#> [1] "Connection (connection: index=3, description=\"\", class=\"file\", mode=\"w+b\", text=\"binary\", opened=\"opened\", can read=\"yes\", can write=\"yes\", id=NA) is no longer valid. It differ from the currently registered R connection with the same index 3 (connection: index=3, description=\"\", class=\"file\", mode=\"w+b\", text=\"binary\", opened=\"opened\", can read=\"yes\", can write=\"yes\", id=1403, raw_id=\"<pointer: 0x57b>\")"
+#> [1] "Connection (connection: index=3, description=\"\", class=\"file\", mode=\"w+b\", text=\"binary\", opened=\"opened\", can read=\"yes\", can write=\"yes\", id=NA) is no longer valid. It differ from the currently registered R connection with the same index 3 (connection: index=3, description=\"\", class=\"file\", mode=\"w+b\", text=\"binary\", opened=\"opened\", can read=\"yes\", can write=\"yes\", id=1413, raw_id=\"<pointer: 0x585>\")"
 connectionId(stdout())       ## 1L
 #> [1] NA
 isConnectionValid(stderr())  ## TRUE
@@ -142,7 +142,7 @@ connectionId(y$stderr)       ##  2L
 isConnectionValid(y$con)     ## FALSE with attribute 'reason'
 #> [1] FALSE
 #> attr(,"reason")
-#> [1] "Connection (connection: index=4, description=\"/tmp/hb/RtmpxabLP3/file10cf66392813e8\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=-1) is no longer valid. It differ from the currently registered R connection with the same index 4 (connection: index=4, description=\"/tmp/hb/RtmpxabLP3/file10cf66392813e8\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=1405, raw_id=\"<pointer: 0x57d>\")"
+#> [1] "Connection (connection: index=4, description=\"/tmp/hb/Rtmp83JQS3/file2672b41a00d3ed\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=-1) is no longer valid. It differ from the currently registered R connection with the same index 4 (connection: index=4, description=\"/tmp/hb/Rtmp83JQS3/file2672b41a00d3ed\", class=\"file\", mode=\"w\", text=\"text\", opened=\"opened\", can read=\"no\", can write=\"yes\", id=1415, raw_id=\"<pointer: 0x587>\")"
 connectionId(y$con)          ## -1L
 #> [1] -1
 close(con)

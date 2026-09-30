@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9042</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9043</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -229,7 +229,9 @@ e.g. Slurm 21.08, where otherwise a worker waits for the CPUs of the
 other workers on the same machine, despite <code>--overlap</code>. If
 you need different <code>srun</code> options, you can specify them
 explicitly,
-e.g. <code>rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "-w")</code>.</p>
+e.g. <code>rshcmd = c("srun", "--exact", "--overlap", "--nodes=1", "--ntasks=1", "--cpus-per-task=1", "-w")</code>.
+Note that if you are on an older version of Slurm, e.g. Slurm 21.08, you
+need to include <code>--overcommit</code> as well.</p>
 <p>Here is the output from one such run, where the scheduler happened to
 allot the slots across 3 machines:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="ex">Information</span> on R:</span>
