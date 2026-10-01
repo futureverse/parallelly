@@ -74,6 +74,10 @@
     machine running the job script. Now the workers are listed in the
     same order as in SGE file `PE_HOSTFILE`.
 
+  - `availableWorkers(methods = "SGE")` would give an error “missing
+    value where TRUE/FALSE needed”, if environment variable
+    `PE_HOSTFILE` was set, but `NSLOTS` was not.
+
 - [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   and
   [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
