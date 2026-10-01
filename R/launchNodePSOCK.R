@@ -216,7 +216,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
   setTimeLimit(elapsed = Inf)
 
   ## Successfully connected: remove the temporary PID file
-  readWorkerPID(pidfile)
+  removeWorkerPIDFile(pidfile)
 
   if (verbose) {
     mdebugf("%sConnection with worker #%s on %s established", verbose_prefix, rank, sQuote(worker))

@@ -471,7 +471,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     socket <- NULL
 
     ## Workers successfully connected: remove the temporary PID file
-    readWorkerPID(pidfile)
+    removeWorkerPIDFile(pidfile)
   } else if (setup_strategy == "sequential") {
     retryPort <- getOption2("parallelly.makeNodePSOCK.tries.port", "same")
     for (ii in seq_along(cl)) {

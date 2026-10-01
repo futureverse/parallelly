@@ -572,6 +572,12 @@ readWorkerPID <- function(pidfile, wait = 0.5, maxTries = 8L, verbose = FALSE) {
 } ## readWorkerPID()
 
 
+removeWorkerPIDFile <- function(pidfile) {
+  if (is.null(pidfile) || !file.exists(pidfile)) return(invisible(FALSE))
+  invisible(file.remove(pidfile))
+} ## removeWorkerPIDFile()
+
+
 # shQuote() that also accepts type = "none"
 shQuote <- local({
   known_types <- eval(formals(base::shQuote)[["type"]])
