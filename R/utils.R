@@ -188,7 +188,8 @@ warn_future_reexport_deprecation <- local({
     call <- sys.call(sys.parent())
     if (is.call(call) && is.call(call[[1]])) {
       env <- call[[1]]
-      if (as.character(env[[1]]) %in% c("::", ":::") && as.character(env[[2]]) == "future") {
+      if (is.symbol(env[[1]]) && as.character(env[[1]]) %in% c("::", ":::") &&
+          is.symbol(env[[2]]) && as.character(env[[2]]) == "future") {
         msg <- sprintf("future::%s() is deprecated. Please use the identical parallelly::%s() instead", name, name)
         
         calls <- sys.calls()
