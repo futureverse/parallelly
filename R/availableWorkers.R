@@ -528,7 +528,7 @@ availableWorkersSGE <- function() {
   ## on the UCSF Wynton SGE cluster, 'qsub -pe mpi-8 16 ...' will produce
   ## a job with w=2 workers and NSLOTS=16. /HB 2023-02-01
   nslots <- getenv_int("NSLOTS")
-  if (length(w) < nslots) {
+  if (!is.na(nslots) && length(w) < nslots) {
     warnf("Identified %d workers from the %s file (%s), which is less than environment variable %s = %d", length(w), sQuote("PE_HOSTFILE"), sQuote(pathname), sQuote("NSLOTS"), nslots)
   }
 

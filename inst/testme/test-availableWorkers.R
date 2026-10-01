@@ -474,6 +474,16 @@ print(w)
 stopifnot(identical(w, c(rep("n2", times = 4L), rep("n1", times = 2L))))
 file.remove(pathname)
 
+## PE_HOSTFILE set, but NSLOTS not set
+pathname <- tempfile(fileext = ".pe_hostfile")
+writeLines("n1 2 long.q@n1 UNDEFINED", con = pathname)
+Sys.unsetenv(sge_vars)
+Sys.setenv(PE_HOSTFILE = pathname, HOSTNAME = "n1")
+w <- availableWorkers(methods = "SGE")
+print(w)
+stopifnot(identical(w, c("n1", "n1")))
+file.remove(pathname)
+
 ## Cleanup
 Sys.unsetenv(sge_vars)
 if (!is.na(ohostname)) Sys.setenv(HOSTNAME = ohostname)

@@ -66,6 +66,10 @@
      hostname, which meant that the first worker was not necessarily
      the machine running the job script. Now the workers are listed in
      the same order as in SGE file `PE_HOSTFILE`.
+     
+   - `availableWorkers(methods = "SGE")` would give an error "missing
+     value where TRUE/FALSE needed", if environment variable
+     `PE_HOSTFILE` was set, but `NSLOTS` was not.
 
  * `availableCores()` and `availableWorkers()` on Slurm:
  
@@ -82,7 +86,7 @@
      `sbatch --nodes=2 --ntasks=16` returned 8 when it was
      given 10. Now it returns the value of environment variable
      `SLURM_CPUS_ON_NODE`, which is what `availableWorkers()`
-     reflects.
+     reflects.     
   
    - `availableCores(method = "Slurm")` in a task launched by Slurm's
      `srun` in a job without `--cpus-per-task=<c>` could overestimate
