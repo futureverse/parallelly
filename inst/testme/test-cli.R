@@ -46,6 +46,13 @@ print(parallelly::availableCores, call = TRUE)
 options(parallelly.tests.cmdargs = c("--max=4"))
 print(parallelly::availableCores, call = TRUE)
 
+options(parallelly.tests.cmdargs = c("--default=2", "--methods=non-existing-method"))
+out <- capture.output(print(parallelly::availableCores, call = TRUE))
+print(out)
+stopifnot(identical(trimws(out[1]), "2"))
+
+options(parallelly.tests.cmdargs = NULL)
+
 
 fcn <- function(abc = 0L, def = 0.0) {
   abc <- as.integer(abc)

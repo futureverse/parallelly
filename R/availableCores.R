@@ -921,7 +921,7 @@ slurm_step_ntasks_on_node <- function() {
 } ## slurm_step_ntasks_on_node()
 
 
-cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_character("default"), cli_arg_character("which"), cli_arg_integer("omit"), cli_arg_numeric("max"))
+cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_integer("default"), cli_arg_character("which"), cli_arg_integer("omit"), cli_arg_numeric("max"))
 
 
 ## Get the set of CPUs that the current process may run on, according to

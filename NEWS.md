@@ -131,6 +131,8 @@
    reused by another connection, e.g. when called via
    `capture.output()`.
 
+ * `Rscript -e parallelly::availableCores --default=n` gave an error.
+
 ## Deprecated and Defunct
 
  * Calling `future::availableCores()`, `future::availableWorkers()`,
