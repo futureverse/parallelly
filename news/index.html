@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9048</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9052</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,6 +124,7 @@
 <li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> would still record the call stack for each node, even if argument <code>calls = FALSE</code> (default).</p></li>
 <li><p><code><a href="../reference/serializedSize.html">serializedSize()</a></code> gave an error “version 3 not supported” in R (&lt; 3.5.0). Now it uses the same serialization version as <code><a href="https://rdrr.io/r/base/serialize.html" class="external-link">serialize()</a></code> does by default, i.e. version 2 in R (&lt; 3.6.0) and version 3 in R (&gt;= 3.6.0).</p></li>
 <li><p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> for <code>RichSOCKcluster</code> objects failed to report on broken connections in R (&lt; 4.0.0), if the connection index had been reused by another connection, e.g. when called via <code><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output()</a></code>.</p></li>
+<li><p><code>Rscript -e parallelly::availableCores --default=n</code> gave an error.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="deprecated-and-defunct-development-version">Deprecated and Defunct<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-development-version"></a></h3>

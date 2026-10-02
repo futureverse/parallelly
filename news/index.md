@@ -148,6 +148,8 @@
   called via
   [`capture.output()`](https://rdrr.io/r/utils/capture.output.html).
 
+- `Rscript -e parallelly::availableCores --default=n` gave an error.
+
 ### Deprecated and Defunct
 
 - Calling
