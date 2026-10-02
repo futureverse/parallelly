@@ -388,6 +388,20 @@ stopifnot(inherits(res, "error"))
 res <- tryCatch(availableCores(default = Inf), error = identity)
 stopifnot(inherits(res, "error"))
 
+## An unnamed default should not get missing names
+n <- availableCores(default = 2L, methods = "non-existing-method")
+print(n)
+stopifnot(n == 2L, is.null(names(n)))
+
+## ... also not when the minimum number of cores is enforced
+if (parallelly:::detectCores() >= 2L) {
+  oopts <- options(parallelly.availableCores.min = 2L)
+  n <- availableCores(default = 1L, methods = "non-existing-method")
+  print(n)
+  stopifnot(n == 2L, is.null(names(n)))
+  options(oopts)
+}
+
 ## Invalid omit (negative)
 res <- tryCatch(availableCores(omit = -1L), error = identity)
 stopifnot(inherits(res, "error"))

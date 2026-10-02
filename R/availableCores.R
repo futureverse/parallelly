@@ -537,8 +537,12 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     stop(sprintf("Option %s must not be greater than the number cores on the system: %d > %d", sQuote("parallelly.availableCores.min"), min, detectCores(logical = logical)))
   } else {
     idxs <- which(ncores < min)
-    ncores[idxs] <- as.integer(floor(min))
-    names(ncores)[idxs] <- paste(names(ncores)[idxs], "*", sep = "")
+    if (length(idxs) > 0L) {
+      ncores[idxs] <- as.integer(floor(min))
+      if (!is.null(names(ncores))) {
+        names(ncores)[idxs] <- paste(names(ncores)[idxs], "*", sep = "")
+      }
+    }
   }
 
   ## Use only a fraction of the cores?
