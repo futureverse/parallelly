@@ -393,6 +393,14 @@ n <- availableCores(default = 2L, methods = "non-existing-method")
 print(n)
 stopifnot(n == 2L, is.null(names(n)))
 
+## A non-integer default should be returned as an integer
+n <- availableCores(default = 2, methods = "non-existing-method")
+print(n)
+stopifnot(is.integer(n), n == 2L)
+n <- availableCores(default = c(abc = 2), methods = "non-existing-method")
+print(n)
+stopifnot(is.integer(n), n == 2L, identical(names(n), "abc"))
+
 ## ... also not when the minimum number of cores is enforced
 if (parallelly:::detectCores() >= 2L) {
   oopts <- options(parallelly.availableCores.min = 2L)

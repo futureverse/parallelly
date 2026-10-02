@@ -334,6 +334,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
 
   which <- match.arg(which, choices = c("min", "max", "all"))
   stop_if_not(length(default) == 1, is.finite(default), default >= 1L)
+  storage.mode(default) <- "integer"
 
   stop_if_not(length(fraction) == 1L, is.numeric(fraction),
               is.finite(fraction), fraction > 0, fraction <= 1)
