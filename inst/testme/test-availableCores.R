@@ -876,6 +876,18 @@ stopifnot(
 )
 Sys.unsetenv("NSLOTS")
 
+## Missing values should remain missing values when 'na.rm = FALSE'
+Sys.unsetenv("NSLOTS")
+ns <- availableCores(methods = c("system", "NSLOTS"), which = "all", na.rm = FALSE, max = 6L)
+print(ns)
+stopifnot(
+  length(ns) == 2L,
+  identical(names(ns), c("system", "NSLOTS")),
+  is.integer(ns),
+  ns[["system"]] <= 6L,
+  is.na(ns[["NSLOTS"]])
+)
+
 message("*** availableCores(max, which = 'all') ... DONE")
 
 

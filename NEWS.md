@@ -52,6 +52,9 @@
 
  * `availableCores(fraction = f)` would return unnamed values.
 
+ * `availableCores(which = "all", na.rm = FALSE, max = n)` would
+   report `n` instead of a missing value for methods that are not set.
+
  * `availableCores()` and `availableWorkers()` on SGE:
  
    - `availableCores(method = "SGE")` in a Grid Engine job script
