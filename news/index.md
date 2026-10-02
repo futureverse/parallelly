@@ -54,6 +54,11 @@
 - `availableCores(which = "all", max = n)` would return only the
   smallest value among all and unnamed.
 
+- `availableCores(fraction = f)` would return unnamed values.
+
+- `availableCores(which = "all", na.rm = FALSE, max = n)` would report
+  `n` instead of a missing value for methods that are not set.
+
 - [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   and
   [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)

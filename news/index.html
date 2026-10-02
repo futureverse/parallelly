@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9045</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9048</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,6 +103,8 @@
 <ul><li><p><code><a href="../reference/availableCores.html">availableCores()</a></code> did not respect CGroups v1 and v2 CPU quotas (<code>cpu.cfs_quota_us</code> and <code>cpu.max</code>) set on a parent CGroup when a less restricted one was set on the process itself.</p></li>
 <li><p><code>availableCores(methods = "/proc/self/status")</code> could overestimate the number of CPU cores on machines where not all CPU sockets are used. For example, a machine could hold 64 CPUs, but only 48 are installed.</p></li>
 <li><p><code>availableCores(which = "all", max = n)</code> would return only the smallest value among all and unnamed.</p></li>
+<li><p><code>availableCores(fraction = f)</code> would return unnamed values.</p></li>
+<li><p><code>availableCores(which = "all", na.rm = FALSE, max = n)</code> would report <code>n</code> instead of a missing value for methods that are not set.</p></li>
 <li>
 <p><code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> on SGE:</p>
 <ul><li><p><code>availableCores(method = "SGE")</code> in a Grid Engine job script would overestimate the number of CPU cores available for a multi-node job, because it returned the value of SGE environment variable <code>NSLOTS</code>. Now it returns the number of slots allotted to the current machine according to the SGE environment variable <code>PE_HOSTFILE</code> file (or the<code>pe_hostfile</code> under <code>SGE_JOB_SPOOL_DIR</code>), which is what <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> also uses. It only uses <code>NSLOTS</code> as a fallback if such a hostfile does not exist.</p></li>
