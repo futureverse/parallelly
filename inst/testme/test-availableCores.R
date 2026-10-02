@@ -777,6 +777,13 @@ stopifnot(length(n) == 1, is.integer(n), n >= 1L)
 expected <- max(1L, as.integer(floor(0.7 * n_sys)) - 1L)
 stopifnot(n == expected)
 
+## fraction should preserve names
+n <- availableCores(methods = "system", fraction = 0.5)
+stopifnot(identical(names(n), "system"))
+n_all <- availableCores(which = "all")
+n <- availableCores(which = "all", fraction = 0.5)
+stopifnot(identical(names(n), names(n_all)))
+
 ## fraction should always return at least 1
 n <- availableCores(methods = "system", fraction = 0.01)
 stopifnot(n >= 1L)

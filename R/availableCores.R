@@ -543,7 +543,9 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
 
   ## Use only a fraction of the cores?
   if (fraction < 1) {
+    names <- names(ncores)
     ncores <- as.integer(floor(fraction * ncores))
+    names(ncores) <- names
     ncores[ncores < 1L] <- 1L
   }
 

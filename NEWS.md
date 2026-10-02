@@ -50,6 +50,8 @@
  * `availableCores(which = "all", max = n)` would return only the
    smallest value among all and unnamed.
 
+ * `availableCores(fraction = f)` would return unnamed values.
+
  * `availableCores()` and `availableWorkers()` on SGE:
  
    - `availableCores(method = "SGE")` in a Grid Engine job script
