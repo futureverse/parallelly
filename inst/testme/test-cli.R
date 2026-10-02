@@ -49,7 +49,7 @@ print(parallelly::availableCores, call = TRUE)
 options(parallelly.tests.cmdargs = c("--default=2", "--methods=non-existing-method"))
 out <- capture.output(print(parallelly::availableCores, call = TRUE))
 print(out)
-stopifnot(identical(trimws(out[1]), "2"))
+stopifnot(identical(trimws(out), "2"))
 
 options(parallelly.tests.cmdargs = NULL)
 

@@ -97,7 +97,7 @@ print.cli_fcn <- function(x, ..., call = !interactive(), envir = parent.frame())
   }
 
   # Return nothing
-  invisible(return())
+  invisible(NULL)
 }
 
 
