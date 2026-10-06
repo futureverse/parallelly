@@ -53,6 +53,21 @@ stopifnot(identical(trimws(out), "2"))
 
 options(parallelly.tests.cmdargs = NULL)
 
+## An out-of-range 'default' or 'omit' passed via the CLI should trigger
+## availableCores()'s own validation error, not an earlier, less clear
+## one from the CLI argument parser silently coercing it to NA first
+options(parallelly.tests.cmdargs = c("--default=10000000000"))
+res <- tryCatch(print(parallelly::availableCores, call = TRUE), error = identity)
+print(res)
+stopifnot(inherits(res, "error"), grepl("integer.max", conditionMessage(res), fixed = TRUE))
+
+options(parallelly.tests.cmdargs = c("--omit=10000000000"))
+res <- tryCatch(print(parallelly::availableCores, call = TRUE), error = identity)
+print(res)
+stopifnot(inherits(res, "error"), grepl("integer.max", conditionMessage(res), fixed = TRUE))
+
+options(parallelly.tests.cmdargs = NULL)
+
 
 fcn <- function(abc = 0L, def = 0.0) {
   abc <- as.integer(abc)

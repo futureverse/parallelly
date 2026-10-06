@@ -333,14 +333,15 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
   }
 
   which <- match.arg(which, choices = c("min", "max", "all"))
-  stop_if_not(length(default) == 1, is.finite(default), default >= 1L)
+  stop_if_not(length(default) == 1, is.finite(default), default >= 1L,
+              default <= .Machine$integer.max)
   storage.mode(default) <- "integer"
 
   stop_if_not(length(fraction) == 1L, is.numeric(fraction),
               is.finite(fraction), fraction > 0, fraction <= 1)
 
   stop_if_not(length(omit) == 1L, is.numeric(omit),
-              is.finite(omit), omit >= 0L)
+              is.finite(omit), omit >= 0L, omit <= .Machine$integer.max)
   omit <- as.integer(omit)
 
   stop_if_not(length(max) == 1L, is.numeric(max), !is.na(max), max >= 1L)
@@ -922,7 +923,7 @@ slurm_step_ntasks_on_node <- function() {
 } ## slurm_step_ntasks_on_node()
 
 
-cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_integer("default"), cli_arg_character("which"), cli_arg_integer("omit"), cli_arg_numeric("max"))
+cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_numeric("default"), cli_arg_character("which"), cli_arg_numeric("omit"), cli_arg_numeric("max"))
 
 
 ## Get the set of CPUs that the current process may run on, according to

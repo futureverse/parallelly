@@ -388,6 +388,10 @@ stopifnot(inherits(res, "error"))
 res <- tryCatch(availableCores(default = Inf), error = identity)
 stopifnot(inherits(res, "error"))
 
+## Invalid default (too large to represent as an integer)
+res <- tryCatch(availableCores(default = 1e10), error = identity)
+stopifnot(inherits(res, "error"))
+
 ## An unnamed default should not get missing names
 n <- availableCores(default = 2L, methods = "non-existing-method")
 print(n)
@@ -416,6 +420,10 @@ stopifnot(inherits(res, "error"))
 
 ## Invalid omit (not finite)
 res <- tryCatch(availableCores(omit = Inf), error = identity)
+stopifnot(inherits(res, "error"))
+
+## Invalid omit (too large to represent as an integer)
+res <- tryCatch(availableCores(omit = 1e10), error = identity)
 stopifnot(inherits(res, "error"))
 
 ## Invalid max (< 1)
