@@ -55,9 +55,6 @@
  * `availableCores(which = "all", na.rm = FALSE, max = n)` would
    report `n` instead of a missing value for methods that are not set.
 
- * `availableWorkers()` did not always acknowledge all CGroups v2
-   settings.
-
  * `availableCores()` and `availableWorkers()` on PBS:
  
    - `availableWorkers(method = "PBS")` would produce incorrect
@@ -109,6 +106,11 @@
      for each of 16 tasks, while only sharing 16 CPUs. In multi-node
      jobs, it returned the number of Slurm tasks on the first node,
      e.g. 14 for each of 14 tasks, while only sharing 16 CPUs.
+
+ * `availableWorkers()` did not always acknowledge all CGroups v2
+   settings.
+
+ * `availableWorkers()` did not acknowledge `methods = "/proc/self/status"`.
 
  * `isNodeAlive()` and `killNode()` would give an error, e.g.
    "Error in as.character(x) : cannot coerce type 'closure' to

@@ -111,7 +111,7 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.availableCores.max}:}{(integer; positive) The default maximum number of cores to return.}
 
-\item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")})}
+\item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")})}
 
 \item{\code{parallelly.availableWorkers.methods.excludes}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}} to be excluded. (Default: \code{NULL})}
 

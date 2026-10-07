@@ -32,7 +32,7 @@
 #'
 #'  \item{`parallelly.availableCores.max`:}{(integer; positive) The default maximum number of cores to return.}
 #'
-#'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")`)}
+#'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")`)}
 #'
 #'  \item{`parallelly.availableWorkers.methods.excludes`:}{(character vector) Default lookup methods for [availableWorkers()] to be excluded. (Default: `NULL`)}
 #'
