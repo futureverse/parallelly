@@ -364,15 +364,16 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     timeout <- options[["timeout"]]
     useXDR <- options[["useXDR"]]
     nodeClass <- c("RichSOCKnode", if(useXDR) "SOCKnode" else "SOCK0node")
-    cmd <- options[["cmd"]]
-    pidfile <- options[["pidfile"]]
-    ## Make sure to remove the temporary PID file also if we error,
-    ## e.g. because of a connection timeout
-    on.exit(removeWorkerPIDFile(pidfile), add = TRUE)
+
+    ## Give nodes their own 'cmd' and 'pidfile'
+    cmds <- vapply(nodeOptions, FUN = function(o) o[["cmd"]], FUN.VALUE = NA_character_)
+    pidfiles <- lapply(nodeOptions, FUN = function(o) o[["pidfile"]])
+    ## Remove temporary PID files on exit, also on errors
+    on.exit(lapply(pidfiles, FUN = removeWorkerPIDFile), add = TRUE)
 
     if (verbose) {
       mdebugf("%sSystem call to launch all workers:", verbose_prefix)
-      mdebugf("%s%s", verbose_prefix, cmd)
+      mdebugf("%s%s", verbose_prefix, cmds)
     }
 
     ## FIXME: Add argument, option, environment variable for this
@@ -385,13 +386,13 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     assert_system_is_supported()
 
     if (.Platform[["OS.type"]] == "windows") {
-      for (ii in seq_along(cl)) {
+      for (cmd in cmds) {
         ## See parallel::newPSOCKnode() for the input = ""
         system(cmd, wait = FALSE, input = "")
       }
     } else {
       ## Asynchronous lists are defined by POSIX
-      cmd <- paste(rep(cmd, times = length(cl)), collapse = " & ")
+      cmd <- paste(cmds, collapse = " & ")
       system(cmd, wait = FALSE)
     }
 
@@ -425,6 +426,14 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
           ## The workers will give up after connectTimeout, so there is
           ## no point waiting for them much longer.
           failed <- length(cl) - ready
+
+          ## If at least one worker failed to connect in time, lets
+          ## terminate them all already here
+          for (pidfile in pidfiles) {
+            pid <- readWorkerPID(pidfile, wait = 0, maxTries = 1L)
+            if (!is.null(pid)) pid_kill(pid)
+          }
+
           stop(sprintf(ngettext(failed,
                "Cluster setup failed (connectTimeout=%.1f seconds). %d worker of %d failed to connect.",
                "Cluster setup failed (connectTimeout=%.1f seconds). %d of %d workers failed to connect."),
@@ -473,8 +482,8 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     try(close(socket), silent = TRUE)
     socket <- NULL
 
-    ## Workers successfully connected: remove the temporary PID file
-    removeWorkerPIDFile(pidfile)
+    ## Workers successfully connected: remove the temporary PID files
+    lapply(pidfiles, FUN = removeWorkerPIDFile)
   } else if (setup_strategy == "sequential") {
     retryPort <- getOption2("parallelly.makeNodePSOCK.tries.port", "same")
     for (ii in seq_along(cl)) {

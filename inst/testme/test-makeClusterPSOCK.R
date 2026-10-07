@@ -374,6 +374,25 @@ if (getRversion() >= "4.0.0") {
   Sys.sleep(1.0)
   pidfiles_after <- list.files(tempdir(), pattern = "[.]pid$", full.names = TRUE)
   stopifnot(length(setdiff(pidfiles_after, pidfiles_before)) == 0L)
+
+  ## Same, but with more than one worker, each of which has its own,
+  ## separate temporary PID file
+  pidfiles_before <- list.files(tempdir(), pattern = "[.]pid$", full.names = TRUE)
+  res <- tryCatch({
+    parallelly::makeClusterPSOCK(3L, rscript_startup = quote(Sys.sleep(6.0)),
+                                 connectTimeout = 0.1, timeout = 7.0)
+  }, error = identity)
+  print(res)
+  stopifnot(
+    inherits(res, "error"),
+    grepl("^Cluster setup failed", conditionMessage(res))
+  )
+
+  if (on_windows) Sys.sleep(5.0)
+
+  Sys.sleep(1.0)
+  pidfiles_after <- list.files(tempdir(), pattern = "[.]pid$", full.names = TRUE)
+  stopifnot(length(setdiff(pidfiles_after, pidfiles_before)) == 0L)
 }
 
 message("*** makeClusterPSOCK() ... DONE")

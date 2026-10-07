@@ -121,8 +121,9 @@
  * `makeClusterPSOCK()` would still record the call stack for each
    node, even if argument `calls = FALSE` (default).
    
- * `makeClusterPSOCK()` would leave behind temporary PID files, if
-   the parallel cluster setup failed due to a connection timeout.
+ * `makeClusterPSOCK()` would leave worker processes, and their
+   temporary PID files, running in the background, if the parallel
+   cluster setup failed due to a connection timeout.
 
  * `serializedSize()` gave an error "version 3 not supported" in R
    (< 3.5.0). Now it uses the same serialization version as
