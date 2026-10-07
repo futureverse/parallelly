@@ -55,6 +55,9 @@
  * `availableCores(which = "all", na.rm = FALSE, max = n)` would
    report `n` instead of a missing value for methods that are not set.
 
+ * `availableWorkers()` did not always acknowledge all CGroups v2
+   settings.
+
  * `availableCores()` and `availableWorkers()` on PBS:
  
    - `availableWorkers(method = "PBS")` would produce incorrect

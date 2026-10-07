@@ -166,7 +166,7 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
   which <- match.arg(which, choices = c("auto", "min", "max", "all"))
   stop_if_not(is.character(default), length(default) >= 1, !anyNA(default))
 
-  methods_localhost <- c("BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "mc.cores", "mc.cores+1", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system")
+  methods_localhost <- c("BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "mc.cores", "mc.cores+1", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system")
 
   pattern_connections <- "^connections(|-[[:digit:]]+)$"
   idxs <- grep(pattern_connections, constraints)
