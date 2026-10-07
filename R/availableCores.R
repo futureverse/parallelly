@@ -406,6 +406,7 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       ## Number of cores available according to parallel::detectCores()
       n <- detectCores(logical = logical)
     } else if (method == "/proc/self/status") {
+      n <- NA_integer_
       cpus <- getProcSelfStatusCpuSet()
       if (length(cpus) > 0L) n <- length(cpus)
     } else if (method == "cgroups.cpuset") {
