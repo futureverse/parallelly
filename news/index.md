@@ -59,9 +59,6 @@
 - `availableCores(which = "all", na.rm = FALSE, max = n)` would report
   `n` instead of a missing value for methods that are not set.
 
-- [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
-  did not always acknowledge all CGroups v2 settings.
-
 - [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   and
   [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
@@ -124,6 +121,12 @@
     the number of Slurm tasks on the first node, e.g. 14 for each of 14
     tasks, while only sharing 16 CPUs.
 
+- [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+  did not always acknowledge all CGroups v2 settings.
+
+- [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+  did not acknowledge `methods = "/proc/self/status"`.
+
 - [`isNodeAlive()`](https://parallelly.futureverse.org/reference/isNodeAlive.md)
   and
   [`killNode()`](https://parallelly.futureverse.org/reference/killNode.md)
@@ -165,7 +168,12 @@
   called via
   [`capture.output()`](https://rdrr.io/r/utils/capture.output.html).
 
-- `Rscript -e parallelly::availableCores --default=n` gave an error.
+- Command-line interface:
+
+  - `Rscript -e parallelly::availableCores --default=<integer>` gave an
+    error.
+
+  - `Rscript -e parallelly::freePort --default=<integer>` gave an error.
 
 ### Deprecated and Defunct
 

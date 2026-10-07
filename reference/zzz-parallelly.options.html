@@ -23,7 +23,7 @@ further notice."><meta property="og:image" content="https://parallelly.futurever
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9060</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9065</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -144,7 +144,7 @@ further notice.</em></p>
 
 
 <dt><code>parallelly.availableWorkers.methods</code>:</dt>
-<dd><p>(character vector) Default lookup methods for <code><a href="availableWorkers.html">availableWorkers()</a></code>. (Default: <code>c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")</code>)</p></dd>
+<dd><p>(character vector) Default lookup methods for <code><a href="availableWorkers.html">availableWorkers()</a></code>. (Default: <code>c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")</code>)</p></dd>
 
 
 <dt><code>parallelly.availableWorkers.methods.excludes</code>:</dt>
