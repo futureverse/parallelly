@@ -66,7 +66,12 @@
 #' Sys.setenv(R_PARALLELLY_RANDOM_PORTS = oenv)
 #' @export
 freePort <- function(ports = 1024:65535, default = "random", randomize = TRUE) {
-  if (is.character(default)) {
+  ## Handle when called from the command line, e.g. --default=1024
+  if (inherits(default, "cmd_arg") && is.character(default) &&
+      length(default) == 1L && grepl("^[[:digit:]]+$", default)) {
+    default <- as.numeric(default)
+    default <- assertPort(default)
+  } else if (is.character(default)) {
     default <- match.arg(default, choices = c("first", "random"))
   } else {
     default <- as.integer(default)
@@ -126,11 +131,10 @@ freePort <- function(ports = 1024:65535, default = "random", randomize = TRUE) {
 
 assertPort <- function(port) {
   stop_if_not(is.numeric(port), length(port) == 1L)
-  port <- as.integer(port)
   if (is.na(port) || port < 0L || port > 65535L) {
     stopf("Invalid port: %s", port)
   }
-  port
+  as.integer(port)
 }
 
 

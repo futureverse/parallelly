@@ -146,10 +146,13 @@
    reused by another connection, e.g. when called via
    `capture.output()`.
 
- * `Rscript -e parallelly::availableCores --default=n` gave an error.
+ * Command-line interface:
+ 
+   - `Rscript -e parallelly::availableCores --default=<integer>` gave
+     an error.
 
- * `Rscript -e parallelly::availableWorkers --default=name` gave an
-   error.
+   - `Rscript -e parallelly::freePort --default=<integer>` gave an
+     error.
 
 ## Deprecated and Defunct
 
