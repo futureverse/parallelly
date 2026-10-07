@@ -63,32 +63,26 @@ stand-in replacement of the default
 Most of **parallelly** functions apply also to clusters created by the
 **parallel** package. For example,
 
-``` r
-
-cl <- parallel::makeCluster(2)
-cl <- parallelly::autoStopCluster(cl)
-```
+\
+`cl`` ``<-`` ``parallel``::`[`makeCluster`](https://rdrr.io/r/parallel/makeCluster.html)`(``2``)`\
+`cl`` ``<-`` ``parallelly``::`[`autoStopCluster`](https://parallelly.futureverse.org/reference/autoStopCluster.md)`(``cl``)`
 
 makes the cluster created by **parallel** to shut down automatically
 when R’s garbage collector removes the cluster object. This lowers the
 risk for leaving stray R worker processes running in the background by
 mistake. Another way to achieve the above in a single call is to use:
 
-``` r
-
-cl <- parallel::makeCluster(2, type = "RPSOCK", autoStop = TRUE)
-```
+\
+`cl`` ``<-`` ``parallel``::`[`makeCluster`](https://rdrr.io/r/parallel/makeCluster.html)`(``2``, type ``=`` ``"RPSOCK"``, autoStop ``=`` ``TRUE``)`
 
 For older versions of R, use:
 
-``` r
-
-# R (>= 4.5 && <= 4.6):
-cl <- parallel::makeCluster(2, type = parallelly::RPSOCK, autoStop = TRUE)
-
-# R (< 4.5):
-cl <- parallelly::makeClusterPSOCK(2, autoStop = TRUE)
-```
+\
+`# R (>= 4.5 && <= 4.6):`\
+`cl`` ``<-`` ``parallel``::`[`makeCluster`](https://rdrr.io/r/parallel/makeCluster.html)`(``2``, type ``=`` ``parallelly``::`[`RPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`, autoStop ``=`` ``TRUE``)`\
+\
+`# R (< 4.5):`\
+`cl`` ``<-`` ``parallelly``::`[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(``2``, autoStop ``=`` ``TRUE``)`
 
 ### availableCores() vs parallel::detectCores()
 
@@ -218,36 +212,37 @@ also be set with `future.*` and `R_FUTURE_*` prefixes.
 
 ## Roadmap
 
-Submit **parallelly** to CRAN, with minimal changes compared to the
-corresponding functions in the **future** package (on CRAN as of
-2020-10-20)
+- [x] Submit **parallelly** to CRAN, with minimal changes compared to
+  the corresponding functions in the **future** package (on CRAN as of
+  2020-10-20)
 
-Update the **future** package to import and re-export the functions from
-**parallelly** to maximize backward compatibility in the future
-framework (**future** 1.20.1 on CRAN as of 2020-11-03)
+- [x] Update the **future** package to import and re-export the
+  functions from **parallelly** to maximize backward compatibility in
+  the future framework (**future** 1.20.1 on CRAN as of 2020-11-03)
 
-Switch to use 10-15% faster `useXDR=FALSE`
+- [x] Switch to use 10-15% faster `useXDR=FALSE`
 
-Implement same fast parallel setup of parallel PSOCK workers as in
-**parallel** (\>= 4.0.0)
+- [x] Implement same fast parallel setup of parallel PSOCK workers as in
+  **parallel** (\>= 4.0.0)
 
-After having validated that there is no negative impact on the future
-framework, allow for changes in the **parallelly** package,
-e.g. renaming the R options and environment variable to be
-`parallelly.*` and `R_PARALLELLY_*` while falling back to `future.*` and
-`R_FUTURE_*`
+- [x] After having validated that there is no negative impact on the
+  future framework, allow for changes in the **parallelly** package,
+  e.g. renaming the R options and environment variable to be
+  `parallelly.*` and `R_PARALLELLY_*` while falling back to `future.*`
+  and `R_FUTURE_*`
 
-Add vignettes on how to set up cluster running on local or remote
-machines, including in Linux containers and on popular cloud services,
-and vignettes on common problems and how to troubleshoot them
+- [x] Add vignettes on how to set up cluster running on local or remote
+  machines, including in Linux containers and on popular cloud services,
+  and vignettes on common problems and how to troubleshoot them
 
-Migrate, currently internal, UUID functions and export them,
-e.g. `uuid()`, `connectionUuid()`, and `sessionUuid()`
-(<https://github.com/HenrikBengtsson/Wishlist-for-R/issues/96>). Because
-[R does not have a built-in md5 checksum function that operates on
-object](https://github.com/HenrikBengtsson/Wishlist-for-R/issues/21),
-these functions require us adding a dependency on the
-**[digest](https://cran.r-project.org/package=digest)** package.
+- [ ] Migrate, currently internal, UUID functions and export them,
+  e.g. `uuid()`, `connectionUuid()`, and `sessionUuid()`
+  (<https://github.com/HenrikBengtsson/Wishlist-for-R/issues/96>).
+  Because [R does not have a built-in md5 checksum function that
+  operates on
+  object](https://github.com/HenrikBengtsson/Wishlist-for-R/issues/21),
+  these functions require us adding a dependency on the
+  **[digest](https://cran.r-project.org/package=digest)** package.
 
 Initially, backward compatibility for the **future** package is of top
 priority.

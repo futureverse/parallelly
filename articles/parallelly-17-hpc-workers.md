@@ -51,27 +51,25 @@ Rscript script.R
 
 script.R:
 
-``` r
-
-library(parallelly)
-library(parallel)
-
-cl <- makeClusterPSOCK(
-  availableWorkers(),
-  rshcmd = "<hpc>",
-  rscript_startup = quote(options(mc.cores = 1L))
-)
-print(cl)
-
-# Perform calculations in parallel
-X <- 1:100
-y <- parLapply(cl = cl, X, fun = sqrt)
-y <- unlist(y)
-z <- sum(y)
-print(z)
-
-stopCluster(cl)
-```
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`parallelly`](https://parallelly.futureverse.org)`)`\
+[`library`](https://rdrr.io/r/base/library.html)`(``parallel``)`\
+\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(`\
+`  `[`availableWorkers`](https://parallelly.futureverse.org/reference/availableWorkers.md)`(``)``,`\
+`  rshcmd ``=`` ``"<hpc>"``,`\
+`  rscript_startup ``=`` `[`quote`](https://rdrr.io/r/base/substitute.html)`(`[`options`](https://rdrr.io/r/base/options.html)`(``mc.cores ``=`` ``1L``)``)`\
+`)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``cl``)`\
+\
+`# Perform calculations in parallel`\
+`X`` ``<-`` ``1``:``100`\
+`y`` ``<-`` `[`parLapply`](https://rdrr.io/r/parallel/clusterApply.html)`(``cl ``=`` ``cl``, ``X``, fun ``=`` ``sqrt``)`\
+`y`` ``<-`` `[`unlist`](https://rdrr.io/r/base/unlist.html)`(``y``)`\
+`z`` ``<-`` `[`sum`](https://rdrr.io/r/base/sum.html)`(``y``)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``z``)`\
+\
+[`stopCluster`](https://rdrr.io/r/parallel/makeCluster.html)`(``cl``)`
 
 The `script.sh` file is a job script that we submit to the scheduler
 that runs the R script `script.R` when launched. We can submit
@@ -210,27 +208,25 @@ Rscript script.R
 
 script.R:
 
-``` r
-
-library(parallelly)
-library(parallel)
-
-cl <- makeClusterPSOCK(
-  availableWorkers(),
-  rshcmd = "<hpc>",
-  rscript_startup = quote(options(mc.cores = 1L))
-)
-print(cl)
-
-# Perform calculations in parallel
-X <- 1:100
-y <- parLapply(cl = cl, X, fun = sqrt)
-y <- unlist(y)
-z <- sum(y)
-print(z)
-
-stopCluster(cl)
-```
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`parallelly`](https://parallelly.futureverse.org)`)`\
+[`library`](https://rdrr.io/r/base/library.html)`(``parallel``)`\
+\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(`\
+`  `[`availableWorkers`](https://parallelly.futureverse.org/reference/availableWorkers.md)`(``)``,`\
+`  rshcmd ``=`` ``"<hpc>"``,`\
+`  rscript_startup ``=`` `[`quote`](https://rdrr.io/r/base/substitute.html)`(`[`options`](https://rdrr.io/r/base/options.html)`(``mc.cores ``=`` ``1L``)``)`\
+`)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``cl``)`\
+\
+`# Perform calculations in parallel`\
+`X`` ``<-`` ``1``:``100`\
+`y`` ``<-`` `[`parLapply`](https://rdrr.io/r/parallel/clusterApply.html)`(``cl ``=`` ``cl``, ``X``, fun ``=`` ``sqrt``)`\
+`y`` ``<-`` `[`unlist`](https://rdrr.io/r/base/unlist.html)`(``y``)`\
+`z`` ``<-`` `[`sum`](https://rdrr.io/r/base/sum.html)`(``y``)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``z``)`\
+\
+[`stopCluster`](https://rdrr.io/r/parallel/makeCluster.html)`(``cl``)`
 
 The `script.sh` file is a job script that we submit to the scheduler
 that runs the R script `script.R` when launched. If we submit
@@ -338,27 +334,25 @@ Rscript script.R
 
 script.R:
 
-``` r
-
-library(parallelly)
-library(parallel)
-
-cl <- makeClusterPSOCK(
-  availableWorkers(),
-  rshcmd = "<hpc>",
-  rscript_startup = quote(options(mc.cores = 1L))
-)
-print(cl)
-
-# Perform calculations in parallel
-X <- 1:100
-y <- parLapply(cl = cl, X, fun = sqrt)
-y <- unlist(y)
-z <- sum(y)
-print(z)
-
-stopCluster(cl)
-```
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`parallelly`](https://parallelly.futureverse.org)`)`\
+[`library`](https://rdrr.io/r/base/library.html)`(``parallel``)`\
+\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(`\
+`  `[`availableWorkers`](https://parallelly.futureverse.org/reference/availableWorkers.md)`(``)``,`\
+`  rshcmd ``=`` ``"<hpc>"``,`\
+`  rscript_startup ``=`` `[`quote`](https://rdrr.io/r/base/substitute.html)`(`[`options`](https://rdrr.io/r/base/options.html)`(``mc.cores ``=`` ``1L``)``)`\
+`)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``cl``)`\
+\
+`# Perform calculations in parallel`\
+`X`` ``<-`` ``1``:``100`\
+`y`` ``<-`` `[`parLapply`](https://rdrr.io/r/parallel/clusterApply.html)`(``cl ``=`` ``cl``, ``X``, fun ``=`` ``sqrt``)`\
+`y`` ``<-`` `[`unlist`](https://rdrr.io/r/base/unlist.html)`(``y``)`\
+`z`` ``<-`` `[`sum`](https://rdrr.io/r/base/sum.html)`(``y``)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``z``)`\
+\
+[`stopCluster`](https://rdrr.io/r/parallel/makeCluster.html)`(``cl``)`
 
 The `script.sh` file is a job script that we submit to the scheduler
 that runs the R script `script.R` when launched. We can submit
@@ -396,12 +390,10 @@ evaluated by the workers parallelizes further based on
 [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md),
 e.g.
 
-``` r
-
-y <- parLapply(cl = cl, X, fun = function(x) {
-  parallel::mclapply(x, FUN = slow_fcn, mc.cores = parallelly::availableCores())
-})
-```
+\
+`y`` ``<-`` `[`parLapply`](https://rdrr.io/r/parallel/clusterApply.html)`(``cl ``=`` ``cl``, ``X``, fun ``=`` ``function``(``x``)`` ``{`\
+`  ``parallel``::`[`mclapply`](https://rdrr.io/r/parallel/mclapply.html)`(``x``, FUN ``=`` ``slow_fcn``, mc.cores ``=`` ``parallelly``::`[`availableCores`](https://parallelly.futureverse.org/reference/availableCores.md)`(``)``)`\
+`}``)`
 
 then there could be up to 64 R processes competing for 8 CPU cores. With
 `mc.cores = 1L`,

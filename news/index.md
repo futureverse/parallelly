@@ -59,6 +59,18 @@
 - `availableCores(which = "all", na.rm = FALSE, max = n)` would report
   `n` instead of a missing value for methods that are not set.
 
+- [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+  did not always acknowledge all CGroups v2 settings.
+
+- [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+  and
+  [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+  on PBS:
+
+  - `availableWorkers(method = "PBS")` would produce incorrect warnings
+    on number of workers not matching the PBS environment variables,
+    when those were actually not set.
+
 - [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   and
   [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
@@ -134,6 +146,11 @@
 - [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
   would still record the call stack for each node, even if argument
   `calls = FALSE` (default).
+
+- [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
+  would leave worker processes, and their temporary PID files, running
+  in the background, if the parallel cluster setup failed due to a
+  connection timeout.
 
 - [`serializedSize()`](https://parallelly.futureverse.org/reference/serializedSize.md)
   gave an error “version 3 not supported” in R (\< 3.5.0). Now it uses
@@ -1117,8 +1134,8 @@ CRAN release: 2021-09-09
 
 ### CRAN Policies
 
-- `example("isNodeAlive")` now uses `\donttest{}` to avoid long (\> 10
-  19. elapsed run times on MS Windows.
+- `example("isNodeAlive")` now uses `\donttest{}` to avoid long (\>
+  10 s) elapsed run times on MS Windows.
 
 ## Version 1.28.0
 

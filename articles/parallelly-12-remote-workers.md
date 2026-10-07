@@ -223,7 +223,7 @@ To configure SSH to use port 2201 and username `alice` whenever
 connecting to `n1.remote.org`, the `~/.ssh/config` file should contain
 the following entry:
 
-``` plain
+```
 Host n1.remote.org
   User alice
   Port 2201
@@ -246,7 +246,7 @@ cl <- makeClusterPSOCK("n1.remote.org")
 
 To achieve the same for other machines, add another entry for them, e.g.
 
-``` plain
+```
 Host n1.remote.org
   User alice
   Port 2201
@@ -263,7 +263,7 @@ When hosts on the same system share the same setting, one can use
 globbing to configure them the same way. For instance, the above can be
 shorted to:
 
-``` plain
+```
 Host n?.remote.org
   User alice
   Port 2201
@@ -287,15 +287,13 @@ Contrary to local parallel workers, the number of parallel workers on
 remote machines is specified by repeating the machine name an equal
 number of times;
 
-``` r
-
-library(parallelly)
-workers <- c("n1.remote.org", "n1.remote.org")
-cl <- makeClusterPSOCK(workers, user = "alice")
-print(cl)
-#> Socket cluster with 2 nodes are on host 'n1.remote.org' (R version 4.6.1
-#> (2026-06-24), platform x86_64-pc-linux-gnu)
-```
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`parallelly`](https://parallelly.futureverse.org)`)`\
+`workers`` ``<-`` `[`c`](https://rdrr.io/r/base/c.html)`(``"n1.remote.org"``, ``"n1.remote.org"``)`\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(``workers``, user ``=`` ``"alice"``)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``cl``)`\
+`#> Socket cluster with 2 nodes are on host 'n1.remote.org' (R version 4.6.1`\
+`#> (2026-06-24), platform x86_64-pc-linux-gnu)`
 
 *Comment*: In the **parallel** package, a parallel worker is referred to
 a parallel node, or short *node*, which is why we use the same term in
@@ -332,17 +330,15 @@ This example sets up a parallel worker on each of two remote machines
 previous example, but now the two SSH connections go to two different
 machines rather than the same.
 
-``` r
-
-library(parallelly)
-workers <- c("n1.remote.org", "n2.remote.org")
-cl <- makeClusterPSOCK(workers, user = "alice")
-print(cl)
-#> Socket cluster with 2 nodes where 1 node is on host 'n1.remote.org'
-#> (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)
-#> 1 node is on host 'n2.remote.org' (R version 4.6.1 (2026-06-24),
-#> platform x86_64-pc-linux-gnu)
-```
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`parallelly`](https://parallelly.futureverse.org)`)`\
+`workers`` ``<-`` `[`c`](https://rdrr.io/r/base/c.html)`(``"n1.remote.org"``, ``"n2.remote.org"``)`\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(``workers``, user ``=`` ``"alice"``)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``cl``)`\
+`#> Socket cluster with 2 nodes where 1 node is on host 'n1.remote.org'`\
+`#> (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)`\
+`#> 1 node is on host 'n2.remote.org' (R version 4.6.1 (2026-06-24),`\
+`#> platform x86_64-pc-linux-gnu)`
 
 *Technical details*: If we would add `verbose = TRUE` also in this case,
 we would see:
@@ -354,11 +350,9 @@ Recall, if we have configured SSH to pick up the username `alice` from
 `~/.ssh/config` on our local machine, as shown in the previous section,
 we could have skipped the `user` argument, and just used:
 
-``` r
-
-workers <- c("n1.remote.org", "n2.remote.org")
-cl <- makeClusterPSOCK(workers)
-```
+\
+`workers`` ``<-`` `[`c`](https://rdrr.io/r/base/c.html)`(``"n1.remote.org"``, ``"n2.remote.org"``)`\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(``workers``)`
 
 Note how these instructions for setting up a parallel cluster on these
 two machines would be the identical for another user that has configured
@@ -374,17 +368,15 @@ specified, because it has already been configured via the
 `~/.ssh/config` file. With this, we can sets up two parallel workers on
 `n1.remote.org` and one on `n2.remote.org`, by:
 
-``` r
-
-library(parallelly)
-workers <- c("n1.remote.org", "n1.remote.org", "n2.remote.org")
-cl <- makeClusterPSOCK(workers)
-print(cl)
-#> Socket cluster with 3 nodes where 2 nodes are on host 'n1.remote.org'
-#> (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)
-#> 1 node is on host 'n2.remote.org' (R version 4.6.1 (2026-06-24),
-#> platform x86_64-pc-linux-gnu)
-```
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`parallelly`](https://parallelly.futureverse.org)`)`\
+`workers`` ``<-`` `[`c`](https://rdrr.io/r/base/c.html)`(``"n1.remote.org"``, ``"n1.remote.org"``, ``"n2.remote.org"``)`\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(``workers``)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``cl``)`\
+`#> Socket cluster with 3 nodes where 2 nodes are on host 'n1.remote.org'`\
+`#> (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)`\
+`#> 1 node is on host 'n2.remote.org' (R version 4.6.1 (2026-06-24),`\
+`#> platform x86_64-pc-linux-gnu)`
 
 Again, the `user` argument does not have to be specified, because it is
 configured in `~/.ssh/config`.
@@ -392,10 +384,8 @@ configured in `~/.ssh/config`.
 To generalize to many workers, we can use the
 [`rep()`](https://rdrr.io/r/base/rep.html) function. For example,
 
-``` r
-
-workers <- c(rep("n1.remote.org", 3), rep("n2.remote.org", 4))
-```
+\
+`workers`` ``<-`` `[`c`](https://rdrr.io/r/base/c.html)`(`[`rep`](https://rdrr.io/r/base/rep.html)`(``"n1.remote.org"``, ``3``)``, `[`rep`](https://rdrr.io/r/base/rep.html)`(``"n2.remote.org"``, ``4``)``)`
 
 sets up three workers on `n1.remote.org` and four on `n2.remote.org`,
 totaling seven parallel workers.
@@ -435,15 +425,13 @@ At this point, we have two independent clusters of parallel workers:
 `cl_local` and `cl_remote`. We can combine them into a single cluster
 using:
 
-``` r
-
-cl <- c(cl_local, cl_remote)
-print(cl)
-#> Socket cluster with 8 nodes where 4 nodes are on host 'localhost'
-#> (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)
-#> nodes are on host 'n1.remote.org' (R version 4.6.1 (2026-06-24),
-#> platform x86_64-pc-linux-gnu)
-```
+\
+`cl`` ``<-`` `[`c`](https://rdrr.io/r/base/c.html)`(``cl_local``, ``cl_remote``)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``cl``)`\
+`#> Socket cluster with 8 nodes where 4 nodes are on host 'localhost'`\
+`#> (R version 4.6.1 (2026-06-24), platform x86_64-pc-linux-gnu)`\
+`#> nodes are on host 'n1.remote.org' (R version 4.6.1 (2026-06-24),`\
+`#> platform x86_64-pc-linux-gnu)`
 
 To emphasize the usefulness of customizing our SSH connections via
 `~/.ssh/config`, if the remote username would already have been already
@@ -483,20 +471,18 @@ We can use the `rshopts` argument of
 to achieve the same when setting up parallel workers. To launch three
 parallel workers on `secret1.remote.org`, use:
 
-``` r
-
-workers <- rep("secret1.remote.org", 3)
-cl <- makeClusterPSOCK(
-  workers,
-  rshopts = c("-J", "login.remote.org"),
-  user = "alice"
-)
-```
+\
+`workers`` ``<-`` `[`rep`](https://rdrr.io/r/base/rep.html)`(``"secret1.remote.org"``, ``3``)`\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(`\
+`  ``workers``,`\
+`  rshopts ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"-J"``, ``"login.remote.org"``)``,`\
+`  user ``=`` ``"alice"`\
+`)`
 
 A more convenient solution is to configure the jumphost in
 `~/.ssh/config`, as in:
 
-``` plain
+```
 Host *.remote.org
   User alice
 
@@ -523,12 +509,10 @@ and then:
 
 If the above work, then the following will work from within R:
 
-``` r
-
-library(parallelly)
-workers <- rep("secret1.remote.org", 3)
-cl <- makeClusterPSOCK(workers)
-```
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`parallelly`](https://parallelly.futureverse.org)`)`\
+`workers`` ``<-`` `[`rep`](https://rdrr.io/r/base/rep.html)`(``"secret1.remote.org"``, ``3``)`\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(``workers``)`
 
 ## Special needs and tweaks
 
@@ -543,11 +527,9 @@ To launch parallel workers skipping any `~/.Rprofile` settings on the
 remote machines, we can pass option `--no-init-file` to `Rscript` via
 argument `rscript_args`. For example,
 
-``` r
-
-workers <- rep("n1.remote.org", 2)
-cl <- makeClusterPSOCK(workers, rscript_args = "--no-init-file")
-```
+\
+`workers`` ``<-`` `[`rep`](https://rdrr.io/r/base/rep.html)`(``"n1.remote.org"``, ``2``)`\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(``workers``, rscript_args ``=`` ``"--no-init-file"``)`
 
 will launch two parallel workers on `n1.remote.org` ignoring any
 `.Rprofile` files.
@@ -564,16 +546,14 @@ Here is an example that launches two parallel workers on `n1.remote.org`
 running under user `alice` connecting via SSH port 2201 using PuTTY and
 public-private SSH keys in file `C:/Users/ally/.ssh/putty.ppk`:
 
-``` r
-
-workers <- "n1.remote.org"
-cl <- makeClusterPSOCK(
-  workers, 
-  user = "alice",
-  rshcmd = "<putty-plink>",
-  rshopts = c("-P", 2201, "-i", "C:/Users/ally/.ssh/putty.ppk")
-)
-```
+\
+`workers`` ``<-`` ``"n1.remote.org"`\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(`\
+`  ``workers``, `\
+`  user ``=`` ``"alice"``,`\
+`  rshcmd ``=`` ``"<putty-plink>"``,`\
+`  rshopts ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"-P"``, ``2201``, ``"-i"``, ``"C:/Users/ally/.ssh/putty.ppk"``)`\
+`)`
 
 ### Example: Two remote workers running on MS Windows
 
@@ -591,11 +571,9 @@ Assuming we have SSH access to two MS Windows machines,
 as before, except that we need to specify also argument
 `rscript_sh = "cmd"`;
 
-``` r
-
-workers <- c("mswin1.remote.org", "mswin2.remote.org")
-cl <- makeClusterPSOCK(workers, rscript_sh = "cmd")
-```
+\
+`workers`` ``<-`` `[`c`](https://rdrr.io/r/base/c.html)`(``"mswin1.remote.org"``, ``"mswin2.remote.org"``)`\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(``workers``, rscript_sh ``=`` ``"cmd"``)`
 
 That argument specifies that the parallel R workers should be launched
 on the remote machines via MS Windows’ `cmd.exe` shell.

@@ -43,36 +43,32 @@ Rscript (R) version 4.6.1 (2026-06-24)
 This example shows how to launch one worker running in Wine for Linux on
 the local machine.
 
-``` r
-
-cl <- makeClusterPSOCK(
-  1L,
-  rscript = c(
-    ## Silence Wine warnings
-    "WINEDEBUG=fixme-all",
-    "LC_ALL=en_US.UTF-8",
-    ## Don't pass LC_* and R_LIBS* environments from host to Wine
-    sprintf("%s=", grep("^(LC_|R_LIBS)", names(Sys.getenv()), value = TRUE)),
-    "wine",
-    "C:/Program Files/R/R-4.6.1/bin/x64/Rscript.exe"
-  )
-)
-print(cl)
-#> Socket cluster with 1 node on host 'localhost'
-#> (R version 4.6.1 (2026-06-24 ucrt), platform x86_64-w64-mingw32)
-```
+\
+`cl`` ``<-`` `[`makeClusterPSOCK`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)`(`\
+`  ``1L``,`\
+`  rscript ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(`\
+`    ``## Silence Wine warnings`\
+`    ``"WINEDEBUG=fixme-all"``,`\
+`    ``"LC_ALL=en_US.UTF-8"``,`\
+`    ``## Don't pass LC_* and R_LIBS* environments from host to Wine`\
+`    `[`sprintf`](https://rdrr.io/r/base/sprintf.html)`(``"%s="``, `[`grep`](https://rdrr.io/r/base/grep.html)`(``"^(LC_|R_LIBS)"``, `[`names`](https://rdrr.io/r/base/names.html)`(`[`Sys.getenv`](https://rdrr.io/r/base/Sys.getenv.html)`(``)``)``, value ``=`` ``TRUE``)``)``,`\
+`    ``"wine"``,`\
+`    ``"C:/Program Files/R/R-4.6.1/bin/x64/Rscript.exe"`\
+`  ``)`\
+`)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``cl``)`\
+`#> Socket cluster with 1 node on host 'localhost'`\
+`#> (R version 4.6.1 (2026-06-24 ucrt), platform x86_64-w64-mingw32)`
 
 ### Example: Installing packages in Wine
 
 We can install R packages as usual, e.g.
 
-``` r
-
-void <- parallel::clusterEvalQ(cl[1], { 
-  chooseCRANmirror(ind = 1L) 
-  install.packages("future")
-})
-```
+\
+`void`` ``<-`` ``parallel``::`[`clusterEvalQ`](https://rdrr.io/r/parallel/clusterApply.html)`(``cl``[``1``]``, ``{`` `\
+`  `[`chooseCRANmirror`](https://rdrr.io/r/utils/chooseCRANmirror.html)`(``ind ``=`` ``1L``)`` `\
+`  `[`install.packages`](https://rdrr.io/r/utils/install.packages.html)`(``"future"``)`\
+`}``)`
 
 ## Appendix
 
@@ -87,12 +83,10 @@ Sometimes its preferred to install packages to a personal package
 library. To do this, all we have to do is pre-create the personal
 package library in Wine. This can be done as:
 
-``` r
-
-void <- parallel::clusterEvalQ(cl[1], { 
-  dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE) 
-})
-```
+\
+`void`` ``<-`` ``parallel``::`[`clusterEvalQ`](https://rdrr.io/r/parallel/clusterApply.html)`(``cl``[``1``]``, ``{`` `\
+`  `[`dir.create`](https://rdrr.io/r/base/files2.html)`(`[`Sys.getenv`](https://rdrr.io/r/base/Sys.getenv.html)`(``"R_LIBS_USER"``)``, recursive ``=`` ``TRUE``)`` `\
+`}``)`
 
 To validate that the personal package library exists, *restart the
 cluster*. Then call:
@@ -109,13 +103,13 @@ The first directory is the personal package library.
 
 It might be that Wine produces warnings like:
 
-``` plain
+```
 0128:fixme:font:find_matching_face Untranslated charset 255
 ```
 
 and R for Windows produces a warning on:
 
-``` plain
+```
 During startup - Warning message:
 Using locale code page other than 65001 ("UTF-8") may cause problems.
 ```
@@ -129,13 +123,11 @@ These are typically harmless. Environment variable setting
 A small number of the CRAN packages install only on MS Windows. Here is
 how to see which they are:
 
-``` r
-
-db <- read.dcf(url("https://cran.r-project.org/src/contrib/PACKAGES"))
-db <- as.data.frame(db)
-win_only <- subset(db, OS_type == "windows")
-print(win_only$Package)
-```
+\
+`db`` ``<-`` `[`read.dcf`](https://rdrr.io/r/base/dcf.html)`(`[`url`](https://rdrr.io/r/base/connections.html)`(``"https://cran.r-project.org/src/contrib/PACKAGES"``)``)`\
+`db`` ``<-`` `[`as.data.frame`](https://rdrr.io/r/base/as.data.frame.html)`(``db``)`\
+`win_only`` ``<-`` `[`subset`](https://rdrr.io/r/base/subset.html)`(``db``, ``OS_type`` ``==`` ``"windows"``)`\
+[`print`](https://rdrr.io/r/base/print.html)`(``win_only``$``Package``)`
 
 As of 2026-08-04, this outputs:
 

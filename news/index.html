@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9052</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9060</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,6 +105,12 @@
 <li><p><code>availableCores(which = "all", max = n)</code> would return only the smallest value among all and unnamed.</p></li>
 <li><p><code>availableCores(fraction = f)</code> would return unnamed values.</p></li>
 <li><p><code>availableCores(which = "all", na.rm = FALSE, max = n)</code> would report <code>n</code> instead of a missing value for methods that are not set.</p></li>
+<li><p><code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> did not always acknowledge all CGroups v2 settings.</p></li>
+<li>
+<p><code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> on PBS:</p>
+<ul><li>
+<code>availableWorkers(method = "PBS")</code> would produce incorrect warnings on number of workers not matching the PBS environment variables, when those were actually not set.</li>
+</ul></li>
 <li>
 <p><code><a href="../reference/availableCores.html">availableCores()</a></code> and <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> on SGE:</p>
 <ul><li><p><code>availableCores(method = "SGE")</code> in a Grid Engine job script would overestimate the number of CPU cores available for a multi-node job, because it returned the value of SGE environment variable <code>NSLOTS</code>. Now it returns the number of slots allotted to the current machine according to the SGE environment variable <code>PE_HOSTFILE</code> file (or the<code>pe_hostfile</code> under <code>SGE_JOB_SPOOL_DIR</code>), which is what <code><a href="../reference/availableWorkers.html">availableWorkers()</a></code> also uses. It only uses <code>NSLOTS</code> as a fallback if such a hostfile does not exist.</p></li>
@@ -122,6 +128,7 @@
 <li><p><code>makeNodePSOCK(..., manual = TRUE)</code> would not default to reverse SSH tunneling, if no SSH client could be found on the current machine.</p></li>
 <li><p>Parallel workers launched with <code>rscript_call = "parallelly:::workRPSOCK()"</code> would terminate with an “Error in unserialize(node$con) : error reading from connection” error even when stopped with <code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">parallel::stopCluster()</a></code>.</p></li>
 <li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> would still record the call stack for each node, even if argument <code>calls = FALSE</code> (default).</p></li>
+<li><p><code><a href="../reference/makeClusterPSOCK.html">makeClusterPSOCK()</a></code> would leave worker processes, and their temporary PID files, running in the background, if the parallel cluster setup failed due to a connection timeout.</p></li>
 <li><p><code><a href="../reference/serializedSize.html">serializedSize()</a></code> gave an error “version 3 not supported” in R (&lt; 3.5.0). Now it uses the same serialization version as <code><a href="https://rdrr.io/r/base/serialize.html" class="external-link">serialize()</a></code> does by default, i.e. version 2 in R (&lt; 3.6.0) and version 3 in R (&gt;= 3.6.0).</p></li>
 <li><p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> for <code>RichSOCKcluster</code> objects failed to report on broken connections in R (&lt; 4.0.0), if the connection index had been reused by another connection, e.g. when called via <code><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output()</a></code>.</p></li>
 <li><p><code>Rscript -e parallelly::availableCores --default=n</code> gave an error.</p></li>
@@ -527,8 +534,7 @@
 <h3 id="cran-policies-1-28-1">CRAN Policies<a class="anchor" aria-label="anchor" href="#cran-policies-1-28-1"></a></h3>
 <ul><li>
 <code>example("isNodeAlive")</code> now uses <code>\donttest{}</code> to avoid long (&gt; 10
-<ol start="19" style="list-style-type: lower-alpha"><li>elapsed run times on MS Windows.</li>
-</ol></li>
+s) elapsed run times on MS Windows.</li>
 </ul></div>
 </div>
     <div class="section level2">
