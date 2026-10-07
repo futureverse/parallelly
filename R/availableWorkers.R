@@ -784,4 +784,5 @@ availableWorkersSlurm <- function() {
   w
 } ## availableWorkersSlurm()
 
-cli_fcn(availableWorkers) <- cli_fcn_args(availableCores)
+cli_fcn(availableWorkers) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_character("default"), cli_arg_character("which"), cli_arg_numeric("omit"), cli_arg_numeric("max"))
+

@@ -146,6 +146,9 @@
 
  * `Rscript -e parallelly::availableCores --default=n` gave an error.
 
+ * `Rscript -e parallelly::availableWorkers --default=name` gave an
+   error.
+
 ## Deprecated and Defunct
 
  * Calling `future::availableCores()`, `future::availableWorkers()`,
