@@ -354,6 +354,7 @@ if (fullTest || covr_testing) {
 
 ## https://github.com/futureverse/parallelly/issues/95
 if (getRversion() >= "4.0.0") {
+  pidfiles_before <- list.files(tempdir(), pattern = "[.]pid$", full.names = TRUE)
   res <- tryCatch({
     parallelly::makeClusterPSOCK(1L, rscript_startup = quote(Sys.sleep(6.0)),
                                  connectTimeout = 0.1, timeout = 7.0)
@@ -367,6 +368,12 @@ if (getRversion() >= "4.0.0") {
   ## Make sure to wait for background process to timeout before continuing,
   ## when on MS Windows
   if (on_windows) Sys.sleep(5.0)
+
+  ## The temporary PID file used to track the worker should not be
+  ## left behind after a connection-timeout error
+  Sys.sleep(1.0)
+  pidfiles_after <- list.files(tempdir(), pattern = "[.]pid$", full.names = TRUE)
+  stopifnot(length(setdiff(pidfiles_after, pidfiles_before)) == 0L)
 }
 
 message("*** makeClusterPSOCK() ... DONE")

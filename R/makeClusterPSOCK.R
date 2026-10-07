@@ -366,6 +366,9 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     nodeClass <- c("RichSOCKnode", if(useXDR) "SOCKnode" else "SOCK0node")
     cmd <- options[["cmd"]]
     pidfile <- options[["pidfile"]]
+    ## Make sure to remove the temporary PID file also if we error,
+    ## e.g. because of a connection timeout
+    on.exit(removeWorkerPIDFile(pidfile), add = TRUE)
 
     if (verbose) {
       mdebugf("%sSystem call to launch all workers:", verbose_prefix)
