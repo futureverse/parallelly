@@ -105,6 +105,16 @@ res <- tryCatch({
 }, warning = identity)
 stopifnot(inherits(res, "warning"))
 
+## Unset optional PBS_NP, PBS_NUM_NODES, and PBS_NUM_PPN environment
+## variables should not produce warnings
+Sys.unsetenv("PBS_NP")
+Sys.unsetenv("PBS_NUM_NODES")
+Sys.unsetenv("PBS_NUM_PPN")
+res <- tryCatch({
+  workers <- availableWorkers(methods = "PBS")
+}, warning = identity)
+stopifnot(!inherits(res, "warning"))
+
 ## Exceptions
 workersE <- c(workers, "n 3")
 pathname <- tempfile()

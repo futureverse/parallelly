@@ -394,14 +394,14 @@ availableWorkersPBS <- function() {
 
   ## Sanity checks
   pbs_np <- getenv_int("PBS_NP")
-  if (!identical(pbs_np, length(w))) {
+  if (!is.na(pbs_np) && !identical(pbs_np, length(w))) {
     warnf("Identified %d workers from the %s file (%s), which does not match environment variable %s = %d", length(w), sQuote("PBS_NODEFILE"), sQuote(pathname), sQuote("PBS_NP"), pbs_np)
   }
 
   pbs_nodes <- getenv_int("PBS_NUM_NODES")
   pbs_ppn <- getenv_int("PBS_NUM_PPN")
   pbs_np <- pbs_nodes * pbs_ppn
-  if (!identical(pbs_np, length(w))) {
+  if (!is.na(pbs_np) && !identical(pbs_np, length(w))) {
     warnf("Identified %d workers from the %s file (%s), which does not match environment variables %s * %s = %d * %d = %d", length(w), sQuote("PBS_NODEFILE"), sQuote(pathname), sQuote("PBS_NUM_NODES"), sQuote("PBS_NUM_PPN"), pbs_nodes, pbs_ppn, pbs_np)
   }
 

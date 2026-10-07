@@ -55,6 +55,12 @@
  * `availableCores(which = "all", na.rm = FALSE, max = n)` would
    report `n` instead of a missing value for methods that are not set.
 
+ * `availableCores()` and `availableWorkers()` on PBS:
+ 
+   - `availableWorkers(method = "PBS")` would produce incorrect
+     warnings on number of workers not matching the PBS environment
+     variables, when those were actually not set.
+   
  * `availableCores()` and `availableWorkers()` on SGE:
  
    - `availableCores(method = "SGE")` in a Grid Engine job script
