@@ -428,10 +428,12 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
           failed <- length(cl) - ready
 
           ## If at least one worker failed to connect in time, lets
-          ## terminate them all already here
+          ## terminate them all already here.
           for (pidfile in pidfiles) {
-            pid <- readWorkerPID(pidfile, wait = 0, maxTries = 1L)
-            if (!is.null(pid)) pid_kill(pid)
+            pid <- readWorkerPID(pidfile, wait = 0.2, maxTries = 5L)
+            if (!is.null(pid)) {
+              if (!isTRUE(pid_kill(pid))) pid_kill(pid)
+            }
           }
 
           stop(sprintf(ngettext(failed,
