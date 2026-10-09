@@ -1,4 +1,4 @@
-#' @tags detrius-files
+#' @tags detritus-files
 
 library(parallelly)
 

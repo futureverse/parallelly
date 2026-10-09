@@ -1,3 +1,5 @@
+#' @tags detritus-files
+
 library(parallelly)
 
 options(parallelly.debug = TRUE)
