@@ -43,9 +43,101 @@ print(availableWorkers(methods = "SGE"))
 print(availableWorkers(methods = "Slurm"))
 print(availableWorkers(methods = "LSF"))
 print(availableWorkers(methods = "PJM"))
+print(availableWorkers(methods = "HTCondor"))
 
 
 message("*** HPC related ...")
+
+message("*** HTCondor ...")
+machine_ad_file <- tempfile(fileext = ".ad")
+writeLines(c(
+  "MyType = \"Machine\"",
+  "Cpus = 3"
+), con = machine_ad_file)
+
+Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+env <- environment(parallelly:::availableCoresHTCondor)
+env$n <- NULL
+workers <- availableWorkers(methods = "HTCondor")
+print(workers)
+stopifnot(length(workers) == 3L, all(workers == "localhost"))
+
+file.remove(machine_ad_file)
+Sys.unsetenv("_CONDOR_MACHINE_AD")
+env$n <- NULL
+message("*** HTCondor ... done")
+
+message("*** HTCondor scenarios observed on real clusters ...")
+
+file <- system.file(package = "parallelly", "test-data", "htcondor", "scenarios.csv", mustWork = FALSE)
+if (nzchar(file) && file.exists(file)) {
+  scenarios <- read.csv(file, colClasses = "character", na.strings = "", check.names = FALSE)
+  
+  machine_ad_cols <- grep("^_CONDOR_MACHINE_AD-", colnames(scenarios), value = TRUE)
+  job_ad_cols <- grep("^_CONDOR_JOB_AD-", colnames(scenarios), value = TRUE)
+  meta_cols <- c("cluster", "context", "condor_submit", "expected_cores", "expected_workers", machine_ad_cols, job_ad_cols)
+  env_vars <- setdiff(colnames(scenarios), meta_cols)
+  
+  env <- environment(parallelly:::availableCoresHTCondor)
+  
+  for (kk in seq_len(nrow(scenarios))) {
+    scenario <- scenarios[kk, ]
+    message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, scenario$condor_submit, scenario$cluster))
+    
+    m_attrs <- as.list(scenario[machine_ad_cols])
+    m_attrs <- m_attrs[!is.na(m_attrs)]
+    if (length(m_attrs) > 0L) {
+      m_lines <- sprintf("%s = %s", sub("^_CONDOR_MACHINE_AD-", "", names(m_attrs)), unlist(m_attrs))
+      machine_ad_file <- tempfile(fileext = ".ad")
+      writeLines(m_lines, con = machine_ad_file)
+      Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+    } else {
+      machine_ad_file <- NULL
+      Sys.unsetenv("_CONDOR_MACHINE_AD")
+    }
+    
+    j_attrs <- as.list(scenario[job_ad_cols])
+    j_attrs <- j_attrs[!is.na(j_attrs)]
+    if (length(j_attrs) > 0L) {
+      j_lines <- sprintf("%s = %s", sub("^_CONDOR_JOB_AD-", "", names(j_attrs)), unlist(j_attrs))
+      job_ad_file <- tempfile(fileext = ".ad")
+      writeLines(j_lines, con = job_ad_file)
+      Sys.setenv("_CONDOR_JOB_AD" = job_ad_file)
+    } else {
+      job_ad_file <- NULL
+      Sys.unsetenv("_CONDOR_JOB_AD")
+    }
+    
+    envs <- as.list(scenario[env_vars])
+    envs <- envs[!is.na(envs)]
+    Sys.unsetenv(env_vars)
+    if (length(envs) > 0L) {
+      do.call(Sys.setenv, envs)
+    }
+    
+    env$n <- NULL
+    
+    exp_w <- scenario$expected_workers
+    if (is.na(exp_w) || !nzchar(exp_w)) {
+      truth <- rep("localhost", times = as.integer(scenario$expected_cores))
+    } else {
+      truth <- strsplit(exp_w, split = ",", fixed = TRUE)[[1]]
+    }
+    
+    w <- availableWorkers(methods = "HTCondor")
+    stopifnot(
+      length(w) == length(truth),
+      identical(w, truth)
+    )
+    
+    if (!is.null(machine_ad_file)) file.remove(machine_ad_file)
+    if (!is.null(job_ad_file)) file.remove(job_ad_file)
+    Sys.unsetenv(c("_CONDOR_MACHINE_AD", "_CONDOR_JOB_AD", env_vars))
+    env$n <- NULL
+  }
+}
+
+message("*** HTCondor scenarios observed on real clusters ... done")
 
 sge_expand_node_count_pairs <- parallelly:::sge_expand_node_count_pairs
 read_pbs_nodefile <- parallelly:::read_pbs_nodefile

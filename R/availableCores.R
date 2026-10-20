@@ -190,6 +190,13 @@
 #'    tasks of the job step on the current machine according to
 #'    \env{SLURM_STEP_TASKS_PER_NODE}.
 #'
+#'  \item `"HTCondor"` -
+#'    Query HTCondor environment variables \env{_CONDOR_MACHINE_AD} and
+#'    \env{_CONDOR_JOB_AD}.
+#'    The slot's machine ClassAd file is queried for \code{Cpus}.
+#'    If not available, the job ClassAd file is queried for
+#'    \code{CpusProvisioned} (or \code{Cpus}).
+#'
 #'  \item `"custom"` -
 #'    If option
 #'    \code{\link[=parallelly.options]{parallelly.availableCores.custom}}
@@ -311,7 +318,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @export
-availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
+availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
   warn_future_reexport_deprecation("availableCores")
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
@@ -361,6 +368,8 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       n <- availableCoresLSF()
     } else if (method == "PJM") {
       n <- availableCoresPJM()
+    } else if (method == "HTCondor") {
+      n <- availableCoresHTCondor()
     } else if (method == "mc.cores") {
       ## Number of cores by option defined by 'parallel' package
       n <- getopt_int("mc.cores")
@@ -696,6 +705,10 @@ getenv_int <- function(name, mode = "integer") {
   value
 } # getenv_int()
 
+getenv_chr <- function(name) {
+  as.character(trim(getEnvVar2(name, default = NA_character_)))
+} # getenv_chr()
+
 getopt_int <- function(name, mode = "integer") {
   value <- getOption2(name, default = NA_integer_)
   storage.mode(value) <- mode
@@ -922,6 +935,107 @@ slurm_step_ntasks_on_node <- function() {
   if (length(nodes) != length(counts)) return(NA_integer_)
   counts[match(nodename, nodes)]
 } ## slurm_step_ntasks_on_node()
+
+
+# --------------------------------------------------------------------------
+# HTCondor
+# --------------------------------------------------------------------------
+read_classad_attribute <- function(pathname, attribute) {
+  if (is.na(pathname) || !file_test("-f", pathname)) return(NA_character_)
+  lines <- readLines(pathname, warn = FALSE)
+  lines <- lines[!grepl("^\\s*(#|//)", lines)]
+  pattern <- sprintf("^\\s*%s\\s*=\\s*(.*)$", attribute)
+  hits <- grep(pattern, lines, ignore.case = TRUE, value = TRUE)
+  if (length(hits) == 0L) return(NA_character_)
+  val <- sub(pattern, "\\1", hits[1], ignore.case = TRUE)
+  val <- trim(val)
+  ## Strip surrounding single or double quotes
+  val <- sub("^[\"']", "", val)
+  val <- sub("[\"']$", "", val)
+  val
+}
+
+parse_classad_integer <- function(val) {
+  if (is.na(val) || !nzchar(val)) return(NA_integer_)
+  n <- suppressWarnings(as.numeric(val))
+  if (is.na(n) || !is.finite(n)) return(NA_integer_)
+  n <- as.integer(floor(n + 0.5))
+  if (n <= 0L) return(NA_integer_)
+  n
+}
+
+## Number of cores assigned by HTCondor
+availableCoresHTCondor <- local({
+  n <- NULL
+  function() {
+    if (!is.null(n)) return(n)
+
+    machine_ad <- getenv_chr("_CONDOR_MACHINE_AD")
+    if (is.na(machine_ad) || !nzchar(machine_ad)) machine_ad <- NA_character_
+
+    job_ad <- getenv_chr("_CONDOR_JOB_AD")
+    if (is.na(job_ad) || !nzchar(job_ad)) job_ad <- NA_character_
+
+    ## HTCondor is detected if and only if _CONDOR_MACHINE_AD or _CONDOR_JOB_AD is set
+    if (is.na(machine_ad) && is.na(job_ad)) {
+      n <<- NA_integer_
+      return(n)
+    }
+
+    source_desc <- NULL
+
+    ## 1. Machine ClassAd: Cpus (preferred)
+    if (!is.na(machine_ad)) {
+      if (file_test("-f", machine_ad)) {
+        val <- read_classad_attribute(machine_ad, "Cpus")
+        n0 <- parse_classad_integer(val)
+        if (!is.na(n0)) {
+          n <<- n0
+          source_desc <- sprintf("the %s file (%s)", sQuote("_CONDOR_MACHINE_AD"), machine_ad)
+        }
+      } else {
+        warnf("Environment variable %s was set but no such file %s exists", sQuote("_CONDOR_MACHINE_AD"), sQuote(machine_ad))
+      }
+    }
+
+    ## 2. Job ClassAd: CpusProvisioned (or Cpus) as fallback
+    if (is.null(n) || is.na(n)) {
+      if (!is.na(job_ad)) {
+        if (file_test("-f", job_ad)) {
+          val <- read_classad_attribute(job_ad, "CpusProvisioned")
+          if (is.na(val) || !nzchar(val)) {
+            val <- read_classad_attribute(job_ad, "Cpus")
+          }
+          n0 <- parse_classad_integer(val)
+          if (!is.na(n0)) {
+            n <<- n0
+            source_desc <- sprintf("the %s file (%s)", sQuote("_CONDOR_JOB_AD"), job_ad)
+          }
+        } else {
+          warnf("Environment variable %s was set but no such file %s exists", sQuote("_CONDOR_JOB_AD"), sQuote(job_ad))
+        }
+      }
+    }
+
+    if (is.null(n) || is.na(n)) {
+      n <<- NA_integer_
+      return(n)
+    }
+
+    ## Check machine ad vs job ad if both available
+    if (!is.na(machine_ad) && !is.na(job_ad) && file_test("-f", machine_ad) && file_test("-f", job_ad)) {
+      job_cpus <- parse_classad_integer(read_classad_attribute(job_ad, "CpusProvisioned"))
+      if (is.na(job_cpus)) {
+        job_cpus <- parse_classad_integer(read_classad_attribute(job_ad, "Cpus"))
+      }
+      if (!is.na(job_cpus) && job_cpus != n) {
+        warnf("Identified %d CPU cores from %s, which does not match %s in the %s file (%s) = %d", n, source_desc, "CpusProvisioned", sQuote("_CONDOR_JOB_AD"), job_ad, job_cpus)
+      }
+    }
+
+    n
+  }
+})
 
 
 cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_numeric("default"), cli_arg_character("which"), cli_arg_numeric("omit"), cli_arg_numeric("max"))

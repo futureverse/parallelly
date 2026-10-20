@@ -77,6 +77,7 @@ print(availableCores(methods = "PBS"))
 print(availableCores(methods = "SGE"))
 print(availableCores(methods = "Slurm"))
 print(availableCores(methods = "LSF"))
+print(availableCores(methods = "HTCondor"))
 
 ## Any R options and system environment variable
 print(availableCores(methods = c("width", "FOO_BAR_ENV"),
@@ -119,6 +120,173 @@ print(ncores)
 stopifnot(ncores == ncores0)
 Sys.unsetenv("PJM_PROC_BY_NODE")
 message("*** PJM (Fujitsu Technical Computing Suite) ... done")
+
+message("*** HTCondor ...")
+
+env <- environment(parallelly:::availableCoresHTCondor)
+
+## Baseline: not in HTCondor
+env$n <- NULL
+Sys.unsetenv(c("_CONDOR_MACHINE_AD", "_CONDOR_JOB_AD"))
+ncores <- availableCores(methods = "HTCondor", na.rm = FALSE)
+stopifnot(is.na(ncores[["HTCondor"]]))
+
+## 1. Machine ClassAd: Cpus
+machine_ad_file <- tempfile(fileext = ".ad")
+writeLines(c(
+  "# Comment line",
+  "// Another comment",
+  "MyType = \"Machine\"",
+  "TargetType = \"Job\"",
+  "Name = \"slot1@execute01\"",
+  "Cpus = 4",
+  "TotalCpus = 16"
+), con = machine_ad_file)
+
+Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+print(ncores)
+stopifnot(ncores == 4L)
+
+## 2. Machine ClassAd preferred over Job ClassAd
+job_ad_file <- tempfile(fileext = ".ad")
+writeLines(c(
+  "MyType = \"Job\"",
+  "TargetType = \"Machine\"",
+  "RequestCpus = 2",
+  "CpusProvisioned = 4"
+), con = job_ad_file)
+
+Sys.setenv("_CONDOR_JOB_AD" = job_ad_file)
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+stopifnot(ncores == 4L)
+
+## 3. Fallback to Job ClassAd CpusProvisioned (when machine ad not available)
+Sys.unsetenv("_CONDOR_MACHINE_AD")
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+print(ncores)
+stopifnot(ncores == 4L)
+
+## 4. Fallback to Job ClassAd Cpus (when CpusProvisioned not available)
+writeLines(c(
+  "MyType = \"Job\"",
+  "TargetType = \"Machine\"",
+  "RequestCpus = 1",
+  "Cpus = 6"
+), con = job_ad_file)
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+print(ncores)
+stopifnot(ncores == 6L)
+
+## 5. Cross-check mismatch between machine ad and job ad
+Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+writeLines(c(
+  "MyType = \"Job\"",
+  "CpusProvisioned = 8"
+), con = job_ad_file)
+Sys.setenv("_CONDOR_JOB_AD" = job_ad_file)
+env$n <- NULL
+warn_msg <- NULL
+ncores <- withCallingHandlers({
+  availableCores(methods = "HTCondor")
+}, warning = function(w) {
+  warn_msg <<- conditionMessage(w)
+  invokeRestart("muffleWarning")
+})
+stopifnot(ncores == 4L, !is.null(warn_msg), grepl("CpusProvisioned", warn_msg))
+
+## 6. Non-existent file warning
+Sys.setenv("_CONDOR_MACHINE_AD" = tempfile())
+Sys.unsetenv("_CONDOR_JOB_AD")
+env$n <- NULL
+warn_msg <- NULL
+ncores <- withCallingHandlers({
+  availableCores(methods = "HTCondor", na.rm = FALSE)
+}, warning = function(w) {
+  warn_msg <<- conditionMessage(w)
+  invokeRestart("muffleWarning")
+})
+stopifnot(is.na(ncores[["HTCondor"]]), !is.null(warn_msg), grepl("no such file", warn_msg))
+
+## Clean up
+file.remove(machine_ad_file)
+file.remove(job_ad_file)
+Sys.unsetenv(c("_CONDOR_MACHINE_AD", "_CONDOR_JOB_AD"))
+env$n <- NULL
+
+message("*** HTCondor ... done")
+
+message("*** HTCondor scenarios observed on real clusters ...")
+
+file <- system.file(package = "parallelly", "test-data", "htcondor", "scenarios.csv", mustWork = FALSE)
+if (nzchar(file) && file.exists(file)) {
+  scenarios <- read.csv(file, colClasses = "character", na.strings = "", check.names = FALSE)
+  
+  machine_ad_cols <- grep("^_CONDOR_MACHINE_AD-", colnames(scenarios), value = TRUE)
+  job_ad_cols <- grep("^_CONDOR_JOB_AD-", colnames(scenarios), value = TRUE)
+  meta_cols <- c("cluster", "context", "condor_submit", "expected_cores", "expected_workers", machine_ad_cols, job_ad_cols)
+  env_vars <- setdiff(colnames(scenarios), meta_cols)
+  
+  env <- environment(parallelly:::availableCoresHTCondor)
+  
+  for (kk in seq_len(nrow(scenarios))) {
+    scenario <- scenarios[kk, ]
+    message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, scenario$condor_submit, scenario$cluster))
+    
+    ## Write machine ad file if any machine ad columns are non-empty
+    m_attrs <- as.list(scenario[machine_ad_cols])
+    m_attrs <- m_attrs[!is.na(m_attrs)]
+    if (length(m_attrs) > 0L) {
+      m_lines <- sprintf("%s = %s", sub("^_CONDOR_MACHINE_AD-", "", names(m_attrs)), unlist(m_attrs))
+      machine_ad_file <- tempfile(fileext = ".ad")
+      writeLines(m_lines, con = machine_ad_file)
+      Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+    } else {
+      machine_ad_file <- NULL
+      Sys.unsetenv("_CONDOR_MACHINE_AD")
+    }
+    
+    ## Write job ad file if any job ad columns are non-empty
+    j_attrs <- as.list(scenario[job_ad_cols])
+    j_attrs <- j_attrs[!is.na(j_attrs)]
+    if (length(j_attrs) > 0L) {
+      j_lines <- sprintf("%s = %s", sub("^_CONDOR_JOB_AD-", "", names(j_attrs)), unlist(j_attrs))
+      job_ad_file <- tempfile(fileext = ".ad")
+      writeLines(j_lines, con = job_ad_file)
+      Sys.setenv("_CONDOR_JOB_AD" = job_ad_file)
+    } else {
+      job_ad_file <- NULL
+      Sys.unsetenv("_CONDOR_JOB_AD")
+    }
+    
+    ## Set environment variables
+    envs <- as.list(scenario[env_vars])
+    envs <- envs[!is.na(envs)]
+    Sys.unsetenv(env_vars)
+    if (length(envs) > 0L) {
+      do.call(Sys.setenv, envs)
+    }
+    
+    env$n <- NULL
+    truth <- as.integer(scenario$expected_cores)
+    
+    ncores <- availableCores(methods = "HTCondor")
+    message(sprintf("availableCores(methods = \"HTCondor\") = %d (truth = %d)", ncores, truth))
+    stopifnot(ncores == truth)
+    
+    ## Cleanup temp files
+    if (!is.null(machine_ad_file)) file.remove(machine_ad_file)
+    if (!is.null(job_ad_file)) file.remove(job_ad_file)
+    Sys.unsetenv(c("_CONDOR_MACHINE_AD", "_CONDOR_JOB_AD", env_vars))
+    env$n <- NULL
+  }
+}
+
+message("*** HTCondor scenarios observed on real clusters ... done")
 
 
 message("*** Internal detectCores() ...")

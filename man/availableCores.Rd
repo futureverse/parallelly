@@ -10,7 +10,7 @@ availableCores(
     "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus",
     "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores",
     "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE",
-    "Slurm", "fallback", "custom")),
+    "Slurm", "HTCondor", "fallback", "custom")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
@@ -210,6 +210,13 @@ with the other tasks on that machine.  In this case,
 \code{--cpus-per-task=2}, otherwise the CPUs are split equally among the
 tasks of the job step on the current machine according to
 \env{SLURM_STEP_TASKS_PER_NODE}.
+
+\item \code{"HTCondor"} -
+Query HTCondor environment variables \env{_CONDOR_MACHINE_AD} and
+\env{_CONDOR_JOB_AD}.
+The slot's machine ClassAd file is queried for \code{Cpus}.
+If not available, the job ClassAd file is queried for
+\code{CpusProvisioned} (or \code{Cpus}).
 
 \item \code{"custom"} -
 If option

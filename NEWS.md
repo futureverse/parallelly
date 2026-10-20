@@ -16,6 +16,11 @@
    
 ## New Features
 
+ * Add support for the HTCondor job scheduler to `availableCores()`
+   and `availableWorkers()`. For now, `availableWorkers()` assumes
+   single-node jobs. If called on a multi-node job, it will only
+   return the workers on the current compute node.
+
  * `makeClusterPSOCK()` has an optional argument `rshcmd` for
    controlling how to launch the parallel workers that are other
    machines. It defaults to `rshcmd = "<ssh>"` (launch workers over

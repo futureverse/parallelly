@@ -8,9 +8,9 @@ availableWorkers(
   constraints = NULL,
   methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores",
     "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE",
-    "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus",
-    "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status",
-    "system", "fallback")),
+    "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota",
+    "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max",
+    "nproc", "/proc/self/status", "system", "fallback")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = getOption2("parallelly.localhost.hostname", "localhost"),
@@ -110,6 +110,13 @@ the number of workers per node.  This means that the number of
 workers on the current machine equals \code{availableCores()} in the
 Slurm job script.
 
+\item \code{"HTCondor"} -
+Query HTCondor environment variables \env{_CONDOR_MACHINE_AD} and
+\env{_CONDOR_JOB_AD}.
+Currently, single-node jobs are assumed. If called on a multi-node job,
+it will only return the workers for the current node.
+Returns \code{availableCores(methods = "HTCondor")} localhost workers.
+
 \item \code{"custom"} -
 If option
 \code{\link[=parallelly.options]{parallelly.availableWorkers.custom}}
@@ -122,6 +129,9 @@ done, the custom function will \emph{not} be recursively called.
 }
 }
 \section{Known limitations}{
+
+\code{availableWorkers(methods = "HTCondor")} currently assumes single-node jobs.
+If called on a multi-node job, it will only return the workers for the current node.
 
 \code{availableWorkers(methods = "Slurm")} will expand \env{SLURM_JOB_NODELIST}
 using \command{scontrol show hostnames "$SLURM_JOB_NODELIST"}, if available.

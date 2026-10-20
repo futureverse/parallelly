@@ -89,6 +89,13 @@
 #'    workers on the current machine equals `availableCores()` in the
 #'    Slurm job script.
 #'
+#'  \item `"HTCondor"` -
+#'    Query HTCondor environment variables \env{_CONDOR_MACHINE_AD} and
+#'    \env{_CONDOR_JOB_AD}.
+#'    Currently, single-node jobs are assumed. If called on a multi-node job,
+#'    it will only return the workers for the current node.
+#'    Returns `availableCores(methods = "HTCondor")` localhost workers.
+#'
 #'  \item `"custom"` -
 #'    If option
 #'    \code{\link[=parallelly.options]{parallelly.availableWorkers.custom}}
@@ -101,6 +108,9 @@
 #' }
 #'
 #' @section Known limitations:
+#' `availableWorkers(methods = "HTCondor")` currently assumes single-node jobs.
+#' If called on a multi-node job, it will only return the workers for the current node.
+#'
 #' `availableWorkers(methods = "Slurm")` will expand \env{SLURM_JOB_NODELIST}
 #' using \command{scontrol show hostnames "$SLURM_JOB_NODELIST"}, if available.
 #' If not available, then it attempts to parse the compressed nodelist based
@@ -148,7 +158,7 @@
 #'
 #' @importFrom utils file_test
 #' @export
-availableWorkers <- function(constraints = NULL, methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = getOption2("parallelly.localhost.hostname", "localhost"), which = c("auto", "min", "max", "all"), ...) {
+availableWorkers <- function(constraints = NULL, methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = getOption2("parallelly.localhost.hostname", "localhost"), which = c("auto", "min", "max", "all"), ...) {
   warn_future_reexport_deprecation("availableWorkers")
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
@@ -202,6 +212,9 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
       if (anyNA(w)) next
     } else if (method == "PJM") {
       w <- availableWorkersPJM()
+      if (anyNA(w)) next
+    } else if (method == "HTCondor") {
+      w <- availableWorkersHTCondor()
       if (anyNA(w)) next
     } else if (method == "custom") {
       fcn <- getOption2("parallelly.availableWorkers.custom", NULL)
@@ -783,6 +796,20 @@ availableWorkersSlurm <- function() {
   
   w
 } ## availableWorkersSlurm()
+
+
+# --------------------------------------------------------------------------
+# HTCondor
+# --------------------------------------------------------------------------
+## Note: Currently assumes single-node jobs. If called on a multi-node job,
+## it will only return the workers for the current node.
+availableWorkersHTCondor <- function() {
+  n <- availableCoresHTCondor()
+  if (is.na(n) || n <= 0L) return(NA_character_)
+  localhost_hostname <- getOption2("parallelly.localhost.hostname", "localhost")
+  rep(localhost_hostname, times = n)
+} ## availableWorkersHTCondor()
+
 
 cli_fcn(availableWorkers) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_character("default"), cli_arg_character("which"), cli_arg_numeric("omit"), cli_arg_numeric("max"))
 

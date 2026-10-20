@@ -14,7 +14,7 @@
 #' \describe{
 #'  \item{`parallelly.availableCores.logical`:}{(logical) The default value of argument `logical` as used by `availableCores()`, `availableWorkers()`, and `availableCores()` for querying `parallel::detectCores(logical = logical)`.  The default is `TRUE` just like it is for [parallel::detectCores()].}
 #'
-#'  \item{`parallelly.availableCores.methods`:}{(character vector) Default lookup methods for [availableCores()]. (Default: `c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")`)}
+#'  \item{`parallelly.availableCores.methods`:}{(character vector) Default lookup methods for [availableCores()]. (Default: `c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "fallback", "custom")`)}
 #'
 #'  \item{`parallelly.availableCores.methods.excludes`:}{(character vector) Default lookup methods for [availableCores()] to be excluded. (Default: `NULL`)}
 #'
@@ -32,7 +32,7 @@
 #'
 #'  \item{`parallelly.availableCores.max`:}{(integer; positive) The default maximum number of cores to return.}
 #'
-#'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")`)}
+#'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")`)}
 #'
 #'  \item{`parallelly.availableWorkers.methods.excludes`:}{(character vector) Default lookup methods for [availableWorkers()] to be excluded. (Default: `NULL`)}
 #'
