@@ -49,7 +49,7 @@ print(free)
 #> [1] 6
 #> attr(,"loadavg")
 #>  1min  5min 15min 
-#>  1.00  0.55  0.49 
+#>  0.80  0.93  0.72 
 #> attr(,"maxCores")
 #> system 
 #>      8 

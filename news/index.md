@@ -18,6 +18,15 @@
 
 ### New Features
 
+- Add support for the HTCondor job scheduler to
+  [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+  and
+  [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md).
+  For now,
+  [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+  assumes single-node jobs. If called on a multi-node job, it will only
+  return the workers on the current compute node.
+
 - [`makeClusterPSOCK()`](https://parallelly.futureverse.org/reference/makeClusterPSOCK.md)
   has an optional argument `rshcmd` for controlling how to launch the
   parallel workers that are other machines. It defaults to

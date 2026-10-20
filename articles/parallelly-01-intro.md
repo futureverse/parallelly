@@ -164,10 +164,10 @@ by the scheduler. On Son of Grid Engine (SGE), the scheduler sets
 returns eight (8). See
 [`help("availableCores", package = "parallelly")`](https://parallelly.futureverse.org/reference/availableCores.md)
 for currently supported job schedulers, which includes ‘Fujitsu
-Technical Computing Suite’, ‘Load Sharing Facility’ (LSF), Simple Linux
-Utility for Resource Management (Slurm), Sun Grid Engine/Oracle Grid
-Engine/Son of Grid Engine/Univa Grid Engine/Altair Grid Engine (AGE,
-SGE, UGE), and TORQUE/PBS.
+Technical Computing Suite’, ‘HTCondor’, ‘Load Sharing Facility’ (LSF),
+Simple Linux Utility for Resource Management (Slurm), Sun Grid
+Engine/Oracle Grid Engine/Son of Grid Engine/Univa Grid Engine/Altair
+Grid Engine (AGE, SGE, UGE), and TORQUE/PBS.
 
 Of course,
 [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)

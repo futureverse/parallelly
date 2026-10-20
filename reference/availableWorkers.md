@@ -9,9 +9,9 @@ availableWorkers(
   constraints = NULL,
   methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores",
     "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE",
-    "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus",
-    "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status",
-    "system", "fallback")),
+    "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota",
+    "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max",
+    "nproc", "/proc/self/status", "system", "fallback")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = getOption2("parallelly.localhost.hostname", "localhost"),
@@ -122,6 +122,12 @@ In addition, the following settings ("methods") are also acknowledged:
   [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   in the Slurm job script.
 
+- `"HTCondor"` - Query HTCondor environment variables
+  `_CONDOR_MACHINE_AD` and `_CONDOR_JOB_AD`. Currently, single-node jobs
+  are assumed. If called on a multi-node job, it will only return the
+  workers for the current node. Returns
+  `availableCores(methods = "HTCondor")` localhost workers.
+
 - `"custom"` - If option
   [`parallelly.availableWorkers.custom`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
   is set and a function, then this function will be called (without
@@ -131,6 +137,10 @@ In addition, the following settings ("methods") are also acknowledged:
   function will *not* be recursively called.
 
 ## Known limitations
+
+`availableWorkers(methods = "HTCondor")` currently assumes single-node
+jobs. If called on a multi-node job, it will only return the workers for
+the current node.
 
 `availableWorkers(methods = "Slurm")` will expand `SLURM_JOB_NODELIST`
 using `scontrol show hostnames "$SLURM_JOB_NODELIST"`, if available. If

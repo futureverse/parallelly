@@ -12,7 +12,7 @@ availableCores(
     "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus",
     "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores",
     "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE",
-    "Slurm", "fallback", "custom")),
+    "Slurm", "HTCondor", "fallback", "custom")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
@@ -203,6 +203,11 @@ supported:
   `SLURM_CPUS_PER_TASK` is used, if set, e.g. `--cpus-per-task=2`,
   otherwise the CPUs are split equally among the tasks of the job step
   on the current machine according to `SLURM_STEP_TASKS_PER_NODE`.
+
+- `"HTCondor"` - Query HTCondor environment variables
+  `_CONDOR_MACHINE_AD` and `_CONDOR_JOB_AD`. The slot's machine ClassAd
+  file is queried for `Cpus`. If not available, the job ClassAd file is
+  queried for `CpusProvisioned` (or `Cpus`).
 
 - `"custom"` - If option
   [`parallelly.availableCores.custom`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)

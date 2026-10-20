@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9065</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9067</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -377,10 +377,10 @@ submitting using <code>qsub -pe smp 8 ...</code> and
 <code><a href="../reference/availableCores.html">availableCores()</a></code> returns eight (8). See
 <code><a href="../reference/availableCores.html">help("availableCores", package = "parallelly")</a></code> for
 currently supported job schedulers, which includes ‘Fujitsu Technical
-Computing Suite’, ‘Load Sharing Facility’ (LSF), Simple Linux Utility
-for Resource Management (Slurm), Sun Grid Engine/Oracle Grid Engine/Son
-of Grid Engine/Univa Grid Engine/Altair Grid Engine (AGE, SGE, UGE), and
-TORQUE/PBS.</p>
+Computing Suite’, ‘HTCondor’, ‘Load Sharing Facility’ (LSF), Simple
+Linux Utility for Resource Management (Slurm), Sun Grid Engine/Oracle
+Grid Engine/Son of Grid Engine/Univa Grid Engine/Altair Grid Engine
+(AGE, SGE, UGE), and TORQUE/PBS.</p>
 <p>Of course, <code><a href="../reference/availableCores.html">availableCores()</a></code> respects also R options and
 environment variables commonly used to specify the number of parallel
 workers, e.g. R option <code>mc.cores</code> and Bioconductor
