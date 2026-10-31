@@ -1,4 +1,4 @@
-# chms (7.1)
+# chms (7.2)
 
 * GitHub: <https://github.com/statcan/chms>
 * Email: <mailto:joel.barnes@statcan.gc.ca>
@@ -11,7 +11,7 @@ Run `revdepcheck::revdep_details(, "chms")` for more info
 *   checking dependencies in R code ... NOTE
      ```
      Namespaces in Imports field not imported from:
-       ‘R6’ ‘dbplyr’ ‘knitr’ ‘mirai’ ‘mori’ ‘parallelly’ ‘readr’ ‘utils’
+       ‘R6’ ‘dbplyr’ ‘knitr’ ‘mirai’ ‘parallelly’ ‘readr’ ‘utils’
        All declared Imports should be used.
      ```
 
@@ -52,7 +52,7 @@ Run `revdepcheck::revdep_details(, "flexstanr")` for more info
      message which cannot be suppressed: see ?packageStartupMessage.
      ```
 
-# future.batchtools (0.22.0)
+# future.batchtools (0.30.0)
 
 * GitHub: <https://github.com/futureverse/future.batchtools>
 * Email: <mailto:henrikb@braju.com>
@@ -66,6 +66,42 @@ Run `revdepcheck::revdep_details(, "future.batchtools")` for more info
      ```
      Found the following files/directories:
        ‘.future-set-during-startup’
+     ```
+
+# InPAS (2.20.0)
+
+* Email: <mailto:jou@morgridge.org>
+
+Run `revdepcheck::revdep_details(, "InPAS")` for more info
+
+## In both
+
+*   checking dependencies in R code ... NOTE
+     ```
+     There are ::: calls to the package's namespace in its code. A package
+       almost never needs to use ::: for its own objects:
+       ‘adjust_distalCPs’ ‘adjust_proximalCPs’ ‘adjust_proximalCPsByNBC’
+       ‘adjust_proximalCPsByPWM’ ‘calculate_mse’ ‘find_valleyBySpline’
+       ‘get_PAscore’ ‘get_PAscore2’ ‘remove_convergentUTR3s’
+       ‘search_distalCPs’ ‘search_proximalCPs’
+     ```
+
+*   checking Rd metadata ... NOTE
+     ```
+     Invalid package aliases in Rd file 'InPAS.Rd':
+       ‘-package’
+     ```
+
+*   checking Rd \usage sections ... NOTE
+     ```
+     Documented arguments not in \usage in Rd file 'get_UTR3TotalCov.Rd':
+       ‘gcCompensationensation’
+     
+     Functions with \usage entries need to have the appropriate \alias
+     entries, and all their arguments documented.
+     The \usage entries must correspond to syntactically valid R code.
+     See chapter ‘Writing R documentation files’ in the ‘Writing R
+     Extensions’ manual.
      ```
 
 # mappp (1.0.0)
@@ -147,8 +183,8 @@ Run `revdepcheck::revdep_details(, "scruff")` for more info
 *   checking for non-standard things in the check directory ... NOTE
      ```
      Found the following files/directories:
-       ‘20260928_002722__10x_bamqc_filtered.tsv’
-       ‘20260928_002723_10X_QC_sce.rda’ ‘Demultiplex’
+       ‘20261031_051610_10X_QC_sce.rda’
+       ‘20261031_051610__10x_bamqc_filtered.tsv’ ‘Demultiplex’
      ```
 
 # streetscape (1.0.5)
