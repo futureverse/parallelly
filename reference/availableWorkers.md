@@ -15,8 +15,8 @@ availableWorkers(
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = getOption2("parallelly.localhost.hostname", "localhost"),
-  which = c("auto", "min", "max", "all"),
   threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L),
+  which = c("auto", "min", "max", "all"),
   ...
 )
 ```
@@ -47,19 +47,19 @@ availableWorkers(
 
   The default set of workers.
 
-- which:
-
-  A character specifying which set / sets to return. If `"auto"`
-  (default), the first non-empty set found. If `"min"`, the minimum
-  value is returned. If `"max"`, the maximum value is returned (be
-  careful!) If `"all"`, all values are returned.
-
 - threadsPerWorker:
 
   (positive integer) Number of CPU cores, or threads, for each parallel
   worker. Each host is listed `n %/% threadsPerWorker` times, where `n`
   is the number of CPUs allotted on that host. Passed as-is to
   [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md).
+
+- which:
+
+  A character specifying which set / sets to return. If `"auto"`
+  (default), the first non-empty set found. If `"min"`, the minimum
+  value is returned. If `"max"`, the maximum value is returned (be
+  careful!) If `"all"`, all values are returned.
 
 - ...:
 
@@ -197,5 +197,14 @@ options(parallelly.availableWorkers.custom = function() {
 })
 message(paste("Available workers:",
         paste(sQuote(availableWorkers()), collapse = ", ")))
+} # }
+
+if (FALSE) { # \dontrun{
+## Slurm job submitted with 'sbatch --ntasks=4 --cpus-per-task=2'
+## Use one worker per task, each running two threads, instead of
+## one worker per CPU core
+nthreads <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "1"))
+workers <- availableWorkers(threadsPerWorker = nthreads)
+message(paste("Workers to use:", paste(sQuote(workers), collapse = ", ")))
 } # }
 ```

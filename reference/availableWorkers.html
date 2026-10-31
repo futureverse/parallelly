@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">parallelly</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9070</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.48.0-9072</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,8 +95,8 @@
 <span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  logical <span class="op">=</span> <span class="fu">getOption2</span><span class="op">(</span><span class="st">"parallelly.availableCores.logical"</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  default <span class="op">=</span> <span class="fu">getOption2</span><span class="op">(</span><span class="st">"parallelly.localhost.hostname"</span>, <span class="st">"localhost"</span><span class="op">)</span>,</span>
-<span>  which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
 <span>  threadsPerWorker <span class="op">=</span> <span class="fu">getOption2</span><span class="op">(</span><span class="st">"parallelly.availableCores.threadsPerWorker"</span>, <span class="fl">1L</span><span class="op">)</span>,</span>
+<span>  which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -129,19 +129,19 @@ of available cores.</p></dd>
 <dd><p>The default set of workers.</p></dd>
 
 
+<dt id="arg-threadsperworker">threadsPerWorker<a class="anchor" aria-label="anchor" href="#arg-threadsperworker"></a></dt>
+<dd><p>(positive integer) Number of CPU cores, or
+threads, for each parallel worker. Each host is listed
+<code>n %/% threadsPerWorker</code> times, where <code>n</code> is the number of CPUs
+allotted on that host. Passed as-is to <code><a href="availableCores.html">availableCores()</a></code>.</p></dd>
+
+
 <dt id="arg-which">which<a class="anchor" aria-label="anchor" href="#arg-which"></a></dt>
 <dd><p>A character specifying which set / sets to return.
 If <code>"auto"</code> (default), the first non-empty set found.
 If <code>"min"</code>, the minimum value is returned.
 If <code>"max"</code>, the maximum value is returned (be careful!)
 If <code>"all"</code>, all values are returned.</p></dd>
-
-
-<dt id="arg-threadsperworker">threadsPerWorker<a class="anchor" aria-label="anchor" href="#arg-threadsperworker"></a></dt>
-<dd><p>(positive integer) Number of CPU cores, or
-threads, for each parallel worker. Each host is listed
-<code>n %/% threadsPerWorker</code> times, where <code>n</code> is the number of CPUs
-allotted on that host. Passed as-is to <code><a href="availableCores.html">availableCores()</a></code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -277,6 +277,15 @@ see <code><a href="availableCores.html">availableCores()</a></code>.</p></div>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Available workers:"</span>,</span></span>
 <span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sQuote.html" class="external-link">sQuote</a></span><span class="op">(</span><span class="fu">availableWorkers</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co">## Slurm job submitted with 'sbatch --ntasks=4 --cpus-per-task=2'</span></span></span>
+<span class="r-in"><span><span class="co">## Use one worker per task, each running two threads, instead of</span></span></span>
+<span class="r-in"><span><span class="co">## one worker per CPU core</span></span></span>
+<span class="r-in"><span><span class="va">nthreads</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"SLURM_CPUS_PER_TASK"</span>, <span class="st">"1"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">workers</span> <span class="op">&lt;-</span> <span class="fu">availableWorkers</span><span class="op">(</span>threadsPerWorker <span class="op">=</span> <span class="va">nthreads</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Workers to use:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sQuote.html" class="external-link">sQuote</a></span><span class="op">(</span><span class="va">workers</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
