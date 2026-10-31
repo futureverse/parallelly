@@ -340,6 +340,15 @@ options(parallelly.availableCores.custom = function() {
 message(paste("Number of cores available:", availableCores()))
 }
 
+\dontrun{
+## Slurm job submitted with 'sbatch --ntasks=4 --cpus-per-task=2'
+## Use one worker per task, each running two threads, instead of
+## one worker per CPU core
+nthreads <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "1"))
+nworkers <- availableCores(threadsPerWorker = nthreads)
+message(paste("Number of workers to use:", nworkers))
+}
+
 }
 \seealso{
 To get the set of available workers regardless of machine,
