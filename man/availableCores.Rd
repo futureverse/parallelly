@@ -15,7 +15,7 @@ availableCores(
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
   which = c("min", "max", "all"),
-  threadsPerWorker = 1L,
+  threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L),
   fraction = getOption2("parallelly.availableCores.fraction", 1),
   omit = getOption2("parallelly.availableCores.omit", 0L),
   max = getOption2("parallelly.availableCores.max", Inf)

@@ -26,6 +26,8 @@
 #'
 #'  \item{`parallelly.availableCores.min`:}{(integer) The default minimum number of cores [availableCores()] is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (`*`).  (Default: `1L`)}
 #'
+#'  \item{`parallelly.availableCores.threadsPerWorker`:}{(integer; positive) The default number of CPU cores (threads) to reserve for each parallel worker, used by [availableCores()] and [availableWorkers()]. (Default: `1L`)}
+#'
 #'  \item{`parallelly.availableCores.fraction`:}{(numeric; in `[0,1]`) The default fraction of cores to keep.}
 #'
 #'  \item{`parallelly.availableCores.omit`:}{(integer; non-negative) The default number of cores to set aside, i.e. not to include.}
@@ -163,6 +165,7 @@
 #' @aliases parallelly.availableCores.min
 #' @aliases parallelly.availableCores.omit
 #' @aliases parallelly.availableCores.system
+#' @aliases parallelly.availableCores.threadsPerWorker
 #' @aliases parallelly.availableWorkers.custom
 #' @aliases parallelly.availableWorkers.methods
 #' @aliases parallelly.availableWorkers.methods.excludes
@@ -359,6 +362,7 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("availableCores.min", mode = "integer", disallow = "NA", debug = debug)
   update_package_option("availableCores.system", mode = "integer", disallow = NULL, debug = debug)
   update_package_option("availableCores.logical", mode = "logical", debug = debug)
+  update_package_option("availableCores.threadsPerWorker", mode = "integer", disallow = "NA", debug = debug)
   update_package_option("availableCores.fraction", mode = "double", debug = debug)
   update_package_option("availableCores.omit", mode = "integer", debug = debug)
   update_package_option("availableCores.max", mode = "numeric", disallow = "NA", debug = debug)

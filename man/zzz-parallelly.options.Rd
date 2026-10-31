@@ -14,6 +14,7 @@
 \alias{parallelly.availableCores.min}
 \alias{parallelly.availableCores.omit}
 \alias{parallelly.availableCores.system}
+\alias{parallelly.availableCores.threadsPerWorker}
 \alias{parallelly.availableWorkers.custom}
 \alias{parallelly.availableWorkers.methods}
 \alias{parallelly.availableWorkers.methods.excludes}
@@ -104,6 +105,8 @@ The below \R options and environment variables control the default results of \c
 \item{\code{parallelly.availableCores.system}:}{(integer) The default number of "system" cores used instead of what is reported by \code{\link{availableCores}(which = "system")}. This option allows you to effectively override what \code{parallel::detectCores()} reports the system has.}
 
 \item{\code{parallelly.availableCores.min}:}{(integer) The default minimum number of cores \code{\link[=availableCores]{availableCores()}} is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (\code{*}).  (Default: \code{1L})}
+
+\item{\code{parallelly.availableCores.threadsPerWorker}:}{(integer; positive) The default number of CPU cores (threads) to reserve for each parallel worker, used by \code{\link[=availableCores]{availableCores()}} and \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{1L})}
 
 \item{\code{parallelly.availableCores.fraction}:}{(numeric; in \verb{[0,1]}) The default fraction of cores to keep.}
 

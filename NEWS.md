@@ -23,6 +23,8 @@
    threads.
    Similarly, `availableWorkers()` gained `threadsPerWorker`, which
    lists each host `n %/% threadsPerWorker` times.
+   The default is controlled by R option
+   `parallelly.availableCores.threadsPerWorker`.
 
  * Add support for the HTCondor job scheduler to `availableCores()`
    and `availableWorkers()`. For now, `availableWorkers()` assumes

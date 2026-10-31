@@ -1106,6 +1106,11 @@ stopifnot(identical(availableCores(threadsPerWorker = 100L), c(system = 1L)))
 stopifnot(identical(availableCores(threadsPerWorker = 2L, omit = 1L), c(system = 3L)))
 stopifnot(identical(availableCores(threadsPerWorker = 2L, fraction = 0.5), c(system = 2L)))
 
+## Via option
+options(parallelly.availableCores.threadsPerWorker = 4L)
+stopifnot(identical(availableCores(), c(system = 2L)))
+options(parallelly.availableCores.threadsPerWorker = NULL)
+
 ## Invalid values
 for (value in list(0L, -1L, NA_integer_, Inf, 1:2, "2")) {
   res <- tryCatch(availableCores(threadsPerWorker = value), error = identity)

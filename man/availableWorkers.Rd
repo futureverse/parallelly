@@ -15,7 +15,7 @@ availableWorkers(
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = getOption2("parallelly.localhost.hostname", "localhost"),
   which = c("auto", "min", "max", "all"),
-  threadsPerWorker = 1L,
+  threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L),
   ...
 )
 }
