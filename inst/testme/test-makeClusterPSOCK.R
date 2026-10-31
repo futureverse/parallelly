@@ -1,3 +1,5 @@
+#' @tags detritus-files
+
 library(parallelly)
 
 options(parallelly.debug = TRUE)
@@ -137,6 +139,20 @@ for (setup_strategy in c("sequential", "parallel")) {
   })
   print(dt)
   print(cl)
+  parallel::stopCluster(cl)
+}
+
+
+message("- makeClusterPSOCK() - only collect sys.calls() if calls = TRUE")
+
+## Assert that sys.calls() is only collected if calls = TRUE
+for (setup_strategy in c("sequential", "parallel")) {
+  cl <- makeClusterPSOCK(1L, setup_strategy = setup_strategy, calls = FALSE)
+  stopifnot(is.null(attr(cl[[1]], "calls")))
+  parallel::stopCluster(cl)
+
+  cl <- makeClusterPSOCK(1L, setup_strategy = setup_strategy, calls = TRUE)
+  stopifnot(!is.null(attr(cl[[1]], "calls")))
   parallel::stopCluster(cl)
 }
 
@@ -340,6 +356,7 @@ if (fullTest || covr_testing) {
 
 ## https://github.com/futureverse/parallelly/issues/95
 if (getRversion() >= "4.0.0") {
+  pidfiles_before <- list.files(tempdir(), pattern = "[.]pid$", full.names = TRUE)
   res <- tryCatch({
     parallelly::makeClusterPSOCK(1L, rscript_startup = quote(Sys.sleep(6.0)),
                                  connectTimeout = 0.1, timeout = 7.0)
@@ -353,6 +370,31 @@ if (getRversion() >= "4.0.0") {
   ## Make sure to wait for background process to timeout before continuing,
   ## when on MS Windows
   if (on_windows) Sys.sleep(5.0)
+
+  ## The temporary PID file used to track the worker should not be
+  ## left behind after a connection-timeout error
+  Sys.sleep(1.0)
+  pidfiles_after <- list.files(tempdir(), pattern = "[.]pid$", full.names = TRUE)
+  stopifnot(length(setdiff(pidfiles_after, pidfiles_before)) == 0L)
+
+  ## Same, but with more than one worker, each of which has its own,
+  ## separate temporary PID file
+  pidfiles_before <- list.files(tempdir(), pattern = "[.]pid$", full.names = TRUE)
+  res <- tryCatch({
+    parallelly::makeClusterPSOCK(3L, rscript_startup = quote(Sys.sleep(6.0)),
+                                 connectTimeout = 0.1, timeout = 7.0)
+  }, error = identity)
+  print(res)
+  stopifnot(
+    inherits(res, "error"),
+    grepl("^Cluster setup failed", conditionMessage(res))
+  )
+
+  if (on_windows) Sys.sleep(5.0)
+
+  Sys.sleep(1.0)
+  pidfiles_after <- list.files(tempdir(), pattern = "[.]pid$", full.names = TRUE)
+  stopifnot(length(setdiff(pidfiles_after, pidfiles_before)) == 0L)
 }
 
 message("*** makeClusterPSOCK() ... DONE")

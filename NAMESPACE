@@ -63,18 +63,26 @@ if (getRversion() >= "4.4") export(SEQ)
 if (getRversion() >= "4.4") export(makeClusterSequential)
 if (getRversion() >= "4.4") importFrom(parallel,recvData)
 if (getRversion() >= "4.4") importFrom(parallel,sendData)
-importFrom(parallel,clusterCall)
-importFrom(parallel,detectCores)
-importFrom(parallel,makeCluster)
-importFrom(parallel,stopCluster)
-importFrom(tools,pskill)
-importFrom(utils,capture.output)
-importFrom(utils,file_test)
-importFrom(utils,flush.console)
-importFrom(utils,installed.packages)
-importFrom(utils,read.table)
-importFrom(utils,str)
-importFrom(utils,tar)
-importFrom(utils,untar)
-importFrom(utils,write.table)
+importFrom(parallel,
+  clusterCall,
+  detectCores,
+  makeCluster,
+  stopCluster
+)
+importFrom(tools,
+  SIGKILL,
+  SIGTERM,
+  pskill
+)
+importFrom(utils,
+  capture.output,
+  file_test,
+  flush.console,
+  installed.packages,
+  read.table,
+  str,
+  tar,
+  untar,
+  write.table
+)
 useDynLib("parallelly", .registration = TRUE, .fixes = "C_")

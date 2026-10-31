@@ -165,6 +165,26 @@ stopifnot(inherits(res, "error"))
 
 message("*** pid_exists() - argument validation ... DONE")
 
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# warn_future_reexport_deprecation()
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+message("*** warn_future_reexport_deprecation() ...")
+
+## Function called via a call whose function part is a nested call,
+## e.g. obj$get()()
+obj <- list(get = function() parallelly::availableCores)
+res <- obj$get()()
+print(res)
+stopifnot(is.integer(res), length(res) == 1L, res >= 1L)
+
+f <- function() function() parallelly::availableCores
+res <- f()()()
+print(res)
+stopifnot(is.integer(res), length(res) == 1L, res >= 1L)
+
+message("*** warn_future_reexport_deprecation() ... DONE")
+
 options(parallelly.debug = FALSE)
 
 message("*** utils ... DONE")

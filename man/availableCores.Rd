@@ -10,10 +10,11 @@ availableCores(
     "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus",
     "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores",
     "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE",
-    "Slurm", "fallback", "custom")),
+    "Slurm", "HTCondor", "fallback", "custom")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
+  threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L),
   which = c("min", "max", "all"),
   fraction = getOption2("parallelly.availableCores.fraction", 1),
   omit = getOption2("parallelly.availableCores.omit", 0L),
@@ -45,6 +46,12 @@ This argument is only used if argument \code{methods} includes \code{"system"}.}
 
 \item{default}{The default number of cores to return if no non-missing
 settings are available.}
+
+\item{threadsPerWorker}{(positive integer) Number of CPU cores, or
+threads, to reserve for each parallel worker. The number of cores is
+divided by this number, rounding down, with a minimum of one.
+Applied before \code{fraction} and \code{omit}. The default is one, which
+means one worker per CPU core.}
 
 \item{which}{A character specifying which settings to return.
 If \code{"min"} (default), the minimum value is returned.
@@ -79,9 +86,15 @@ are supported:
 \itemize{
 \item \code{"system"} -
 Query \code{\link[parallel]{detectCores}(logical = logical)}.
+If it returns a missing value, which happens on platforms where
+the number of cores cannot be detected, such as webR, then \code{1} is
+used.
 
 \item \code{"/proc/self/status"} -
 Query \code{Cpus_allowed_list} of \verb{/proc/self/status}.
+Since this list may include CPUs that are not online, only CPUs
+that are also online according to \verb{/sys/devices/system/cpu/online}
+are counted.
 
 \item \code{"cgroups.cpuset"} -
 On Unix, query control group (cgroup v1) \emph{affinity} value
@@ -175,6 +188,14 @@ Query the "Grid Engine" scheduler environment variable \env{NSLOTS}.
 An example of a job submission that results in this is
 \verb{qsub -pe smp 2} (or \verb{qsub -pe by_node 2}), which
 requests two cores on a single machine.
+If the job spans multiple machines, e.g. \verb{qsub -pe mpi 16},
+\env{NSLOTS} is the total number of slots on all machines.
+Because of this, the number of slots allotted to the current
+machine according to the file that \env{PE_HOSTFILE} specifies
+is used instead, if available.
+In processes launched by \code{qrsh -inherit}, \env{PE_HOSTFILE} is not
+set. On the machine running the job script, the file is searched for
+in the job's spool folder via \env{SGE_JOB_SPOOL_DIR}.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
@@ -183,15 +204,26 @@ Son of Grid Engine (SGE aka SoGE; open-source fork of SGE 6.2u5), and
 
 \item \code{"Slurm"} -
 Query Simple Linux Utility for Resource Management (Slurm)
-environment variable \env{SLURM_CPUS_PER_TASK}.
-This may or may not be set.  It can be set when submitting a job,
-e.g. \verb{sbatch --cpus-per-task=2 hello.sh} or by adding
-\verb{#SBATCH --cpus-per-task=2} to the \file{hello.sh} script.
-If \env{SLURM_CPUS_PER_TASK} is not set, then it will fall back to
-use \env{SLURM_CPUS_ON_NODE} if the job is a single-node job
-(\env{SLURM_JOB_NUM_NODES} is 1), e.g. \verb{sbatch --ntasks=2 hello.sh}.
-To make sure all tasks are assigned to a single node, specify
-\code{--nodes=1}, e.g. \verb{sbatch --nodes=1 --ntasks=16 hello.sh}.
+environment variable \env{SLURM_CPUS_ON_NODE}, which is the number
+of CPUs that Slurm has allotted to the job on the current machine.
+For example, \verb{sbatch --ntasks=4 --cpus-per-task=2 hello.sh}
+gives eight CPUs, when all tasks are assigned to the same machine.
+This is the number of cores available to the \file{hello.sh} job
+script, and similarly to the interactive shell of \command{salloc}.
+In a task launched by \command{srun} (as indicated by
+\env{SLURM_STEP_ID} being set), the CPUs on the machine are shared
+with the other tasks on that machine.  In this case,
+\env{SLURM_CPUS_PER_TASK} is used, if set, e.g.
+\code{--cpus-per-task=2}, otherwise the CPUs are split equally among the
+tasks of the job step on the current machine according to
+\env{SLURM_STEP_TASKS_PER_NODE}.
+
+\item \code{"HTCondor"} -
+Query HTCondor environment variables \env{_CONDOR_MACHINE_AD} and
+\env{_CONDOR_JOB_AD}.
+The slot's machine ClassAd file is queried for \code{Cpus}.
+If not available, the job ClassAd file is queried for
+\code{CpusProvisioned} (or \code{Cpus}).
 
 \item \code{"custom"} -
 If option
@@ -251,7 +283,7 @@ availableCores(constraints = "connections-16")
 }\if{html}{\out{</div>}}
 
 To achieve the same from outside of R, for instance when running
-\verb{R CMD check}, set the the corresponding environment variables, e.g.
+\verb{R CMD check}, set the corresponding environment variables, e.g.
 
 \if{html}{\out{<div class="sourceCode sh">}}\preformatted{$ export R_PARALLELLY_AVAILABLECORES_SYSTEM=192
 $ export R_PARALLELLY_AVAILABLECORES_METHODS=system
@@ -306,6 +338,15 @@ options(parallelly.availableCores.custom = function() {
   0.50 * parallelly::availableCores()
 })
 message(paste("Number of cores available:", availableCores()))
+}
+
+\dontrun{
+## Slurm job submitted with 'sbatch --ntasks=4 --cpus-per-task=2'
+## Use one worker per task, each running two threads, instead of
+## one worker per CPU core
+nthreads <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "1"))
+nworkers <- availableCores(threadsPerWorker = nthreads)
+message(paste("Number of workers to use:", nworkers))
 }
 
 }

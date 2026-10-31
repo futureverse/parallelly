@@ -8,11 +8,13 @@ availableWorkers(
   constraints = NULL,
   methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores",
     "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE",
-    "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus",
-    "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")),
+    "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota",
+    "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max",
+    "nproc", "/proc/self/status", "system", "fallback")),
   na.rm = TRUE,
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = getOption2("parallelly.localhost.hostname", "localhost"),
+  threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L),
   which = c("auto", "min", "max", "all"),
   ...
 )
@@ -31,6 +33,11 @@ of available cores.}
 \item{logical}{Passed as-is to \code{\link[=availableCores]{availableCores()}}.}
 
 \item{default}{The default set of workers.}
+
+\item{threadsPerWorker}{(positive integer) Number of CPU cores, or
+threads, for each parallel worker. Each host is listed
+\code{n \%/\% threadsPerWorker} times, where \code{n} is the number of CPUs
+allotted on that host. Passed as-is to \code{\link[=availableCores]{availableCores()}}.}
 
 \item{which}{A character specifying which set / sets to return.
 If \code{"auto"} (default), the first non-empty set found.
@@ -85,6 +92,9 @@ Query the "Grid Engine" scheduler environment variable \env{PE_HOSTFILE}.
 An example of a job submission that results in this is
 \verb{qsub -pe mpi 8} (or \verb{qsub -pe ompi 8}), which
 requests eight cores on any number of machines.
+The workers are listed in the same order as the machines in
+\env{PE_HOSTFILE}, where the machine running the job script comes
+first.
 Known Grid Engine schedulers are
 Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
 Univa Grid Engine (UGE; fork of open-source SGE 6.2u5),
@@ -96,16 +106,22 @@ Query Slurm environment variable \env{SLURM_JOB_NODELIST} (fallback
 to legacy \env{SLURM_NODELIST}) and parse set of nodes.
 Then query Slurm environment variable \env{SLURM_JOB_CPUS_PER_NODE}
 (fallback \env{SLURM_TASKS_PER_NODE}) to infer how many CPU cores
-Slurm has allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
-is set, which is always a scalar, then that is respected too, i.e.
-if it is smaller, then that is used for all nodes.
+Slurm has allotted to each of the nodes.
 For example, if \code{SLURM_NODELIST="n1,n[03-05]"} (expands to
 \code{c("n1", "n03", "n04", "n05")}) and \code{SLURM_JOB_CPUS_PER_NODE="2(x2),3,2"}
 (expands to \code{c(2, 2, 3, 2)}), then
 \code{c("n1", "n1", "n03", "n03", "n04", "n04", "n04", "n05", "n05")} is
-returned.  If in addition, \code{SLURM_CPUS_PER_TASK=1}, which can happen
-depending on hyperthreading configurations on the Slurm cluster, then
-\code{c("n1", "n03", "n04", "n05")} is returned.
+returned.  Note that \env{SLURM_CPUS_PER_TASK} is not used to limit
+the number of workers per node.  This means that the number of
+workers on the current machine equals \code{availableCores()} in the
+Slurm job script.
+
+\item \code{"HTCondor"} -
+Query HTCondor environment variables \env{_CONDOR_MACHINE_AD} and
+\env{_CONDOR_JOB_AD}.
+Currently, single-node jobs are assumed. If called on a multi-node job,
+it will only return the workers for the current node.
+Returns \code{availableCores(methods = "HTCondor")} localhost workers.
 
 \item \code{"custom"} -
 If option
@@ -119,6 +135,9 @@ done, the custom function will \emph{not} be recursively called.
 }
 }
 \section{Known limitations}{
+
+\code{availableWorkers(methods = "HTCondor")} currently assumes single-node jobs.
+If called on a multi-node job, it will only return the workers for the current node.
 
 \code{availableWorkers(methods = "Slurm")} will expand \env{SLURM_JOB_NODELIST}
 using \command{scontrol show hostnames "$SLURM_JOB_NODELIST"}, if available.
@@ -160,6 +179,15 @@ options(parallelly.availableWorkers.custom = function() {
 })
 message(paste("Available workers:",
         paste(sQuote(availableWorkers()), collapse = ", ")))
+}
+
+\dontrun{
+## Slurm job submitted with 'sbatch --ntasks=4 --cpus-per-task=2'
+## Use one worker per task, each running two threads, instead of
+## one worker per CPU core
+nthreads <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "1"))
+workers <- availableWorkers(threadsPerWorker = nthreads)
+message(paste("Workers to use:", paste(sQuote(workers), collapse = ", ")))
 }
 
 }

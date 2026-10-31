@@ -4,10 +4,18 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
+#include <Rversion.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+// Serialization format version 3 is the default in R (>= 3.6.0)
+#if defined(R_VERSION) && R_VERSION >= R_Version(3, 6, 0)
+#define SERIALIZATION_VERSION 3
+#else
+#define SERIALIZATION_VERSION 2
+#endif
 
 #ifndef R_INT_MAX
 #define R_INT_MAX  INT_MAX
@@ -51,7 +59,7 @@ R_xlen_t calc_serialized_size(SEXP robj) {
     &output_stream,            // The stream object which wraps everything
     (R_pstream_data_t) &count, // user data that persists within the process
     R_pstream_binary_format,   // Store as binary
-    3,                         // Version = 3 for R >3.5.0 See `?base::serialize`
+    SERIALIZATION_VERSION,     // Same as the default of `base::serialize()`
     count_byte,                // Function to write single byte to buffer
     count_bytes,               // Function for writing multiple bytes to buffer
     NULL,                      // Func for special handling of reference data.

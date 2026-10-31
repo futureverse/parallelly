@@ -48,7 +48,7 @@ importParallel <- local({
       if (name %in% c("mccollect", "selectChildren") &&
           getRversion() >= "3.5.0" && getRversion() <= "3.5.1") {
         ## Suppress warnings produced by parallel::mccollect() and
-        ## parallel::selectChildren() in R 3.5.0 and and R 3.5.1
+        ## parallel::selectChildren() in R 3.5.0 and R 3.5.1
         ## (https://github.com/HenrikBengtsson/future/issues/218), e.g.
         ##
         ##  "Warning in selectChildren(pids[!fin], -1) :

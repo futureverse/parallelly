@@ -77,6 +77,7 @@ print(availableCores(methods = "PBS"))
 print(availableCores(methods = "SGE"))
 print(availableCores(methods = "Slurm"))
 print(availableCores(methods = "LSF"))
+print(availableCores(methods = "HTCondor"))
 
 ## Any R options and system environment variable
 print(availableCores(methods = c("width", "FOO_BAR_ENV"),
@@ -119,6 +120,173 @@ print(ncores)
 stopifnot(ncores == ncores0)
 Sys.unsetenv("PJM_PROC_BY_NODE")
 message("*** PJM (Fujitsu Technical Computing Suite) ... done")
+
+message("*** HTCondor ...")
+
+env <- environment(parallelly:::availableCoresHTCondor)
+
+## Baseline: not in HTCondor
+env$n <- NULL
+Sys.unsetenv(c("_CONDOR_MACHINE_AD", "_CONDOR_JOB_AD"))
+ncores <- availableCores(methods = "HTCondor", na.rm = FALSE)
+stopifnot(is.na(ncores[["HTCondor"]]))
+
+## 1. Machine ClassAd: Cpus
+machine_ad_file <- tempfile(fileext = ".ad")
+writeLines(c(
+  "# Comment line",
+  "// Another comment",
+  "MyType = \"Machine\"",
+  "TargetType = \"Job\"",
+  "Name = \"slot1@execute01\"",
+  "Cpus = 4",
+  "TotalCpus = 16"
+), con = machine_ad_file)
+
+Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+print(ncores)
+stopifnot(ncores == 4L)
+
+## 2. Machine ClassAd preferred over Job ClassAd
+job_ad_file <- tempfile(fileext = ".ad")
+writeLines(c(
+  "MyType = \"Job\"",
+  "TargetType = \"Machine\"",
+  "RequestCpus = 2",
+  "CpusProvisioned = 4"
+), con = job_ad_file)
+
+Sys.setenv("_CONDOR_JOB_AD" = job_ad_file)
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+stopifnot(ncores == 4L)
+
+## 3. Fallback to Job ClassAd CpusProvisioned (when machine ad not available)
+Sys.unsetenv("_CONDOR_MACHINE_AD")
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+print(ncores)
+stopifnot(ncores == 4L)
+
+## 4. Fallback to Job ClassAd Cpus (when CpusProvisioned not available)
+writeLines(c(
+  "MyType = \"Job\"",
+  "TargetType = \"Machine\"",
+  "RequestCpus = 1",
+  "Cpus = 6"
+), con = job_ad_file)
+env$n <- NULL
+ncores <- availableCores(methods = "HTCondor")
+print(ncores)
+stopifnot(ncores == 6L)
+
+## 5. Cross-check mismatch between machine ad and job ad
+Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+writeLines(c(
+  "MyType = \"Job\"",
+  "CpusProvisioned = 8"
+), con = job_ad_file)
+Sys.setenv("_CONDOR_JOB_AD" = job_ad_file)
+env$n <- NULL
+warn_msg <- NULL
+ncores <- withCallingHandlers({
+  availableCores(methods = "HTCondor")
+}, warning = function(w) {
+  warn_msg <<- conditionMessage(w)
+  invokeRestart("muffleWarning")
+})
+stopifnot(ncores == 4L, !is.null(warn_msg), grepl("CpusProvisioned", warn_msg))
+
+## 6. Non-existent file warning
+Sys.setenv("_CONDOR_MACHINE_AD" = tempfile())
+Sys.unsetenv("_CONDOR_JOB_AD")
+env$n <- NULL
+warn_msg <- NULL
+ncores <- withCallingHandlers({
+  availableCores(methods = "HTCondor", na.rm = FALSE)
+}, warning = function(w) {
+  warn_msg <<- conditionMessage(w)
+  invokeRestart("muffleWarning")
+})
+stopifnot(is.na(ncores[["HTCondor"]]), !is.null(warn_msg), grepl("no such file", warn_msg))
+
+## Clean up
+file.remove(machine_ad_file)
+file.remove(job_ad_file)
+Sys.unsetenv(c("_CONDOR_MACHINE_AD", "_CONDOR_JOB_AD"))
+env$n <- NULL
+
+message("*** HTCondor ... done")
+
+message("*** HTCondor scenarios observed on real clusters ...")
+
+file <- system.file(package = "parallelly", "test-data", "htcondor", "scenarios.csv", mustWork = FALSE)
+if (nzchar(file) && file.exists(file)) {
+  scenarios <- read.csv(file, colClasses = "character", na.strings = "", check.names = FALSE)
+  
+  machine_ad_cols <- grep("^_CONDOR_MACHINE_AD-", colnames(scenarios), value = TRUE)
+  job_ad_cols <- grep("^_CONDOR_JOB_AD-", colnames(scenarios), value = TRUE)
+  meta_cols <- c("cluster", "context", "condor_submit", "expected_cores", "expected_workers", machine_ad_cols, job_ad_cols)
+  env_vars <- setdiff(colnames(scenarios), meta_cols)
+  
+  env <- environment(parallelly:::availableCoresHTCondor)
+  
+  for (kk in seq_len(nrow(scenarios))) {
+    scenario <- scenarios[kk, ]
+    message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, scenario$condor_submit, scenario$cluster))
+    
+    ## Write machine ad file if any machine ad columns are non-empty
+    m_attrs <- as.list(scenario[machine_ad_cols])
+    m_attrs <- m_attrs[!is.na(m_attrs)]
+    if (length(m_attrs) > 0L) {
+      m_lines <- sprintf("%s = %s", sub("^_CONDOR_MACHINE_AD-", "", names(m_attrs)), unlist(m_attrs))
+      machine_ad_file <- tempfile(fileext = ".ad")
+      writeLines(m_lines, con = machine_ad_file)
+      Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+    } else {
+      machine_ad_file <- NULL
+      Sys.unsetenv("_CONDOR_MACHINE_AD")
+    }
+    
+    ## Write job ad file if any job ad columns are non-empty
+    j_attrs <- as.list(scenario[job_ad_cols])
+    j_attrs <- j_attrs[!is.na(j_attrs)]
+    if (length(j_attrs) > 0L) {
+      j_lines <- sprintf("%s = %s", sub("^_CONDOR_JOB_AD-", "", names(j_attrs)), unlist(j_attrs))
+      job_ad_file <- tempfile(fileext = ".ad")
+      writeLines(j_lines, con = job_ad_file)
+      Sys.setenv("_CONDOR_JOB_AD" = job_ad_file)
+    } else {
+      job_ad_file <- NULL
+      Sys.unsetenv("_CONDOR_JOB_AD")
+    }
+    
+    ## Set environment variables
+    envs <- as.list(scenario[env_vars])
+    envs <- envs[!is.na(envs)]
+    Sys.unsetenv(env_vars)
+    if (length(envs) > 0L) {
+      do.call(Sys.setenv, envs)
+    }
+    
+    env$n <- NULL
+    truth <- as.integer(scenario$expected_cores)
+    
+    ncores <- availableCores(methods = "HTCondor")
+    message(sprintf("availableCores(methods = \"HTCondor\") = %d (truth = %d)", ncores, truth))
+    stopifnot(ncores == truth)
+    
+    ## Cleanup temp files
+    if (!is.null(machine_ad_file)) file.remove(machine_ad_file)
+    if (!is.null(job_ad_file)) file.remove(job_ad_file)
+    Sys.unsetenv(c("_CONDOR_MACHINE_AD", "_CONDOR_JOB_AD", env_vars))
+    env$n <- NULL
+  }
+}
+
+message("*** HTCondor scenarios observed on real clusters ... done")
 
 
 message("*** Internal detectCores() ...")
@@ -168,8 +336,9 @@ ncores <- availableCores(methods = "Slurm")
 print(ncores)
 stopifnot(ncores == 16L)
 
-## Multi-node with SLURM_TASKS_PER_NODE (simple format)
-Sys.unsetenv("SLURM_CPUS_PER_TASK")
+## Multi-node with SLURM_TASKS_PER_NODE (simple format), which is
+## a fallback when SLURM_CPUS_ON_NODE is not set
+Sys.unsetenv(c("SLURM_CPUS_PER_TASK", "SLURM_CPUS_ON_NODE"))
 Sys.setenv(SLURM_JOB_NUM_NODES = "2", SLURM_TASKS_PER_NODE = "5,2")
 env$n <- NULL
 ncores <- availableCores(methods = "Slurm")
@@ -190,6 +359,45 @@ Sys.unsetenv(c("SLURM_CPUS_PER_TASK", "SLURM_JOB_NUM_NODES", "SLURM_NNODES",
 env$n <- NULL
 
 message("*** Slurm multi-node scenarios ... done")
+
+
+message("*** Slurm scenarios observed on real clusters ...")
+
+## Slurm environment variables recorded on real Slurm clusters, for
+## the batch script (context 'batch'), for
+## tasks launched by 'srun' (context 'srun'), and for the interactive
+## shell of 'salloc' (context 'salloc'). Empty cells correspond to
+## environment variables that are not set
+file <- system.file(package = "parallelly", "test-data", "slurm", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+slurm_vars <- grep("^SLURM", colnames(scenarios), value = TRUE)
+
+env <- environment(parallelly:::availableCoresSlurm)
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, scenario$sbatch, scenario$cluster))
+  envs <- unlist(scenario[slurm_vars])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(slurm_vars)
+  do.call(Sys.setenv, as.list(envs))
+  print(envs)
+  env$n <- NULL
+  truth <- as.integer(scenario$expected_cores)
+  ## Any warnings are unexpected
+  ncores <- withCallingHandlers({
+    availableCores(methods = "Slurm")
+  }, warning = function(w) {
+    stop("Unexpected warning: ", conditionMessage(w))
+  })
+  message(sprintf("availableCores(methods = \"Slurm\") = %d (truth = %d)", ncores, truth))
+  stopifnot(ncores == truth)
+}
+
+## Cleanup
+Sys.unsetenv(slurm_vars)
+env$n <- NULL
+
+message("*** Slurm scenarios observed on real clusters ... done")
 
 
 message("*** PBS NCPUS fallback ...")
@@ -348,12 +556,42 @@ stopifnot(inherits(res, "error"))
 res <- tryCatch(availableCores(default = Inf), error = identity)
 stopifnot(inherits(res, "error"))
 
+## Invalid default (too large to represent as an integer)
+res <- tryCatch(availableCores(default = 1e10), error = identity)
+stopifnot(inherits(res, "error"))
+
+## An unnamed default should not get missing names
+n <- availableCores(default = 2L, methods = "non-existing-method")
+print(n)
+stopifnot(n == 2L, is.null(names(n)))
+
+## A non-integer default should be returned as an integer
+n <- availableCores(default = 2, methods = "non-existing-method")
+print(n)
+stopifnot(is.integer(n), n == 2L)
+n <- availableCores(default = c(abc = 2), methods = "non-existing-method")
+print(n)
+stopifnot(is.integer(n), n == 2L, identical(names(n), "abc"))
+
+## ... also not when the minimum number of cores is enforced
+if (parallelly:::detectCores() >= 2L) {
+  oopts <- options(parallelly.availableCores.min = 2L)
+  n <- availableCores(default = 1L, methods = "non-existing-method")
+  print(n)
+  stopifnot(n == 2L, is.null(names(n)))
+  options(oopts)
+}
+
 ## Invalid omit (negative)
 res <- tryCatch(availableCores(omit = -1L), error = identity)
 stopifnot(inherits(res, "error"))
 
 ## Invalid omit (not finite)
 res <- tryCatch(availableCores(omit = Inf), error = identity)
+stopifnot(inherits(res, "error"))
+
+## Invalid omit (too large to represent as an integer)
+res <- tryCatch(availableCores(omit = 1e10), error = identity)
 stopifnot(inherits(res, "error"))
 
 ## Invalid max (< 1)
@@ -526,6 +764,64 @@ env$n <- NULL
 message("*** SGE method ... done")
 
 
+message("*** SGE scenarios observed on real clusters ...")
+
+## Grid Engine environment variables recorded on a real SGE cluster,
+## for the job script (context 'job') and for processes
+## launched by 'qrsh -inherit' (context 'inherit'). Column
+## 'PE_HOSTFILE_content' holds the lines of the PE_HOSTFILE file,
+## separated by semicolons. Empty cells correspond to environment
+## variables that are not set. Processes launched by 'qrsh -inherit'
+## have no PE_HOSTFILE, but SGE_JOB_SPOOL_DIR, which is a folder below
+## the job's spool folder, e.g. '<spool>/active_jobs/123.1/1.n1'.
+## On the host running the job script, the job's spool folder holds
+## the 'pe_hostfile' file, whose lines are in column
+## 'spool_pe_hostfile_content'. On the other hosts, there is none
+file <- system.file(package = "parallelly", "test-data", "sge", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+sge_vars <- c("HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE", "SGE_JOB_SPOOL_DIR")
+ohostname <- Sys.getenv("HOSTNAME", NA_character_)
+
+env <- environment(parallelly:::availableCoresSGE)
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, if (is.na(scenario$qsub)) "(no PE)" else scenario$qsub, scenario$cluster))
+  envs <- unlist(scenario[intersect(sge_vars, colnames(scenario))])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(sge_vars)
+  do.call(Sys.setenv, as.list(envs))
+  if (!is.na(scenario$PE_HOSTFILE_content)) {
+    pathname <- tempfile(fileext = ".pe_hostfile")
+    writeLines(strsplit(scenario$PE_HOSTFILE_content, split = "; ", fixed = TRUE)[[1]], con = pathname)
+    Sys.setenv(PE_HOSTFILE = pathname)
+  }
+  if (scenario$context == "inherit") {
+    spool <- file.path(tempfile(), "active_jobs", "123.1")
+    task_spool <- file.path(spool, paste0("1.", scenario$HOSTNAME))
+    dir.create(task_spool, recursive = TRUE)
+    if (!is.na(scenario$spool_pe_hostfile_content)) {
+      writeLines(strsplit(scenario$spool_pe_hostfile_content, split = "; ", fixed = TRUE)[[1]], con = file.path(spool, "pe_hostfile"))
+    }
+    Sys.setenv(SGE_JOB_SPOOL_DIR = task_spool)
+  }
+  print(envs)
+  env$n <- NULL
+  truth <- as.integer(scenario$expected_cores)
+  ncores <- availableCores(methods = "SGE")
+  message(sprintf("availableCores(methods = \"SGE\") = %d (truth = %d)", ncores, truth))
+  stopifnot(ncores == truth)
+  if (!is.na(scenario$PE_HOSTFILE_content)) file.remove(pathname)
+  if (scenario$context == "inherit") unlink(dirname(dirname(spool)), recursive = TRUE)
+}
+
+## Cleanup
+Sys.unsetenv(sge_vars)
+if (!is.na(ohostname)) Sys.setenv(HOSTNAME = ohostname)
+env$n <- NULL
+
+message("*** SGE scenarios observed on real clusters ... done")
+
+
 message("*** _R_CHECK_LIMIT_CORES_ method ...")
 
 ## When set to true-ish value, should return 2
@@ -621,6 +917,42 @@ if (file.exists("/proc/self/status")) {
   }
 }
 
+## 'Cpus_allowed_list' may list CPUs that are not online, e.g. '0-63'
+## on a machine with 48 CPUs. Only CPUs that are online should count
+getProcSelfStatusCpuSet <- parallelly:::getProcSelfStatusCpuSet
+status <- tempfile()
+online <- tempfile()
+writeLines(c("Name:\tR", "Cpus_allowed:\tffffffff,ffffffff", "Cpus_allowed_list:\t0-63"), con = status)
+writeLines("0-47", con = online)
+cpus <- getProcSelfStatusCpuSet(status = status, online = online)
+print(cpus)
+stopifnot(identical(cpus, 0:47))
+
+## A job's CPU set is not affected
+writeLines(c("Name:\tR", "Cpus_allowed_list:\t25,45,77,97"), con = status)
+writeLines("0-103", con = online)
+cpus <- getProcSelfStatusCpuSet(status = status, online = online)
+print(cpus)
+stopifnot(identical(cpus, c(25L, 45L, 77L, 97L)))
+
+## Online CPUs may be non-contiguous
+writeLines(c("Name:\tR", "Cpus_allowed_list:\t0-7"), con = status)
+writeLines("0-1,4-5", con = online)
+cpus <- getProcSelfStatusCpuSet(status = status, online = online)
+print(cpus)
+stopifnot(identical(cpus, c(0L, 1L, 4L, 5L)))
+
+## Without information on online CPUs, all allowed CPUs are returned
+cpus <- getProcSelfStatusCpuSet(status = status, online = tempfile())
+print(cpus)
+stopifnot(identical(cpus, 0:7))
+
+## No 'Cpus_allowed_list' gives an empty set
+writeLines("Name:\tR", con = status)
+cpus <- getProcSelfStatusCpuSet(status = status, online = online)
+stopifnot(identical(cpus, integer(0L)))
+file.remove(c(status, online))
+
 message("*** /proc/self/status method ... done")
 
 
@@ -642,6 +974,13 @@ n <- availableCores(methods = "system", fraction = 0.7, omit = 1)
 stopifnot(length(n) == 1, is.integer(n), n >= 1L)
 expected <- max(1L, as.integer(floor(0.7 * n_sys)) - 1L)
 stopifnot(n == expected)
+
+## fraction should preserve names
+n <- availableCores(methods = "system", fraction = 0.5)
+stopifnot(identical(names(n), "system"))
+n_all <- availableCores(which = "all")
+n <- availableCores(which = "all", fraction = 0.5)
+stopifnot(identical(names(n), names(n_all)))
 
 ## fraction should always return at least 1
 n <- availableCores(methods = "system", fraction = 0.01)
@@ -715,6 +1054,77 @@ parallelly:::update_package_options()
 # Restore options
 options(oopts)
 message("*** availableCores(methods.excludes) ... done")
+
+
+message("*** availableCores(max, which = 'all') ...")
+
+## When 'which = "all"' and methods disagree, 'max' should clamp each
+## method's value independently, preserving names and length [#XXX]
+Sys.setenv(NSLOTS = "3")
+ns0 <- availableCores(methods = c("system", "NSLOTS"), which = "all")
+stopifnot(length(ns0) == 2, identical(names(ns0), c("system", "NSLOTS")))
+
+ns <- availableCores(methods = c("system", "NSLOTS"), which = "all", max = 6L)
+print(ns)
+stopifnot(
+  length(ns) == length(ns0),
+  identical(names(ns), names(ns0)),
+  all(ns <= 6L),
+  ns[["NSLOTS"]] == 3L  ## unaffected, since already <= max
+)
+Sys.unsetenv("NSLOTS")
+
+## Missing values should remain missing values when 'na.rm = FALSE'
+Sys.unsetenv("NSLOTS")
+ns <- availableCores(methods = c("system", "NSLOTS"), which = "all", na.rm = FALSE, max = 6L)
+print(ns)
+stopifnot(
+  length(ns) == 2L,
+  identical(names(ns), c("system", "NSLOTS")),
+  is.integer(ns),
+  ns[["system"]] <= 6L,
+  is.na(ns[["NSLOTS"]])
+)
+
+message("*** availableCores(max, which = 'all') ... DONE")
+
+
+message("*** availableCores(threadsPerWorker) ...")
+
+options(parallelly.availableCores.system = 12L)
+options(parallelly.availableCores.methods = "system")
+
+env <- environment(parallelly:::detectCores)
+env$cache <- list(NULL, NULL)
+
+stopifnot(identical(availableCores(), c(system = 12L)))
+stopifnot(identical(availableCores(threadsPerWorker = 1L), c(system = 12L)))
+stopifnot(identical(availableCores(threadsPerWorker = 2L), c(system = 6L)))
+stopifnot(identical(availableCores(threadsPerWorker = 3L), c(system = 4L)))
+
+
+## At least one worker
+stopifnot(identical(availableCores(threadsPerWorker = 100L), c(system = 1L)))
+
+## Applied before 'omit' and 'fraction'
+stopifnot(identical(availableCores(threadsPerWorker = 2L, omit = 1L), c(system = 5L)))
+stopifnot(identical(availableCores(threadsPerWorker = 2L, fraction = 0.5), c(system = 3L)))
+
+## Via option
+options(parallelly.availableCores.threadsPerWorker = 4L)
+stopifnot(identical(availableCores(), c(system = 3L)))
+options(parallelly.availableCores.threadsPerWorker = NULL)
+
+## Invalid values
+for (value in list(0L, -1L, NA_integer_, Inf, 1:2, "2")) {
+  res <- tryCatch(availableCores(threadsPerWorker = value), error = identity)
+  stopifnot(inherits(res, "error"))
+}
+
+options(parallelly.availableCores.system = NULL)
+options(parallelly.availableCores.methods = NULL)
+
+message("*** availableCores(threadsPerWorker) ... DONE")
 
 
 message("*** availableCores() ... DONE")

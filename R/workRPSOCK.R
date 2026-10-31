@@ -12,6 +12,8 @@
 #' 
 #' @return Nothing. The function enters an event loop and does not
 #' return until the worker receives a `"DONE"` message.
+#' If the connection to the parent process is lost, then an error is
+#' produced.
 #'
 #' @keywords internal
 workRPSOCK <- function(workCommand = NULL) {
@@ -133,11 +135,20 @@ workRPSOCK <- function(workCommand = NULL) {
          format(Sys.time(), "%H:%M:%OS3"))
   cat(msg)
 
+  master_host <- master
   master <- makeSOCKmaster(master, port, setup_timeout, timeout, useXDR,
                            setup_strategy)
-  if (!is.null(master)) {
-    repeat {
-      workCommand(master)
-    }
+  if (is.null(master)) return(invisible(NULL))
+
+  ## Process commands until the parent process sends "DONE", which makes
+  ## workCommand() return FALSE. Errors are relayed with more information
+  repeat {
+    res <- tryCatch(workCommand(master), error = function(ex) {
+      stop(sprintf("Worker (PID %d) failed while communicating with the parent R process (%s:%s): %s",
+                   Sys.getpid(), master_host, port, conditionMessage(ex)), call. = FALSE)
+    })
+    if (!isTRUE(res)) break
   }
+
+  invisible(NULL)
 }

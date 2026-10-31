@@ -28,7 +28,7 @@ as.cluster.list <- function(x, ...) {
 #' @rdname as.cluster
 #' @export
 as.cluster.SOCKnode <- function(x, ...) {
-  cl <- structure(list(x), class = c("SOCKcluster", "cluster"))
+  structure(list(x), class = c("SOCKcluster", "cluster"))
 }
 
 #' @rdname as.cluster
@@ -39,7 +39,7 @@ as.cluster.SOCK0node <- as.cluster.SOCKnode
 #' @rdname as.cluster
 #' @export
 as.cluster.RichSOCKnode <- function(x, ...) {
-  cl <- structure(list(x), class = c("RichSOCKcluster", "SOCKcluster", "cluster"))
+  structure(list(x), class = c("RichSOCKcluster", "SOCKcluster", "cluster"))
 }
 
 

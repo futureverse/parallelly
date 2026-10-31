@@ -14,6 +14,11 @@
 #'
 #' @param default The default set of workers.
 #'
+#' @param threadsPerWorker (positive integer) Number of CPU cores, or
+#' threads, for each parallel worker. Each host is listed
+#' `n %/% threadsPerWorker` times, where `n` is the number of CPUs
+#' allotted on that host. Passed as-is to [availableCores()].
+#'
 #' @param which A character specifying which set / sets to return.
 #' If `"auto"` (default), the first non-empty set found.
 #' If `"min"`, the minimum value is returned.
@@ -63,6 +68,9 @@
 #'    An example of a job submission that results in this is
 #'    `qsub -pe mpi 8` (or `qsub -pe ompi 8`), which
 #'    requests eight cores on any number of machines.
+#'    The workers are listed in the same order as the machines in
+#'    \env{PE_HOSTFILE}, where the machine running the job script comes
+#'    first.
 #'    Known Grid Engine schedulers are
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
@@ -76,16 +84,22 @@
 #'    to legacy \env{SLURM_NODELIST}) and parse set of nodes.
 #'    Then query Slurm environment variable \env{SLURM_JOB_CPUS_PER_NODE}
 #'    (fallback \env{SLURM_TASKS_PER_NODE}) to infer how many CPU cores
-#'    Slurm has allotted to each of the nodes.  If \env{SLURM_CPUS_PER_TASK}
-#'    is set, which is always a scalar, then that is respected too, i.e.
-#'    if it is smaller, then that is used for all nodes.
+#'    Slurm has allotted to each of the nodes.
 #'    For example, if `SLURM_NODELIST="n1,n[03-05]"` (expands to
 #'    `c("n1", "n03", "n04", "n05")`) and `SLURM_JOB_CPUS_PER_NODE="2(x2),3,2"`
 #'    (expands to `c(2, 2, 3, 2)`), then
 #'    `c("n1", "n1", "n03", "n03", "n04", "n04", "n04", "n05", "n05")` is
-#'    returned.  If in addition, `SLURM_CPUS_PER_TASK=1`, which can happen
-#'    depending on hyperthreading configurations on the Slurm cluster, then 
-#'    `c("n1", "n03", "n04", "n05")` is returned.
+#'    returned.  Note that \env{SLURM_CPUS_PER_TASK} is not used to limit
+#'    the number of workers per node.  This means that the number of
+#'    workers on the current machine equals `availableCores()` in the
+#'    Slurm job script.
+#'
+#'  \item `"HTCondor"` -
+#'    Query HTCondor environment variables \env{_CONDOR_MACHINE_AD} and
+#'    \env{_CONDOR_JOB_AD}.
+#'    Currently, single-node jobs are assumed. If called on a multi-node job,
+#'    it will only return the workers for the current node.
+#'    Returns `availableCores(methods = "HTCondor")` localhost workers.
 #'
 #'  \item `"custom"` -
 #'    If option
@@ -99,6 +113,9 @@
 #' }
 #'
 #' @section Known limitations:
+#' `availableWorkers(methods = "HTCondor")` currently assumes single-node jobs.
+#' If called on a multi-node job, it will only return the workers for the current node.
+#'
 #' `availableWorkers(methods = "Slurm")` will expand \env{SLURM_JOB_NODELIST}
 #' using \command{scontrol show hostnames "$SLURM_JOB_NODELIST"}, if available.
 #' If not available, then it attempts to parse the compressed nodelist based
@@ -140,13 +157,23 @@
 #'         paste(sQuote(availableWorkers()), collapse = ", ")))
 #' }
 #'
+#' \dontrun{
+#' ## Slurm job submitted with 'sbatch --ntasks=4 --cpus-per-task=2'
+#' ## Use one worker per task, each running two threads, instead of
+#' ## one worker per CPU core
+#' nthreads <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "1"))
+#' workers <- availableWorkers(threadsPerWorker = nthreads)
+#' message(paste("Workers to use:", paste(sQuote(workers), collapse = ", ")))
+#' }
+#'
 #' @seealso
 #' To get the number of available workers on the current machine,
 #' see [availableCores()].
 #'
 #' @importFrom utils file_test
 #' @export
-availableWorkers <- function(constraints = NULL, methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = getOption2("parallelly.localhost.hostname", "localhost"), which = c("auto", "min", "max", "all"), ...) {
+availableWorkers <- function(constraints = NULL, methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = getOption2("parallelly.localhost.hostname", "localhost"), threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L), which = c("auto", "min", "max", "all"), ...) {
+  warn_future_reexport_deprecation("availableWorkers")
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
@@ -161,9 +188,13 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
   }
 
   which <- match.arg(which, choices = c("auto", "min", "max", "all"))
+  stop_if_not(length(threadsPerWorker) == 1L, is.numeric(threadsPerWorker),
+              is.finite(threadsPerWorker), threadsPerWorker >= 1L,
+              threadsPerWorker <= .Machine$integer.max)
+  threadsPerWorker <- as.integer(threadsPerWorker)
   stop_if_not(is.character(default), length(default) >= 1, !anyNA(default))
 
-  methods_localhost <- c("BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "mc.cores", "mc.cores+1", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpu.max", "nproc", "system")
+  methods_localhost <- c("BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "mc.cores", "mc.cores+1", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system")
 
   pattern_connections <- "^connections(|-[[:digit:]]+)$"
   idxs <- grep(pattern_connections, constraints)
@@ -174,7 +205,7 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
   }
 
   ## Default is to use the current machine
-  ncores <- availableCores(constraints = constraints, methods = methods, na.rm = FALSE, logical = logical, which = "all", ...)
+  ncores <- availableCores(constraints = constraints, methods = methods, na.rm = FALSE, logical = logical, which = "all", threadsPerWorker = threadsPerWorker, ...)
 
   localhost_hostname <- getOption2("parallelly.localhost.hostname", "localhost")
   workers <- lapply(ncores, FUN = function(n) {
@@ -200,6 +231,9 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
     } else if (method == "PJM") {
       w <- availableWorkersPJM()
       if (anyNA(w)) next
+    } else if (method == "HTCondor") {
+      w <- availableWorkersHTCondor()
+      if (anyNA(w)) next
     } else if (method == "custom") {
       fcn <- getOption2("parallelly.availableWorkers.custom", NULL)
       if (!is.function(fcn)) next
@@ -221,6 +255,17 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
 
     ## Drop missing values?
     if (na.rm) w <- w[!is.na(w)]
+
+    if (threadsPerWorker > 1L && length(w) > 0L) {
+      ## Keep 'n %/% threadsPerWorker' of the 'n' entries for each hostname.
+      ## Preserve the order in which the hosts first appear.
+      hosts <- unique(w)
+      counts <- tabulate(match(w, hosts), nbins = length(hosts))
+      w2 <- rep(hosts, times = counts %/% threadsPerWorker)
+      ## Keep at least one worker
+      if (length(w2) == 0L) w2 <- w[1L]
+      w <- w2
+    }
 
     workers[[method]] <- w
   }
@@ -391,14 +436,14 @@ availableWorkersPBS <- function() {
 
   ## Sanity checks
   pbs_np <- getenv_int("PBS_NP")
-  if (!identical(pbs_np, length(w))) {
+  if (!is.na(pbs_np) && !identical(pbs_np, length(w))) {
     warnf("Identified %d workers from the %s file (%s), which does not match environment variable %s = %d", length(w), sQuote("PBS_NODEFILE"), sQuote(pathname), sQuote("PBS_NP"), pbs_np)
   }
 
   pbs_nodes <- getenv_int("PBS_NUM_NODES")
   pbs_ppn <- getenv_int("PBS_NUM_PPN")
   pbs_np <- pbs_nodes * pbs_ppn
-  if (!identical(pbs_np, length(w))) {
+  if (!is.na(pbs_np) && !identical(pbs_np, length(w))) {
     warnf("Identified %d workers from the %s file (%s), which does not match environment variables %s * %s = %d * %d = %d", length(w), sQuote("PBS_NODEFILE"), sQuote(pathname), sQuote("PBS_NUM_NODES"), sQuote("PBS_NUM_PPN"), pbs_nodes, pbs_ppn, pbs_np)
   }
 
@@ -510,13 +555,22 @@ availableWorkersSGE <- function() {
     return(NA_character_)
   }
   
-  w <- read_pe_hostfile(pathname, expand = TRUE)
+  ## Keep the order of PE_HOSTFILE, which lists the host running the
+  ## job script first
+  data <- read_pe_hostfile(pathname, sort = FALSE)
+
+  ## A host may be listed more than once, e.g. once per queue
+  nodes <- unique(data$node)
+  counts <- vapply(nodes, FUN = function(node) {
+    sum(data$count[data$node == node])
+  }, FUN.VALUE = NA_integer_, USE.NAMES = FALSE)
+  w <- rep(nodes, times = counts)
 
   ## Sanity checks: It is not always true that length(w) == $NSLOTS, e.g.
   ## on the UCSF Wynton SGE cluster, 'qsub -pe mpi-8 16 ...' will produce
   ## a job with w=2 workers and NSLOTS=16. /HB 2023-02-01
   nslots <- getenv_int("NSLOTS")
-  if (length(w) < nslots) {
+  if (!is.na(nslots) && length(w) < nslots) {
     warnf("Identified %d workers from the %s file (%s), which is less than environment variable %s = %d", length(w), sQuote("PE_HOSTFILE"), sQuote(pathname), sQuote("NSLOTS"), nslots)
   }
 
@@ -751,21 +805,15 @@ availableWorkersSlurm <- function() {
     }
 
     if (length(c) != length(w)) {
-      warnf("Skipping Slurm settings because the number of elements in 'SLURM_JOB_CPUS_PER_NODE'/'SLURM_TASKS_PER_NODE' (%s) does not match parsed 'SLURM_JOB_NODELIST'/'SLURM_NODELIST' (%s): %d != %d", nodelist, nodecounts, length(c), length(w))
+      warnf("Skipping Slurm settings because the number of elements in 'SLURM_JOB_CPUS_PER_NODE'/'SLURM_TASKS_PER_NODE' (%s) does not match parsed 'SLURM_JOB_NODELIST'/'SLURM_NODELIST' (%s): %d != %d", nodecounts, nodelist, length(c), length(w))
       return(NA_character_)
     }
 
-    ## Always respect 'SLURM_CPUS_PER_TASK' (always a scalar), if that exists
-    n <- getenv_int("SLURM_CPUS_PER_TASK")
-    if (!is.na(n)) {
-      c0 <- c
-      c <- rep(n, times = length(w))
-      ## Is our assumption that SLURM_CPUS_PER_TASK <= SLURM_JOB_NODELIST, correct?
-      if (any(c0 < n)) {
-        c <- pmin(c0, n)
-        warnf("Unexpected values of Slurm environment variable. The Slurm environment variables specify CPU counts on one or more nodes that is strictly less than what 'SLURM_CPUS_PER_TASK' specifies. Will use the minimum of the two for each node: %s < %s", sQuote(nodecounts), n)
-      }
-    }
+    ## Note that 'SLURM_CPUS_PER_TASK' is not used to limit the number
+    ## of workers per node, because all CPUs Slurm allots on a node
+    ## are available. These may be more than the number of tasks times
+    ## 'SLURM_CPUS_PER_TASK', because Slurm allots whole cores on
+    ## hyperthreaded systems
 
     ## Expand workers list
     w <- as.list(w)
@@ -778,4 +826,19 @@ availableWorkersSlurm <- function() {
   w
 } ## availableWorkersSlurm()
 
-cli_fcn(availableWorkers) <- cli_fcn_args(availableCores)
+
+# --------------------------------------------------------------------------
+# HTCondor
+# --------------------------------------------------------------------------
+## Note: Currently assumes single-node jobs. If called on a multi-node job,
+## it will only return the workers for the current node.
+availableWorkersHTCondor <- function() {
+  n <- availableCoresHTCondor()
+  if (is.na(n) || n <= 0L) return(NA_character_)
+  localhost_hostname <- getOption2("parallelly.localhost.hostname", "localhost")
+  rep(localhost_hostname, times = n)
+} ## availableWorkersHTCondor()
+
+
+cli_fcn(availableWorkers) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_character("default"), cli_arg_character("which"), cli_arg_numeric("omit"), cli_arg_numeric("max"))
+

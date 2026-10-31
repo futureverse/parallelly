@@ -1,0 +1,34 @@
+# ------------------------------------------------
+# CITATION.cff file created with {cffr} R package
+# See also: https://docs.ropensci.org/cffr/
+# ------------------------------------------------
+ 
+cff-version: 1.2.0
+message: 'To cite package "parallelly" in publications use:'
+type: software
+license: LGPL-2.0-or-later
+title: 'parallelly: Enhancing the ''parallel'' Package'
+doi: 10.32614/CRAN.package.parallelly
+abstract: Utility functions that enhance the 'parallel' package and support the built-in
+  parallel backends of the 'future' package. For example, availableCores() gives the
+  number of CPU cores available to your R process as given by the operating system,
+  'cgroups' and Linux containers, R options, and environment variables, including
+  those set by job schedulers on high-performance compute clusters. If none is set,
+  it will fall back to parallel::detectCores(). Another example is 'parallel::makeCluster(type
+  = "RPSOCK")', which is backward compatible with 'parallel::makeCluster()' while
+  doing a better job in setting up remote cluster workers without the need for configuring
+  the firewall to do port-forwarding to your local computer.
+authors:
+- family-names: Bengtsson
+  given-names: Henrik
+  email: henrikb@braju.com
+  orcid: https://orcid.org/0000-0002-7579-5165
+repository: https://CRAN.R-project.org/package=parallelly
+repository-code: https://github.com/futureverse/parallelly
+url: https://parallelly.futureverse.org
+contact:
+- family-names: Bengtsson
+  given-names: Henrik
+  email: henrikb@braju.com
+  orcid: https://orcid.org/0000-0002-7579-5165
+

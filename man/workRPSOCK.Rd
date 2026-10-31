@@ -17,6 +17,8 @@ If \code{NULL} (default), \code{parallel:::workCommand()} is used.}
 \value{
 Nothing. The function enters an event loop and does not
 return until the worker receives a \code{"DONE"} message.
+If the connection to the parent process is lost, then an error is
+produced.
 }
 \description{
 This is a version of \code{parallel:::.workRSOCK()} with an option

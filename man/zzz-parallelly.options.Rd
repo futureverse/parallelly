@@ -14,6 +14,7 @@
 \alias{parallelly.availableCores.min}
 \alias{parallelly.availableCores.omit}
 \alias{parallelly.availableCores.system}
+\alias{parallelly.availableCores.threadsPerWorker}
 \alias{parallelly.availableWorkers.custom}
 \alias{parallelly.availableWorkers.methods}
 \alias{parallelly.availableWorkers.methods.excludes}
@@ -22,6 +23,8 @@
 \alias{parallelly.maxWorkers.localhost.ignore}
 \alias{parallelly.supportsMulticore.disableOn}
 \alias{parallelly.supportsMulticore.unstable}
+\alias{parallelly.future.reexports}
+\alias{R_PARALLELLY_FUTURE_REEXPORTS}
 \alias{R_PARALLELLY_AVAILABLECORES_FALLBACK}
 \alias{R_PARALLELLY_AVAILABLECORES_FRACTION}
 \alias{R_PARALLELLY_AVAILABLECORES_LOGICAL}
@@ -91,7 +94,7 @@ The below \R options and environment variables control the default results of \c
 \describe{
 \item{\code{parallelly.availableCores.logical}:}{(logical) The default value of argument \code{logical} as used by \code{availableCores()}, \code{availableWorkers()}, and \code{availableCores()} for querying \code{parallel::detectCores(logical = logical)}.  The default is \code{TRUE} just like it is for \code{\link[parallel:detectCores]{parallel::detectCores()}}.}
 
-\item{\code{parallelly.availableCores.methods}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}}. (Default: \code{c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")})}
+\item{\code{parallelly.availableCores.methods}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}}. (Default: \code{c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "fallback", "custom")})}
 
 \item{\code{parallelly.availableCores.methods.excludes}:}{(character vector) Default lookup methods for \code{\link[=availableCores]{availableCores()}} to be excluded. (Default: \code{NULL})}
 
@@ -103,13 +106,15 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.availableCores.min}:}{(integer) The default minimum number of cores \code{\link[=availableCores]{availableCores()}} is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (\code{*}).  (Default: \code{1L})}
 
+\item{\code{parallelly.availableCores.threadsPerWorker}:}{(integer; positive) The default number of CPU cores (threads) to reserve for each parallel worker, used by \code{\link[=availableCores]{availableCores()}} and \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{1L})}
+
 \item{\code{parallelly.availableCores.fraction}:}{(numeric; in \verb{[0,1]}) The default fraction of cores to keep.}
 
 \item{\code{parallelly.availableCores.omit}:}{(integer; non-negative) The default number of cores to set aside, i.e. not to include.}
 
 \item{\code{parallelly.availableCores.max}:}{(integer; positive) The default maximum number of cores to return.}
 
-\item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")})}
+\item{\code{parallelly.availableWorkers.methods}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}}. (Default: \code{c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")})}
 
 \item{\code{parallelly.availableWorkers.methods.excludes}:}{(character vector) Default lookup methods for \code{\link[=availableWorkers]{availableWorkers()}} to be excluded. (Default: \code{NULL})}
 
@@ -157,7 +162,7 @@ The below \R options and environment variables control the default results of \c
 
 \item{\code{parallelly.makeNodePSOCK.useXDR}:}{(logical) If FALSE (default), the communication between master and workers, which is binary, will use small-endian (faster), otherwise big-endian ("XDR"; slower).}
 
-\item{\code{parallelly.makeNodePSOCK.socketOptions}:}{(character string) If set to another value than \code{"NULL"}, then option \code{socketOptions} is set to this value on the workers during startup. See \code{\link[base:connections]{base::socketConnection()}} for details. (defaults to \code{"no-delay"})}
+\item{\code{parallelly.makeNodePSOCK.socketOptions}:}{(character string) If set to another value than \code{"NULL"}, then option \code{socketOptions} is set to this value on the workers during startup. See \code{\link[base:socketConnection]{base::socketConnection()}} for details. (defaults to \code{"no-delay"})}
 
 \item{\code{parallelly.makeNodePSOCK.rscript_call}:}{(character string or R expression) The R expression that is used to start the R worker event loop on the worker node. (defaults to \code{"workRSOCK<-tryCatch(parallel:::.workRSOCK,error=function(e)parallel:::.slaveRSOCK);workRSOCK()"}) }
 
@@ -219,6 +224,10 @@ by options and environment variables with prefixes \code{future.} and
 \code{parallelly.availableCores.fallback=1}, and setting environment
 variable \env{R_FUTURE_AVAILABLECORES_FALLBACK=1} is the same as setting
 \env{R_PARALLELLY_AVAILABLECORES_FALLBACK=1}.
+
+\describe{
+\item{\code{parallelly.future.reexports}:}{(character string) Controls whether a deprecation warning should be produced when \code{future::availableCores()}, \code{future::availableWorkers()}, \code{future::makeClusterPSOCK()}, or \code{future::supportsMulticore()} are called. If \code{"deprecated"} (default), a warning is produced. If \code{"defunct"}, an error is produced. If \code{"ignore"}, no warning or error is produced.}
+}
 }
 
 \examples{

@@ -341,6 +341,38 @@ worker is very low. This might be safe to do so when the parallel
 tasks are mostly in a waiting state, e.g. polling a webserver.
 }
 
+\section{Protection against CPU overuse via nested parallelism}{
+
+Parallel workers on the current machine inherit the settings of the
+main \R session. This means that \code{\link[=availableCores]{availableCores()}} reports the same
+number of CPU cores in each worker as in the main \R session. For
+example, on an eight-core machine, each of the eight workers in
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cl <- makeClusterPSOCK(8)
+}\if{html}{\out{</div>}}
+
+reports eight CPU cores. If the code evaluated by the workers
+parallelizes further based on \code{availableCores()}, e.g.
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{y <- parallel::parLapply(cl, X, function(x) \{
+  parallel::mclapply(x, FUN = slow_fcn, mc.cores = parallelly::availableCores())
+\})
+}\if{html}{\out{</div>}}
+
+then there could be up to 64 \R processes competing for eight CPU
+cores. To protect against this, set \R option \code{mc.cores} to one in
+each worker using:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cl <- makeClusterPSOCK(8, rscript_startup = quote(options(mc.cores = 1L)))
+}\if{html}{\out{</div>}}
+
+This makes \code{availableCores()} report a single CPU core in each
+worker, and \code{parallel::mclapply()} run sequentially. This is not
+needed when using the cluster via the \pkg{future} framework,
+e.g. \code{plan(cluster, workers = cl)}, because futures are evaluated
+with \code{mc.cores} set to one on parallel workers.
+}
+
 \section{Definition of \emph{localhost}}{
 
 A hostname is considered to be \emph{localhost} if it equals:
@@ -402,6 +434,38 @@ instance, a private SSH key can be provided as
 specify a PuTTY PPK file, e.g.
 \code{rshopts = c("-i", "C:/Users/joe/.ssh/my_keys.ppk")}.
 Contrary to \code{rshcmd}, elements of \code{rshopts} are not quoted.
+}
+
+\section{Launching workers via an HPC job scheduler}{
+
+On high-performance compute (HPC) clusters, SSH access to compute nodes
+is often disabled. Instead, parallel workers on other compute nodes that
+are part of the same job can be launched via the job scheduler. The
+following \code{rshcmd} types are supported for this:
+\itemize{
+\item \code{"<srun>"} -
+Slurm's \command{srun}, which launches each worker as a single-CPU
+job step via
+\verb{srun --exact --overlap --overcommit --nodes=1 --ntasks=1 --cpus-per-task=1 -w <worker>}.
+Since \command{srun} does not launch the worker via a shell,
+\code{rscript_sh[2]} defaults to \code{"none"} for this type.
+\item \code{"<qrsh>"} -
+Grid Engine's (SGE) \command{qrsh} via \verb{qrsh -inherit -nostdin -V <worker>}
+\item \code{"<pjrsh>"} -
+Fujitsu Technical Computing Suite's (PJM) \command{pjrsh} via
+\verb{pjrsh <worker>}
+\item \code{"<hpc>"} -
+Infers which of the above to use from the environment variables
+of the job that the current R process runs in, i.e. \code{"<srun>"}
+if \env{SLURM_JOB_ID} is set, \code{"<qrsh>"} if \env{PE_HOSTFILE} is
+set, and \code{"<pjrsh>"} if \env{PJM_JOBID} is set.
+It is an error if none of them is set, unless a fallback is given,
+e.g. \code{rshcmd = c("<hpc>", "<ssh>")}.
+}
+As with any \code{rshcmd}, these are only used for workers on \emph{other}
+machines. Workers on the current machine are launched directly, which
+means \code{makeClusterPSOCK(availableWorkers(), rshcmd = "<hpc>")} works
+also for single-node jobs.
 }
 
 \section{Accessing external machines that prompts for a password}{
@@ -580,7 +644,7 @@ The latter will assert that you have proper startup configuration also for
 
 If the remote machines are running on MS Windows, make sure to add argument
 \code{rscript_sh = "cmd"} when calling \code{makeClusterPSOCK()}, because the default
-is \code{rscript_sh = "sh"}, which assumes that that the remote machines are
+is \code{rscript_sh = "sh"}, which assumes that the remote machines are
 Unix-like machines.
 
 Another reason for failing to setup remote workers could be that they are
@@ -619,7 +683,7 @@ Found the following files/directories:
 
 Those \verb{Rscript<hexcode>} files are from background R worker processes,
 which almost always are parallel \code{cluster}:s that we forgot to stop
-at the end.  To stop all \code{cluster} workers, use \code{\link[parallel:makeCluster]{parallel::stopCluster()}}
+at the end.  To stop all \code{cluster} workers, use \code{\link[parallel:stopCluster]{parallel::stopCluster()}}
 at the end of your examples(*), vignettes, and package tests for every
 \code{cluster} object that is created.
 

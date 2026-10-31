@@ -43,9 +43,101 @@ print(availableWorkers(methods = "SGE"))
 print(availableWorkers(methods = "Slurm"))
 print(availableWorkers(methods = "LSF"))
 print(availableWorkers(methods = "PJM"))
+print(availableWorkers(methods = "HTCondor"))
 
 
 message("*** HPC related ...")
+
+message("*** HTCondor ...")
+machine_ad_file <- tempfile(fileext = ".ad")
+writeLines(c(
+  "MyType = \"Machine\"",
+  "Cpus = 3"
+), con = machine_ad_file)
+
+Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+env <- environment(parallelly:::availableCoresHTCondor)
+env$n <- NULL
+workers <- availableWorkers(methods = "HTCondor")
+print(workers)
+stopifnot(length(workers) == 3L, all(workers == "localhost"))
+
+file.remove(machine_ad_file)
+Sys.unsetenv("_CONDOR_MACHINE_AD")
+env$n <- NULL
+message("*** HTCondor ... done")
+
+message("*** HTCondor scenarios observed on real clusters ...")
+
+file <- system.file(package = "parallelly", "test-data", "htcondor", "scenarios.csv", mustWork = FALSE)
+if (nzchar(file) && file.exists(file)) {
+  scenarios <- read.csv(file, colClasses = "character", na.strings = "", check.names = FALSE)
+  
+  machine_ad_cols <- grep("^_CONDOR_MACHINE_AD-", colnames(scenarios), value = TRUE)
+  job_ad_cols <- grep("^_CONDOR_JOB_AD-", colnames(scenarios), value = TRUE)
+  meta_cols <- c("cluster", "context", "condor_submit", "expected_cores", "expected_workers", machine_ad_cols, job_ad_cols)
+  env_vars <- setdiff(colnames(scenarios), meta_cols)
+  
+  env <- environment(parallelly:::availableCoresHTCondor)
+  
+  for (kk in seq_len(nrow(scenarios))) {
+    scenario <- scenarios[kk, ]
+    message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, scenario$condor_submit, scenario$cluster))
+    
+    m_attrs <- as.list(scenario[machine_ad_cols])
+    m_attrs <- m_attrs[!is.na(m_attrs)]
+    if (length(m_attrs) > 0L) {
+      m_lines <- sprintf("%s = %s", sub("^_CONDOR_MACHINE_AD-", "", names(m_attrs)), unlist(m_attrs))
+      machine_ad_file <- tempfile(fileext = ".ad")
+      writeLines(m_lines, con = machine_ad_file)
+      Sys.setenv("_CONDOR_MACHINE_AD" = machine_ad_file)
+    } else {
+      machine_ad_file <- NULL
+      Sys.unsetenv("_CONDOR_MACHINE_AD")
+    }
+    
+    j_attrs <- as.list(scenario[job_ad_cols])
+    j_attrs <- j_attrs[!is.na(j_attrs)]
+    if (length(j_attrs) > 0L) {
+      j_lines <- sprintf("%s = %s", sub("^_CONDOR_JOB_AD-", "", names(j_attrs)), unlist(j_attrs))
+      job_ad_file <- tempfile(fileext = ".ad")
+      writeLines(j_lines, con = job_ad_file)
+      Sys.setenv("_CONDOR_JOB_AD" = job_ad_file)
+    } else {
+      job_ad_file <- NULL
+      Sys.unsetenv("_CONDOR_JOB_AD")
+    }
+    
+    envs <- as.list(scenario[env_vars])
+    envs <- envs[!is.na(envs)]
+    Sys.unsetenv(env_vars)
+    if (length(envs) > 0L) {
+      do.call(Sys.setenv, envs)
+    }
+    
+    env$n <- NULL
+    
+    exp_w <- scenario$expected_workers
+    if (is.na(exp_w) || !nzchar(exp_w)) {
+      truth <- rep("localhost", times = as.integer(scenario$expected_cores))
+    } else {
+      truth <- strsplit(exp_w, split = ",", fixed = TRUE)[[1]]
+    }
+    
+    w <- availableWorkers(methods = "HTCondor")
+    stopifnot(
+      length(w) == length(truth),
+      identical(w, truth)
+    )
+    
+    if (!is.null(machine_ad_file)) file.remove(machine_ad_file)
+    if (!is.null(job_ad_file)) file.remove(job_ad_file)
+    Sys.unsetenv(c("_CONDOR_MACHINE_AD", "_CONDOR_JOB_AD", env_vars))
+    env$n <- NULL
+  }
+}
+
+message("*** HTCondor scenarios observed on real clusters ... done")
 
 sge_expand_node_count_pairs <- parallelly:::sge_expand_node_count_pairs
 read_pbs_nodefile <- parallelly:::read_pbs_nodefile
@@ -104,6 +196,16 @@ res <- tryCatch({
   workers <- availableWorkers(methods = "PBS")
 }, warning = identity)
 stopifnot(inherits(res, "warning"))
+
+## Unset optional PBS_NP, PBS_NUM_NODES, and PBS_NUM_PPN environment
+## variables should not produce warnings
+Sys.unsetenv("PBS_NP")
+Sys.unsetenv("PBS_NUM_NODES")
+Sys.unsetenv("PBS_NUM_PPN")
+res <- tryCatch({
+  workers <- availableWorkers(methods = "PBS")
+}, warning = identity)
+stopifnot(!inherits(res, "warning"))
 
 ## Exceptions
 workersE <- c(workers, "n 3")
@@ -279,7 +381,7 @@ for (kk in seq_along(specs)) {
   cat(sprintf("truth: c(%s)\n", paste(sQuote(truth), collapse = ", ")))
   stopifnot(
     is.character(expanded),
-    !any(is.na(expanded)),
+    !anyNA(expanded),
     length(expanded) == length(truth),
     identical(expanded, truth)
   )
@@ -357,7 +459,7 @@ for (kk in seq_along(specs)) {
   cat(sprintf("truth: c(%s)\n", paste(sQuote(truth), collapse = ", ")))
   stopifnot(
     is.integer(expanded),
-    !any(is.na(expanded)),
+    !anyNA(expanded),
     length(expanded) == length(truth),
     identical(expanded, truth)
   )
@@ -366,7 +468,7 @@ for (kk in seq_along(specs)) {
 message("*** Slurm w/ SLURM_TASKS_PER_NODE ... DONE")
 
 message("*** Slurm odds'n'ends ...")
-# Respect SLURM_CPUS_PER_TASK, if set
+# All CPUs allotted on a node are available, regardless of SLURM_CPUS_PER_TASK
 Sys.setenv(
   SLURM_JOB_NODELIST = "n1",
   SLURM_JOB_CPUS_PER_NODE = "10(x1)",
@@ -374,8 +476,121 @@ Sys.setenv(
 )
 w <- parallelly:::availableWorkersSlurm()
 str(w)
-stopifnot(length(w) == 9L, all(w == "n1"))
+stopifnot(length(w) == 10L, all(w == "n1"))
+Sys.unsetenv(c("SLURM_JOB_NODELIST", "SLURM_JOB_CPUS_PER_NODE", "SLURM_CPUS_PER_TASK"))
 message("*** Slurm odds'n'ends ... DONE")
+
+
+message("*** Slurm scenarios observed on real clusters ...")
+
+## Slurm environment variables recorded on real Slurm clusters, for
+## the batch script (context 'batch') and for
+## tasks launched by 'srun' (context 'srun'). Empty cells correspond to
+## environment variables that are not set
+file <- system.file(package = "parallelly", "test-data", "slurm", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+slurm_vars <- grep("^SLURM", colnames(scenarios), value = TRUE)
+
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, scenario$sbatch, scenario$cluster))
+  envs <- unlist(scenario[slurm_vars])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(slurm_vars)
+  do.call(Sys.setenv, as.list(envs))
+  print(envs)
+
+  ## Expected workers, e.g. "n1*4,n2*2"
+  truth <- strsplit(scenario$expected_workers, split = ",", fixed = TRUE)[[1]]
+  truth <- structure(as.integer(sub(".*[*]", "", truth)), names = sub("[*].*", "", truth))
+  
+  w <- availableWorkers(methods = "Slurm")
+  counts <- table(w)[names(truth)]
+  print(counts)
+  stopifnot(
+    length(w) == sum(truth),
+    identical(unique(w), names(truth)),
+    all(counts == truth)
+  )
+}
+
+## Cleanup
+Sys.unsetenv(slurm_vars)
+
+message("*** Slurm scenarios observed on real clusters ... DONE")
+
+
+message("*** SGE scenarios observed on real clusters ...")
+
+## Grid Engine environment variables recorded on a real SGE cluster.
+## Column 'PE_HOSTFILE_content' holds the lines of the
+## PE_HOSTFILE file, separated by semicolons
+file <- system.file(package = "parallelly", "test-data", "sge", "scenarios.csv", mustWork = TRUE)
+scenarios <- read.csv(file, colClasses = "character", na.strings = "")
+scenarios <- subset(scenarios, !is.na(expected_workers))
+sge_vars <- c("HOSTNAME", "NSLOTS", "NHOSTS", "PE", "PE_HOSTFILE")
+ohostname <- Sys.getenv("HOSTNAME", NA_character_)
+
+for (kk in seq_len(nrow(scenarios))) {
+  scenario <- scenarios[kk, ]
+  message(sprintf("- Scenario #%d of %d: %s %s (%s)", kk, nrow(scenarios), scenario$context, if (is.na(scenario$qsub)) "(no PE)" else scenario$qsub, scenario$cluster))
+  envs <- unlist(scenario[intersect(sge_vars, colnames(scenario))])
+  envs <- envs[!is.na(envs)]
+  Sys.unsetenv(sge_vars)
+  do.call(Sys.setenv, as.list(envs))
+  pathname <- tempfile(fileext = ".pe_hostfile")
+  writeLines(strsplit(scenario$PE_HOSTFILE_content, split = "; ", fixed = TRUE)[[1]], con = pathname)
+  Sys.setenv(PE_HOSTFILE = pathname)
+  print(envs)
+
+  ## Expected workers, e.g. "n1*4,n2*2"
+  truth <- strsplit(scenario$expected_workers, split = ",", fixed = TRUE)[[1]]
+  truth <- structure(as.integer(sub(".*[*]", "", truth)), names = sub("[*].*", "", truth))
+
+  w <- availableWorkers(methods = "SGE")
+  counts <- table(w)[names(truth)]
+  print(counts)
+  stopifnot(
+    length(w) == sum(truth),
+    identical(unique(w), names(truth)),
+    all(counts == truth),
+    ## Workers on the same host are next to each other, in the order
+    ## of PE_HOSTFILE, which lists the host running the job script first
+    identical(w, rep(names(truth), times = truth)),
+    sub("[.].*", "", w[1]) == sub("[.].*", "", scenario$HOSTNAME)
+  )
+  file.remove(pathname)
+}
+
+## A host listed more than once, and not next to each other
+pathname <- tempfile(fileext = ".pe_hostfile")
+writeLines(c(
+  "n2 1 short.q@n2 UNDEFINED",
+  "n1 2 long.q@n1 UNDEFINED",
+  "n2 3 long.q@n2 UNDEFINED"
+), con = pathname)
+Sys.unsetenv(sge_vars)
+Sys.setenv(PE_HOSTFILE = pathname, NSLOTS = "6", HOSTNAME = "n2")
+w <- availableWorkers(methods = "SGE")
+print(w)
+stopifnot(identical(w, c(rep("n2", times = 4L), rep("n1", times = 2L))))
+file.remove(pathname)
+
+## PE_HOSTFILE set, but NSLOTS not set
+pathname <- tempfile(fileext = ".pe_hostfile")
+writeLines("n1 2 long.q@n1 UNDEFINED", con = pathname)
+Sys.unsetenv(sge_vars)
+Sys.setenv(PE_HOSTFILE = pathname, HOSTNAME = "n1")
+w <- availableWorkers(methods = "SGE")
+print(w)
+stopifnot(identical(w, c("n1", "n1")))
+file.remove(pathname)
+
+## Cleanup
+Sys.unsetenv(sge_vars)
+if (!is.na(ohostname)) Sys.setenv(HOSTNAME = ohostname)
+
+message("*** SGE scenarios observed on real clusters ... DONE")
 
 message("*** HPC related ... DONE")
 
@@ -435,6 +650,42 @@ parallelly:::update_package_options()
 # Restore options
 options(oopts)
 message("*** availableWorkers(methods.excludes) ... done")
+
+
+message("*** availableWorkers(threadsPerWorker) ...")
+
+## Localhost
+options(parallelly.availableCores.system = 12L)
+options(parallelly.availableCores.methods = "system")
+options(parallelly.availableWorkers.methods = "system")
+
+env <- environment(parallelly:::detectCores)
+env$cache <- list(NULL, NULL)
+
+stopifnot(length(availableWorkers()) == 12L)
+stopifnot(length(availableWorkers(threadsPerWorker = 2L)) == 6L)
+stopifnot(length(availableWorkers(threadsPerWorker = 100L)) == 1L)
+options(parallelly.availableCores.system = NULL)
+options(parallelly.availableCores.methods = NULL)
+options(parallelly.availableWorkers.methods = NULL)
+
+## Multiple hosts
+workers <- c("n1", "n1", "n1", "n1", "n2", "n2", "n3")
+
+## Custom workers
+options(parallelly.availableWorkers.custom = function() workers)
+options(parallelly.availableWorkers.methods = "custom")
+stopifnot(identical(availableWorkers(threadsPerWorker = 2L), c("n1", "n1", "n2")))
+options(parallelly.availableCores.threadsPerWorker = 2L)
+stopifnot(identical(availableWorkers(), c("n1", "n1", "n2")))
+options(parallelly.availableCores.threadsPerWorker = NULL)
+options(parallelly.availableWorkers.custom = NULL)
+options(parallelly.availableWorkers.methods = NULL)
+
+res <- tryCatch(availableWorkers(threadsPerWorker = 0L), error = identity)
+stopifnot(inherits(res, "error"))
+
+message("*** availableWorkers(threadsPerWorker) ... DONE")
 
 
 message("*** availableWorkers() ... DONE")

@@ -1,3 +1,182 @@
+# Version 1.50.0 [2026-10-31]
+
+## Significant Changes
+
+ * `availableCores(method = "Slurm")` and `availableWorkers(method =
+   "Slurm")` have been updated to better reflect what is allotted by
+   Slurm under different combinations of `--nodes=<n>`,
+   `--ntasks=<t>`, and `--cpus-per-task=<c>`, and whether running R
+   via Slurm's `srun` or not. Agility to `srun` is new and has never
+   before been attempted by **parallelly**. See below bug fixes for
+   details.
+
+ * `availableCores(method = "SGE")` is now agile to multi-node
+   jobs. It was already agile to using `qrsh` for multi-node
+   tasks. See below bug fixes for details.
+   
+## New Features
+
+ * `availableCores()` gained argument `threadsPerWorker` to control
+   the amount of multi-threading per parallel worker. For example,
+   with 8 allotted CPUs, `nworkers <- availableCores(threadsPerWorker
+   = 2)` can be used to set up 4 parallel workers each running 2
+   threads.
+   Similarly, `availableWorkers()` gained `threadsPerWorker`, which
+   lists each host `n %/% threadsPerWorker` times.
+   The default is controlled by R option
+   `parallelly.availableCores.threadsPerWorker`.
+
+ * Add support for the HTCondor job scheduler to `availableCores()`
+   and `availableWorkers()`. For now, `availableWorkers()` assumes
+   single-node jobs. If called on a multi-node job, it will only
+   return the workers on the current compute node.
+
+ * `makeClusterPSOCK()` has an optional argument `rshcmd` for
+   controlling how to launch the parallel workers that are other
+   machines. It defaults to `rshcmd = "<ssh>"` (launch workers over
+   SSH), when not specified. In this version, we add support for
+   launching workers on other compute nodes via HPC job scheduler
+   tools. Specifically, you can use either `rshcmd = "<srun>"`
+   (Slurm), `rshcmd = "<qrsh>"` (Grid Engine), or `rshcmd = "<pjrsh>"`
+   (Fujitsu Technical Computing Suite). These "shortcuts" expand to
+   calls to those command with convenient defaults.  There is also the
+   generic `rshcmd = "<hpc>"`, which automatically infers which of
+   these to use from the job environment variables available.
+
+## Documentation
+
+ * Add example to HPC vignette on how to launch parallel workers in a
+   multi-node Slurm job.
+
+## Miscellaneous
+
+ * The package now declares that it requires R (>= 3.3.0).
+
+## Bug Fixes
+
+ * `availableCores()` did not respect CGroups v1 and v2 CPU quotas
+   (`cpu.cfs_quota_us` and `cpu.max`) set on a parent CGroup when a
+   less restricted one was set on the process itself.
+
+ * `availableCores(methods = "/proc/self/status")` could overestimate
+   the number of CPU cores on machines where not all CPU sockets are used.
+   For example, a machine could hold 64 CPUs, but only 48 are installed.
+
+ * `availableCores(which = "all", max = n)` would return only the
+   smallest value among all and unnamed.
+
+ * `availableCores(fraction = f)` would return unnamed values.
+
+ * `availableCores(which = "all", na.rm = FALSE, max = n)` would
+   report `n` instead of a missing value for methods that are not set.
+
+ * `availableCores()` and `availableWorkers()` on PBS:
+ 
+   - `availableWorkers(method = "PBS")` would produce incorrect
+     warnings on number of workers not matching the PBS environment
+     variables, when those were actually not set.
+   
+ * `availableCores()` and `availableWorkers()` on SGE:
+ 
+   - `availableCores(method = "SGE")` in a Grid Engine job script
+     would overestimate the number of CPU cores available for a
+     multi-node job, because it returned the value of SGE environment
+     variable `NSLOTS`. Now it returns the number of slots allotted to
+     the current machine according to the SGE environment variable
+     `PE_HOSTFILE` file (or the`pe_hostfile` under
+     `SGE_JOB_SPOOL_DIR`), which is what `availableWorkers()` also
+     uses. It only uses `NSLOTS` as a fallback if such a hostfile does
+     not exist.
+
+   - `availableWorkers(method = "SGE")` returned the workers sorted by
+     hostname, which meant that the first worker was not necessarily
+     the machine running the job script. Now the workers are listed in
+     the same order as in SGE file `PE_HOSTFILE`.
+     
+   - `availableWorkers(methods = "SGE")` would give an error "missing
+     value where TRUE/FALSE needed", if environment variable
+     `PE_HOSTFILE` was set, but `NSLOTS` was not.
+
+ * `availableCores()` and `availableWorkers()` on Slurm:
+ 
+   - `availableWorkers(method = "Slurm")` underestimated the number of
+     workers available in some case, because it always returned the
+     value of environment variable `SLURM_CPUS_PER_TASK`. Now it
+     returns all CPUs that Slurm allotted on each node, as given by
+     environment variable `SLURM_JOB_CPUS_PER_NODE`.
+  
+   - `availableCores(method = "Slurm")` in a Slurm job script would
+     underestimate the number of CPU cores available when there was
+     more than one Slurm task on the current machine, e.g. `sbatch
+     --ntasks=16 --cpus-per-task=1` returned 1 instead of 16, and
+     `sbatch --nodes=2 --ntasks=16` returned 8 when it was
+     given 10. Now it returns the value of environment variable
+     `SLURM_CPUS_ON_NODE`, which is what `availableWorkers()`
+     reflects.     
+  
+   - `availableCores(method = "Slurm")` in a task launched by Slurm's
+     `srun` in a job without `--cpus-per-task=<c>` could overestimate
+     the number of CPU cores available. In single-node jobs, it
+     returned all allotted CPUs on the machine for each task, e.g. 16
+     for each of 16 tasks, while only sharing 16 CPUs. In multi-node
+     jobs, it returned the number of Slurm tasks on the first node,
+     e.g. 14 for each of 14 tasks, while only sharing 16 CPUs.
+
+ * `availableWorkers()` did not always acknowledge all CGroups v2
+   settings.
+
+ * `availableWorkers()` did not acknowledge `methods = "/proc/self/status"`.
+
+ * `isNodeAlive()` and `killNode()` would give an error, e.g.
+   "Error in as.character(x) : cannot coerce type 'closure' to
+   vector of type 'character'", on a node created by
+   `makeClusterPSOCK(..., rshcmd)` where `rshcmd` was a function.
+
+ * `makeNodePSOCK(..., manual = TRUE)` would unexpectedly run the
+   pre-launch self-test on localhost.
+
+ * `makeNodePSOCK(..., manual = TRUE)` would not default to reverse
+   SSH tunneling, if no SSH client could be found on the current
+   machine.
+
+ * Parallel workers launched with `rscript_call =
+   "parallelly:::workRPSOCK()"` would terminate with an "Error in
+   unserialize(node$con) : error reading from connection" error even when
+   stopped with `parallel::stopCluster()`.
+
+ * `makeClusterPSOCK()` would still record the call stack for each
+   node, even if argument `calls = FALSE` (default).
+   
+ * `makeClusterPSOCK()` would leave worker processes, and their
+   temporary PID files, running in the background, if the parallel
+   cluster setup failed due to a connection timeout.
+
+ * `serializedSize()` gave an error "version 3 not supported" in R
+   (< 3.5.0). Now it uses the same serialization version as
+   `serialize()` does by default, i.e. version 2 in R (< 3.6.0) and
+   version 3 in R (>= 3.6.0).
+
+ * `print()` for `RichSOCKcluster` objects failed to report on broken
+   connections in R (< 4.0.0), if the connection index had been
+   reused by another connection, e.g. when called via
+   `capture.output()`.
+
+ * Command-line interface:
+ 
+   - `Rscript -e parallelly::availableCores --default=<integer>` gave
+     an error.
+
+   - `Rscript -e parallelly::freePort --default=<integer>` gave an
+     error.
+
+## Deprecated and Defunct
+
+ * Calling `future::availableCores()`, `future::availableWorkers()`,
+   `future::makeClusterPSOCK()`, and `future::supportsMulticore()` now
+   produces a deprecation warning alerting the user to use the
+   corresponding and identical `parallelly::*()` functions instead.
+
+
 # Version 1.48.0 [2026-06-29]
 
 ## New Features
@@ -16,7 +195,7 @@
    optional argument `workCommand` to customize the default
    `parallel:::workCommand()`.
    
- * Analogusly to `availableCores()`, `availableWorkers()` queries also
+ * Analogously to `availableCores()`, `availableWorkers()` queries also
    Linux CGroups v2 CPU affinity values `cpuset.cpus` and
    `cpuset.cpus.effective`.
    
@@ -511,7 +690,7 @@
 ## New Features
 
  * Add support for `availableWorkers(constraints = "connections")`,
-   which limits the number of workers that can be be used to the
+   which limits the number of workers that can be used to the
    current number of free R connections according to
    `freeConnections()`.  This is the maximum number of PSOCK, SOCK,
    and MPI **parallel** cluster nodes we can open without running out
@@ -1213,7 +1392,7 @@
    3.6.3 (2020-02-29), platform x86_64-pc-linux-gnu)".
 
  * It is now possible to set environment variables on workers before
-   they are launched by `makeClusterPSOCK()` by specify them as as
+   they are launched by `makeClusterPSOCK()` by specifying them as
    `<name>=<value>` as part of the `rscript` vector argument,
    e.g. `rscript=c("ABC=123", "DEF='hello world'", "Rscript")`. This
    works because elements in `rscript` that match regular expression

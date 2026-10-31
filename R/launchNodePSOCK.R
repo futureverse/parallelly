@@ -22,6 +22,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
   rshcmd <- options[["rshcmd"]]
   revtunnel <- options[["revtunnel"]]
   setup_strategy <- options[["setup_strategy"]]
+  calls <- options[["arguments"]][["calls"]]
 
   if (setup_strategy == "parallel") {
     stop("INTERNAL ERROR: launchNodePSOCK() called with setup_strategy='parallel', which should never occur")
@@ -182,7 +183,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
            smsg <- sprintf("%s The first %d lines are:\n%s", smsg, length(lmsg), paste(lmsg, collapse = "\n"))
          }
          suggestions <- c(suggestions, smsg)
-       } else {
+       } else if (rshcmd_supports(rshcmd, "rshlogfile")) {
          suggestions <- c(suggestions, sprintf("Set 'rshlogfile=TRUE' to enable logging for %s.", paste(sQuote(rshcmd), collapse = " ")))
        }
        
@@ -214,6 +215,9 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
   })
   setTimeLimit(elapsed = Inf)
 
+  ## Successfully connected: remove the temporary PID file
+  removeWorkerPIDFile(pidfile)
+
   if (verbose) {
     mdebugf("%sConnection with worker #%s on %s established", verbose_prefix, rank, sQuote(worker))
   }
@@ -221,7 +225,7 @@ launchNodePSOCK <- function(options, verbose = FALSE) {
   structure(
     list(con = con, host = worker, rank = rank, rshlogfile = rshlogfile),
     options = options,
-    calls = sys.calls(),
+    calls = if (isTRUE(calls)) sys.calls() else NULL,
     class = c("RichSOCKnode", if (useXDR) "SOCKnode" else "SOCK0node")
   )
 } ## launchNodePSOCK()

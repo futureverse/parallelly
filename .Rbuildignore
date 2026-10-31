@@ -2,8 +2,6 @@
 ^README[.]md$
 ^INSTALL[.]md$
 ^OVERVIEW[.]md$
-^CONDUCT[.]md$
-^CONTRIBUTING[.]md$
 ^docs
 ^pkgdown
 ^revdep
@@ -14,3 +12,4 @@ Rplots.pdf$
 ^vignettes/[.]install_extras$
 ^Makefile$
 ^incl
+^CITATION\.cff$

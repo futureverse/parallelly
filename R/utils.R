@@ -1,3 +1,4 @@
+
 isFALSE <- function(x) {
   is.logical(x) && length(x) == 1L && !is.na(x) && !x
 }
@@ -170,5 +171,64 @@ assert_system_is_supported <- local({
     results[[method]] <<- TRUE
     
     TRUE
+  }
+})
+
+warn_future_reexport_deprecation <- local({
+  already_warned <- new.env(parent = emptyenv())
+  
+  function(name) {
+    action <- getOption2(sprintf("parallelly.future.reexports.%s", name), NULL)
+    if (is.null(action)) {
+      action <- getOption2("parallelly.future.reexports", "deprecated")
+    }
+    action <- match.arg(action, choices = c("deprecated", "defunct", "ignore"))
+    if (action == "ignore") return()
+  
+    call <- sys.call(sys.parent())
+    if (is.call(call) && is.call(call[[1]])) {
+      env <- call[[1]]
+      if (is.symbol(env[[1]]) && as.character(env[[1]]) %in% c("::", ":::") &&
+          is.symbol(env[[2]]) && as.character(env[[2]]) == "future") {
+        msg <- sprintf("future::%s() is deprecated. Please use the identical parallelly::%s() instead", name, name)
+        
+        calls <- sys.calls()
+        ## Drop the current warn_future_reexport_deprecation() call
+        if (length(calls) > 0) calls <- calls[-length(calls)]
+        
+        if (length(calls) > 0) {
+          for (kk in seq_along(calls)) {
+            c <- calls[[kk]]
+            if (kk < length(calls)) c <- c[1]
+            c_str <- paste(deparse(c), collapse = " ")
+            
+            if (!grepl("::", c_str)) {
+              pkg <- tryCatch({
+                f <- sys.function(kk)
+                if (is.function(f)) {
+                  env <- environment(f)
+                  if (isNamespace(env)) environmentName(env) else ""
+                } else ""
+              }, error = function(e) "")
+              if (nzchar(pkg)) {
+                c_str <- sprintf("%s::%s", pkg, c_str)
+              }
+            }
+            
+            calls[[kk]] <- c_str
+          }
+          calls <- paste(calls, collapse = " -> ")
+          msg <- sprintf("%s [%s]", msg, calls)
+        }
+  
+        if (action == "deprecated") {
+          if (!is.null(already_warned[[msg]])) return()
+          already_warned[[msg]] <- TRUE
+          .Deprecated(msg = msg)
+        } else if (action == "defunct") {
+          .Defunct(msg = msg)
+        }
+      }
+    }
   }
 })

@@ -122,6 +122,128 @@ worker <- "remote.example.org"
 options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "unknown", verbose = TRUE)
 stopifnot(inherits(options, "makeNodePSOCKOptions"))
 
+
+## Test HPC job-scheduler 'rshcmd' types using mockup executables
+if (.Platform[["OS.type"]] != "windows") {
+  message("- rshcmd = '<srun>', '<qrsh>', '<pjrsh>', and '<hpc>' ...")
+
+  oenvs <- Sys.getenv("PATH", names = TRUE)
+
+  bin <- tempfile()
+  dir.create(bin)
+  for (name in c("srun", "qrsh", "pjrsh")) {
+    pathname <- file.path(bin, name)
+    writeLines(c("#! /bin/sh", "echo 'mockup 1.0'"), con = pathname)
+    Sys.chmod(pathname, mode = "0755")
+  }
+  Sys.setenv(PATH = paste(bin, oenvs[["PATH"]], sep = .Platform[["path.sep"]]))
+
+  worker <- "remote.example.org"
+  for (type in c("srun", "qrsh", "pjrsh")) {
+    options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = sprintf("<%s>", type), verbose = TRUE)
+    print(options)
+    stopifnot(
+      inherits(options, "makeNodePSOCKOptions"),
+      identical(attr(options[["rshcmd"]], "type"), type),
+      !options[["revtunnel"]],
+      grepl(type, options[["local_cmd"]], fixed = TRUE),
+      options[["rscript_sh"]][2] == if (type == "srun") "none" else "sh"
+    )
+  }
+
+  ## rshcmd = "<hpc>" infers the scheduler from the job environment
+  oenvs2 <- Sys.getenv(c("SLURM_JOB_ID", "PE_HOSTFILE", "PJM_JOBID"), unset = NA_character_, names = TRUE)
+  Sys.unsetenv(names(oenvs2))
+  envs <- c(srun = "SLURM_JOB_ID", qrsh = "PE_HOSTFILE", pjrsh = "PJM_JOBID")
+  for (type in names(envs)) {
+    args <- structure(list("1"), names = envs[[type]])
+    do.call(Sys.setenv, args)
+    options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "<hpc>")
+    stopifnot(
+      identical(attr(options[["rshcmd"]], "type"), type),
+      options[["rscript_sh"]][2] == if (type == "srun") "none" else "sh"
+    )
+    Sys.unsetenv(envs[[type]])
+  }
+
+  ## rshcmd = "<hpc>" outside of a job gives an error ...
+  res <- tryCatch({
+    makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "<hpc>")
+  }, error = identity)
+  print(res)
+  stopifnot(inherits(res, "error"))
+
+  ## ... unless there is a fallback
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = c("<hpc>", "<pjrsh>"))
+  stopifnot(identical(attr(options[["rshcmd"]], "type"), "pjrsh"))
+
+  oenvs2 <- oenvs2[!is.na(oenvs2)]
+  if (length(oenvs2) > 0) do.call(Sys.setenv, as.list(oenvs2))
+
+  ## Explicit 'srun' command is also recognized as such
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = c("srun", "-w"))
+  stopifnot(
+    identical(attr(options[["rshcmd"]], "type"), "srun"),
+    options[["rscript_sh"]][2] == "none"
+  )
+
+  ## An explicit 'rscript_sh' is respected
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "<srun>", rscript_sh = "sh")
+  stopifnot(identical(options[["rscript_sh"]], c("sh", "sh")))
+
+  ## SSH options are only supported by SSH-like 'rshcmd' types 
+  for (type in c("srun", "qrsh", "pjrsh")) {
+    rshcmd <- sprintf("<%s>", type)
+    for (args in list(list(user = "alice"), list(revtunnel = TRUE), list(rshlogfile = TRUE))) {
+      res <- tryCatch({
+        do.call(makeNodePSOCK, args = c(list(action = "options", worker = worker, port = 12345L, rshcmd = rshcmd), args))
+      }, error = identity)
+      print(res)
+      stopifnot(inherits(res, "error"))
+    }
+  }
+
+  ## The 'rsh' type is similar to SSH
+  pathname <- file.path(bin, "rsh")
+  writeLines(c("#! /bin/sh", "echo 'mockup 1.0'"), con = pathname)
+  Sys.chmod(pathname, mode = "0755")
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = pathname, user = "alice")
+  stopifnot(grepl("-l alice", options[["rsh_call"]], fixed = TRUE))
+  res <- tryCatch({
+    makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = pathname, revtunnel = TRUE)
+  }, error = identity)
+  stopifnot(inherits(res, "error"))
+
+  ## We also allow them for unknown 'rshcmd' types
+  options <- makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "my_ssh", user = "alice", revtunnel = TRUE, rshlogfile = TRUE)
+  stopifnot(
+    identical(attr(options[["rshcmd"]], "type"), "<unknown>"),
+    grepl("-l alice", options[["rsh_call"]], fixed = TRUE),
+    grepl("-R ", options[["rsh_call"]], fixed = TRUE),
+    grepl("-E ", options[["rsh_call"]], fixed = TRUE)
+  )
+
+  ## 'rshcmd' is not used for localhost workers
+  options <- makeNodePSOCK(action = "options", worker = Sys.info()[["nodename"]], port = 12345L, rshcmd = "<srun>")
+  stopifnot(
+    options[["localMachine"]],
+    !grepl("srun", options[["local_cmd"]], fixed = TRUE)
+  )
+
+  ## Undo
+  unlink(bin, recursive = TRUE)
+  do.call(Sys.setenv, as.list(oenvs))
+
+  ## An error is produced if the command is not on the PATH
+  if (!nzchar(Sys.which("srun"))) {
+    res <- tryCatch({
+      makeNodePSOCK(action = "options", worker = worker, port = 12345L, rshcmd = "<srun>")
+    }, error = identity)
+    print(res)
+    stopifnot(inherits(res, "error"))
+  }
+}
+
 options <- makeNodePSOCK(action = "options", port = 12345L, rshlogfile = FALSE, verbose = TRUE)
 stopifnot(inherits(options, "makeNodePSOCKOptions"))
 
@@ -246,6 +368,35 @@ options <- makeNodePSOCK(action = "options", port = 12345L)
 stopifnot(inherits(options, "makeNodePSOCKOptions"))
 stopifnot(grepl("message\\([\"']opt_hello[\"']\\)", options$cmd))
 options(parallelly.makeNodePSOCK.rscript_call = NULL)
+
+
+## Assert that manual = TRUE skips localhost PID self-test
+message("- manual = TRUE must not run the PID self-test ...")
+options <- makeNodePSOCK(port = 12345L, manual = TRUE, quiet = TRUE, action = "options")
+stopifnot(inherits(options, "makeNodePSOCKOptions"), is.null(options[["pidfile"]]))
+
+options <- makeNodePSOCK(port = 12345L, manual = TRUE, dryrun = TRUE, quiet = TRUE, action = "options")
+stopifnot(inherits(options, "makeNodePSOCKOptions"), is.null(options[["pidfile"]]))
+
+
+## Assert that the fallback 'ssh' client, used when no SSH client is found
+## and dryrun = TRUE, is of type 'ssh', which means revtunnel = TRUE
+if (.Platform[["OS.type"]] != "windows") {
+  message("- dryrun = TRUE falls back to 'ssh' when no SSH client is found ...")
+  opath <- Sys.getenv("PATH")
+  Sys.setenv(PATH = tempdir())
+  options <- tryCatch({
+    suppressWarnings({
+      makeNodePSOCK(action = "options", worker = "remote.example.org", port = 12345L, dryrun = TRUE)
+    })
+  }, finally = Sys.setenv(PATH = opath))
+  print(options[["rshcmd"]])
+  stopifnot(
+    identical(as.vector(options[["rshcmd"]]), "ssh"),
+    identical(attr(options[["rshcmd"]], "type"), "ssh"),
+    options[["revtunnel"]]
+  )
+}
 
 
 message("*** makeNodePSOCK() ... DONE")

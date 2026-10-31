@@ -74,6 +74,7 @@
 #' @seealso
 #' Use [isNodeAlive()] to check whether one or more cluster nodes are alive.
 #'
+#' @importFrom tools SIGTERM
 #' @export
 killNode <- function(x, signal = tools::SIGTERM, ...) {
   stop_if_not(
@@ -86,13 +87,14 @@ killNode <- function(x, signal = tools::SIGTERM, ...) {
   UseMethod("killNode")
 }
 
+#' @importFrom tools SIGTERM
 #' @export
 killNode.default <- function(x, signal = tools::SIGTERM, ...) {
   warning(sprintf("killNode() is not supported for this %s. Signal %d was not sent", sQuote(class(x)[1]), signal))
   NA
 }
 
-#' @importFrom tools pskill
+#' @importFrom tools pskill SIGKILL SIGTERM
 #' @importFrom utils file_test
 #' @export
 killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...) {
@@ -102,10 +104,10 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
   }
 
   ## If successfully killed, and node has a socket connection, close it
-  success <- NA
+  signaled <- NA  # was signal sent?
   on.exit({
     ## Epilogue cleanups, if successfully signaled
-    if (isTRUE(success)) local({
+    if (isTRUE(signaled)) local({
       if (debug) {
         mdebug_push("Post-kill cleanup ...")
         mdebugf("Signal: %d", signal)
@@ -177,8 +179,11 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
       } else {
         if (debug) mdebugf("Skipping, because signal was %d", signal)
       } ## if (signal %in% ...)
-    }) ## if (isTRUE(success)) local({ ... })
+    }) ## if (isTRUE(signaled)) local({ ... })
   }) ## on.exit()
+
+  # Return value in {FALSE, TRUE} or NA for R (< 3.5.0)
+  success <- NA
 
   if (debug) {
     on.exit({
@@ -219,86 +224,29 @@ killNode.RichSOCKnode <- function(x, signal = tools::SIGTERM, timeout = 0.0, ...
       mdebugf("pskill(pid = %d, signal = %d)", pid, signal)
     }
     ## Try to signal the process
-    success <- pskill(pid, signal = signal)
+    signaled <- pskill(pid, signal = signal)
+    success <- signaled
     if (getRversion() < "3.5.0") success <- NA
     return(success)
   }
 
   if (debug) mdebug("The R worker is running on another host")
-  
-  ## Can we connect to the host?
-  options <- attr(x, "options")
-  args_org <- options$arguments
-  worker <- options$worker
-  rshcmd <- options$rshcmd
-  rscript <- options$rscript
-  rscript_sh <- options$rscript_sh
 
-  ## Command to call Rscript -e
   signal_str <- paste(sprintf("%s", signal), collapse = ", ")
   if (length(signal) > 1) signal_str <- sprintf("c(%s)", signal_str)
   code <- sprintf("cat(tools::pskill(%d, signal = %s))", pid, signal_str)
-  rscript_args <- paste(c("-e", shQuote(code, type = rscript_sh[1])), collapse = " ")
-  cmd <- paste(rscript, rscript_args)
-  if (debug) mdebugf("Rscript command to be called on the other host: %s", cmd)
-  stop_if_not(length(cmd) == 1L)
+  res <- run_remote_rscript(x, code = code, timeout = timeout, debug = debug,
+    what = "killNode()",
+    msg = sprintf("Could not kill %s node", sQuote(class(x)[1]))
+  )
 
-  rshopts <- args_org$rshopts
-  if (length(args_org$user) == 1L) rshopts <- c("-l", args_org$user, rshopts)
-  rshopts <- paste(rshopts, collapse = " ")
-  rsh_call <- paste(paste(shQuote(rshcmd), collapse = " "), rshopts, worker)
-  if (debug) mdebugf("Command to connect to the other host: %s", rsh_call)
-  stop_if_not(length(rsh_call) == 1L)
-
-  local_cmd <- paste(rsh_call, shQuote(cmd, type = rscript_sh[2]))
-  if (debug) mdebugf("System call: %s", local_cmd)
-  stop_if_not(length(local_cmd) == 1L)
-
-  ## system() ignores fractions of seconds, so need to be at least 1 second
-  if (timeout > 0 && timeout < 1) timeout <- 1.0
-  if (debug) mdebugf("Timeout: %g seconds", timeout)
-
-  ## system() does not support argument 'timeout' in R (<= 3.4.0)
-  if (getRversion() < "3.5.0") {
-    if (timeout > 0) warning("killNode() does not support argument 'timeout' in R (< 3.5.0) for cluster nodes running on a remote machine")
-    system <- function(..., timeout) base::system(...)
-  }
-  
-  reason <- NULL
-  res <- withCallingHandlers({
-    system(local_cmd, intern = TRUE, ignore.stderr = TRUE, timeout = timeout)
-  }, condition = function(w) {
-    reason <<- conditionMessage(w)
-    if (debug) mdebugf("Caught condition: %s", reason)
-  })
-  if (debug) mdebugf("Results: %s", res)
-  status <- attr(res, "status")
-  res <- as.logical(res)
-
-  success <- FALSE
-  if (length(res) != 1L || is.na(res)) {
-    res <- NA
-    attr(res, "status") <- status
-    
-    msg <- sprintf("Could not kill %s node", sQuote(class(x)[1]))
-    if (!is.null(reason)) {
-      if (debug) mdebugf("Reason: %s", reason)
-      msg <- sprintf("%s. Reason reported: %s", msg, reason)
-    }
-
-    if (!is.null(status)) {
-      if (debug) mdebugf("Status: %s", status)
-      msg <- sprintf("%s [exit code: %d]", msg, status)
-    }
-
-    warning(msg)
-  } else if (isTRUE(res)) {
-    success <- TRUE
-  }
+  success <- isTRUE(res)
+  signaled <- success
 
   success
 }
 
+#' @importFrom tools SIGTERM
 #' @export
 killNode.cluster <- function(x, signal = tools::SIGTERM, ...) {
   vapply(x, FUN = killNode, signal = signal, ..., FUN.VALUE = NA)

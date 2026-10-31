@@ -1,0 +1,10 @@
+"cluster","context","condor_submit","expected_cores","expected_workers","HOSTNAME","BATCH_SYSTEM","_CONDOR_SLOT","_CONDOR_MACHINE_AD-Cpus","_CONDOR_MACHINE_AD-TotalSlotCpus","_CONDOR_MACHINE_AD-TotalCpus","_CONDOR_MACHINE_AD-DetectedCpus","_CONDOR_JOB_AD-CpusProvisioned","_CONDOR_JOB_AD-Cpus","_CONDOR_JOB_AD-RequestCpus","_CONDOR_JOB_AD-MachineAttrCpus0","OMP_NUM_THREADS","OMP_THREAD_LIMIT","PYTHON_CPU_COUNT","CUBACORES","GOMAXPROCS","JULIA_NUM_THREADS","MKL_NUM_THREADS","NUMEXPR_NUM_THREADS","OPENBLAS_NUM_THREADS","ROOT_MAX_THREADS","TF_NUM_THREADS","TF_LOOP_PARALLEL_ITERATIONS"
+"htcondor1","job","request_cpus = 2","2",,"org-iu-node1","HTCondor","slot1_7","2","2","8.0","8","2",,"2","2","2","2","2","2","2","2","2","2","2","2","2","2"
+"htcondor1","job","","1",,"org-clemson-node1","HTCondor","slot1_4","1","1","4.0","128","1",,"1","1","1","1","1","1","1","1","1","1","1","1","1","1"
+"htcondor1","job","request_cpus = 1","1",,"org-syracuse-node1","HTCondor","slot1_1","1","1","8.0","256","1",,"1","1","1","1","1","1","1","1","1","1","1","1","1","1"
+"htcondor1","job","request_cpus = 4","4",,"org-syracuse-node2","HTCondor","slot1_13","4","4","64.0","64","4",,"4","4","4","4","4","4","4","4","4","4","4","4","4","4"
+"htcondor1","job","request_cpus = 8","8",,"org-ltu-node1","HTCondor","slot1_1","8","8","8.0","24","8",,"8","8","8","8","8","8","8","8","8","8","8","8","8","8"
+"htcondor1","job","request_cpus = 2","2",,"org-fsu-node1","HTCondor","slot1_3","2","2","4.0","4","2",,"2","2","2","2","2","2","2","2","2","2","2","2","2","2"
+"htcondor1","job","request_cpus = 2","2",,"org-fsu-node1","HTCondor","slot1_3","2","2","4.0","4","2",,"2","2","2","2","2","2","2","2","2","2","2","2","2","2"
+"htcondor1","job","request_cpus = 2","2",,"org-fsu-node2","HTCondor","slot1_3","2","2","4.0","32","2",,"2","2","2","2","2","2","2","2","2","2","2","2","2","2"
+"htcondor1","job","request_cpus = 2","2",,"org-clemson-node2","HTCondor","slot1_3","2","2","4.0","32","2",,"2","2","4",,,"2","2","2","2","2",,,,

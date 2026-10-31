@@ -139,12 +139,46 @@
 #' worker is very low. This might be safe to do so when the parallel
 #' tasks are mostly in a waiting state, e.g. polling a webserver.
 #'
+#' @section Protection against CPU overuse via nested parallelism:
+#' Parallel workers on the current machine inherit the settings of the
+#' main \R session. This means that [availableCores()] reports the same
+#' number of CPU cores in each worker as in the main \R session. For
+#' example, on an eight-core machine, each of the eight workers in
+#'
+#' ```r
+#' cl <- makeClusterPSOCK(8)
+#' ```
+#'
+#' reports eight CPU cores. If the code evaluated by the workers
+#' parallelizes further based on `availableCores()`, e.g.
+#'
+#' ```r
+#' y <- parallel::parLapply(cl, X, function(x) {
+#'   parallel::mclapply(x, FUN = slow_fcn, mc.cores = parallelly::availableCores())
+#' })
+#' ```
+#'
+#' then there could be up to 64 \R processes competing for eight CPU
+#' cores. To protect against this, set \R option `mc.cores` to one in
+#' each worker using:
+#'
+#' ```r
+#' cl <- makeClusterPSOCK(8, rscript_startup = quote(options(mc.cores = 1L)))
+#' ```
+#'
+#' This makes `availableCores()` report a single CPU core in each
+#' worker, and `parallel::mclapply()` run sequentially. This is not
+#' needed when using the cluster via the \pkg{future} framework,
+#' e.g. `plan(cluster, workers = cl)`, because futures are evaluated
+#' with `mc.cores` set to one on parallel workers.
+#'
 #' @example incl/makeClusterPSOCK.R
 #'
 #' @aliases RPSOCK
 #' @importFrom parallel stopCluster
 #' @export
 makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto", "random"), user = NULL, ..., autoStop = FALSE, tries = getOption2("parallelly.makeNodePSOCK.tries", 3L), delay = getOption2("parallelly.makeNodePSOCK.tries.delay", 15.0), validate = getOption2("parallelly.makeNodePSOCK.validate", TRUE), verbose = isTRUE(getOption("parallelly.debug"))) {
+  warn_future_reexport_deprecation("makeClusterPSOCK")
   if (verbose) {
     verbose_prefix <- "[local output] "
     oopts <- options(parallelly.debug = verbose)
@@ -330,11 +364,16 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     timeout <- options[["timeout"]]
     useXDR <- options[["useXDR"]]
     nodeClass <- c("RichSOCKnode", if(useXDR) "SOCKnode" else "SOCK0node")
-    cmd <- options[["cmd"]]
+
+    ## Give nodes their own 'cmd' and 'pidfile'
+    cmds <- vapply(nodeOptions, FUN = function(o) o[["cmd"]], FUN.VALUE = NA_character_)
+    pidfiles <- lapply(nodeOptions, FUN = function(o) o[["pidfile"]])
+    ## Remove temporary PID files on exit, also on errors
+    on.exit(lapply(pidfiles, FUN = removeWorkerPIDFile), add = TRUE)
 
     if (verbose) {
       mdebugf("%sSystem call to launch all workers:", verbose_prefix)
-      mdebugf("%s%s", verbose_prefix, cmd)
+      mdebugf("%s%s", verbose_prefix, cmds)
     }
 
     ## FIXME: Add argument, option, environment variable for this
@@ -347,13 +386,13 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     assert_system_is_supported()
 
     if (.Platform[["OS.type"]] == "windows") {
-      for (ii in seq_along(cl)) {
+      for (cmd in cmds) {
         ## See parallel::newPSOCKnode() for the input = ""
         system(cmd, wait = FALSE, input = "")
       }
     } else {
       ## Asynchronous lists are defined by POSIX
-      cmd <- paste(rep(cmd, times = length(cl)), collapse = " & ")
+      cmd <- paste(cmds, collapse = " & ")
       system(cmd, wait = FALSE)
     }
 
@@ -387,6 +426,16 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
           ## The workers will give up after connectTimeout, so there is
           ## no point waiting for them much longer.
           failed <- length(cl) - ready
+
+          ## If at least one worker failed to connect in time, lets
+          ## terminate them all already here.
+          for (pidfile in pidfiles) {
+            pid <- readWorkerPID(pidfile, wait = 0.2, maxTries = 5L)
+            if (!is.null(pid)) {
+              if (!isTRUE(pid_kill(pid))) pid_kill(pid)
+            }
+          }
+
           stop(sprintf(ngettext(failed,
                "Cluster setup failed (connectTimeout=%.1f seconds). %d worker of %d failed to connect.",
                "Cluster setup failed (connectTimeout=%.1f seconds). %d of %d workers failed to connect."),
@@ -404,7 +453,7 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
         scon <- structure(
           list(con = con, host = localhostHostname, rank = ready),
           options = options,
-          calls = sys.calls(),
+          calls = if (isTRUE(options[["arguments"]][["calls"]])) sys.calls() else NULL,
           class = nodeClass
         )
         res <- tryCatch({
@@ -430,6 +479,13 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
       mdebugf("%s%d workers out of %d ready", verbose_prefix, ready, length(cl))
       mdebugf_pop("%sWaiting for workers to connect back ... done", verbose_prefix)
     }
+
+    ## Cleanup
+    try(close(socket), silent = TRUE)
+    socket <- NULL
+
+    ## Workers successfully connected: remove the temporary PID files
+    lapply(pidfiles, FUN = removeWorkerPIDFile)
   } else if (setup_strategy == "sequential") {
     retryPort <- getOption2("parallelly.makeNodePSOCK.tries.port", "same")
     for (ii in seq_along(cl)) {
@@ -494,10 +550,6 @@ makeClusterPSOCK <- function(workers, makeNode = makeNodePSOCK, port = c("auto",
     mdebugf("%sLaunching of %d workers completed", verbose_prefix, n)
     mdebugf("%sNumber of nodes in cluster: %d", verbose_prefix, length(cl))
   }
-
-  ## Cleanup
-  try(close(socket), silent = TRUE)
-  socket <- NULL
 
   ## Sanity check
   stopifnot(length(cl) == n)

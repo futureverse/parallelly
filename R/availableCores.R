@@ -28,6 +28,12 @@
 #' @param default The default number of cores to return if no non-missing
 #' settings are available.
 #'
+#' @param threadsPerWorker (positive integer) Number of CPU cores, or
+#' threads, to reserve for each parallel worker. The number of cores is
+#' divided by this number, rounding down, with a minimum of one.
+#' Applied before `fraction` and `omit`. The default is one, which
+#' means one worker per CPU core.
+#'
 #' @param which A character specifying which settings to return.
 #' If `"min"` (default), the minimum value is returned.
 #' If `"max"`, the maximum value is returned (be careful!)
@@ -56,9 +62,15 @@
 #' \itemize{
 #'  \item `"system"` -
 #'    Query \code{\link[parallel]{detectCores}(logical = logical)}.
+#'    If it returns a missing value, which happens on platforms where
+#'    the number of cores cannot be detected, such as webR, then `1` is
+#'    used.
 #'
 #'  \item `"/proc/self/status"` -
 #'    Query \code{Cpus_allowed_list} of `/proc/self/status`.
+#'    Since this list may include CPUs that are not online, only CPUs
+#'    that are also online according to `/sys/devices/system/cpu/online`
+#'    are counted.
 #'
 #'  \item `"cgroups.cpuset"` -
 #'    On Unix, query control group (cgroup v1) _affinity_ value
@@ -152,6 +164,14 @@
 #'    An example of a job submission that results in this is
 #'    `qsub -pe smp 2` (or `qsub -pe by_node 2`), which
 #'    requests two cores on a single machine.
+#'    If the job spans multiple machines, e.g. `qsub -pe mpi 16`,
+#'    \env{NSLOTS} is the total number of slots on all machines.
+#'    Because of this, the number of slots allotted to the current
+#'    machine according to the file that \env{PE_HOSTFILE} specifies
+#'    is used instead, if available.
+#'    In processes launched by `qrsh -inherit`, \env{PE_HOSTFILE} is not
+#'    set. On the machine running the job script, the file is searched for
+#'    in the job's spool folder via \env{SGE_JOB_SPOOL_DIR}.
 #'    Known Grid Engine schedulers are
 #     Sun Grid Engine (SGE; open source; acquired Gridware, Inc. in 2000),
 #'    Oracle Grid Engine (OGE; acquired Sun Microsystems in 2010),
@@ -162,15 +182,26 @@
 #'
 #'  \item `"Slurm"` -
 #'    Query Simple Linux Utility for Resource Management (Slurm)
-#'    environment variable \env{SLURM_CPUS_PER_TASK}.
-#'    This may or may not be set.  It can be set when submitting a job,
-#'    e.g. `sbatch --cpus-per-task=2 hello.sh` or by adding
-#'    `#SBATCH --cpus-per-task=2` to the \file{hello.sh} script.
-#'    If \env{SLURM_CPUS_PER_TASK} is not set, then it will fall back to
-#'    use \env{SLURM_CPUS_ON_NODE} if the job is a single-node job
-#'    (\env{SLURM_JOB_NUM_NODES} is 1), e.g. `sbatch --ntasks=2 hello.sh`.
-#'    To make sure all tasks are assigned to a single node, specify
-#'    `--nodes=1`, e.g. `sbatch --nodes=1 --ntasks=16 hello.sh`.
+#'    environment variable \env{SLURM_CPUS_ON_NODE}, which is the number
+#'    of CPUs that Slurm has allotted to the job on the current machine.
+#'    For example, `sbatch --ntasks=4 --cpus-per-task=2 hello.sh`
+#'    gives eight CPUs, when all tasks are assigned to the same machine.
+#'    This is the number of cores available to the \file{hello.sh} job
+#'    script, and similarly to the interactive shell of \command{salloc}.
+#'    In a task launched by \command{srun} (as indicated by
+#'    \env{SLURM_STEP_ID} being set), the CPUs on the machine are shared
+#'    with the other tasks on that machine.  In this case,
+#'    \env{SLURM_CPUS_PER_TASK} is used, if set, e.g.
+#'    `--cpus-per-task=2`, otherwise the CPUs are split equally among the
+#'    tasks of the job step on the current machine according to
+#'    \env{SLURM_STEP_TASKS_PER_NODE}.
+#'
+#'  \item `"HTCondor"` -
+#'    Query HTCondor environment variables \env{_CONDOR_MACHINE_AD} and
+#'    \env{_CONDOR_JOB_AD}.
+#'    The slot's machine ClassAd file is queried for \code{Cpus}.
+#'    If not available, the job ClassAd file is queried for
+#'    \code{CpusProvisioned} (or \code{Cpus}).
 #'
 #'  \item `"custom"` -
 #'    If option
@@ -230,7 +261,7 @@
 #' ```
 #'
 #' To achieve the same from outside of R, for instance when running
-#' `R CMD check`, set the the corresponding environment variables, e.g.
+#' `R CMD check`, set the corresponding environment variables, e.g.
 #' 
 #' ```sh
 #' $ export R_PARALLELLY_AVAILABLECORES_SYSTEM=192
@@ -287,13 +318,23 @@
 #' message(paste("Number of cores available:", availableCores()))
 #' }
 #'
+#' \dontrun{
+#' ## Slurm job submitted with 'sbatch --ntasks=4 --cpus-per-task=2'
+#' ## Use one worker per task, each running two threads, instead of
+#' ## one worker per CPU core
+#' nthreads <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "1"))
+#' nworkers <- availableCores(threadsPerWorker = nthreads)
+#' message(paste("Number of workers to use:", nworkers))
+#' }
+#'
 #' @seealso
 #' To get the set of available workers regardless of machine,
 #' see [availableWorkers()].
 #'
 #' @importFrom parallel detectCores
 #' @export
-availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
+availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L), which = c("min", "max", "all"), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
+  warn_future_reexport_deprecation("availableCores")
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
   )
@@ -314,13 +355,20 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
   }
 
   which <- match.arg(which, choices = c("min", "max", "all"))
-  stop_if_not(length(default) == 1, is.finite(default), default >= 1L)
+  stop_if_not(length(default) == 1, is.finite(default), default >= 1L,
+              default <= .Machine$integer.max)
+  storage.mode(default) <- "integer"
+
+  stop_if_not(length(threadsPerWorker) == 1L, is.numeric(threadsPerWorker),
+              is.finite(threadsPerWorker), threadsPerWorker >= 1L,
+              threadsPerWorker <= .Machine$integer.max)
+  threadsPerWorker <- as.integer(threadsPerWorker)
 
   stop_if_not(length(fraction) == 1L, is.numeric(fraction),
               is.finite(fraction), fraction > 0, fraction <= 1)
 
   stop_if_not(length(omit) == 1L, is.numeric(omit),
-              is.finite(omit), omit >= 0L)
+              is.finite(omit), omit >= 0L, omit <= .Machine$integer.max)
   omit <- as.integer(omit)
 
   stop_if_not(length(max) == 1L, is.numeric(max), !is.na(max), max >= 1L)
@@ -340,6 +388,8 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       n <- availableCoresLSF()
     } else if (method == "PJM") {
       n <- availableCoresPJM()
+    } else if (method == "HTCondor") {
+      n <- availableCoresHTCondor()
     } else if (method == "mc.cores") {
       ## Number of cores by option defined by 'parallel' package
       n <- getopt_int("mc.cores")
@@ -385,18 +435,9 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
       ## Number of cores available according to parallel::detectCores()
       n <- detectCores(logical = logical)
     } else if (method == "/proc/self/status") {
-      pathname <- "/proc/self/status"
-      if (file_test("-f", pathname)) {
-        bfr <- readLines(pathname, warn = FALSE)
-        bfr <- grep("^Cpus_allowed_list:", bfr, value = TRUE)
-        if (length(bfr) == 1) {
-          bfr <- sub("^Cpus_allowed_list:\t", "", bfr)
-          if (nzchar(bfr)) {
-            bfr <- slurm_expand_nodelist(sprintf("[%s]", bfr))
-            n <- length(bfr)
-          }
-        }
-      }
+      n <- NA_integer_
+      cpus <- getProcSelfStatusCpuSet()
+      if (length(cpus) > 0L) n <- length(cpus)
     } else if (method == "cgroups.cpuset") {
       ## Number of cores according to Unix cgroups v1 CPU set
       n <- length(getCGroups1CpuSet())
@@ -528,13 +569,27 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
     stop(sprintf("Option %s must not be greater than the number cores on the system: %d > %d", sQuote("parallelly.availableCores.min"), min, detectCores(logical = logical)))
   } else {
     idxs <- which(ncores < min)
-    ncores[idxs] <- as.integer(floor(min))
-    names(ncores)[idxs] <- paste(names(ncores)[idxs], "*", sep = "")
+    if (length(idxs) > 0L) {
+      ncores[idxs] <- as.integer(floor(min))
+      if (!is.null(names(ncores))) {
+        names(ncores)[idxs] <- paste(names(ncores)[idxs], "*", sep = "")
+      }
+    }
+  }
+
+  ## Reserve multiple cores (threads) per worker?
+  if (threadsPerWorker > 1L) {
+    names <- names(ncores)
+    ncores <- ncores %/% threadsPerWorker
+    names(ncores) <- names
+    ncores[ncores < 1L] <- 1L
   }
 
   ## Use only a fraction of the cores?
   if (fraction < 1) {
+    names <- names(ncores)
     ncores <- as.integer(floor(fraction * ncores))
+    names(ncores) <- names
     ncores[ncores < 1L] <- 1L
   }
 
@@ -546,8 +601,8 @@ availableCores <- function(constraints = NULL, methods = getOption2("parallelly.
 
   ## Upper limit?
   if (is.finite(max)) {
-    ncores <- min(max, ncores, na.rm = TRUE)
-    ncores <- as.integer(ncores)
+    ncores <- pmin(ncores, max, na.rm = FALSE)
+    storage.mode(ncores) <- "integer"
   }
 
   ## Sanity check
@@ -678,6 +733,10 @@ getenv_int <- function(name, mode = "integer") {
   value
 } # getenv_int()
 
+getenv_chr <- function(name) {
+  as.character(trim(getEnvVar2(name, default = NA_character_)))
+} # getenv_chr()
+
 getopt_int <- function(name, mode = "integer") {
   value <- getOption2(name, default = NA_integer_)
   storage.mode(value) <- mode
@@ -743,10 +802,54 @@ availableCoresSGE <- local({
   n <- NULL
   function() {
     if (!is.null(n)) return(n)
-    n <<- getenv_int("NSLOTS")
+    ## In the job script of a job spanning multiple hosts, NSLOTS is the
+    ## total number of slots on all hosts, whereas the PE hostfile gives
+    ## the number of slots per host.
+    n <<- sge_slots_on_host()
+    if (is.na(n)) n <<- getenv_int("NSLOTS")
     n
   }
 })
+
+
+## Pathname of the PE hostfile, if available. It is given by
+## PE_HOSTFILE in the job script and in processes launched from it. In
+## processes launched by 'qrsh -inherit', PE_HOSTFILE is not set, and
+## if set, e.g.  via 'qrsh -inherit -V', it is the pathname on the
+## host running the job script. Instead, SGE_JOB_SPOOL_DIR is set to a
+## subfolder of the job's spool folder,
+## '<spool>/active_jobs/<job-id>.<task-id>/<petask-id>.<hostname>',
+## where the job's spool folder holds the 'pe_hostfile' file. This
+## file exists only on the host running the job script.
+sge_pe_hostfile <- function() {
+  pathname <- getenv_chr("PE_HOSTFILE")
+  if (!is.na(pathname) && file_test("-f", pathname)) return(pathname)
+  spool <- getenv_chr("SGE_JOB_SPOOL_DIR")
+  if (is.na(spool)) return(NA_character_)
+  pathnames <- file.path(c(spool, dirname(spool)), "pe_hostfile")
+  pathnames <- pathnames[file_test("-f", pathnames)]
+  if (length(pathnames) == 0L) return(NA_character_)
+  pathnames[1]
+} ## sge_pe_hostfile()
+
+
+## Number of slots on the current host according to the PE hostfile
+sge_slots_on_host <- function() {
+  pathname <- sge_pe_hostfile()
+  if (is.na(pathname)) return(NA_integer_)
+  data <- tryCatch(read_pe_hostfile(pathname, sort = FALSE), error = function(ex) NULL)
+  if (is.null(data)) return(NA_integer_)
+
+  ## The hostnames in PE_HOSTFILE may or may not be fully qualified
+  hostname <- getenv_chr("HOSTNAME")
+  if (is.na(hostname)) hostname <- Sys.info()[["nodename"]]
+  short <- function(x) sub("[.].*", "", x)
+  is_local <- (short(data$node) == short(hostname))
+  if (!any(is_local)) return(NA_integer_)
+
+  ## A host may be listed more than once, e.g. once per queue
+  sum(data$count[is_local])
+} ## sge_slots_on_host()
 
 
 ## Number of cores assigned by Slurm
@@ -754,10 +857,42 @@ availableCoresSlurm <- local({
   n <- NULL
   function() {
     if (!is.null(n)) return(n)
-    ## The assumption is that the following works regardless of
-    ## number of nodes requested /HB 2020-09-18
-    ## Example: --cpus-per-task={n}
-    n <<- getenv_int("SLURM_CPUS_PER_TASK")
+
+    ## Number of CPUs allotted to the job on the current node. On
+    ## hyperthreaded systems, this may be greater than requested, because
+    ## Slurm allots whole cores, e.g. --cpus-per-task=3 gives four CPUs
+    ncpus <- getenv_int("SLURM_CPUS_ON_NODE")
+
+    ## SLURM_STEP_ID (and SLURM_STEPID for backwards compatibility) is set
+    ## in tasks launched by 'srun', but not in the batch script.
+    step <- getenv_int("SLURM_STEP_ID", mode = "double")
+    if (is.na(step)) step <- getenv_int("SLURM_STEPID", mode = "double")
+
+    ## Was 'salloc' used? Step IDs of 0xFFFFFFF0 and above are
+    ## special, e.g. 0xFFFFFFFA (4294967290) for the interactive shell
+    ## of 'salloc', which, like the batch script, has all CPUs
+    ## allotted on this node.
+    if (!is.na(step) && step >= 0xFFFFFFF0) step <- NA_real_
+
+    if (is.na(step)) {
+      ## In the batch script, and in the interactive shell of 'salloc',
+      ## all CPUs allotted on this node are available
+      n <<- ncpus
+    } else {
+      ## In an 'srun' task, the CPUs on this node are shared with the other
+      ## tasks of the job step on this node. Note that SLURM_CPUS_ON_NODE
+      ## is for the whole job, and the CPU affinity is not always limited
+      ## to the task's CPUs.
+      ## Example: --cpus-per-task={n}
+      n <<- getenv_int("SLURM_CPUS_PER_TASK")
+      if (is.na(n) && !is.na(ncpus)) {
+        ntasks <- slurm_step_ntasks_on_node()
+        if (!is.na(ntasks) && ntasks > 0L) n <<- max(1L, ncpus %/% ntasks)
+      }
+    }
+
+    ## Fallbacks, in case SLURM_CPUS_ON_NODE is not set
+    if (is.na(n)) n <<- getenv_int("SLURM_CPUS_PER_TASK")
     if (is.na(n)) {
       ## Example: --nodes={nnodes} (defaults to 1, short: -N {nnodes})
       ## From 'man sbatch':
@@ -769,14 +904,7 @@ availableCoresSlurm <- local({
   
       if (nnodes == 1L) {
         ## Example: --nodes=1 --ntasks={n} (short: -n {n})
-        ## IMPORTANT: 'SLURM_CPUS_ON_NODE' appears to be rounded up when nodes > 1.
-        ## Example 1: With --nodes=2 --cpus-per-task=3 we see SLURM_CPUS_ON_NODE=4
-        ## although SLURM_CPUS_PER_TASK=3. 
-        ## Example 2: With --nodes=2 --ntasks=7, we see SLURM_CPUS_ON_NODE=6,
-        ## SLURM_JOB_CPUS_PER_NODE=6,2, no SLURM_CPUS_PER_TASK, and
-        ## SLURM_TASKS_PER_NODE=5,2.
-        ## Conclusions: We can only use 'SLURM_CPUS_ON_NODE' for nnodes = 1.
-        n <<- getenv_int("SLURM_CPUS_ON_NODE")
+        n <<- ncpus
       } else {
         ## Parse `SLURM_TASKS_PER_NODE`
         nodecounts <- getenv_int("SLURM_TASKS_PER_NODE", mode = "character")
@@ -814,4 +942,160 @@ availableCoresSlurm <- local({
 }) ## availableCoresSlurm()
 
 
-cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_character("default"), cli_arg_character("which"), cli_arg_integer("omit"), cli_arg_numeric("max"))
+## Number of tasks of the current 'srun' job step on the current node
+slurm_step_ntasks_on_node <- function() {
+  ## Examples:
+  ## SLURM_STEP_TASKS_PER_NODE=14,2
+  ## SLURM_STEP_TASKS_PER_NODE=2(x2)
+  counts <- getenv_chr("SLURM_STEP_TASKS_PER_NODE")
+  if (is.na(counts)) return(NA_integer_)
+  counts <- slurm_expand_nodecounts(counts)
+  if (length(counts) == 0L || anyNA(counts)) return(NA_integer_)
+
+  ## Same number of tasks on all nodes?
+  if (length(unique(counts)) == 1L) return(counts[1])
+
+  ## Otherwise, identify the current node among the step's nodes
+  nodelist <- getenv_chr("SLURM_STEP_NODELIST")
+  nodename <- getenv_chr("SLURMD_NODENAME")
+  if (is.na(nodelist) || is.na(nodename)) return(NA_integer_)
+  nodes <- slurm_expand_nodelist(nodelist)
+  if (length(nodes) != length(counts)) return(NA_integer_)
+  counts[match(nodename, nodes)]
+} ## slurm_step_ntasks_on_node()
+
+
+# --------------------------------------------------------------------------
+# HTCondor
+# --------------------------------------------------------------------------
+read_classad_attribute <- function(pathname, attribute) {
+  if (is.na(pathname) || !file_test("-f", pathname)) return(NA_character_)
+  lines <- readLines(pathname, warn = FALSE)
+  lines <- lines[!grepl("^\\s*(#|//)", lines)]
+  pattern <- sprintf("^\\s*%s\\s*=\\s*(.*)$", attribute)
+  hits <- grep(pattern, lines, ignore.case = TRUE, value = TRUE)
+  if (length(hits) == 0L) return(NA_character_)
+  val <- sub(pattern, "\\1", hits[1], ignore.case = TRUE)
+  val <- trim(val)
+  ## Strip surrounding single or double quotes
+  val <- sub("^[\"']", "", val)
+  val <- sub("[\"']$", "", val)
+  val
+}
+
+parse_classad_integer <- function(val) {
+  if (is.na(val) || !nzchar(val)) return(NA_integer_)
+  n <- suppressWarnings(as.numeric(val))
+  if (is.na(n) || !is.finite(n)) return(NA_integer_)
+  n <- as.integer(floor(n + 0.5))
+  if (n <= 0L) return(NA_integer_)
+  n
+}
+
+## Number of cores assigned by HTCondor
+availableCoresHTCondor <- local({
+  n <- NULL
+  function() {
+    if (!is.null(n)) return(n)
+
+    machine_ad <- getenv_chr("_CONDOR_MACHINE_AD")
+    if (is.na(machine_ad) || !nzchar(machine_ad)) machine_ad <- NA_character_
+
+    job_ad <- getenv_chr("_CONDOR_JOB_AD")
+    if (is.na(job_ad) || !nzchar(job_ad)) job_ad <- NA_character_
+
+    ## HTCondor is detected if and only if _CONDOR_MACHINE_AD or _CONDOR_JOB_AD is set
+    if (is.na(machine_ad) && is.na(job_ad)) {
+      n <<- NA_integer_
+      return(n)
+    }
+
+    source_desc <- NULL
+
+    ## 1. Machine ClassAd: Cpus (preferred)
+    if (!is.na(machine_ad)) {
+      if (file_test("-f", machine_ad)) {
+        val <- read_classad_attribute(machine_ad, "Cpus")
+        n0 <- parse_classad_integer(val)
+        if (!is.na(n0)) {
+          n <<- n0
+          source_desc <- sprintf("the %s file (%s)", sQuote("_CONDOR_MACHINE_AD"), machine_ad)
+        }
+      } else {
+        warnf("Environment variable %s was set but no such file %s exists", sQuote("_CONDOR_MACHINE_AD"), sQuote(machine_ad))
+      }
+    }
+
+    ## 2. Job ClassAd: CpusProvisioned (or Cpus) as fallback
+    if (is.null(n) || is.na(n)) {
+      if (!is.na(job_ad)) {
+        if (file_test("-f", job_ad)) {
+          val <- read_classad_attribute(job_ad, "CpusProvisioned")
+          if (is.na(val) || !nzchar(val)) {
+            val <- read_classad_attribute(job_ad, "Cpus")
+          }
+          n0 <- parse_classad_integer(val)
+          if (!is.na(n0)) {
+            n <<- n0
+            source_desc <- sprintf("the %s file (%s)", sQuote("_CONDOR_JOB_AD"), job_ad)
+          }
+        } else {
+          warnf("Environment variable %s was set but no such file %s exists", sQuote("_CONDOR_JOB_AD"), sQuote(job_ad))
+        }
+      }
+    }
+
+    if (is.null(n) || is.na(n)) {
+      n <<- NA_integer_
+      return(n)
+    }
+
+    ## Check machine ad vs job ad if both available
+    if (!is.na(machine_ad) && !is.na(job_ad) && file_test("-f", machine_ad) && file_test("-f", job_ad)) {
+      job_cpus <- parse_classad_integer(read_classad_attribute(job_ad, "CpusProvisioned"))
+      if (is.na(job_cpus)) {
+        job_cpus <- parse_classad_integer(read_classad_attribute(job_ad, "Cpus"))
+      }
+      if (!is.na(job_cpus) && job_cpus != n) {
+        warnf("Identified %d CPU cores from %s, which does not match %s in the %s file (%s) = %d", n, source_desc, "CpusProvisioned", sQuote("_CONDOR_JOB_AD"), job_ad, job_cpus)
+      }
+    }
+
+    n
+  }
+})
+
+
+cli_fcn(availableCores) <- list(cli_arg_character("constraints"), cli_arg_character("methods"), cli_arg_logical("na.rm"), cli_arg_logical("logical"), cli_arg_numeric("default"), cli_arg_character("which"), cli_arg_numeric("omit"), cli_arg_numeric("max"))
+
+
+## Get the set of CPUs that the current process may run on, according to
+## 'Cpus_allowed_list' of /proc/self/status (Linux). This list may include
+## CPUs that are not online, e.g. '0-63' on a machine with 48 CPUs, which
+## is why only CPUs that are also online are returned, if known.
+## Returns an integer vector of CPU IDs, which is empty if unknown.
+getProcSelfStatusCpuSet <- function(status = "/proc/self/status", online = "/sys/devices/system/cpu/online") {
+  ## Parse a CPU list, e.g. "0-3,8,10-11"
+  parse_cpu_list <- function(x) {
+    x <- gsub("[[:space:]]", "", x)
+    if (!nzchar(x)) return(integer(0L))
+    as.integer(slurm_expand_nodelist(sprintf("[%s]", x)))
+  }
+
+  if (!file_test("-f", status)) return(integer(0L))
+  bfr <- readLines(status, warn = FALSE)
+  bfr <- grep("^Cpus_allowed_list:", bfr, value = TRUE)
+  if (length(bfr) != 1L) return(integer(0L))
+  cpus <- parse_cpu_list(sub("^Cpus_allowed_list:", "", bfr))
+
+  ## Keep only CPUs that are online?
+  if (length(cpus) > 0L && file_test("-f", online)) {
+    bfr <- readLines(online, n = 1L, warn = FALSE)
+    if (length(bfr) == 1L) {
+      online_cpus <- parse_cpu_list(bfr)
+      if (length(online_cpus) > 0L) cpus <- intersect(cpus, online_cpus)
+    }
+  }
+
+  cpus
+}

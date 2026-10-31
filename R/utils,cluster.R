@@ -50,6 +50,9 @@ is_localhost <- local({
     ## Search for (hostname, worker) and (worker, hostname)
     ## occuring on the same line and are separates by one or
     ## more whitespace symbols (but nothing else).
+    ## (i) Escape dots, so they are matched literally, not as wildcards
+    hostname <- gsub(".", "[.]", hostname, fixed = TRUE)
+    worker <- gsub(".", "[.]", worker, fixed = TRUE)
     pattern <- sprintf("^((|.*[[:space:]])%s[[:space:]]+%s([[:space:]]+|)|(|.*[[:space:]])%s[[:space:]]+%s([[:space:]]+|))$", hostname, worker, worker, hostname)
     
     for (pathname in pathnames) {
@@ -86,7 +89,11 @@ is_fqdn <- function(worker) {
 #' Search for SSH clients on the current system
 #'
 #' @param which A character vector specifying which types of SSH clients
-#' to search for.  If NULL, a default set of clients supported by the
+#' to search for, e.g. `"ssh"`, `"putty-plink"`, and `"rstudio-ssh"`.
+#' It may also specify an HPC job-scheduler command, i.e. `"srun"`,
+#' `"qrsh"`, and `"pjrsh"`, or `"hpc"`, which infers which of these
+#' three to use from the job environment of the current R process.
+#' If NULL, a default set of clients supported by the
 #' current platform is searched for.
 #'
 #' @param first If TRUE, the first client found is returned, otherwise
@@ -156,6 +163,57 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
     bin
   }
 
+  ## Slurm: Launch as a job step on one of the nodes allotted to the job
+  ## * --exact: Only use the resources requested by the job step. Without
+  ##   it, the first job step on a node takes all of the job's memory
+  ##   on that node
+  ## * --overlap, --overcommit: Allow multiple job steps on the same
+  ##   node. Without --overcommit, a second concurrent job step on the
+  ##   same node might be pending forever (observed in Slurm 21.08)
+  ## * --cpus-per-task=1: Without it, the job step inherits the job's
+  ##   --cpus-per-task
+  find_srun <- function() {
+    bin <- Sys.which("srun")
+    if (!nzchar(bin)) return(NULL)
+    res <- c(bin, "--exact", "--overlap", "--overcommit", "--nodes=1",
+             "--ntasks=1", "--cpus-per-task=1", "-w")
+    attr(res, "type") <- "srun"
+    attr(res, "version") <- query_version(bin, args = "--version")
+    res
+  }
+
+  ## Grid Engine (SGE): Launch on one of the nodes allotted to the job
+  find_qrsh <- function() {
+    bin <- Sys.which("qrsh")
+    if (!nzchar(bin)) return(NULL)
+    res <- c(bin, "-inherit", "-nostdin", "-V")
+    attr(res, "type") <- "qrsh"
+    attr(res, "version") <- "<unknown>"
+    res
+  }
+
+  ## Fujitsu Technical Computing Suite (PJM): Launch on one of the nodes
+  ## allotted to the job
+  find_pjrsh <- function() {
+    bin <- Sys.which("pjrsh")
+    if (!nzchar(bin)) return(NULL)
+    res <- bin
+    attr(res, "type") <- "pjrsh"
+    attr(res, "version") <- "<unknown>"
+    res
+  }
+
+  ## HPC job scheduler: Infer which of the above from the job
+  ## environment of the current R process
+  find_hpc <- function() {
+    switch(hpc_scheduler(),
+      "Slurm" = find_srun(),
+      "SGE"   = find_qrsh(),
+      "PJM"   = find_pjrsh(),
+      NULL
+    )
+  }
+
   if (!is.null(which)) stop_if_not(is.character(which), length(which) >= 1L, !anyNA(which))
   stop_if_not(is.logical(first), length(first) == 1L, !is.na(first))
   stop_if_not(is.logical(must_work), length(must_work) == 1L, !is.na(must_work))
@@ -174,6 +232,10 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
       "ssh"         = find_ssh(),
       "putty-plink" = find_putty_plink(),
       "rstudio-ssh" = find_rstudio_ssh(),
+      "srun"        = find_srun(),
+      "qrsh"        = find_qrsh(),
+      "pjrsh"       = find_pjrsh(),
+      "hpc"         = find_hpc(),
       stopf("Unknown 'rshcmd' type: %s", sQuote(name))
     )
     
@@ -185,14 +247,121 @@ find_rshcmd <- function(which = NULL, first = FALSE, must_work = TRUE) {
 
   if (length(res) > 0) return(res)
   
-  msg <- sprintf("Failed to locate a default SSH client (checked: %s). Please specify one via argument 'rshcmd'.", paste(sQuote(which), collapse = ", ")) #nolint
+  msg <- sprintf("Failed to locate a default SSH client (checked: %s). Please specify one via argument 'rshcmd'", paste(sQuote(which), collapse = ", ")) #nolint
+  if ("hpc" %in% which && is.na(hpc_scheduler())) {
+    hpc_envs <- c("SLURM_JOB_ID", "PE_HOSTFILE", "PJM_JOBID")
+    msg <- sprintf("%s. Note that 'hpc' requires running in a Slurm, Grid Engine, or Fujitsu Technical Computing Suite (PJM) job, but none of the environment variables %s is set", msg, paste(sQuote(hpc_envs), collapse = ", ")) #nolint
+  }
   if (must_work) stop(msg)
 
   pathname <- "ssh"
-  msg <- sprintf("%s Will still try with %s.", msg, sQuote(paste(pathname, collapse = " ")))
+  attr(pathname, "type") <- "ssh"
+  attr(pathname, "version") <- "<unknown>"
+  msg <- sprintf("%s. Will still try with %s", msg, sQuote(paste(pathname, collapse = " ")))
   warning(msg)
-  pathname
+  ## Return a list, as above, so that attributes are preserved by
+  ## callers that use res[[1]]
+  res <- list(ssh = pathname)
+  if (first) return(pathname)
+  res
 }
+
+
+## Check if 'rshcmd' support SSH-specific options from makeNodePSOCK()
+## arguments 'user' (-l), 'revtunnel' (-R), and 'rshlogfile' (-E)?
+rshcmd_supports <- function(rshcmd, option = c("user", "revtunnel", "rshlogfile")) {
+  option <- match.arg(option)
+  if (is.function(rshcmd)) return(TRUE)
+  type <- attr(rshcmd, "type")
+  if (is.null(type) || type == "<unknown>") return(TRUE)
+  types <- switch(option,
+    user       = c("ssh", "rstudio-ssh", "putty-plink", "rsh"),
+    revtunnel  = c("ssh", "rstudio-ssh", "putty-plink"),
+    rshlogfile = c("ssh", "rstudio-ssh")
+  )
+  (type %in% types)
+}
+
+
+## The HPC job scheduler that the current R process runs in, if any.
+## Returns "Slurm", "SGE", "PJM", or NA_character_
+hpc_scheduler <- function() {
+  if (nzchar(Sys.getenv("SLURM_JOB_ID"))) return("Slurm")
+  if (nzchar(Sys.getenv("PE_HOSTFILE"))) return("SGE")
+  if (nzchar(Sys.getenv("PJM_JOBID"))) return("PJM")
+  NA_character_
+}
+
+
+## Runs R code on the remote host of 'node' per 'rshcmd'
+run_remote_rscript <- function(node, code, timeout, debug, what, msg) {
+  options <- attr(node, "options")
+  args_org <- options$arguments
+  worker <- options$worker
+  rshcmd <- options$rshcmd
+  rscript <- options$rscript
+  rscript_sh <- options$rscript_sh
+
+  ## Command to call Rscript -e
+  rscript_args <- paste(c("-e", shQuote(code, type = rscript_sh[1])), collapse = " ")
+  cmd <- paste(rscript, rscript_args)
+  if (debug) mdebugf("Rscript command to be called on the other host: %s", cmd)
+  stop_if_not(length(cmd) == 1L)
+
+  rshopts <- args_org$rshopts
+  if (length(args_org$user) == 1L) rshopts <- c("-l", args_org$user, rshopts)
+  rshopts <- paste(rshopts, collapse = " ")
+  if (is.function(rshcmd)) {
+    rsh_call <- rshcmd(rshopts = rshopts, worker = worker)
+  } else {
+    rsh_call <- paste(paste(shQuote(rshcmd), collapse = " "), rshopts, worker)
+  }
+  if (debug) mdebugf("Command to connect to the other host: %s", rsh_call)
+  stop_if_not(length(rsh_call) == 1L)
+
+  local_cmd <- paste(rsh_call, shQuote(cmd, type = rscript_sh[2]))
+  if (debug) mdebugf("System call: %s", local_cmd)
+  stop_if_not(length(local_cmd) == 1L)
+
+  ## system() ignores fractions of seconds, so need to be at least 1 second
+  if (timeout > 0 && timeout < 1) timeout <- 1.0
+  if (debug) mdebugf("Timeout: %g seconds", timeout)
+
+  ## system() does not support argument 'timeout' in R (<= 3.4.0)
+  if (getRversion() < "3.5.0") {
+    if (timeout > 0) warning(sprintf("%s does not support argument 'timeout' in R (< 3.5.0) for cluster nodes running on a remote machine", what))
+    system <- function(..., timeout) base::system(...)
+  }
+
+  reason <- NULL
+  res <- withCallingHandlers({
+    system(local_cmd, intern = TRUE, ignore.stderr = TRUE, timeout = timeout)
+  }, condition = function(w) {
+    reason <<- conditionMessage(w)
+    if (debug) mdebugf("Caught condition: %s", reason)
+  })
+  if (debug) mdebugf("Results: %s", res)
+  status <- attr(res, "status")
+  res <- as.logical(res)
+  if (length(res) != 1L || is.na(res)) {
+    res <- NA
+    attr(res, "status") <- status
+
+    if (!is.null(reason)) {
+      if (debug) mdebugf("Reason: %s", reason)
+      msg <- sprintf("%s. Reason reported: %s", msg, reason)
+    }
+
+    if (!is.null(status)) {
+      if (debug) mdebugf("Status: %s", status)
+      msg <- sprintf("%s [exit code: %d]", msg, status)
+    }
+
+    warning(msg)
+  }
+
+  res
+} ## run_remote_rscript()
 
 
 #' @importFrom utils installed.packages
@@ -368,7 +537,7 @@ readWorkerPID <- function(pidfile, wait = 0.5, maxTries = 8L, verbose = FALSE) {
   
   ## Wait for PID file
   tries <- 0L
-  while (!file.exists(pidfile) && tries <= maxTries) {
+  while (!file.exists(pidfile) && tries < maxTries) {
     Sys.sleep(wait)
     tries <- tries + 1L
   }
@@ -401,6 +570,12 @@ readWorkerPID <- function(pidfile, wait = 0.5, maxTries = 8L, verbose = FALSE) {
   
   pid
 } ## readWorkerPID()
+
+
+removeWorkerPIDFile <- function(pidfile) {
+  if (is.null(pidfile) || !file.exists(pidfile)) return(invisible(FALSE))
+  invisible(file.remove(pidfile))
+} ## removeWorkerPIDFile()
 
 
 # shQuote() that also accepts type = "none"

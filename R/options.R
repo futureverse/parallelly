@@ -14,7 +14,7 @@
 #' \describe{
 #'  \item{`parallelly.availableCores.logical`:}{(logical) The default value of argument `logical` as used by `availableCores()`, `availableWorkers()`, and `availableCores()` for querying `parallel::detectCores(logical = logical)`.  The default is `TRUE` just like it is for [parallel::detectCores()].}
 #'
-#'  \item{`parallelly.availableCores.methods`:}{(character vector) Default lookup methods for [availableCores()]. (Default: `c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "fallback", "custom")`)}
+#'  \item{`parallelly.availableCores.methods`:}{(character vector) Default lookup methods for [availableCores()]. (Default: `c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "fallback", "custom")`)}
 #'
 #'  \item{`parallelly.availableCores.methods.excludes`:}{(character vector) Default lookup methods for [availableCores()] to be excluded. (Default: `NULL`)}
 #'
@@ -26,13 +26,15 @@
 #'
 #'  \item{`parallelly.availableCores.min`:}{(integer) The default minimum number of cores [availableCores()] is allowed to return. This can be used to force multiple cores on a single-core environment. If this is limit is applied, the names of the returned value are appended with an asterisk (`*`).  (Default: `1L`)}
 #'
+#'  \item{`parallelly.availableCores.threadsPerWorker`:}{(integer; positive) The default number of CPU cores (threads) to reserve for each parallel worker, used by [availableCores()] and [availableWorkers()]. (Default: `1L`)}
+#'
 #'  \item{`parallelly.availableCores.fraction`:}{(numeric; in `[0,1]`) The default fraction of cores to keep.}
 #'
 #'  \item{`parallelly.availableCores.omit`:}{(integer; non-negative) The default number of cores to set aside, i.e. not to include.}
 #'
 #'  \item{`parallelly.availableCores.max`:}{(integer; positive) The default maximum number of cores to return.}
 #'
-#'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "system", "fallback")`)}
+#'  \item{`parallelly.availableWorkers.methods`:}{(character vector) Default lookup methods for [availableWorkers()]. (Default: `c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")`)}
 #'
 #'  \item{`parallelly.availableWorkers.methods.excludes`:}{(character vector) Default lookup methods for [availableWorkers()] to be excluded. (Default: `NULL`)}
 #'
@@ -138,6 +140,10 @@
 #' variable \env{R_FUTURE_AVAILABLECORES_FALLBACK=1} is the same as setting
 #' \env{R_PARALLELLY_AVAILABLECORES_FALLBACK=1}.
 #'
+#' \describe{
+#'  \item{`parallelly.future.reexports`:}{(character string) Controls whether a deprecation warning should be produced when `future::availableCores()`, `future::availableWorkers()`, `future::makeClusterPSOCK()`, or `future::supportsMulticore()` are called. If `"deprecated"` (default), a warning is produced. If `"defunct"`, an error is produced. If `"ignore"`, no warning or error is produced.}
+#' }
+#'
 #'
 #' @examples
 #' # Set an R option:
@@ -159,6 +165,7 @@
 #' @aliases parallelly.availableCores.min
 #' @aliases parallelly.availableCores.omit
 #' @aliases parallelly.availableCores.system
+#' @aliases parallelly.availableCores.threadsPerWorker
 #' @aliases parallelly.availableWorkers.custom
 #' @aliases parallelly.availableWorkers.methods
 #' @aliases parallelly.availableWorkers.methods.excludes
@@ -167,6 +174,8 @@
 #' @aliases parallelly.maxWorkers.localhost.ignore
 #' @aliases parallelly.supportsMulticore.disableOn
 #' @aliases parallelly.supportsMulticore.unstable
+#' @aliases parallelly.future.reexports
+#' @aliases R_PARALLELLY_FUTURE_REEXPORTS
 #' @aliases R_PARALLELLY_AVAILABLECORES_FALLBACK
 #' @aliases R_PARALLELLY_AVAILABLECORES_FRACTION
 #' @aliases R_PARALLELLY_AVAILABLECORES_LOGICAL
@@ -353,6 +362,7 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("availableCores.min", mode = "integer", disallow = "NA", debug = debug)
   update_package_option("availableCores.system", mode = "integer", disallow = NULL, debug = debug)
   update_package_option("availableCores.logical", mode = "logical", debug = debug)
+  update_package_option("availableCores.threadsPerWorker", mode = "integer", disallow = "NA", debug = debug)
   update_package_option("availableCores.fraction", mode = "double", debug = debug)
   update_package_option("availableCores.omit", mode = "integer", debug = debug)
   update_package_option("availableCores.max", mode = "numeric", disallow = "NA", debug = debug)
@@ -385,4 +395,11 @@ update_package_options <- function(debug = FALSE) {
   update_package_option("makeNodePSOCK.master.localhost.hostname", mode = "character", debug = debug)
   update_package_option("makeNodePSOCK.port.increment", mode = "logical", debug = debug)
   update_package_option("makeNodePSOCK.calls", mode = "logical", debug = debug)
+
+  ## parallelly (>= 1.49.0)
+  update_package_option("future.reexports", mode = "character", debug = debug)
+  update_package_option("future.reexports.availableCores", mode = "character", debug = debug)
+  update_package_option("future.reexports.availableWorkers", mode = "character", debug = debug)  
+  update_package_option("future.reexports.makeClusterPSOCK", mode = "character", debug = debug)  
+  update_package_option("future.reexports.supportsMulticore", mode = "character", debug = debug)  
 }

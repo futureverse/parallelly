@@ -210,6 +210,36 @@
 #' specify a PuTTY PPK file, e.g.
 #' `rshopts = c("-i", "C:/Users/joe/.ssh/my_keys.ppk")`.
 #' Contrary to `rshcmd`, elements of `rshopts` are not quoted.
+#'
+#' @section Launching workers via an HPC job scheduler:
+#' On high-performance compute (HPC) clusters, SSH access to compute nodes
+#' is often disabled. Instead, parallel workers on other compute nodes that
+#' are part of the same job can be launched via the job scheduler. The
+#' following `rshcmd` types are supported for this:
+#' \itemize{
+#'   \item `"<srun>"` -
+#'     Slurm's \command{srun}, which launches each worker as a single-CPU
+#'     job step via
+#'     `srun --exact --overlap --overcommit --nodes=1 --ntasks=1 --cpus-per-task=1 -w <worker>`.
+#'     Since \command{srun} does not launch the worker via a shell,
+#'     `rscript_sh[2]` defaults to `"none"` for this type.
+#'   \item `"<qrsh>"` -
+#'     Grid Engine's (SGE) \command{qrsh} via `qrsh -inherit -nostdin -V <worker>`
+#'   \item `"<pjrsh>"` -
+#'     Fujitsu Technical Computing Suite's (PJM) \command{pjrsh} via
+#'     `pjrsh <worker>`
+#'   \item `"<hpc>"` -
+#'     Infers which of the above to use from the environment variables
+#'     of the job that the current R process runs in, i.e. `"<srun>"`
+#'     if \env{SLURM_JOB_ID} is set, `"<qrsh>"` if \env{PE_HOSTFILE} is
+#'     set, and `"<pjrsh>"` if \env{PJM_JOBID} is set.
+#'     It is an error if none of them is set, unless a fallback is given,
+#'     e.g. `rshcmd = c("<hpc>", "<ssh>")`.
+#' }
+#' As with any `rshcmd`, these are only used for workers on _other_
+#' machines. Workers on the current machine are launched directly, which
+#' means `makeClusterPSOCK(availableWorkers(), rshcmd = "<hpc>")` works
+#' also for single-node jobs.
 #' 
 #' @section Accessing external machines that prompts for a password:
 #' _IMPORTANT: With one exception, it is not possible to for these
@@ -374,7 +404,7 @@
 #'
 #' If the remote machines are running on MS Windows, make sure to add argument
 #' `rscript_sh = "cmd"` when calling `makeClusterPSOCK()`, because the default
-#' is `rscript_sh = "sh"`, which assumes that that the remote machines are
+#' is `rscript_sh = "sh"`, which assumes that the remote machines are
 #' Unix-like machines.
 #' 
 #' Another reason for failing to setup remote workers could be that they are
@@ -455,7 +485,14 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
 
   stop_if_not(is.character(rscript_sh), length(rscript_sh) >= 1L,
               length(rscript_sh) <= 2L, !anyNA(rscript_sh))
+  ## rscript_sh[1] is for inner and rscript_sh[2] is for the outer shell
+  ## quoting of the Rscript call.  Precisely, rscript_sh[1] is for Rscript
+  ## arguments that need shell quoting (e.g. Rscript -e "<expr>"), and
+  ## rscript_sh[2] is for the whole 'Rscript ...' call
+  rscript_sh <- rep(rscript_sh, length.out = 2L)
   is_auto <- (rscript_sh == "auto")
+  ## Remember, in case the outer quoting depends on 'rshcmd' (see below)
+  rscript_sh_auto <- is_auto
   if (any(is_auto)) {
     if (localMachine) {
       rscript_sh[is_auto] <- if (.Platform[["OS.type"]] == "windows") "cmd" else "sh"
@@ -465,12 +502,6 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
     }
   }
 
-  ## rscript_sh[1] is for inner and rscript_sh[2] is for the outer shell
-  ## quoting of the Rscript call.  Precisely, rscript_sh[1] is for Rscript
-  ## arguments that need shell quoting (e.g. Rscript -e "<expr>"), and
-  ## rscript_sh[2] is for the the whole 'Rscript ...' call
-  rscript_sh <- rep(rscript_sh, length.out = 2L)
-  
   manual <- as.logical(manual)
   stop_if_not(length(manual) == 1L, !is.na(manual))
 
@@ -548,13 +579,19 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
     basename <- tolower(basename(rshcmd[1]))
     if (basename %in% c("ssh", "plink")) {
       type <- "ssh"
-    } else if (basename %in% c("rsh")) {
-      type <- "rsh"
+    } else if (basename %in% c("rsh", "srun", "qrsh", "pjrsh")) {
+      type <- basename
     } else {
       type <- "<unknown>"
     }
     if (is.null(attr(rshcmd, "type"))) attr(rshcmd, "type") <- type
     if (is.null(attr(rshcmd, "version"))) attr(rshcmd, "version") <- "<unknown>"
+  }
+
+  ## Slurm's 'srun' launches the command without a shell, meaning the
+  ## whole 'Rscript ...' call must not be quoted as a single string
+  if (!localMachine && rscript_sh_auto[2] && identical(attr(rshcmd, "type"), "srun")) {
+    rscript_sh[2] <- "none"
   }
 
   revtunnel <- as.logical(revtunnel)
@@ -740,7 +777,7 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
   rscript_args_internal <- character(0L)
 
   ## Can we get the worker's PID during launch?
-  if (localMachine && !dryrun) {
+  if (localMachine && !dryrun && !manual) {
     res <- useWorkerPID(rscript, rank = rank, rscript_sh = rscript_sh[1], verbose = verbose)
     pidfile <- res$pidfile
     rscript_args_internal <- c(res$rscript_pid_args, rscript_args_internal)
@@ -948,7 +985,21 @@ makeNodePSOCK <- function(worker = getOption2("parallelly.localhost.hostname", "
       rshcmd_label <- sprintf("%s [%s]", paste(sQuote(rshcmd), collapse = ", "), s)
     }
     if (verbose) mdebugf("%sUsing 'rshcmd': %s", verbose_prefix, rshcmd_label)
-    
+
+    ## Assert that 'rshcmd' supports the requested SSH-specific options
+    requested <- c(
+      user       = (length(user) == 1L),
+      revtunnel  = revtunnel,
+      rshlogfile = is.character(rshlogfile)
+    )
+    requested <- requested[requested]
+    for (option in names(requested)) {
+      if (!rshcmd_supports(rshcmd, option)) {
+        stopf("Argument %s is not supported for 'rshcmd' of type %s: %s",
+              sQuote(option), sQuote(attr(rshcmd, "type")), rshcmd_label)
+      }
+    }
+
     ## User?
     if (length(user) == 1L) rshopts <- c("-l", user, rshopts)
 
