@@ -655,11 +655,15 @@ message("*** availableWorkers(methods.excludes) ... done")
 message("*** availableWorkers(threadsPerWorker) ...")
 
 ## Localhost
-options(parallelly.availableCores.system = 8L)
+options(parallelly.availableCores.system = 12L)
 options(parallelly.availableCores.methods = "system")
 options(parallelly.availableWorkers.methods = "system")
-stopifnot(length(availableWorkers()) == 8L)
-stopifnot(length(availableWorkers(threadsPerWorker = 2L)) == 4L)
+
+env <- environment(parallelly:::detectCores)
+env$cache <- list(NULL, NULL)
+
+stopifnot(length(availableWorkers()) == 12L)
+stopifnot(length(availableWorkers(threadsPerWorker = 2L)) == 6L)
 stopifnot(length(availableWorkers(threadsPerWorker = 100L)) == 1L)
 options(parallelly.availableCores.system = NULL)
 options(parallelly.availableCores.methods = NULL)
