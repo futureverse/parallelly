@@ -157,6 +157,15 @@
 #'         paste(sQuote(availableWorkers()), collapse = ", ")))
 #' }
 #'
+#' \dontrun{
+#' ## Slurm job submitted with 'sbatch --ntasks=4 --cpus-per-task=2'
+#' ## Use one worker per task, each running two threads, instead of
+#' ## one worker per CPU core
+#' nthreads <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "1"))
+#' workers <- availableWorkers(threadsPerWorker = nthreads)
+#' message(paste("Workers to use:", paste(sQuote(workers), collapse = ", ")))
+#' }
+#'
 #' @seealso
 #' To get the number of available workers on the current machine,
 #' see [availableCores()].
