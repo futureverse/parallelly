@@ -15,6 +15,7 @@ availableCores(
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = c(current = 1L),
   which = c("min", "max", "all"),
+  threadsPerWorker = 1L,
   fraction = getOption2("parallelly.availableCores.fraction", 1),
   omit = getOption2("parallelly.availableCores.omit", 0L),
   max = getOption2("parallelly.availableCores.max", Inf)
@@ -50,6 +51,12 @@ settings are available.}
 If \code{"min"} (default), the minimum value is returned.
 If \code{"max"}, the maximum value is returned (be careful!)
 If \code{"all"}, all values are returned.}
+
+\item{threadsPerWorker}{(positive integer) Number of CPU cores, or
+threads, to reserve for each parallel worker. The number of cores is
+divided by this number, rounding down, with a minimum of one.
+Applied before \code{fraction} and \code{omit}. The default is one, which
+means one worker per CPU core.}
 
 \item{fraction}{(numeric; in (0,1]) Fraction of cores to keep.
 Applied before \code{omit}.

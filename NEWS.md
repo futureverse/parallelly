@@ -16,6 +16,12 @@
    
 ## New Features
 
+ * `availableCores()` gained argument `threadsPerWorker` to control
+   the amount of multi-threading per parallel worker. For example,
+   with 8 allotted CPUs, `nworkers <- availableCores(threadsPerWorker
+   = 2)` can be used to set up 4 parallel workers each running 2
+   threads.
+
  * Add support for the HTCondor job scheduler to `availableCores()`
    and `availableWorkers()`. For now, `availableWorkers()` assumes
    single-node jobs. If called on a multi-node job, it will only

@@ -1089,4 +1089,33 @@ stopifnot(
 message("*** availableCores(max, which = 'all') ... DONE")
 
 
+message("*** availableCores(threadsPerWorker) ...")
+
+options(parallelly.availableCores.system = 8L)
+options(parallelly.availableCores.methods = "system")
+
+stopifnot(identical(availableCores(), c(system = 8L)))
+stopifnot(identical(availableCores(threadsPerWorker = 1L), c(system = 8L)))
+stopifnot(identical(availableCores(threadsPerWorker = 2L), c(system = 4L)))
+stopifnot(identical(availableCores(threadsPerWorker = 3L), c(system = 2L)))
+
+## At least one worker
+stopifnot(identical(availableCores(threadsPerWorker = 100L), c(system = 1L)))
+
+## Applied before 'omit' and 'fraction'
+stopifnot(identical(availableCores(threadsPerWorker = 2L, omit = 1L), c(system = 3L)))
+stopifnot(identical(availableCores(threadsPerWorker = 2L, fraction = 0.5), c(system = 2L)))
+
+## Invalid values
+for (value in list(0L, -1L, NA_integer_, Inf, 1:2, "2")) {
+  res <- tryCatch(availableCores(threadsPerWorker = value), error = identity)
+  stopifnot(inherits(res, "error"))
+}
+
+options(parallelly.availableCores.system = NULL)
+options(parallelly.availableCores.methods = NULL)
+
+message("*** availableCores(threadsPerWorker) ... DONE")
+
+
 message("*** availableCores() ... DONE")
