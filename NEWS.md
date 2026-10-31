@@ -21,6 +21,8 @@
    with 8 allotted CPUs, `nworkers <- availableCores(threadsPerWorker
    = 2)` can be used to set up 4 parallel workers each running 2
    threads.
+   Similarly, `availableWorkers()` gained `threadsPerWorker`, which
+   lists each host `n %/% threadsPerWorker` times.
 
  * Add support for the HTCondor job scheduler to `availableCores()`
    and `availableWorkers()`. For now, `availableWorkers()` assumes

@@ -15,6 +15,7 @@ availableWorkers(
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = getOption2("parallelly.localhost.hostname", "localhost"),
   which = c("auto", "min", "max", "all"),
+  threadsPerWorker = 1L,
   ...
 )
 }
@@ -38,6 +39,11 @@ If \code{"auto"} (default), the first non-empty set found.
 If \code{"min"}, the minimum value is returned.
 If \code{"max"}, the maximum value is returned (be careful!)
 If \code{"all"}, all values are returned.}
+
+\item{threadsPerWorker}{(positive integer) Number of CPU cores, or
+threads, for each parallel worker. Each host is listed
+\code{n \%/\% threadsPerWorker} times, where \code{n} is the number of CPUs
+allotted on that host. Passed as-is to \code{\link[=availableCores]{availableCores()}}.}
 
 \item{\ldots}{Additional named arguments pass to \code{\link[=availableCores]{availableCores()}}.}
 }

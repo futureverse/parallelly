@@ -14,6 +14,11 @@
 #'
 #' @param default The default set of workers.
 #'
+#' @param threadsPerWorker (positive integer) Number of CPU cores, or
+#' threads, for each parallel worker. Each host is listed
+#' `n %/% threadsPerWorker` times, where `n` is the number of CPUs
+#' allotted on that host. Passed as-is to [availableCores()].
+#'
 #' @param which A character specifying which set / sets to return.
 #' If `"auto"` (default), the first non-empty set found.
 #' If `"min"`, the minimum value is returned.
@@ -158,7 +163,7 @@
 #'
 #' @importFrom utils file_test
 #' @export
-availableWorkers <- function(constraints = NULL, methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = getOption2("parallelly.localhost.hostname", "localhost"), which = c("auto", "min", "max", "all"), ...) {
+availableWorkers <- function(constraints = NULL, methods = getOption2("parallelly.availableWorkers.methods", c("mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "custom", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system", "fallback")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = getOption2("parallelly.localhost.hostname", "localhost"), which = c("auto", "min", "max", "all"), threadsPerWorker = 1L, ...) {
   warn_future_reexport_deprecation("availableWorkers")
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
@@ -174,6 +179,10 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
   }
 
   which <- match.arg(which, choices = c("auto", "min", "max", "all"))
+  stop_if_not(length(threadsPerWorker) == 1L, is.numeric(threadsPerWorker),
+              is.finite(threadsPerWorker), threadsPerWorker >= 1L,
+              threadsPerWorker <= .Machine$integer.max)
+  threadsPerWorker <- as.integer(threadsPerWorker)
   stop_if_not(is.character(default), length(default) >= 1, !anyNA(default))
 
   methods_localhost <- c("BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "mc.cores", "mc.cores+1", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "/proc/self/status", "system")
@@ -187,7 +196,7 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
   }
 
   ## Default is to use the current machine
-  ncores <- availableCores(constraints = constraints, methods = methods, na.rm = FALSE, logical = logical, which = "all", ...)
+  ncores <- availableCores(constraints = constraints, methods = methods, na.rm = FALSE, logical = logical, which = "all", threadsPerWorker = threadsPerWorker, ...)
 
   localhost_hostname <- getOption2("parallelly.localhost.hostname", "localhost")
   workers <- lapply(ncores, FUN = function(n) {
@@ -237,6 +246,17 @@ availableWorkers <- function(constraints = NULL, methods = getOption2("parallell
 
     ## Drop missing values?
     if (na.rm) w <- w[!is.na(w)]
+
+    if (threadsPerWorker > 1L && length(w) > 0L) {
+      ## Keep 'n %/% threadsPerWorker' of the 'n' entries for each hostname.
+      ## Preserve the order in which the hosts first appear.
+      hosts <- unique(w)
+      counts <- tabulate(match(w, hosts), nbins = length(hosts))
+      w2 <- rep(hosts, times = counts %/% threadsPerWorker)
+      ## Keep at least one worker
+      if (length(w2) == 0L) w2 <- w[1L]
+      w <- w2
+    }
 
     workers[[method]] <- w
   }

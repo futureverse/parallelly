@@ -652,4 +652,33 @@ options(oopts)
 message("*** availableWorkers(methods.excludes) ... done")
 
 
+message("*** availableWorkers(threadsPerWorker) ...")
+
+## Localhost
+options(parallelly.availableCores.system = 8L)
+options(parallelly.availableCores.methods = "system")
+options(parallelly.availableWorkers.methods = "system")
+stopifnot(length(availableWorkers()) == 8L)
+stopifnot(length(availableWorkers(threadsPerWorker = 2L)) == 4L)
+stopifnot(length(availableWorkers(threadsPerWorker = 100L)) == 1L)
+options(parallelly.availableCores.system = NULL)
+options(parallelly.availableCores.methods = NULL)
+options(parallelly.availableWorkers.methods = NULL)
+
+## Multiple hosts
+workers <- c("n1", "n1", "n1", "n1", "n2", "n2", "n3")
+
+## Custom workers
+options(parallelly.availableWorkers.custom = function() workers)
+options(parallelly.availableWorkers.methods = "custom")
+stopifnot(identical(availableWorkers(threadsPerWorker = 2L), c("n1", "n1", "n2")))
+options(parallelly.availableWorkers.custom = NULL)
+options(parallelly.availableWorkers.methods = NULL)
+
+res <- tryCatch(availableWorkers(threadsPerWorker = 0L), error = identity)
+stopifnot(inherits(res, "error"))
+
+message("*** availableWorkers(threadsPerWorker) ... DONE")
+
+
 message("*** availableWorkers() ... DONE")
