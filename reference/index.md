@@ -57,6 +57,7 @@
   [`parallelly.availableCores.min`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
   [`parallelly.availableCores.omit`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
   [`parallelly.availableCores.system`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
+  [`parallelly.availableCores.threadsPerWorker`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
   [`parallelly.availableWorkers.custom`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
   [`parallelly.availableWorkers.methods`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)
   [`parallelly.availableWorkers.methods.excludes`](https://parallelly.futureverse.org/reference/zzz-parallelly.options.md)

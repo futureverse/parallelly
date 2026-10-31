@@ -78,6 +78,15 @@ and
   single-core environment. If this is limit is applied, the names of the
   returned value are appended with an asterisk (`*`). (Default: `1L`)
 
+- `parallelly.availableCores.threadsPerWorker`::
+
+  (integer; positive) The default number of CPU cores (threads) to
+  reserve for each parallel worker, used by
+  [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+  and
+  [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md).
+  (Default: `1L`)
+
 - `parallelly.availableCores.fraction`::
 
   (numeric; in `[0,1]`) The default fraction of cores to keep.

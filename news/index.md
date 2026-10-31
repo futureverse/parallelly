@@ -18,6 +18,16 @@
 
 ### New Features
 
+- [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
+  gained argument `threadsPerWorker` to control the amount of
+  multi-threading per parallel worker. For example, with 8 allotted
+  CPUs, `nworkers <- availableCores(threadsPerWorker = 2)` can be used
+  to set up 4 parallel workers each running 2 threads. Similarly,
+  [`availableWorkers()`](https://parallelly.futureverse.org/reference/availableWorkers.md)
+  gained `threadsPerWorker`, which lists each host
+  `n %/% threadsPerWorker` times. The default is controlled by R option
+  `parallelly.availableCores.threadsPerWorker`.
+
 - Add support for the HTCondor job scheduler to
   [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md)
   and

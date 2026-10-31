@@ -16,6 +16,7 @@ availableWorkers(
   logical = getOption2("parallelly.availableCores.logical", TRUE),
   default = getOption2("parallelly.localhost.hostname", "localhost"),
   which = c("auto", "min", "max", "all"),
+  threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L),
   ...
 )
 ```
@@ -52,6 +53,13 @@ availableWorkers(
   (default), the first non-empty set found. If `"min"`, the minimum
   value is returned. If `"max"`, the maximum value is returned (be
   careful!) If `"all"`, all values are returned.
+
+- threadsPerWorker:
+
+  (positive integer) Number of CPU cores, or threads, for each parallel
+  worker. Each host is listed `n %/% threadsPerWorker` times, where `n`
+  is the number of CPUs allotted on that host. Passed as-is to
+  [`availableCores()`](https://parallelly.futureverse.org/reference/availableCores.md).
 
 - ...:
 
