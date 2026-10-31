@@ -1091,24 +1091,28 @@ message("*** availableCores(max, which = 'all') ... DONE")
 
 message("*** availableCores(threadsPerWorker) ...")
 
-options(parallelly.availableCores.system = 8L)
+options(parallelly.availableCores.system = 12L)
 options(parallelly.availableCores.methods = "system")
 
-stopifnot(identical(availableCores(), c(system = 8L)))
-stopifnot(identical(availableCores(threadsPerWorker = 1L), c(system = 8L)))
-stopifnot(identical(availableCores(threadsPerWorker = 2L), c(system = 4L)))
-stopifnot(identical(availableCores(threadsPerWorker = 3L), c(system = 2L)))
+env <- environment(parallelly:::detectCores)
+env$cache <- list(NULL, NULL)
+
+stopifnot(identical(availableCores(), c(system = 12L)))
+stopifnot(identical(availableCores(threadsPerWorker = 1L), c(system = 12L)))
+stopifnot(identical(availableCores(threadsPerWorker = 2L), c(system = 6L)))
+stopifnot(identical(availableCores(threadsPerWorker = 3L), c(system = 4L)))
+
 
 ## At least one worker
 stopifnot(identical(availableCores(threadsPerWorker = 100L), c(system = 1L)))
 
 ## Applied before 'omit' and 'fraction'
-stopifnot(identical(availableCores(threadsPerWorker = 2L, omit = 1L), c(system = 3L)))
-stopifnot(identical(availableCores(threadsPerWorker = 2L, fraction = 0.5), c(system = 2L)))
+stopifnot(identical(availableCores(threadsPerWorker = 2L, omit = 1L), c(system = 5L)))
+stopifnot(identical(availableCores(threadsPerWorker = 2L, fraction = 0.5), c(system = 3L)))
 
 ## Via option
 options(parallelly.availableCores.threadsPerWorker = 4L)
-stopifnot(identical(availableCores(), c(system = 2L)))
+stopifnot(identical(availableCores(), c(system = 3L)))
 options(parallelly.availableCores.threadsPerWorker = NULL)
 
 ## Invalid values
