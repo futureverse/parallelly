@@ -28,16 +28,16 @@
 #' @param default The default number of cores to return if no non-missing
 #' settings are available.
 #'
-#' @param which A character specifying which settings to return.
-#' If `"min"` (default), the minimum value is returned.
-#' If `"max"`, the maximum value is returned (be careful!)
-#' If `"all"`, all values are returned.
-#'
 #' @param threadsPerWorker (positive integer) Number of CPU cores, or
 #' threads, to reserve for each parallel worker. The number of cores is
 #' divided by this number, rounding down, with a minimum of one.
 #' Applied before `fraction` and `omit`. The default is one, which
 #' means one worker per CPU core.
+#'
+#' @param which A character specifying which settings to return.
+#' If `"min"` (default), the minimum value is returned.
+#' If `"max"`, the maximum value is returned (be careful!)
+#' If `"all"`, all values are returned.
 #'
 #' @param fraction (numeric; in (0,1]) Fraction of cores to keep.
 #' Applied before `omit`.
@@ -324,7 +324,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @export
-availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), which = c("min", "max", "all"), threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
+availableCores <- function(constraints = NULL, methods = getOption2("parallelly.availableCores.methods", c("system", "/proc/self/status", "cgroups.cpuset", "cgroups.cpuquota", "cgroups2.cpuset.cpus", "cgroups2.cpuset.cpus.effective", "cgroups2.cpu.max", "nproc", "mc.cores", "BiocParallel", "_R_CHECK_LIMIT_CORES_", "Bioconductor", "LSF", "PJM", "PBS", "SGE", "Slurm", "HTCondor", "fallback", "custom")), na.rm = TRUE, logical = getOption2("parallelly.availableCores.logical", TRUE), default = c(current = 1L), threadsPerWorker = getOption2("parallelly.availableCores.threadsPerWorker", 1L), which = c("min", "max", "all"), fraction = getOption2("parallelly.availableCores.fraction", 1.0), omit = getOption2("parallelly.availableCores.omit", 0L), max = getOption2("parallelly.availableCores.max", Inf)) {
   warn_future_reexport_deprecation("availableCores")
   stop_if_not(
     is.null(constraints) || is.character(constraints), !anyNA(constraints)
