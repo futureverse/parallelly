@@ -52,7 +52,14 @@ pid_exists <- local({
         ##  validity of pid." [1]
         res <- pskill(pid, signal = 0L)
         if (debug) mdebugf("Call: tools::pskill(%s, signal = 0L): %s", pid, res)
-        as.logical(res)
+        res <- as.logical(res)
+        ## A terminated process may still hang around as a "zombie" process.
+        ## We should consider zombie processes as non-existing.
+        if (isTRUE(res) && is_zombie_process(pid)) {
+          if (debug) mdebugf("Process %s is a zombie process", pid)
+          res <- FALSE
+        }
+        res
       }, error = function(ex) NA)
     }
   } else {
@@ -266,3 +273,16 @@ pid_kill <- function(pid, wait = 0.5, timeout = 30, debug = TRUE) {
     !isTRUE(pid_exists(pid))
   }, error = function(ex) NA)
 }
+
+## Is the process a zombie process? Only known on Linux (via /proc)
+is_zombie_process <- function(pid) {
+  file <- file.path("/proc", pid, "stat")
+  if (!utils::file_test("-f", file)) return(FALSE)
+  tryCatch({
+    stat <- readLines(file, n = 1L, warn = FALSE)
+    ## Format: 'pid (comm) state ...', where 'comm' may contain ')'
+    state <- sub("^.*\\) ([A-Za-z]).*$", "\\1", stat)
+    identical(state, "Z")
+  }, error = function(ex) FALSE)
+}
+

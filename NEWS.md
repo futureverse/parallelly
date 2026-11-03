@@ -1,6 +1,10 @@
 # Version (development version)
 
- * ...
+## Bug Fixes
+
+ * `isNodeAlive()` now reports zombie processes on Linux as not alive.
+   This scenario happens on R-universe, which tests the package in a
+   Linux container.
 
 
 # Version 1.50.0 [2026-10-31]
