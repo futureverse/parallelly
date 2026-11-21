@@ -250,14 +250,7 @@ installed in R as:
 
 ### Pre-release version
 
-To install the pre-release version that is available in Git branch
-`develop` on GitHub, use:
+To install the pre-release version, use:
 
 \
-`remotes``::`[`install_github`](https://remotes.r-lib.org/reference/install_github.html)`(``"futureverse/parallelly"``, ref``=``"develop"``)`
-
-This will install the package from source. Because of this and because
-this package also compiles native code, Windows users need to have
-[Rtools](https://cran.r-project.org/bin/windows/Rtools/) installed and
-macOS users need to have [Xcode](https://developer.apple.com/xcode/)
-installed.
+[`install.packages`](https://rdrr.io/r/utils/install.packages.html)`(``"parallelly"``, repos ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"https://futureverse-devel.r-universe.dev"``, ``"https://cloud.r-project.org"``)``)`
