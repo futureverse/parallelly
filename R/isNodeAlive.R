@@ -42,6 +42,11 @@ isNodeAlive <- function(x, ...) UseMethod("isNodeAlive")
 isNodeAlive.default <- function(x, ...) NA
 
 #' @export
+isNodeAlive.SOCK0node <- function(x, ...) {
+  isConnectionValid(x$con)
+}  
+
+#' @export
 isNodeAlive.RichSOCKnode <- function(x, timeout = 0.0, ...) {
   debug <- isTRUE(getOption("parallelly.debug"))
   if (debug) {
